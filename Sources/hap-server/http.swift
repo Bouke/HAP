@@ -128,7 +128,7 @@ class Response: Message {
         }
     }
 
-    convenience init(status: Status, body: String?, mimeType: String = "text/html") {
+    convenience init(status: Status, body: String? = nil, mimeType: String = "text/html") {
         self.init(statusCode: status.rawValue, statusDescription: status.description, httpVersion: kCFHTTPVersion1_1 as String)
         if let data = body?.data(using: .utf8) {
             headers["Content-Type"] = "\(mimeType); charset=utf8"
@@ -235,6 +235,26 @@ class Connection: NSObject, StreamDelegate {
 
     deinit {
         close()
+    }
+}
+
+class Router {
+    typealias Route = (path: String, application: Application)
+
+    let routes: [Route]
+    init(routes: [Route]) {
+        self.routes = routes
+    }
+
+    var application: Application {
+        return { request in
+            for route in self.routes {
+                if route.path == request.requestURL?.path {
+                    return route.application(request)
+                }
+            }
+            return Response(status: .NotFound)
+        }
     }
 }
 

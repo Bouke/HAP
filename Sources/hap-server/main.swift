@@ -21,11 +21,25 @@ func identifier() -> String {
     return (1...6).map({ _ in String(arc4random() & 255, radix: 16, uppercase: false) }).joined(separator: ":")
 }
 
-func application(request: Request) -> Response {
+func root(request: Request) -> Response {
     return Response(status: .OK, body: "Hello, <b>Gib</b>")
 }
 
-let delegate = Delegate(application: application)
+func identify(request: Request) -> Response {
+    return Response(status: .OK, body: "Got identified")
+}
+
+func pairSetup(request: Request) -> Response {
+    return Response(status: .OK, body: "Setup...")
+}
+
+let router = Router(routes: [
+    ("/", root),
+    ("/identify", identify),
+    ("/pair-setup", pairSetup),
+])
+
+let delegate = Delegate(application: router.application)
 
 let service = NetService(domain: "local.", type: "_hap._tcp.", name: "Swift's Switch", port: 8000)
 let config: [String: Data] = [
