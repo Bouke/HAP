@@ -8,19 +8,136 @@
 
 import Foundation
 
-struct Request {
-    var method: String
-    var path: String
-    var version: String
-    var headers: [String: String]
-    var body: String?
+class Message {
+    internal var boxed: CFHTTPMessage
+    let headers: Headers
+
+    internal init(boxed: CFHTTPMessage) {
+        self.boxed = boxed
+        headers = Headers(boxed: boxed)
+    }
+
+    var isHeaderComplete: Bool {
+        return CFHTTPMessageIsHeaderComplete(boxed)
+    }
+
+    var isRequest: Bool {
+        return CFHTTPMessageIsRequest(boxed)
+    }
+
+    var body: Data? {
+        get {
+            return CFHTTPMessageCopyBody(boxed)?.takeRetainedValue() as Data?
+        }
+        set {
+            CFHTTPMessageSetBody(boxed, newValue ?? Data())
+        }
+    }
+
+    func serialized() -> Data? {
+        return CFHTTPMessageCopySerializedMessage(boxed)?.takeRetainedValue() as Data?
+    }
+
+    var httpVersion: String {
+        return CFHTTPMessageCopyVersion(boxed).takeRetainedValue() as String
+    }
+
+    class Headers {
+        typealias Key = String
+        typealias Value = String
+
+        internal var boxed: CFHTTPMessage
+
+        init(boxed: CFHTTPMessage) {
+            self.boxed = boxed
+        }
+
+        subscript(key: Key) -> Value? {
+            get {
+                return CFHTTPMessageCopyHeaderFieldValue(boxed, key)?.takeRetainedValue() as String?
+            }
+            set {
+                CFHTTPMessageSetHeaderFieldValue(boxed, key, newValue)
+            }
+        }
+
+        // replace with Collection protocol implementation
+        func copy() -> [Key: Value] {
+            let cf = CFHTTPMessageCopyAllHeaderFields(self.boxed)?.takeRetainedValue() as Dictionary?
+            return cf as! [Key: Value]
+        }
+    }
 }
 
-struct Response {
-    var status: String
-    var headers: [String: String]
-    var body: String?
+extension Message: CustomDebugStringConvertible {
+    var debugDescription: String {
+        guard let serialized = serialized() else { return "Message (could not be serialized)" }
+        return String(data: serialized, encoding: .utf8) ?? "Message (could not be serialized)"
+    }
 }
+
+
+class Request: Message {
+    init() {
+        super.init(boxed: CFHTTPMessageCreateEmpty(nil, true).takeRetainedValue())
+    }
+
+    func append(data: Data) -> Bool {
+        return data.withUnsafeBytes {
+            return CFHTTPMessageAppendBytes(boxed, $0, data.count)
+        }
+    }
+
+    var requestMethod: String? {
+        return CFHTTPMessageCopyRequestMethod(boxed)?.takeRetainedValue() as String?
+    }
+
+    var requestURL: URL? {
+        return CFHTTPMessageCopyRequestURL(boxed)?.takeRetainedValue() as URL?
+    }
+}
+
+
+class Response: Message {
+    init(statusCode: Int, statusDescription: String, httpVersion: String) {
+        super.init(boxed: CFHTTPMessageCreateResponse(nil, statusCode, statusDescription, httpVersion).takeRetainedValue())
+    }
+
+    enum Status: Int, CustomDebugStringConvertible {
+        case OK = 200, Created = 201, Accepted = 202
+        case MovedPermanently = 301
+        case BadRequest = 400, Unauthorized = 401, Forbidden = 403, NotFound = 404
+        case InternalServerError = 500
+
+        var description: String {
+            switch self {
+            case .OK: return "OK"
+            case .Created: return "Created"
+            case .Accepted: return "Accepted"
+            case .MovedPermanently: return "Moved Permanently"
+            case .BadRequest: return "Bad Request"
+            case .Unauthorized: return "Unauthorized"
+            case .Forbidden: return "Forbidden"
+            case .NotFound: return "Not Found"
+            case .InternalServerError: return "Internal Server Error"
+            }
+        }
+
+        var debugDescription: String {
+            return "\(rawValue) (\(description))"
+        }
+    }
+
+    convenience init(status: Status, body: String?, mimeType: String = "text/html") {
+        self.init(statusCode: status.rawValue, statusDescription: status.description, httpVersion: kCFHTTPVersion1_1 as String)
+        if let data = body?.data(using: .utf8) {
+            headers["Content-Type"] = "\(mimeType); charset=utf8"
+            headers["Content-Length"] = "\(data.count)"
+            self.body = data
+        }
+    }
+}
+
 
 typealias Application = (Request) -> Response
 
@@ -31,119 +148,87 @@ class Server: NSObject, StreamDelegate {
         self.application = application
     }
 
-    var connections = [Stream: Connection]()
+    var connections: [Connection] = []
 
     func accept(inputStream: InputStream, outputStream: NSOutputStream) {
-        connections[inputStream] = Connection(inputStream: inputStream, outputStream: outputStream)
-        inputStream.schedule(in: RunLoop.main(), forMode: RunLoopMode.defaultRunLoopMode)
-        inputStream.open()
-        inputStream.delegate = self
+        connections.append(Connection(server: self, inputStream: inputStream, outputStream: outputStream))
     }
 
-    func stream(_ aStream: Stream, handle eventCode: Stream.Event) {
-        let inputStream = aStream as! InputStream
-        let connection = connections[inputStream]!
-
-        switch eventCode {
-        case Stream.Event.openCompleted: print("openCompleted")
-        case Stream.Event.hasBytesAvailable:
-            if !connection.read() {
-                connections[inputStream] = nil
-            }
-            print(connection.state)
-            if connection.state == .response {
-                let response = application(connection.request!)
-                print(response)
-                connection.outputStream.open()
-                print(connection.outputStream.write(response.status, maxLength: response.status.utf8.count))
-                connection.close()
-            }
-        case Stream.Event.endEncountered: print("endEncountered")
-        default: print(eventCode)
+    func forget(connection: Connection) {
+        if let index = connections.index(of: connection) {
+            connections.remove(at: index)
         }
     }
 }
 
 
-class Connection {
-    var inputStream: InputStream
-    var outputStream: NSOutputStream
-    var request: Request?
-    var inputBuffer = Data()
-    var state = State.headers
+class Connection: NSObject, StreamDelegate {
+    weak var server: Server?
 
-    enum State {
-        case headers
-        case body
-        case response
-    }
+    let inputStream: InputStream
+    let outputStream: NSOutputStream
+    let request: Request
+    var response: Response?
 
-    init(inputStream: InputStream, outputStream: NSOutputStream) {
+    init(server: Server, inputStream: InputStream, outputStream: NSOutputStream) {
+        self.server = server
         self.inputStream = inputStream
         self.outputStream = outputStream
+        self.request = Request()
+        super.init()
+        open()
     }
 
-    func read() -> Bool {
-        var buffer = [UInt8](repeating: 0, count: 1024)
+    func open() {
+        inputStream.delegate = self
+        inputStream.schedule(in: RunLoop.main(), forMode: .defaultRunLoopMode)
+        inputStream.open()
+    }
 
-        switch inputStream.read(&buffer, maxLength: buffer.count) {
-        case -1:
-            return false
-        case 0:
-            return true
-        case let count:
-            inputBuffer.append(&buffer, count: count)
+    func stream(_ aStream: Stream, handle eventCode: Stream.Event) {
+        switch (aStream, eventCode) {
+        case (inputStream, Stream.Event.openCompleted): break
 
-            switch state {
-            case .headers: readHeaders()
-            case .body: abort()
-            case .response: abort()
+        case (inputStream, Stream.Event.hasBytesAvailable):
+            var buffer = Data(capacity: 1024)!
+            buffer.count = 1024
+            buffer.count = buffer.withUnsafeMutableBytes {
+                inputStream.read($0, maxLength: 1024)
+            }
+            precondition(request.append(data: buffer))
+
+            if request.isHeaderComplete {
+                response = server?.application(request)
+                print(response)
+
+                outputStream.delegate = self
+                outputStream.schedule(in: .main(), forMode: .defaultRunLoopMode)
+                outputStream.open()
             }
 
-            if state == .response {
+        case (inputStream, Stream.Event.endEncountered): break
 
+
+        case (outputStream, Stream.Event.openCompleted): break
+
+        case (outputStream, Stream.Event.hasSpaceAvailable):
+            guard let data = response?.serialized() else {
+                abort()
+            }
+            let written = data.withUnsafeBytes {
+                outputStream.write($0, maxLength: data.count)
             }
 
-            print(request)
-            return true
+            precondition(written == data.count)
+            close()
+
+        default:
+            close()
         }
-    }
-
-    func readHeaders() {
-        var from = inputBuffer.startIndex
-        var colon: Data.Index?
-        for pos in inputBuffer.indices {
-            switch inputBuffer[pos] {
-            case 13 where inputBuffer[inputBuffer.index(after: pos)] == 10:
-                if from == pos {
-                    _ = inputBuffer.dropFirst(pos)
-                    parseHeaders()
-                    return
-                    // end of headers
-                } else if request == nil {
-                    let line = String(bytes: inputBuffer[from..<pos], encoding: .utf8)!.components(separatedBy: " ")
-                    request = Request(method: line[0], path: line[1], version: line[2], headers: [:], body: nil)
-                } else {
-                    guard let key = String(bytes: inputBuffer[from..<colon!], encoding: .utf8)?.lowercased(), value = String(bytes: inputBuffer[inputBuffer.index(colon!, offsetBy: 2)..<pos], encoding: .utf8) else {
-                        abort()
-                    }
-                    request!.headers[key] = value
-                }
-                from = inputBuffer.index(pos, offsetBy: 2)
-                colon = nil
-            case 58 where colon == nil:
-                colon = pos
-            default: break
-            }
-        }
-    }
-
-    func parseHeaders() {
-        print(request?.headers["content-length"])
-        state = .response
     }
 
     func close() {
+        server?.forget(connection: self)
         inputStream.close()
         outputStream.close()
     }

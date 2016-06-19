@@ -22,7 +22,7 @@ func identifier() -> String {
 }
 
 func application(request: Request) -> Response {
-    return Response(status: "200", headers: [:], body: "Hello, world")
+    return Response(status: .OK, body: "Hello, <b>Gib</b>")
 }
 
 let delegate = Delegate(application: application)
