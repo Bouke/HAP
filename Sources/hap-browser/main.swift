@@ -32,12 +32,12 @@ class Delegate: NSObject, NetServiceBrowserDelegate {
 
 let delegate: NetServiceBrowserDelegate = Delegate()
 let browser = NetServiceBrowser()
-browser.schedule(in: RunLoop.current(), forMode: RunLoopMode.defaultRunLoopMode)
+browser.schedule(in: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
 browser.delegate = delegate
 browser.searchForServices(ofType: "_hap._tcp.", inDomain: "local.")
 
 withExtendedLifetime((delegate, browser)) {
-    RunLoop.current().run()
+    RunLoop.current.run()
 }
 
 //print(delegate)
