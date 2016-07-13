@@ -62,27 +62,40 @@ extension Bignum: CustomStringConvertible {
 
 internal let ctx = BN_CTX_new()
 
+public func operation(_ block: (result: Bignum) -> Int32) -> Bignum {
+    let result = Bignum()
+    precondition(block(result: result) == 1)
+    return result
+}
+
+/// Returns: (a ** b) % N
 public func mod_exp(_ a: Bignum, _ p: Bignum, _ m: Bignum) -> Bignum {
-    let r = BN_new()
-    BN_mod_exp(r, a.ctx, p.ctx, m.ctx, ctx)
-//    BN_CTX_free(ctx)
-    return Bignum(ctx: r!)
+    return operation {
+        BN_mod_exp($0.ctx, a.ctx, p.ctx, m.ctx, ctx)
+    }
 }
 
 public func * (lhs: Bignum, rhs: Bignum) -> Bignum {
-    let r = BN_new()
-    BN_mul(r, lhs.ctx, rhs.ctx, ctx)
-    return Bignum(ctx: r!)
+    return operation {
+        BN_mul($0.ctx, lhs.ctx, rhs.ctx, ctx)
+    }
 }
 
 public func + (lhs: Bignum, rhs: Bignum) -> Bignum {
-    let r = BN_new()
-    BN_add(r, lhs.ctx, rhs.ctx)
-    return Bignum(ctx: r!)
+    return operation {
+        BN_add($0.ctx, lhs.ctx, rhs.ctx)
+    }
 }
 
 public func - (lhs: Bignum, rhs: Bignum) -> Bignum {
-    let r = BN_new()
-    BN_sub(r, lhs.ctx, rhs.ctx)
-    return Bignum(ctx: r!)
+    return operation {
+        BN_sub($0.ctx, lhs.ctx, rhs.ctx)
+    }
+}
+
+/// Returns: (a + b) % N
+public func mod_add(_ a: Bignum, _ b: Bignum, _ m: Bignum) -> Bignum {
+    return operation {
+        BN_mod_add($0.ctx, a.ctx, b.ctx, m.ctx, ctx)
+    }
 }
