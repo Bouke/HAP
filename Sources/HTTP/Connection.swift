@@ -6,7 +6,7 @@ class Connection: NSObject, StreamDelegate {
 
     let inputStream: InputStream
     let outputStream: NSOutputStream
-    let request: Request
+    var request: Request
     var response: Response?
 
     init(server: Server, inputStream: InputStream, outputStream: NSOutputStream) {
@@ -20,13 +20,17 @@ class Connection: NSObject, StreamDelegate {
 
     func open() {
         inputStream.delegate = self
-        inputStream.schedule(in: RunLoop.main, forMode: .defaultRunLoopMode)
+        outputStream.delegate = self
+
         inputStream.open()
+        outputStream.open()
+
+        inputStream.schedule(in: RunLoop.main, forMode: .defaultRunLoopMode)
     }
 
     func stream(_ aStream: Stream, handle eventCode: Stream.Event) {
         switch (aStream, eventCode) {
-        case (inputStream, Stream.Event.openCompleted): break
+        case (_, Stream.Event.openCompleted): break
 
         case (inputStream, Stream.Event.hasBytesAvailable):
             var buffer = Data(capacity: 1024)
@@ -38,34 +42,40 @@ class Connection: NSObject, StreamDelegate {
 
             if request.isHeaderComplete {
                 response = server?.application(request)
+                response!.headers["Connection"] = "Keep-Alive"
+                request = Request()
 
-                outputStream.delegate = self
+                print("response ready, waiting to write...")
+//                outputStream.write("", maxLength: 0)
+                inputStream.remove(from: .main, forMode: .defaultRunLoopMode)
                 outputStream.schedule(in: .main, forMode: .defaultRunLoopMode)
-                outputStream.open()
             }
-
-        case (inputStream, Stream.Event.endEncountered): break
-
-
-        case (outputStream, Stream.Event.openCompleted): break
 
         case (outputStream, Stream.Event.hasSpaceAvailable):
             guard let data = response?.serialized() else {
-                abort()
+                print("nothing to write...")
+                return
             }
+            print(response!)
             let written = data.withUnsafeBytes {
                 outputStream.write($0, maxLength: data.count)
             }
+            response = nil
 
             precondition(written == data.count)
+
+            outputStream.remove(from: .main, forMode: .defaultRunLoopMode)
+            inputStream.schedule(in: .main, forMode: .defaultRunLoopMode)
+
+        case (_, Stream.Event.endEncountered), (_, Stream.Event.errorOccurred):
             close()
 
-        default:
-            close()
+        default: break
         }
     }
 
     func close() {
+        print("closing...")
         server?.forget(connection: self)
         inputStream.close()
         outputStream.close()
