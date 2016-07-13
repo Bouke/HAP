@@ -35,7 +35,7 @@ public class Server {
         s = Bignum(data: salt)
         self.username = username
         k = Bignum(data: sha1(N.data + pad(g.data, to: N)))
-        B = k * v + mod_exp(g, b, N)
+        B = mod_add(k * v, mod_exp(g, b, N), N)
     }
 
     public func computeB() -> Data {
