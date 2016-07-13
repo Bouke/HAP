@@ -47,6 +47,7 @@ func decode(_ data: Data) -> TLV8 {
 func encode(_ data: TLV8) -> Data {
     var result = Data()
     func append(type: UInt8, value: Data.SubSequence) {
+        print(type, value.count)
         result.append(Data(bytes: [type, UInt8(value.count)] + value))
     }
 

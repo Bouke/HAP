@@ -66,9 +66,9 @@ public enum Group {
     }
 }
 
-public func createSaltedVerificationKey(username: String, password: String, salt: Data, group: Group) -> Data {
+public func createSaltedVerificationKey(username: String, password: String, salt: Data, group: Group, alg: HashAlgorithm) -> Data {
     // x = SHA1(s | SHA1(I | ":" | P))
-    let x = Bignum(data: sha1(salt + sha1("\(username):\(password)".data(using: .utf8)!)))
+    let x = Bignum(data: alg.hash(salt + alg.hash("\(username):\(password)".data(using: .utf8)!)))
 
     // v = g^x % N
     let v = mod_exp(group.g, x, group.N)

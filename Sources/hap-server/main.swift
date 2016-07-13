@@ -71,9 +71,9 @@ let group = Group.N3072
  * authentication process.
  */
 //let (salt, verificationKey) = try! createSaltedVerificationKey(algorithm: SRP_SHA512, ngType: SRP_NG_3072, username: username, password: password)
-let verificationKey = createSaltedVerificationKey(username: username, password: password, salt: salt, group: group)
+let verificationKey = createSaltedVerificationKey(username: username, password: password, salt: salt, group: group, alg: .SHA512)
 
-let server = Server(group: group, salt: salt, username: username, verificationKey: verificationKey, secret: generateRandomBytes(count: 32))
+let server = Server(group: group, alg: .SHA512, salt: salt, username: username, verificationKey: verificationKey, secret: generateRandomBytes(count: 32))
 
 let B = server.computeB()
 
@@ -142,6 +142,27 @@ func pairSetup(request: Request) -> Response {
         response.headers["Content-Type"] = "application/pairing+tlv8"
         response.body = encode(result)
         return response
+
+    case .verifyRequest?:
+        let A = data[PairTag.publicKey.rawValue]
+        let M1 = data[PairTag.proof.rawValue]
+
+        print(A!.count, A!)
+        print(M1!.count, M1!)
+
+        server.setA(A!)
+        let H_AMK = try! server.verifySession(clientM1: M1!)
+
+        let result: TLV8 = [
+            PairTag.sequence.rawValue: Data(bytes: [PairSetupStep.verifyResponse.rawValue]),
+            PairTag.proof.rawValue: H_AMK
+        ]
+
+        let response = Response(status: .OK)
+        response.headers["Content-Type"] = "application/pairing+tlv8"
+        response.body = encode(result)
+        return response
+
     case let step: print(request); print(step)
     }
 
