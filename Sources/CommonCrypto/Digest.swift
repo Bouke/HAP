@@ -6,11 +6,10 @@
 //
 //
 
-import CommonCrypto
+import CCommonCrypto
 import Foundation
 
-
-func sha1(data: Data) -> Data {
+public func sha1(_ data: Data) -> Data {
     var digest = Data(count: Int(CC_SHA1_DIGEST_LENGTH))
     _ = data.withUnsafeBytes { pData in
         digest.withUnsafeMutableBytes { pDigest in
@@ -20,8 +19,7 @@ func sha1(data: Data) -> Data {
     return digest
 }
 
-
-func sha512(data: Data) -> Data {
+public func sha512(_ data: Data) -> Data {
     var digest = Data(count: Int(CC_SHA512_DIGEST_LENGTH))
     _ = data.withUnsafeBytes { pData in
         digest.withUnsafeMutableBytes { pDigest in

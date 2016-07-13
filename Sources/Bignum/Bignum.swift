@@ -16,17 +16,17 @@ public class Bignum {
         ctx = BN_new()
     }
 
-    init(ctx: UnsafeMutablePointer<BIGNUM>) {
+    public init(ctx: UnsafeMutablePointer<BIGNUM>) {
         self.ctx = ctx
     }
 
-    init(hex: String) {
+    public init(hex: String) {
         var ctx: UnsafeMutablePointer<BIGNUM>? = nil
         BN_hex2bn(&ctx, hex)
         self.ctx = ctx!
     }
 
-    convenience init(data: Data) {
+    public convenience init(data: Data) {
         self.init()
         _ = data.withUnsafeBytes { pData in
             BN_bin2bn(pData, Int32(data.count), ctx)
@@ -37,7 +37,7 @@ public class Bignum {
         BN_free(ctx)
     }
 
-    var data: Data {
+    public var data: Data {
         var data = Data(count: Int((BN_num_bits(ctx) + 7) / 8))
         _ = data.withUnsafeMutableBytes { pData in
             BN_bn2bin(ctx, pData)
@@ -45,11 +45,11 @@ public class Bignum {
         return data
     }
 
-    var dec: String {
+    public var dec: String {
         return String(validatingUTF8: BN_bn2dec(ctx))!
     }
 
-    var hex: String {
+    public var hex: String {
         return String(validatingUTF8: BN_bn2hex(ctx))!
     }
 }
@@ -60,10 +60,29 @@ extension Bignum: CustomStringConvertible {
     }
 }
 
-func mod_exp(_ a: Bignum, _ p: Bignum, _ m: Bignum) -> Bignum {
-    let ctx = BN_CTX_new()
+internal let ctx = BN_CTX_new()
+
+public func mod_exp(_ a: Bignum, _ p: Bignum, _ m: Bignum) -> Bignum {
     let r = BN_new()
     BN_mod_exp(r, a.ctx, p.ctx, m.ctx, ctx)
-    BN_CTX_free(ctx)
+//    BN_CTX_free(ctx)
+    return Bignum(ctx: r!)
+}
+
+public func * (lhs: Bignum, rhs: Bignum) -> Bignum {
+    let r = BN_new()
+    BN_mul(r, lhs.ctx, rhs.ctx, ctx)
+    return Bignum(ctx: r!)
+}
+
+public func + (lhs: Bignum, rhs: Bignum) -> Bignum {
+    let r = BN_new()
+    BN_add(r, lhs.ctx, rhs.ctx)
+    return Bignum(ctx: r!)
+}
+
+public func - (lhs: Bignum, rhs: Bignum) -> Bignum {
+    let r = BN_new()
+    BN_sub(r, lhs.ctx, rhs.ctx)
     return Bignum(ctx: r!)
 }

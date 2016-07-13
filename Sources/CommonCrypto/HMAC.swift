@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import CommonCrypto
+import CCommonCrypto
 
 //func hash(key: Data, data: Data) -> Data {
 //    var HMAC = Data(count: Int(CC_SHA512_DIGEST_LENGTH))

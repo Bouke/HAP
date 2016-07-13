@@ -20,7 +20,7 @@ import Foundation
 
 typealias TLV8 = [UInt8: Data]
 
-func decode(data: Data) -> TLV8 {
+func decode(_ data: Data) -> TLV8 {
     var result = [UInt8: Data]()
     var index = data.startIndex
     while index < data.endIndex {
@@ -30,15 +30,21 @@ func decode(data: Data) -> TLV8 {
         let length = Int(data[index])
         index = data.index(after: index)
 
-        let to = data.index(index, offsetBy: length)
-        let value = data[index..<to]
-        result[type] = Data(bytes: Array(value))
-        index = to
+        let endIndex = data.index(index, offsetBy: length)
+        let value = data[index..<endIndex]
+
+        if let append = result[type] {
+            result[type] = append + Data(bytes: Array(value))
+        } else {
+            result[type] = Data(bytes: Array(value))
+        }
+
+        index = endIndex
     }
     return result
 }
 
-func encode(data: TLV8) -> Data {
+func encode(_ data: TLV8) -> Data {
     var result = Data()
     func append(type: UInt8, value: Data.SubSequence) {
         result.append(Data(bytes: [type, UInt8(value.count)] + value))

@@ -55,16 +55,15 @@ _ = client_secretkey.withUnsafeMutableBytes { secret in
 import CSRP
 import SRP
 
-let username = "Switch"
+let username = "Pair-Setup"
 let password = "001-02-003"
 
+import Bignum
 import CommonCrypto
 
-var salt = Data(count: 16)
-salt.withUnsafeMutableBytes { p in
-    randombytes_buf(p, salt.count)
-}
+var salt = generateRandomBytes(count: 16)
 
+let group = Group.N3072
 
 /* Create a salt+verification key for the user's password. The salt and
  * key need to be computed at the time the user's password is set and
@@ -72,27 +71,47 @@ salt.withUnsafeMutableBytes { p in
  * authentication process.
  */
 //let (salt, verificationKey) = try! createSaltedVerificationKey(algorithm: SRP_SHA512, ngType: SRP_NG_3072, username: username, password: password)
-let verificationKey = createSaltedVerificationKey(username: username, password: password, salt: salt)
+let verificationKey = createSaltedVerificationKey(username: username, password: password, salt: salt, group: group)
 
-/* Begin authentication process */
+let server = Server(group: group, salt: salt, username: username, verificationKey: verificationKey, secret: generateRandomBytes(count: 32))
+
+let B = server.computeB()
+
+// k = SHA1(N | PAD(g))
+//let k = sha1(group.N.data + group.g.data)
+
+// b is a random number that SHOULD be at least 256 bits in length
+//let b = Bignum(data: generateRandomBytes(count: 256))
+
+// B = k*v + g^b % N
+//let B = k(group) * Bignum(data: verificationKey) + mod_exp(group.g, b, group.N)
+
+//print(B)
+
+///* Begin authentication process */
 let user = User(algorithm: SRP_SHA1, ngType: SRP_NG_3072, username: username, password: password)
+//let client = Client(group: group, username: username, password: password, salt: salt, B: B)
 
 // User: generate A
+//let A = client.computeA()
 let (_, A) = try! user.startAuthentication()
-//print(A.count)
+server.setA(A)
 
-// User -> Host (username, A)
-let verifier = try! Verifier(algorithm: SRP_SHA1, ngType: SRP_NG_3072, username: username, salt: salt, verificationKey: verificationKey, A: A)
-//print(verifier.challenge.B.count)
-
+//// User -> Host (username, A)
+//let verifier = try! Verifier(algorithm: SRP_SHA1, ngType: SRP_NG_3072, username: username, salt: salt, verificationKey: verificationKey, A: A)
+////print(verifier.challenge.B.count)
+//
 // Host -> User: (bytes_s, bytes_B)
-let M = try! user.processChallenge(salt: verifier.challenge.salt, B: verifier.challenge.B)
+let M = try! user.processChallenge(salt: salt, B: B)
+//let M = client.M1
 
 // User -> Host: (bytes_M)
-let H_AMK = try! verifier.verifySession(user_M: M)
+//let H_AMK = try! verifier.verifySession(user_M: M)
+//let H_AMK = try! server.verifySession(clientM1: M)
 
-// Host -> User: (HAMK)
-try! user.verifySession(H_AMK: H_AMK)
+//// Host -> User: (HAMK)
+//try! user.verifySession(H_AMK: H_AMK)
+//try! client.verifySession(H_AMK: H_AMK)
 //print(user.isAuthenticated)
 //print(verifier.isAuthenticated)
 
@@ -108,7 +127,7 @@ try! user.verifySession(H_AMK: H_AMK)
 
 func pairSetup(request: Request) -> Response {
     guard let body = request.body else { return Response(status: .BadRequest) }
-    let data = decode(data: body)
+    let data = decode(body)
     print(request)
     print("input", data)
 
@@ -116,13 +135,12 @@ func pairSetup(request: Request) -> Response {
     case .startRequest?:
         let result: TLV8 = [
             PairTag.sequence.rawValue: Data(bytes: [PairSetupStep.startResponse.rawValue]),
-            PairTag.publicKey.rawValue: verifier.challenge.B,
+            PairTag.publicKey.rawValue: B,
             PairTag.salt.rawValue: salt,
         ]
         let response = Response(status: .OK)
         response.headers["Content-Type"] = "application/pairing+tlv8"
-        response.body = encode(data: result)
-        print(response)
+        response.body = encode(result)
         return response
     case let step: print(request); print(step)
     }
