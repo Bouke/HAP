@@ -1,39 +1,7 @@
-//
-//  SRP.swift
-//  HAP
-//
-//  Created by Bouke Haarsma on 30-06-16.
-//
-//
-
 import Foundation
-import CSRP
 import Bignum
 import CommonCrypto
 
-/**
-    Generate a salted verification key for the given username and password and return the tuple: (salt, verificationKey)
-    
-    - Parameters:
-        - algorithm: (Optional) which algorithm to use
-        - ngType: (Optional) which Number Generator (prime) to use
-        - username: the user's username
-        - password: the user's password
- 
-    - Returns: the tuple (salt, verificationKey)
- */
-//public func createSaltedVerificationKey(algorithm: SRP_HashAlgorithm = SRP_SHA1, ngType: SRP_NGType = SRP_NG_2048, username: String, password: String) throws -> (salt: Data, verificationKey: Data) {
-//    var bytes_s: UnsafePointer<UInt8>? = nil
-//    var len_s: Int32 = 16 // default to 16 bytes
-//    var bytes_v: UnsafePointer<UInt8>? = nil
-//    var len_v: Int32 = 0
-//    srp_create_salted_verification_key(algorithm, ngType, username, password, Int32(strlen(password)), &bytes_s, &len_s, &bytes_v, &len_v, nil, nil)
-//    guard bytes_s != nil && bytes_v != nil else { throw Error.authenticationFailed }
-//    return (
-//        Data(bytes: bytes_s!, count: Int(len_s)),
-//        Data(bytes: bytes_v!, count: Int(len_v))
-//    )
-//}
 
 public enum Group {
     case N2048
@@ -78,20 +46,8 @@ public enum Group {
 }
 
 public func createSaltedVerificationKey(username: String, password: String, salt: Data, group: Group = .N2048, alg: HashAlgorithm = .SHA1) -> Data {
-    // x = SHA1(s | SHA1(I | ":" | P))
-    let x = Bignum(data: alg.hash(salt + alg.hash("\(username):\(password)".data(using: .utf8)!)))
-
-    // v = g^x % N
-    let v = mod_exp(group.g, x, group.N)
-    return v.data
-}
-
-func pad(_ data: Data, to number: Bignum) -> Data {
-    return Data(repeating: 0, count: number.data.count - data.count) + data
-}
-
-func pad(_ data: Data, to size: Int) -> Data {
-    return Data(repeating: 0, count: size - data.count) + data
+    let x = calculate_x(alg: alg, salt: salt, username: username, password: password)
+    return calculate_v(group: group, x: x).data
 }
 
 func ^ (lhs: Data, rhs: Data) -> Data? {
@@ -103,15 +59,47 @@ func ^ (lhs: Data, rhs: Data) -> Data? {
     return result
 }
 
-func calculateM(group: Group = .N2048, alg: HashAlgorithm = .SHA1, username: String, salt: Data, A: Data, B: Data, K: Data) -> Data {
+// func pad(_ data: Data, to number: Bignum) -> Data {
+//     return Data(repeating: 0, count: number.data.count - data.count) + data
+// }
+
+func pad(_ data: Data, to size: Int) -> Data {
+    return Data(repeating: 0, count: size - data.count) + data
+}
+
+//u = H(PAD(A) | PAD(B))
+func calculate_u(group: Group, alg: HashAlgorithm, A: Data, B: Data) -> Bignum {
+    let H = alg.hash
+    return Bignum(data: H(pad(A, to: group.N.data.count) + pad(B, to: group.N.data.count)))
+}
+
+//M1 = H(H(N) XOR H(g) | H(I) | s | A | B | K)
+func calculate_M(group: Group, alg: HashAlgorithm, username: String, salt: Data, A: Data, B: Data, K: Data) -> Data {
     let H = alg.hash
     let HN_xor_Hg = (H(group.N.data) ^ H(group.g.data))!
     let HI = H(username.data(using: .utf8)!)
     return H(HN_xor_Hg + HI + salt + A + B + K)
 }
 
-//func k(_ group: Group) -> Bignum {
-//    let N = group.N.data
-//    let g = group.g.data
-//    return Bignum(data: sha1(data: N + Data(repeating: 0, count: N.count - g.count) + g))
-//}
+//HAMK = H(A | M | K)
+func calculate_HAMK(alg: HashAlgorithm, A: Data, M: Data, K: Data) -> Data {
+    let H = alg.hash
+    return H(A + M + K)
+}
+
+//k = H(N | PAD(g))
+func calculate_k(group: Group, alg: HashAlgorithm) -> Bignum {
+    let H = alg.hash
+    return Bignum(data: H(group.N.data + pad(group.g.data, to: group.N.data.count)))
+}
+
+//x = H(s | H(I | ":" | P))
+func calculate_x(alg: HashAlgorithm, salt: Data, username: String, password: String) -> Bignum {
+    let H = alg.hash
+    return Bignum(data: H(salt + H("\(username):\(password)".data(using: .utf8)!)))
+}
+
+// v = g^x % N
+func calculate_v(group: Group, x: Bignum) -> Bignum {
+    return mod_exp(group.g, x, group.N)
+}

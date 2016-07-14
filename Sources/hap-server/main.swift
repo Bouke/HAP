@@ -75,46 +75,6 @@ let verificationKey = createSaltedVerificationKey(username: username, password: 
 
 let server = Server(group: group, alg: .SHA512, salt: salt, username: username, verificationKey: verificationKey, secret: generateRandomBytes(count: 32))
 
-let B = server.computeB()
-
-// k = SHA1(N | PAD(g))
-//let k = sha1(group.N.data + group.g.data)
-
-// b is a random number that SHOULD be at least 256 bits in length
-//let b = Bignum(data: generateRandomBytes(count: 256))
-
-// B = k*v + g^b % N
-//let B = k(group) * Bignum(data: verificationKey) + mod_exp(group.g, b, group.N)
-
-//print(B)
-
-///* Begin authentication process */
-//let user = User(algorithm: SRP_SHA1, ngType: SRP_NG_3072, username: username, password: password)
-let client = Client(group: group, alg: .SHA512, username: username, password: password, salt: salt, B: B)
-
-// User: generate A
-let A = client.computeA()
-//let (_, A) = try! user.startAuthentication()
-
-//// User -> Host (username, A)
-//let verifier = try! Verifier(algorithm: SRP_SHA1, ngType: SRP_NG_3072, username: username, salt: salt, verificationKey: verificationKey, A: A)
-////print(verifier.challenge.B.count)
-server.setA(A)
-
-// Host -> User: (bytes_s, bytes_B)
-//let M = try! user.processChallenge(salt: salt, B: B)
-let M = client.M1
-
-// User -> Host: (bytes_M)
-//let H_AMK = try! verifier.verifySession(user_M: M)
-let H_AMK = try! server.verifySession(clientM1: M)
-
-//// Host -> User: (HAMK)
-//try! user.verifySession(H_AMK: H_AMK)
-try! client.verifySession(H_AMK: H_AMK)
-//print(user.isAuthenticated)
-//print(verifier.isAuthenticated)
-
 //let ESC = "\u{001B}"
 //let CSI = "\(ESC)["
 //print("\(CSI)30;47m                      \(CSI)0m")
@@ -135,7 +95,7 @@ func pairSetup(request: Request) -> Response {
     case .startRequest?:
         let result: TLV8 = [
             PairTag.sequence.rawValue: Data(bytes: [PairSetupStep.startResponse.rawValue]),
-            PairTag.publicKey.rawValue: B,
+            PairTag.publicKey.rawValue: server.B,
             PairTag.salt.rawValue: salt,
         ]
         let response = Response(status: .OK)
@@ -145,23 +105,25 @@ func pairSetup(request: Request) -> Response {
 
     case .verifyRequest?:
         let A = data[PairTag.publicKey.rawValue]
-        let M1 = data[PairTag.proof.rawValue]
+        let M = data[PairTag.proof.rawValue]
 
         print(A!.count, A!)
-        print(M1!.count, M1!)
+        print(M!.count, M!)
 
-        server.setA(A!)
-        let H_AMK = try! server.verifySession(clientM1: M1!)
+        let HAMK = try! server.verifySession(A: A!, M: M!)
 
         let result: TLV8 = [
             PairTag.sequence.rawValue: Data(bytes: [PairSetupStep.verifyResponse.rawValue]),
-            PairTag.proof.rawValue: H_AMK
+            PairTag.proof.rawValue: HAMK
         ]
 
         let response = Response(status: .OK)
         response.headers["Content-Type"] = "application/pairing+tlv8"
         response.body = encode(result)
         return response
+
+    case .keyExchangeRequest?:
+        break
 
     case let step: print(request); print(step)
     }

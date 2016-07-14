@@ -1,83 +1,60 @@
-//
-//  Verifier2.swift
-//  HAP
-//
-//  Created by Bouke Haarsma on 09-07-16.
-//
-//
-
 import Foundation
 import Bignum
 import CommonCrypto
 
 public class Server {
     internal let b: Bignum
-    internal let s: Bignum
+    public let B: Data
+
+    public let salt: Data
+    public let username: String
+
     internal let v: Bignum
-    internal let k: Bignum
-    internal let B: Bignum
-    internal var N: Bignum
-    internal var g: Bignum
-    internal var A: Bignum? = nil
-    internal var M1: Data? = nil
-    internal var M2: Data? = nil
-    internal let username: String
 
     internal let group: Group
     internal let alg: HashAlgorithm
-    internal let H: (Data) -> Data
 
-    public init (group: Group = .N2048, alg: HashAlgorithm = .SHA1, salt: Data, username: String, verificationKey: Data, secret: Data) {
+    public private(set) var isAuthenticated = false
+    public private(set) var sessionKey: Data? = nil
+
+    public init (group: Group = .N2048, alg: HashAlgorithm = .SHA1, salt: Data, username: String, verificationKey: Data, secret: Data? = nil) {
         self.group = group
         self.alg = alg
-        H = alg.hash
-
-//        N, g, s, v = <read from password file>
-//        b = random()
-//        k = SHA1(N | PAD(g))
-//        B = k*v + g^b % N
-        N = group.N
-        g = group.g
-        v = Bignum(data: verificationKey)
-        b = Bignum(data: secret)
-        s = Bignum(data: salt)
+        self.salt = salt
         self.username = username
-        k = Bignum(data: H(N.data + pad(g.data, to: N)))
-        B = mod_add(k * v, mod_exp(g, b, N), N)
-//        print(salt == s.data)
+
+        if let secret = secret {
+            b = Bignum(data: secret)
+        } else {
+            b = Bignum(data: generateRandomBytes(count: 32))
+        }
+        let k = calculate_k(group: group, alg: alg)
+        v = Bignum(data: verificationKey)
+        let N = group.N
+        let g = group.g
+//        B = k*v + g^b % N
+        B = mod_add(k * v, mod_exp(g, b, N), N).data
     }
 
-    public func computeB() -> Data {
-        return B.data
+    public func getChallenge() -> (salt: Data, B: Data) {
+        return (salt, B)
     }
 
-    public func setA(_ A: Data) {
-//        A = <read from client>
-//        u = SHA1(PAD(A) | PAD(B))
+    public func verifySession(A: Data, M clientM: Data) throws -> Data {
+        let u = calculate_u(group: group, alg: alg, A: A, B: B)
+        let A_ = Bignum(data: A)
+        let N = group.N
+
 //        S = (Av^u) mod N
-        let A = Bignum(data: A)
-//        print(N.data.count, A.data.count, B.data.count)
-//        abort()
-        let u = Bignum(data: H(pad(A.data, to: N) + pad(B.data, to: N)))
-        let S = mod_exp(A * mod_exp(v, u, N), b, N)
-        let K = H(S.data)
+        let S = mod_exp(A_ * mod_exp(v, u, N), b, N)
 
-        print("Server K", K)
+        let H = alg.hash
+        sessionKey = H(S.data)
 
-//        print("H(ABS)", H(A.data + B.data + S.data))
+        let M = calculate_M(group: group, alg: alg, username: username, salt: salt, A: A, B: B, K: sessionKey!)
+        guard clientM == M else { throw Error.authenticationFailed }
+        isAuthenticated = true
 
-        //M = H(H(N) xor H(g), H(I), s, A, B, K)
-//        M1 = H((H(N.data) ^ H(g.data))! + H(username.data(using: .utf8)!) + s.data + A.data + B.data + K)
-        M1 = calculateM(group: group, alg: alg, username: username, salt: s.data, A: A.data, B: B.data, K: K)
-
-        M2 = H(A.data + M1! + K)
-    }
-
-    public func verifySession(clientM1: Data) throws -> Data {
-        print("")
-        print(clientM1)
-        print(M1!)
-        guard clientM1 == M1 else { throw Error.authenticationFailed }
-        return M2!
+        return calculate_HAMK(alg: alg, A: A, M: M, K: sessionKey!)
     }
 }

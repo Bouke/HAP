@@ -12,34 +12,39 @@ class SRPTests: XCTestCase {
          * must be stored by the server-side application for use during the
          * authentication process.
          */
-        var salt = generateRandomBytes(count: 16)
+        let salt = generateRandomBytes(count: 16)
         let verificationKey = createSaltedVerificationKey(username: username, password: password, salt: salt)
 
         let server = Server(salt: salt, username: username, verificationKey: verificationKey, secret: generateRandomBytes(count: 32))
-        let B = server.computeB()
 
         /* Begin authentication process */
         // Host -> User: (bytes_s, bytes_B)
-        let client = Client(username: username, password: password, salt: salt, B: B)
-
-        // User -> Host (username, A)
-        let A = client.computeA()
-        server.setA(A)
+        let client = Client(username: username, password: password)
 
         // User -> Host: (bytes_M)
-        let M = client.M1
-        let H_AMK: Data
+        let M = client.processChallenge(salt: server.salt, B: server.B)
+
+        XCTAssertFalse(server.isAuthenticated)
+        XCTAssertFalse(client.isAuthenticated)
+
+        let HAMK: Data
         do {
-            H_AMK = try server.verifySession(clientM1: M)
+            HAMK = try server.verifySession(A: client.A, M: M)
         } catch Error.authenticationFailed {
             return XCTFail("Client generated invalid M")
         }
 
+        XCTAssert(server.isAuthenticated)
+        XCTAssertFalse(client.isAuthenticated)
+
         // Host -> User: (HAMK)
         do {
-            try client.verifySession(H_AMK: H_AMK)
+            try client.verifySession(HAMK: HAMK)
         } catch Error.authenticationFailed {
             return XCTFail("Server generated invalid H(AMK)")
         }
+
+        XCTAssert(server.isAuthenticated)
+        XCTAssert(client.isAuthenticated)
     }
 }
