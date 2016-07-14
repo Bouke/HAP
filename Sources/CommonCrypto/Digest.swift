@@ -31,7 +31,7 @@ public enum HashAlgorithm {
         var digest = Data(count: length)
         _ = data.withUnsafeBytes { pData in
             digest.withUnsafeMutableBytes { pDigest in
-                f(pData, CC_LONG(length), pDigest)
+                f(pData, CC_LONG(data.count), pDigest)
             }
         }
         return digest

@@ -89,29 +89,29 @@ let B = server.computeB()
 //print(B)
 
 ///* Begin authentication process */
-let user = User(algorithm: SRP_SHA1, ngType: SRP_NG_3072, username: username, password: password)
-//let client = Client(group: group, username: username, password: password, salt: salt, B: B)
+//let user = User(algorithm: SRP_SHA1, ngType: SRP_NG_3072, username: username, password: password)
+let client = Client(group: group, alg: .SHA512, username: username, password: password, salt: salt, B: B)
 
 // User: generate A
-//let A = client.computeA()
-let (_, A) = try! user.startAuthentication()
-server.setA(A)
+let A = client.computeA()
+//let (_, A) = try! user.startAuthentication()
 
 //// User -> Host (username, A)
 //let verifier = try! Verifier(algorithm: SRP_SHA1, ngType: SRP_NG_3072, username: username, salt: salt, verificationKey: verificationKey, A: A)
 ////print(verifier.challenge.B.count)
-//
+server.setA(A)
+
 // Host -> User: (bytes_s, bytes_B)
-let M = try! user.processChallenge(salt: salt, B: B)
-//let M = client.M1
+//let M = try! user.processChallenge(salt: salt, B: B)
+let M = client.M1
 
 // User -> Host: (bytes_M)
 //let H_AMK = try! verifier.verifySession(user_M: M)
-//let H_AMK = try! server.verifySession(clientM1: M)
+let H_AMK = try! server.verifySession(clientM1: M)
 
 //// Host -> User: (HAMK)
 //try! user.verifySession(H_AMK: H_AMK)
-//try! client.verifySession(H_AMK: H_AMK)
+try! client.verifySession(H_AMK: H_AMK)
 //print(user.isAuthenticated)
 //print(verifier.isAuthenticated)
 

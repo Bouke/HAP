@@ -36,10 +36,19 @@ import CommonCrypto
 //}
 
 public enum Group {
+    case N2048
     case N3072
 
     var N: Bignum {
         switch self {
+        case .N2048:
+            return Bignum(hex: "AC6BDB41324A9A9BF166DE5E1389582FAF72B6651987EE07FC3192943DB56050A37329CBB4" +
+            "A099ED8193E0757767A13DD52312AB4B03310DCD7F48A9DA04FD50E8083969EDB767B0CF60" +
+            "95179A163AB3661A05FBD5FAAAE82918A9962F0B93B855F97993EC975EEAA80D740ADBF4FF" +
+            "747359D041D5C33EA71D281E446B14773BCA97B43A23FB801676BD207A436C6481F1D2B907" +
+            "8717461A5B9D32E688F87748544523B524B0D57D5EA77A2775D2ECFA032CFBDBF52FB37861" +
+            "60279004E57AE6AF874E7303CE53299CCC041C7BC308D82A5698F3A8D0C38271AE35F8E9DB" +
+            "FBB694B5C803D89F7AE435DE236D525F54759B65E372FCD68EF20FA7111F9E4AFF73")
         case .N3072:
             return Bignum(hex: "FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E08" +
                 "8A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B" +
@@ -60,13 +69,15 @@ public enum Group {
 
     var g: Bignum {
         switch self {
+        case .N2048:
+            return Bignum(hex: "2")
         case .N3072:
             return Bignum(hex: "5")
         }
     }
 }
 
-public func createSaltedVerificationKey(username: String, password: String, salt: Data, group: Group, alg: HashAlgorithm) -> Data {
+public func createSaltedVerificationKey(username: String, password: String, salt: Data, group: Group = .N2048, alg: HashAlgorithm = .SHA1) -> Data {
     // x = SHA1(s | SHA1(I | ":" | P))
     let x = Bignum(data: alg.hash(salt + alg.hash("\(username):\(password)".data(using: .utf8)!)))
 
@@ -90,6 +101,13 @@ func ^ (lhs: Data, rhs: Data) -> Data? {
         result[index] = lhs[index] ^ rhs[index]
     }
     return result
+}
+
+func calculateM(group: Group = .N2048, alg: HashAlgorithm = .SHA1, username: String, salt: Data, A: Data, B: Data, K: Data) -> Data {
+    let H = alg.hash
+    let HN_xor_Hg = (H(group.N.data) ^ H(group.g.data))!
+    let HI = H(username.data(using: .utf8)!)
+    return H(HN_xor_Hg + HI + salt + A + B + K)
 }
 
 //func k(_ group: Group) -> Bignum {
