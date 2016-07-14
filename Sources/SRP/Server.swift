@@ -32,7 +32,7 @@ public class Server {
         v = Bignum(data: verificationKey)
         let N = group.N
         let g = group.g
-//        B = k*v + g^b % N
+        // B = k*v + g^b % N
         B = mod_add(k * v, mod_exp(g, b, N), N).data
     }
 
@@ -45,10 +45,12 @@ public class Server {
         let A_ = Bignum(data: A)
         let N = group.N
 
-//        S = (Av^u) mod N
+        // shared secret
+        // S = (Av^u) mod N
         let S = mod_exp(A_ * mod_exp(v, u, N), b, N)
 
         let H = alg.hash
+        // K = H(S)
         sessionKey = H(S.data)
 
         let M = calculate_M(group: group, alg: alg, username: username, salt: salt, A: A, B: B, K: sessionKey!)

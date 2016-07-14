@@ -122,8 +122,8 @@ func pairSetup(request: Request) -> Response {
         response.body = encode(result)
         return response
 
-    case .keyExchangeRequest?:
-        break
+//    case .keyExchangeRequest?:
+//        break
 
     case let step: print(request); print(step)
     }

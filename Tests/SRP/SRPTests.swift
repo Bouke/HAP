@@ -46,5 +46,10 @@ class SRPTests: XCTestCase {
 
         XCTAssert(server.isAuthenticated)
         XCTAssert(client.isAuthenticated)
+
+        guard let K0 = server.sessionKey, let K1 = client.sessionKey else {
+            return XCTFail("Session keys not set")
+        }
+        XCTAssertEqual(K0, K1, "Session keys not equal")
     }
 }

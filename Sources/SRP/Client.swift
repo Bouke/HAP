@@ -28,7 +28,7 @@ public class Client {
         } else {
             a = Bignum(data: generateRandomBytes(count: 32))
         }
-//        A = g^a % N
+        // A = g^a % N
         A = mod_exp(group.g, a, group.N).data
     }
 
@@ -52,13 +52,13 @@ public class Client {
         let S = mod_exp(B_ - k * v, a + u * x, N)
 
         // session key
-        let K = H(S.data)
+        sessionKey = H(S.data)
 
         // client verification
-        let M = calculate_M(group: group, alg: alg, username: username, salt: salt, A: A, B: B, K: K)
+        let M = calculate_M(group: group, alg: alg, username: username, salt: salt, A: A, B: B, K: sessionKey!)
 
         // server verification
-        HAMK = calculate_HAMK(alg: alg, A: A, M: M, K: K)
+        HAMK = calculate_HAMK(alg: alg, A: A, M: M, K: sessionKey!)
         return M
     }
 
