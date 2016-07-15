@@ -45,18 +45,16 @@ class Connection: NSObject, StreamDelegate {
                 response!.headers["Connection"] = "Keep-Alive"
                 request = Request()
 
-                print("response ready, waiting to write...")
-//                outputStream.write("", maxLength: 0)
                 inputStream.remove(from: .main, forMode: .defaultRunLoopMode)
                 outputStream.schedule(in: .main, forMode: .defaultRunLoopMode)
             }
 
         case (outputStream, Stream.Event.hasSpaceAvailable):
             guard let data = response?.serialized() else {
-                print("nothing to write...")
-                return
+                abort()
+//                print("nothing to write...")
+//                return
             }
-            print(response!)
             let written = data.withUnsafeBytes {
                 outputStream.write($0, maxLength: data.count)
             }
@@ -68,6 +66,7 @@ class Connection: NSObject, StreamDelegate {
             inputStream.schedule(in: .main, forMode: .defaultRunLoopMode)
 
         case (_, Stream.Event.endEncountered), (_, Stream.Event.errorOccurred):
+            print("end encountered, closing")
             close()
 
         default: break
@@ -82,6 +81,7 @@ class Connection: NSObject, StreamDelegate {
     }
     
     deinit {
+        print("deinit, closing...")
         close()
     }
 }

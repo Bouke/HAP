@@ -2,7 +2,7 @@ import Foundation
 import HTTP
 
 class Delegate: NSObject, NetServiceDelegate, StreamDelegate {
-    var server: Server
+    var server: HTTP.Server
 
     init(application: Application) {
         server = Server(application: application)
@@ -31,68 +31,47 @@ func identify(request: Request) -> Response {
     return Response(status: .OK, text: "Got identified")
 }
 
-
 import CLibSodium
-import COpenSSL
-
-//print(sodium_init())
-
-var client_secretkey = Data(count: Int(crypto_box_SECRETKEYBYTES))
-var client_publickey = Data(count: Int(crypto_box_PUBLICKEYBYTES))
-//var client_secretkey = Data(bytes: [UInt8](repeating: 0, count: Int(crypto_box_SECRETKEYBYTES)))
-//var client_publickey = Data(bytes: [UInt8](repeating: 0, count: Int(crypto_box_PUBLICKEYBYTES)))
-
-client_secretkey.withUnsafeMutableBytes { secret in
-    randombytes_buf(secret, client_secretkey.count)
-}
-
-_ = client_secretkey.withUnsafeMutableBytes { secret in
-    client_publickey.withUnsafeMutableBytes { pub in
-        crypto_scalarmult_base(pub, secret)
-    }
-}
-
-import CSRP
+import HKDF
 import SRP
+import CryptoSwift
 
 let username = "Pair-Setup"
 let password = "001-02-003"
 
-import Bignum
 import CommonCrypto
 
-var salt = generateRandomBytes(count: 16)
-
 let group = Group.N3072
+let alg = HashAlgorithm.SHA512
 
 /* Create a salt+verification key for the user's password. The salt and
  * key need to be computed at the time the user's password is set and
  * must be stored by the server-side application for use during the
  * authentication process.
  */
-//let (salt, verificationKey) = try! createSaltedVerificationKey(algorithm: SRP_SHA512, ngType: SRP_NG_3072, username: username, password: password)
-let verificationKey = createSaltedVerificationKey(username: username, password: password, salt: salt, group: group, alg: .SHA512)
+let (salt, verificationKey) = createSaltedVerificationKey(username: username, password: password, group: group, alg: alg)
 
-let server = Server(group: group, alg: .SHA512, salt: salt, username: username, verificationKey: verificationKey, secret: generateRandomBytes(count: 32))
+let server = Server(group: group, alg: alg, salt: salt, username: username, verificationKey: verificationKey)
 
 //let ESC = "\u{001B}"
 //let CSI = "\(ESC)["
-//print("\(CSI)30;47m                      \(CSI)0m")
-//print("\(CSI)30;47m    ┌────────────┐    \(CSI)0m")
-//print("\(CSI)30;47m    | 001-02-003 |    \(CSI)0m")
-//print("\(CSI)30;47m    └────────────┘    \(CSI)0m")
-//print("\(CSI)30;47m                      \(CSI)0m")
+//print("\(CSI)30;47m                        \(CSI)0m")
+//print("\(CSI)30;47m    ┌──────────────┐    \(CSI)0m")
+//print("\(CSI)30;47m    | (\(password) |    \(CSI)0m")
+//print("\(CSI)30;47m    └──────────────┘    \(CSI)0m")
+//print("\(CSI)30;47m                        \(CSI)0m")
 
 //print(client_secretkey, client_publickey)
 
 func pairSetup(request: Request) -> Response {
     guard let body = request.body else { return Response(status: .BadRequest) }
-    let data = decode(body)
-    print(request)
-    print("input", data)
+    let data = try! decode(body)
 
     switch PairSetupStep(rawValue: UInt8(data: data[PairTag.sequence.rawValue]!)) {
     case .startRequest?:
+        print("<-- B", server.B)
+        print("<-- s", salt)
+
         let result: TLV8 = [
             PairTag.sequence.rawValue: Data(bytes: [PairSetupStep.startResponse.rawValue]),
             PairTag.publicKey.rawValue: server.B,
@@ -104,13 +83,18 @@ func pairSetup(request: Request) -> Response {
         return response
 
     case .verifyRequest?:
-        let A = data[PairTag.publicKey.rawValue]
-        let M = data[PairTag.proof.rawValue]
+        guard let A = data[PairTag.publicKey.rawValue], let M = data[PairTag.proof.rawValue] else {
+            return Response(status: .BadRequest)
+        }
 
-        print(A!.count, A!)
-        print(M!.count, M!)
+        print("--> A", A)
+        print("--> M", M)
 
-        let HAMK = try! server.verifySession(A: A!, M: M!)
+        guard let HAMK = try? server.verifySession(A: A, M: M) else {
+            return Response(status: .BadRequest)
+        }
+
+        print("<-- HAMK", HAMK)
 
         let result: TLV8 = [
             PairTag.sequence.rawValue: Data(bytes: [PairSetupStep.verifyResponse.rawValue]),
@@ -122,14 +106,51 @@ func pairSetup(request: Request) -> Response {
         response.body = encode(result)
         return response
 
-//    case .keyExchangeRequest?:
-//        break
+    case .keyExchangeRequest?:
+        guard let encryptedData = data[PairTag.encryptedData.rawValue] else {
+            return Response(status: .BadRequest)
+        }
 
-    case let step: print(request); print(step)
+        let message = Data(encryptedData[0..<encryptedData.index(encryptedData.endIndex, offsetBy: -16)])
+        let mac = Data(encryptedData[encryptedData.index(encryptedData.endIndex, offsetBy: -16)..<encryptedData.endIndex])
+
+        print("message:", message)
+        print("MAC:", mac)
+
+        var plaintext = Data(count: message.count)
+
+        let encryptionSalt = "Pair-Setup-Encrypt-Salt".data(using: .utf8)!
+        let encryptionInfo = "Pair-Setup-Encrypt-Info".data(using: .utf8)!
+        let encryptionKey = deriveKey(algorithm: .SHA512, seed: server.sessionKey!, info: encryptionInfo, salt: encryptionSalt, count: 32)
+
+        print("S:", server.sessionKey!)
+        print("encryptionKey:", encryptionKey)
+
+//        let plaintext = try! ChaCha20(key: Array(encryptionKey), iv: Array("PS-Msg05".utf8))!.decrypt(Array(message))
+//        print("authenticate result:", Data(try! Authenticator.Poly1305(key: Array(encryptionKey)).authenticate(Array(message))))
+
+        let r = plaintext.withUnsafeMutableBytes { (m: UnsafeMutablePointer<UInt8>) in
+            message.withUnsafeBytes { (c: UnsafePointer<UInt8>) in
+                mac.withUnsafeBytes { (mac: UnsafePointer<UInt8>) in
+                    encryptionKey.withUnsafeBytes { (k: UnsafePointer<UInt8>) in
+                        crypto_aead_chacha20poly1305_ietf_decrypt_detached(m, nil, c, UInt64(encryptedData.count), mac, nil, 0, "PS-Msg05", k)
+                    }
+                }
+            }
+        }
+
+        print("r", r)
+        print("plaintext:", Data(plaintext))
+
+        print(try! decode(Data(plaintext)))
+
+    case let step: print(request); print(step); print(data)
     }
 
     return Response(status: .BadRequest, text: "Not sure what to do here...")
 }
+
+//print(crypto_aead_chacha20poly1305_KEYBYTES)
 
 let router = Router(routes: [
     ("/", root),
@@ -149,9 +170,6 @@ let config: [String: Data] = [
     "md": "Switch".data(using: .utf8)!, // name
     "ci": "8".data(using: .utf8)!, // category identifier -- switch
 ]
-
-//exit(0)
-
 
 service.setTXTRecord(NetService.data(fromTXTRecord: config))
 service.delegate = delegate

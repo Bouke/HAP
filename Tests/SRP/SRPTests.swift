@@ -12,8 +12,7 @@ class SRPTests: XCTestCase {
          * must be stored by the server-side application for use during the
          * authentication process.
          */
-        let salt = generateRandomBytes(count: 16)
-        let verificationKey = createSaltedVerificationKey(username: username, password: password, salt: salt)
+        let (salt, verificationKey) = createSaltedVerificationKey(username: username, password: password)
 
         let server = Server(salt: salt, username: username, verificationKey: verificationKey, secret: generateRandomBytes(count: 32))
 

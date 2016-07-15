@@ -5,8 +5,9 @@ let package = Package(
     targets: [
         Target(name: "CommonCrypto"),
         Target(name: "Bignum"),
+        Target(name: "HKDF", dependencies: ["CommonCrypto"]),
         Target(name: "SRP", dependencies: ["CommonCrypto", "Bignum"]),
-        Target(name: "hap-server", dependencies: ["HTTP", "SRP"]),
+        Target(name: "hap-server", dependencies: ["HKDF", "HTTP", "SRP"]),
         Target(name: "hap-browser"),
     ],
     dependencies: [

@@ -45,9 +45,11 @@ public enum Group {
     }
 }
 
-public func createSaltedVerificationKey(username: String, password: String, salt: Data, group: Group = .N2048, alg: HashAlgorithm = .SHA1) -> Data {
+public func createSaltedVerificationKey(username: String, password: String, salt: Data? = nil, group: Group = .N2048, alg: HashAlgorithm = .SHA1) -> (salt: Data, verificationKey: Data) {
+    let salt = salt ?? generateRandomBytes(count: 16)
     let x = calculate_x(alg: alg, salt: salt, username: username, password: password)
-    return calculate_v(group: group, x: x).data
+    let v = calculate_v(group: group, x: x)
+    return (salt, v.data)
 }
 
 func ^ (lhs: Data, rhs: Data) -> Data? {
