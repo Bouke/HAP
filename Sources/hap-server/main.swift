@@ -111,41 +111,44 @@ func pairSetup(request: Request) -> Response {
             return Response(status: .BadRequest)
         }
 
-//        let message = Data(encryptedData[0..<encryptedData.index(encryptedData.endIndex, offsetBy: -16)])
-//        let mac = Data(encryptedData[encryptedData.index(encryptedData.endIndex, offsetBy: -16)..<encryptedData.endIndex])
-//
-//        print("message:", message)
-//        print("MAC:", mac)
-//
-//        var plaintext = Data(count: message.count)
-
         let encryptionSalt = "Pair-Setup-Encrypt-Salt".data(using: .utf8)!
         let encryptionInfo = "Pair-Setup-Encrypt-Info".data(using: .utf8)!
         let encryptionKey = deriveKey(algorithm: .SHA512, seed: server.sessionKey!, info: encryptionInfo, salt: encryptionSalt, count: 32)
 
-        print("S:", server.sessionKey!)
-        print("encryptionKey:", encryptionKey)
-
-//        let plaintext = try! ChaCha20(key: Array(encryptionKey), iv: Array("PS-Msg05".utf8))!.decrypt(Array(message))
-//        print("authenticate result:", Data(try! Authenticator.Poly1305(key: Array(encryptionKey)).authenticate(Array(message))))
-
-//        let r = plaintext.withUnsafeMutableBytes { (m: UnsafeMutablePointer<UInt8>) in
-//            message.withUnsafeBytes { (c: UnsafePointer<UInt8>) in
-//                mac.withUnsafeBytes { (mac: UnsafePointer<UInt8>) in
-//                    encryptionKey.withUnsafeBytes { (k: UnsafePointer<UInt8>) in
-//                        crypto_aead_chacha20poly1305_ietf_decrypt_detached(m, nil, c, UInt64(encryptedData.count), mac, nil, 0, "PS-Msg05", k)
-//                    }
-//                }
-//            }
-//        }
-
         let decryptor = ChaCha20Poly1305(key: encryptionKey, nonce: "PS-Msg05".data(using: .utf8)!)!
-        let plaintext = try! decryptor.decrypt(cipher: encryptedData)
 
-//        print("r", r)
-        print("plaintext:", Data(plaintext))
+        guard let plaintext = try? decryptor.decrypt(cipher: encryptedData) else {
+            return Response(status: .BadRequest)
+        }
 
-        print(try? decode(Data(plaintext)))
+        guard let data = try? decode(plaintext) else {
+            return Response(status: .BadRequest)
+        }
+
+        guard let publicKey = data[PairTag.publicKey.rawValue], let username = data[PairTag.username.rawValue], let signature = data[PairTag.mfiSignature.rawValue] else {
+            return Response(status: .BadRequest)
+        }
+
+        print("--> username", username, String(data: username, encoding: .utf8))
+        print("--> public key", publicKey)
+        print("--> signature", signature)
+
+        let hash = deriveKey(algorithm: .SHA512, seed: server.sessionKey!, info: "Pair-Setup-Controller-Sign-Info".data(using: .utf8)!, salt: "Pair-Setup-Controller-Sign-Salt".data(using: .utf8)!) + username + publicKey
+
+        print("S", server.sessionKey!)
+        print(hash, hash.count)
+
+        let ret = signature.withUnsafeBytes { pSignature in
+            hash.withUnsafeBytes { pHash in
+                publicKey.withUnsafeBytes { pPublicKey in
+                    crypto_sign_verify_detached(pSignature, pHash, UInt64(hash.count), pPublicKey)
+                }
+            }
+        }
+
+        print("Validation result:", ret)
+
+//        let material =
 
     case let step: print(request); print(step); print(data)
     }
