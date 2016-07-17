@@ -11,9 +11,8 @@ let package = Package(
         Target(name: "hap-browser"),
     ],
     dependencies: [
-        .Package(url: "../CLibSodium", majorVersion: 1, minor: 0),
-        .Package(url: "../COpenSSL", majorVersion: 1, minor: 0),
-        .Package(url: "../CSRP", majorVersion: 1, minor: 0),
-        .Package(url: "../CCommonCrypto", majorVersion: 1, minor: 0),
+        .Package(url: "https://github.com/Bouke/CLibSodium.git", majorVersion: 1),
+        .Package(url: "https://github.com/Bouke/COpenSSL.git", majorVersion: 1),
+        .Package(url: "https://github.com/Bouke/CCommonCrypto.git", majorVersion: 1),
     ]
 )

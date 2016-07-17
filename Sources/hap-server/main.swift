@@ -111,13 +111,13 @@ func pairSetup(request: Request) -> Response {
             return Response(status: .BadRequest)
         }
 
-        let message = Data(encryptedData[0..<encryptedData.index(encryptedData.endIndex, offsetBy: -16)])
-        let mac = Data(encryptedData[encryptedData.index(encryptedData.endIndex, offsetBy: -16)..<encryptedData.endIndex])
-
-        print("message:", message)
-        print("MAC:", mac)
-
-        var plaintext = Data(count: message.count)
+//        let message = Data(encryptedData[0..<encryptedData.index(encryptedData.endIndex, offsetBy: -16)])
+//        let mac = Data(encryptedData[encryptedData.index(encryptedData.endIndex, offsetBy: -16)..<encryptedData.endIndex])
+//
+//        print("message:", message)
+//        print("MAC:", mac)
+//
+//        var plaintext = Data(count: message.count)
 
         let encryptionSalt = "Pair-Setup-Encrypt-Salt".data(using: .utf8)!
         let encryptionInfo = "Pair-Setup-Encrypt-Info".data(using: .utf8)!
@@ -129,20 +129,23 @@ func pairSetup(request: Request) -> Response {
 //        let plaintext = try! ChaCha20(key: Array(encryptionKey), iv: Array("PS-Msg05".utf8))!.decrypt(Array(message))
 //        print("authenticate result:", Data(try! Authenticator.Poly1305(key: Array(encryptionKey)).authenticate(Array(message))))
 
-        let r = plaintext.withUnsafeMutableBytes { (m: UnsafeMutablePointer<UInt8>) in
-            message.withUnsafeBytes { (c: UnsafePointer<UInt8>) in
-                mac.withUnsafeBytes { (mac: UnsafePointer<UInt8>) in
-                    encryptionKey.withUnsafeBytes { (k: UnsafePointer<UInt8>) in
-                        crypto_aead_chacha20poly1305_ietf_decrypt_detached(m, nil, c, UInt64(encryptedData.count), mac, nil, 0, "PS-Msg05", k)
-                    }
-                }
-            }
-        }
+//        let r = plaintext.withUnsafeMutableBytes { (m: UnsafeMutablePointer<UInt8>) in
+//            message.withUnsafeBytes { (c: UnsafePointer<UInt8>) in
+//                mac.withUnsafeBytes { (mac: UnsafePointer<UInt8>) in
+//                    encryptionKey.withUnsafeBytes { (k: UnsafePointer<UInt8>) in
+//                        crypto_aead_chacha20poly1305_ietf_decrypt_detached(m, nil, c, UInt64(encryptedData.count), mac, nil, 0, "PS-Msg05", k)
+//                    }
+//                }
+//            }
+//        }
 
-        print("r", r)
+        let decryptor = ChaCha20Poly1305(key: encryptionKey, nonce: "PS-Msg05".data(using: .utf8)!)!
+        let plaintext = try! decryptor.decrypt(cipher: encryptedData)
+
+//        print("r", r)
         print("plaintext:", Data(plaintext))
 
-        print(try! decode(Data(plaintext)))
+        print(try? decode(Data(plaintext)))
 
     case let step: print(request); print(step); print(data)
     }
