@@ -43,4 +43,17 @@ class ChaCha20Poly1305 {
 
         return Data(try chacha20.decrypt(Array(message)))
     }
+
+    func encrypt(message: Data, add: Data = Data()) throws -> Data {
+        let polyMessage = add + Data(repeating: 0, count: (16 - (add.count % 16)) % 16) +
+            message + Data(repeating: 0, count: (16 - (message.count % 16)) % 16)  +
+            Data(bytes: UInt64(add.count).bigEndian.bytes()) +
+            Data(bytes: UInt64(message.count).bigEndian.bytes())
+
+        guard let computedMac = poly1305.authenticate(Array(polyMessage)) else {
+            throw Error.InvalidMessageAuthenticator
+        }
+
+        return Data(try chacha20.encrypt(Array(message))) + computedMac
+    }
 }
