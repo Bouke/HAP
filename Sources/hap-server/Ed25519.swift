@@ -30,17 +30,15 @@ class Ed25519 {
 
     static func sign(privateKey: Data, message: Data) throws -> Data {
         var signature = Data(count: Int(crypto_sign_BYTES))
-//        var siglen = UnsafeMutablePointer<UInt8>(allocatingCapacity: 1)
-        signature.withUnsafeMutableBytes { sig in
-            message.withUnsafeBytes { m in
-                privateKey.withUnsafeBytes { sk in
-                    crypto_sign_detached(sig, 0, m, UInt64(message.count), sk)
+        guard signature.withUnsafeMutableBytes({ sig -> Int32 in
+            message.withUnsafeBytes { m -> Int32 in
+                privateKey.withUnsafeBytes { sk -> Int32 in
+                    crypto_sign_detached(sig, nil, m, UInt64(message.count), sk)
                 }
             }
+        }) == 0 else {
+            throw Error.couldNotSign
         }
-//        ) == 0 else {
-//            throw Error.couldNotSign
-//        }
         return signature
     }
 
