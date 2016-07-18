@@ -30,17 +30,19 @@ class Accessory {
 
 class Device {
     let name: String
+    let identifier: String
     let publicKey: Data
     let privateKey: Data
     let pin: String
 
-    convenience init(name: String, pin: String) {
+    convenience init(name: String, identifier: String, pin: String) {
         let (pk, sk) = Ed25519.generateSignKeypair()
-        self.init(name: name, pin: pin, publicKey: pk, privateKey: sk)
+        self.init(name: name, identifier: identifier, pin: pin, publicKey: pk, privateKey: sk)
     }
 
-    init(name: String, pin: String, publicKey: Data, privateKey: Data) {
+    init(name: String, identifier: String, pin: String, publicKey: Data, privateKey: Data) {
         self.name = name
+        self.identifier = identifier
         self.pin = pin
         self.publicKey = publicKey
         self.privateKey = privateKey
