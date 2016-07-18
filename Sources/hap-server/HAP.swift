@@ -77,7 +77,7 @@ enum VerifyStep: UInt8 {
     case waiting = 0, startRequest, startResponse, finishRequest, finishResponse
 }
 
-enum PairTag: UInt8 {
+enum Tag: UInt8 {
     case pairingMethod = 0, username, salt, publicKey, proof, encryptedData, sequence, errorCode
     case signature = 0x0a
 //    case mfiCertificate = 0x09, mfiSignature = 0x0a // todo: cannot re-use the raw value of `signature`

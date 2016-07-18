@@ -1,14 +1,10 @@
-//
-//  Accessory.swift
-//  HAP
-//
-//  Created by Bouke Haarsma on 17-07-16.
-//
-//
-
 import Foundation
 import CLibSodium
 import CommonCrypto
+
+func generateIdentifier() -> String {
+    return (1...6).map({ _ in String(arc4random() & 255, radix: 16, uppercase: false) }).joined(separator: ":")
+}
 
 class Client {
     let username: String
@@ -35,9 +31,9 @@ class Device {
     let privateKey: Data
     let pin: String
 
-    convenience init(name: String, identifier: String, pin: String) {
+    convenience init(name: String, pin: String) {
         let (pk, sk) = Ed25519.generateSignKeypair()
-        self.init(name: name, identifier: identifier, pin: pin, publicKey: pk, privateKey: sk)
+        self.init(name: name, identifier: generateIdentifier(), pin: pin, publicKey: pk, privateKey: sk)
     }
 
     init(name: String, identifier: String, pin: String, publicKey: Data, privateKey: Data) {
