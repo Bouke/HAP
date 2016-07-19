@@ -10,7 +10,7 @@ public class Router {
 
     public var application: Application {
         return { request in
-            print("Request for \(request.requestURL)")
+            print("Request for \(request.requestURL!)")
             for route in self.routes {
                 if route.path == request.requestURL?.path {
                     return route.application(request)
