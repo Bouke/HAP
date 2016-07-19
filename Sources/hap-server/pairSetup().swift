@@ -3,17 +3,17 @@ import HTTP
 import HKDF
 
 func pairSetup(request: Request) -> Response {
-    guard let body = request.body, let data = try? decode(body) else { return Response(status: .BadRequest) }
+    guard let body = request.body, let data: PairTagTLV8 = try? decode(body) else { return Response(status: .BadRequest) }
 
-    switch PairSetupStep(rawValue: UInt8(data: data[Tag.sequence.rawValue]!)) {
+    switch PairSetupStep(rawValue: data[.sequence]![0]) {
     case .startRequest?:
         print("<-- B", server.B)
         print("<-- s", salt)
 
-        let result: TLV8 = [
-            Tag.sequence.rawValue: Data(bytes: [PairSetupStep.startResponse.rawValue]),
-            Tag.publicKey.rawValue: server.B,
-            Tag.salt.rawValue: salt,
+        let result: PairTagTLV8 = [
+            .sequence: Data(bytes: [PairSetupStep.startResponse.rawValue]),
+            .publicKey: server.B,
+            .salt: salt,
         ]
         let response = Response(status: .OK)
         response.headers["Content-Type"] = "application/pairing+tlv8"
@@ -21,7 +21,7 @@ func pairSetup(request: Request) -> Response {
         return response
 
     case .verifyRequest?:
-        guard let A = data[Tag.publicKey.rawValue], let M = data[Tag.proof.rawValue] else {
+        guard let A = data[.publicKey], let M = data[.proof] else {
             return Response(status: .BadRequest)
         }
 
@@ -34,9 +34,9 @@ func pairSetup(request: Request) -> Response {
 
         print("<-- HAMK", HAMK)
 
-        let result: TLV8 = [
-            Tag.sequence.rawValue: Data(bytes: [PairSetupStep.verifyResponse.rawValue]),
-            Tag.proof.rawValue: HAMK
+        let result: PairTagTLV8 = [
+            .sequence: Data(bytes: [PairSetupStep.verifyResponse.rawValue]),
+            .proof: HAMK
         ]
 
         let response = Response(status: .OK)
@@ -45,7 +45,7 @@ func pairSetup(request: Request) -> Response {
         return response
 
     case .keyExchangeRequest?:
-        guard let encryptedData = data[Tag.encryptedData.rawValue] else {
+        guard let encryptedData = data[.encryptedData] else {
             return Response(status: .BadRequest)
         }
 
@@ -55,11 +55,11 @@ func pairSetup(request: Request) -> Response {
             return Response(status: .BadRequest)
         }
 
-        guard let data = try? decode(plaintext) else {
+        guard let data: PairTagTLV8 = try? decode(plaintext) else {
             return Response(status: .BadRequest)
         }
 
-        guard let publicKey = data[Tag.publicKey.rawValue], let username = data[Tag.username.rawValue], let signatureIn = data[Tag.signature.rawValue] else {
+        guard let publicKey = data[.publicKey], let username = data[.username], let signatureIn = data[.signature] else {
             return Response(status: .BadRequest)
         }
 
@@ -72,8 +72,6 @@ func pairSetup(request: Request) -> Response {
                                salt: "Pair-Setup-Controller-Sign-Salt".data(using: .utf8)!, count: 32) +
             username +
             publicKey
-
-        print("hashOut", hashIn, hashIn.count)
 
         do {
             try Ed25519.verify(publicKey: publicKey, message: hashIn, signature: signatureIn)
@@ -94,10 +92,10 @@ func pairSetup(request: Request) -> Response {
             return Response(status: .BadRequest)
         }
 
-        let resultInner: TLV8 = [
-            Tag.username.rawValue: device.identifier.data(using: .utf8)!,
-            Tag.publicKey.rawValue: device.publicKey,
-            Tag.signature.rawValue: signatureOut
+        let resultInner: PairTagTLV8 = [
+            .username: device.identifier.data(using: .utf8)!,
+            .publicKey: device.publicKey,
+            .signature: signatureOut
         ]
 
         print("<-- username", device.identifier)
@@ -108,14 +106,10 @@ func pairSetup(request: Request) -> Response {
             return Response(status: .BadRequest)
         }
 
-        print("encrypted", encryptedResultInner)
-
-        let resultOuter: TLV8 = [
-            Tag.sequence.rawValue: Data(bytes: [PairSetupStep.keyExchangeResponse.rawValue]),
-            Tag.encryptedData.rawValue: encryptedResultInner
+        let resultOuter: PairTagTLV8 = [
+            .sequence: Data(bytes: [PairSetupStep.keyExchangeResponse.rawValue]),
+            .encryptedData: encryptedResultInner
         ]
-
-        print("result", encode(resultOuter))
 
         let response = Response(status: .OK)
         response.headers["Content-Type"] = "application/pairing+tlv8"
