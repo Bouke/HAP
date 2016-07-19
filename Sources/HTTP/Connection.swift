@@ -52,9 +52,8 @@ class Connection: NSObject, StreamDelegate {
         case (outputStream, Stream.Event.hasSpaceAvailable):
             guard let data = response?.serialized() else {
                 abort()
-//                print("nothing to write...")
-//                return
             }
+            print(response?.status)
             let written = data.withUnsafeBytes {
                 outputStream.write($0, maxLength: data.count)
             }

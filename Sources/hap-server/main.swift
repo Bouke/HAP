@@ -27,7 +27,12 @@ import HKDF
 import SRP
 import CryptoSwift
 
-let device = Device(name: "Switch", pin: "001-02-003")
+let storage = try FileStorage(path: "Switch")
+let device = Device(name: "Switch", pin: "001-02-003", storage: storage)
+
+print(device.identifier)
+print(device.publicKey.count)
+print(device.privateKey.count)
 
 //TODO: converge into "Device()"
 let username = "Pair-Setup"

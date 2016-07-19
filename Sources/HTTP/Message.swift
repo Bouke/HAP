@@ -137,4 +137,8 @@ public class Response: Message {
             self.body = data
         }
     }
+
+    var status: String? {
+        return CFHTTPMessageCopyResponseStatusLine(boxed)?.takeRetainedValue() as String?
+    }
 }

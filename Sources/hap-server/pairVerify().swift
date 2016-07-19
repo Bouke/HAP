@@ -89,12 +89,14 @@ func pairVerify(request: Request) -> Response {
         print("--> username", username, String(data: username, encoding: .utf8)!)
         print("--> signature", signatureIn)
 
-        //TODO: verify if client's username and public are stored
+        guard let publicKey = device.clients[username] else {
+            return Response(status: .BadRequest)
+        }
+        print("--> public key", publicKey)
 
         let material = otherPublicKey! + username + pk
         do {
-            //TODO: use client's stored public key here
-            try Ed25519.verify(publicKey: pk, message: material, signature: signatureIn)
+            try Ed25519.verify(publicKey: publicKey, message: material, signature: signatureIn)
         } catch {
             return Response(status: .BadRequest)
         }

@@ -24,23 +24,46 @@ class Accessory {
     }
 }
 
-class Device {
+public class Device {
     let name: String
     let identifier: String
     let publicKey: Data
     let privateKey: Data
     let pin: String
+    let storage: FileStorage
+    let clients: Clients
 
-    convenience init(name: String, pin: String) {
-        let (pk, sk) = Ed25519.generateSignKeypair()
-        self.init(name: name, identifier: generateIdentifier(), pin: pin, publicKey: pk, privateKey: sk)
+    init(name: String, pin: String, storage: FileStorage) {
+        self.name = name
+        self.pin = pin
+        self.storage = storage
+        if let pk = storage["pk"], let sk = storage["sk"], let identifier = storage["uuid"] {
+            self.identifier = String(data: identifier, encoding: .utf8)!
+            self.publicKey = pk
+            self.privateKey = sk
+        } else {
+            (self.publicKey, self.privateKey) = Ed25519.generateSignKeypair()
+            self.identifier = generateIdentifier()
+            storage["pk"] = self.publicKey
+            storage["sk"] = self.privateKey
+            storage["uuid"] = identifier.data(using: .utf8)
+        }
+        clients = Clients(storage: storage)
     }
 
-    init(name: String, identifier: String, pin: String, publicKey: Data, privateKey: Data) {
-        self.name = name
-        self.identifier = identifier
-        self.pin = pin
-        self.publicKey = publicKey
-        self.privateKey = privateKey
+    public class Clients {
+        private let storage: FileStorage
+        private init(storage: FileStorage) {
+            self.storage = storage
+        }
+
+        public subscript(username: Data) -> Data? {
+            get {
+                return storage[username.toHexString()]
+            }
+            set {
+                storage[username.toHexString()] = newValue
+            }
+        }
     }
 }
