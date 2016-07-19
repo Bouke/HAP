@@ -1,7 +1,7 @@
 import Foundation
 import CommonCrypto
 
-public func deriveKey(algorithm: HMAC.Algorithm, seed: Data, info: Data, salt: Data, count: Int = 64) -> Data {
+public func deriveKey(algorithm: HMAC.Algorithm, seed: Data, info: Data, salt: Data, count: Int) -> Data {
     // extract
     let prk = HMAC(algorithm: algorithm, key: salt).update(seed).final()
 
