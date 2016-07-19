@@ -33,7 +33,7 @@ class Connection: NSObject, StreamDelegate {
         case (_, Stream.Event.openCompleted): break
 
         case (inputStream, Stream.Event.hasBytesAvailable):
-            var buffer = Data(capacity: 1024)
+            var buffer = Data(capacity: 1024)!
             buffer.count = 1024
             buffer.count = buffer.withUnsafeMutableBytes {
                 inputStream.read($0, maxLength: 1024)

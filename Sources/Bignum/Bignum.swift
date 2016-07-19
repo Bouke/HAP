@@ -38,7 +38,7 @@ public class Bignum {
     }
 
     public var data: Data {
-        var data = Data(count: Int((BN_num_bits(ctx) + 7) / 8))
+        var data = Data(count: Int((BN_num_bits(ctx) + 7) / 8))!
         _ = data.withUnsafeMutableBytes { pData in
             BN_bn2bin(ctx, pData)
         }

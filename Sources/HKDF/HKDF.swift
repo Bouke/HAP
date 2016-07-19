@@ -15,10 +15,10 @@ public func deriveKey(algorithm: HMAC.Algorithm, seed: Data, info: Data, salt: D
         let hmac = HMAC(algorithm: algorithm, key: prk)
         hmac.update(mixin)
         hmac.update(info)
-        hmac.update(Data([UInt8(i)]))
+        hmac.update(Data(bytes: [UInt8(i)]))
         mixin = hmac.final()
-        result = result + mixin
+        result.append(mixin)
     }
 
-    return Data(result[0..<count])
+    return Data(bytes: Array(result[0..<count]))
 }

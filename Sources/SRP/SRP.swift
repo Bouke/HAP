@@ -52,21 +52,8 @@ public func createSaltedVerificationKey(username: String, password: String, salt
     return (salt, v.data)
 }
 
-func ^ (lhs: Data, rhs: Data) -> Data? {
-    guard lhs.count == rhs.count else { return nil }
-    var result = Data(count: lhs.count)
-    for index in lhs.indices {
-        result[index] = lhs[index] ^ rhs[index]
-    }
-    return result
-}
-
-// func pad(_ data: Data, to number: Bignum) -> Data {
-//     return Data(repeating: 0, count: number.data.count - data.count) + data
-// }
-
 func pad(_ data: Data, to size: Int) -> Data {
-    return Data(repeating: 0, count: size - data.count) + data
+    return Data(count: size - data.count)! + data
 }
 
 //u = H(PAD(A) | PAD(B))

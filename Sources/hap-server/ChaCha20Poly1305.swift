@@ -10,7 +10,7 @@ class ChaCha20Poly1305 {
     let chacha20: ChaCha20
 
     init?(key: Data, nonce: Data) {
-        precondition(key.count == 32, "encryption key must be 256 bit")
+        precondition(key.count == 32, "encryption key must be 256 bit, but is \(key.count * 8) bits")
 
         guard let chacha20 = ChaCha20(key: Array(key), iv: Array(nonce)) else {
             return nil
@@ -30,8 +30,8 @@ class ChaCha20Poly1305 {
         let message = Data(cipher[0..<cipher.endIndex-16])
         let mac = Data(cipher[cipher.endIndex-16..<cipher.endIndex])
 
-        let polyMessage = add + Data(repeating: 0, count: (16 - (add.count % 16)) % 16) +
-            message + Data(repeating: 0, count: (16 - (message.count % 16)) % 16)  +
+        let polyMessage = add + Data(count: (16 - (add.count % 16)) % 16)! +
+            message + Data(count: (16 - (message.count % 16)) % 16)!  +
             Data(bytes: UInt64(add.count).bigEndian.bytes()) +
             Data(bytes: UInt64(message.count).bigEndian.bytes())
 
@@ -49,8 +49,8 @@ class ChaCha20Poly1305 {
     func encrypt(message: Data, add: Data = Data()) throws -> Data {
         let encrypted = Data(try chacha20.encrypt(Array(message)))
 
-        let polyMessage = add + Data(repeating: 0, count: (16 - (add.count % 16)) % 16) +
-            encrypted + Data(repeating: 0, count: (16 - (encrypted.count % 16)) % 16)  +
+        let polyMessage = add + Data(count: (16 - (add.count % 16)) % 16)! +
+            encrypted + Data(count: (16 - (encrypted.count % 16)) % 16)!  +
             Data(bytes: UInt64(add.count).bigEndian.bytes()) +
             Data(bytes: UInt64(encrypted.count).bigEndian.bytes())
 
@@ -58,6 +58,6 @@ class ChaCha20Poly1305 {
             throw Error.InvalidMessageAuthenticator
         }
         
-        return encrypted + computedMac
+        return encrypted + Data(computedMac)
     }
 }

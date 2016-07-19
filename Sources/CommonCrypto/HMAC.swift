@@ -53,7 +53,7 @@ public class HMAC {
     }
 
     public func final() -> Data {
-        var mac = Data(count: algorithm.length)
+        var mac = Data(count: algorithm.length)!
         mac.withUnsafeMutableBytes { pMac in
             CCHmacFinal(context, pMac)
         }
