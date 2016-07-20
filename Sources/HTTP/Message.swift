@@ -79,13 +79,19 @@ extension Message: CustomDebugStringConvertible {
 
 
 public class Request: Message {
+    enum Error: ErrorProtocol {
+        case couldNotAppendData
+    }
+
     init() {
         super.init(boxed: CFHTTPMessageCreateEmpty(nil, true).takeRetainedValue())
     }
 
-    func append(data: Data) -> Bool {
-        return data.withUnsafeBytes {
-            return CFHTTPMessageAppendBytes(boxed, $0, data.count)
+    func append(data: Data) throws {
+        guard data.withUnsafeBytes({
+            CFHTTPMessageAppendBytes(boxed, $0, data.count)
+        }) else {
+            throw Error.couldNotAppendData
         }
     }
 

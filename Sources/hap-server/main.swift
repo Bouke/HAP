@@ -4,8 +4,8 @@ import HTTP
 class Delegate: NSObject, NetServiceDelegate, StreamDelegate {
     var server: HTTP.Server
 
-    init(application: Application) {
-        server = Server(application: application)
+    init(server: HTTP.Server) {
+        self.server = server
     }
 
     func netService(_ sender: NetService, didNotPublish errorDict: [String : NSNumber]) {
@@ -67,7 +67,11 @@ let router = Router(routes: [
     ("/pair-verify", pairVerify)
 ])
 
-let delegate = Delegate(application: router.application)
+let encryption = EncryptionConnectionMiddleware()
+
+let httpServer = Server(application: router.application, connectionMiddleware: [encryption])
+
+let delegate = Delegate(server: httpServer)
 
 let service = NetService(domain: "local.", type: "_hap._tcp.", name: device.name, port: 8000)
 let config: [String: Data] = [

@@ -50,7 +50,7 @@ public class Connection: NSObject, StreamDelegate {
             try! request.append(data: buffer)
 
             if request.isHeaderComplete {
-                response = server?.application(request)
+                response = server?.application(self, request)
                 response!.headers["Connection"] = "Keep-Alive"
                 request = Request()
 
