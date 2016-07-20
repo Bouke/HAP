@@ -1,13 +1,20 @@
 import Foundation
 
+public protocol ConnectionMiddleware: Hashable {
+    func handle(incoming: Data, in: Connection) -> Data
+    func handle(outgoing: Data, in: Connection) -> Data
+}
 
-class Connection: NSObject, StreamDelegate {
+public protocol Context {}
+
+public class Connection: NSObject, StreamDelegate {
     weak var server: Server?
 
     let inputStream: InputStream
     let outputStream: NSOutputStream
     var request: Request
     var response: Response?
+//    var context: [ConnectionMiddleware: Context] = [:]
 
     init(server: Server, inputStream: InputStream, outputStream: NSOutputStream) {
         self.server = server
@@ -28,17 +35,19 @@ class Connection: NSObject, StreamDelegate {
         inputStream.schedule(in: RunLoop.main, forMode: .defaultRunLoopMode)
     }
 
-    func stream(_ aStream: Stream, handle eventCode: Stream.Event) {
+    public func stream(_ aStream: Stream, handle eventCode: Stream.Event) {
         switch (aStream, eventCode) {
         case (_, Stream.Event.openCompleted): break
 
         case (inputStream, Stream.Event.hasBytesAvailable):
-            var buffer = Data(capacity: 1024)!
-            buffer.count = 1024
+            var buffer = Data(count: 1024)!
             buffer.count = buffer.withUnsafeMutableBytes {
-                inputStream.read($0, maxLength: 1024)
+                inputStream.read($0, maxLength: buffer.count)
             }
-            precondition(request.append(data: buffer))
+
+            buffer = server!.connectionMiddleware.reduce(buffer) { $1.handle(incoming: $0, in: self) }
+
+            try! request.append(data: buffer)
 
             if request.isHeaderComplete {
                 response = server?.application(request)
@@ -50,10 +59,13 @@ class Connection: NSObject, StreamDelegate {
             }
 
         case (outputStream, Stream.Event.hasSpaceAvailable):
-            guard let data = response?.serialized() else {
+            print(response?.status)
+            guard let serialized = response?.serialized() else {
                 abort()
             }
-            print(response?.status)
+
+            let data = server!.connectionMiddleware.reversed().reduce(serialized) { $1.handle(outgoing: $0, in: self) }
+
             let written = data.withUnsafeBytes {
                 outputStream.write($0, maxLength: data.count)
             }

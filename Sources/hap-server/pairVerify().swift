@@ -19,7 +19,7 @@ let pk = { () -> Data in
 var otherPublicKey: Data? = nil
 var sharedSecret: Data? = nil
 
-func pairVerify(request: Request) -> Response {
+func pairVerify(connection: Connection, request: Request) -> Response {
     guard let body = request.body, let data: PairTagTLV8 = try? decode(body) else { return Response(status: .BadRequest) }
     switch PairVerifyStep(rawValue: data[.sequence]![0]) {
 

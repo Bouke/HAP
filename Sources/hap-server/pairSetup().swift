@@ -2,7 +2,7 @@ import Foundation
 import HTTP
 import HKDF
 
-func pairSetup(request: Request) -> Response {
+func pairSetup(connection: Connection, request: Request) -> Response {
     guard let body = request.body, let data: PairTagTLV8 = try? decode(body) else { return Response(status: .BadRequest) }
 
     switch PairSetupStep(rawValue: data[.sequence]![0]) {

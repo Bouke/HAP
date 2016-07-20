@@ -18,7 +18,7 @@ class Delegate: NSObject, NetServiceDelegate, StreamDelegate {
     }
 }
 
-func root(request: Request) -> Response {
+func root(connection: Connection, request: Request) -> Response {
     return Response(status: .OK, text: "Nothing to see here. Pair this Homekit Accessory with an iOS device.")
 }
 
