@@ -72,6 +72,7 @@ public class Message {
 
 extension Message: CustomDebugStringConvertible {
     public var debugDescription: String {
+        precondition(isHeaderComplete)
         guard let serialized = serialized() else { return "Message (could not be serialized)" }
         return serialized.withUnsafeBytes { String(cString: $0) }
     }
@@ -96,19 +97,18 @@ public class Request: Message {
     }
 
     public var requestMethod: String? {
+        precondition(isHeaderComplete)
         return CFHTTPMessageCopyRequestMethod(boxed)?.takeRetainedValue() as String?
     }
 
     public var requestURL: URL? {
+        precondition(isHeaderComplete)
         return CFHTTPMessageCopyRequestURL(boxed)?.takeRetainedValue() as URL?
     }
 }
 
 
 public class Response: Message {
-    init(statusCode: Int, statusDescription: String, httpVersion: String) {
-        super.init(boxed: CFHTTPMessageCreateResponse(nil, statusCode, statusDescription, httpVersion).takeRetainedValue())
-    }
 
     public enum Status: Int, CustomDebugStringConvertible {
         case OK = 200, Created = 201, Accepted = 202
@@ -135,9 +135,9 @@ public class Response: Message {
         }
     }
 
-    public convenience init(status: Status, text: String? = nil, mimeType: String = "text/html") {
-        self.init(statusCode: status.rawValue, statusDescription: status.description, httpVersion: kCFHTTPVersion1_1 as String)
-        if let data = text?.data(using: .utf8) {
+    public init(status: Status, text: String? = nil, mimeType: String? = "text/html") {
+        super.init(boxed: CFHTTPMessageCreateResponse(nil, status.rawValue, status.description, kCFHTTPVersion1_1 as String).takeRetainedValue())
+        if let data = text?.data(using: .utf8), let mimeType = mimeType {
             headers["Content-Type"] = "\(mimeType); charset=utf8"
             headers["Content-Length"] = "\(data.count)"
             self.body = data

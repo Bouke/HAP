@@ -2,11 +2,11 @@ import Foundation
 
 public class Server: NSObject, StreamDelegate {
     let application: Application
-    let connectionMiddleware: [ConnectionMiddleware]
+    let streamMiddleware: [StreamMiddleware]
 
-    public init(application: Application, connectionMiddleware: [ConnectionMiddleware]) {
+    public init(application: Application, streamMiddleware: [StreamMiddleware]) {
         self.application = application
-        self.connectionMiddleware = connectionMiddleware
+        self.streamMiddleware = streamMiddleware
     }
 
     var connections: [Connection] = []

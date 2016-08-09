@@ -1,20 +1,23 @@
 import Foundation
 
-public protocol ConnectionMiddleware: Hashable {
-    func handle(incoming: Data, in: Connection) -> Data
-    func handle(outgoing: Data, in: Connection) -> Data
+public protocol StreamMiddleware {
+    func parse(input data: Data, forConnection connection: Connection) -> Data
+    func parse(output data: Data, forConnection connection: Connection) -> Data
 }
 
-public protocol Context {}
+
 
 public class Connection: NSObject, StreamDelegate {
     weak var server: Server?
 
     let inputStream: InputStream
     let outputStream: NSOutputStream
-    var request: Request
-    var response: Response?
 //    var context: [ConnectionMiddleware: Context] = [:]
+    public private(set) var request: Request
+    public private(set) var response: Response?
+
+    public typealias Context = [String: Any]
+    public var context = Context()
 
     init(server: Server, inputStream: InputStream, outputStream: NSOutputStream) {
         self.server = server
@@ -32,7 +35,7 @@ public class Connection: NSObject, StreamDelegate {
         inputStream.open()
         outputStream.open()
 
-        inputStream.schedule(in: RunLoop.main, forMode: .defaultRunLoopMode)
+        inputStream.schedule(in: .main, forMode: .defaultRunLoopMode)
     }
 
     public func stream(_ aStream: Stream, handle eventCode: Stream.Event) {
@@ -45,14 +48,16 @@ public class Connection: NSObject, StreamDelegate {
                 inputStream.read($0, maxLength: buffer.count)
             }
 
-            buffer = server!.connectionMiddleware.reduce(buffer) { $1.handle(incoming: $0, in: self) }
+            // Used [].reduce before, but resulted in corrupted memory; this as a workaround
+            for middleware in server!.streamMiddleware {
+                buffer = middleware.parse(input: buffer, forConnection: self)
+            }
 
             try! request.append(data: buffer)
 
             if request.isHeaderComplete {
                 response = server?.application(self, request)
                 response!.headers["Connection"] = "Keep-Alive"
-                request = Request()
 
                 inputStream.remove(from: .main, forMode: .defaultRunLoopMode)
                 outputStream.schedule(in: .main, forMode: .defaultRunLoopMode)
@@ -64,12 +69,14 @@ public class Connection: NSObject, StreamDelegate {
                 abort()
             }
 
-            let data = server!.connectionMiddleware.reversed().reduce(serialized) { $1.handle(outgoing: $0, in: self) }
+            let data = server!.streamMiddleware.reversed().reduce(serialized) { $1.parse(output: $0, forConnection: self) }
 
             let written = data.withUnsafeBytes {
                 outputStream.write($0, maxLength: data.count)
             }
+
             response = nil
+            request = Request()
 
             precondition(written == data.count)
 

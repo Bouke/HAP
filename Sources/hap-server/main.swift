@@ -67,9 +67,9 @@ let router = Router(routes: [
     ("/pair-verify", pairVerify)
 ])
 
-let encryption = EncryptionConnectionMiddleware()
+let encryption = EncryptionMiddleware()
 
-let httpServer = Server(application: router.application, connectionMiddleware: [encryption])
+let httpServer =  Server(application: router.application, streamMiddleware: [encryption])
 
 let delegate = Delegate(server: httpServer)
 

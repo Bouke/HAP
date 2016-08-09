@@ -105,7 +105,7 @@ func pairVerify(connection: Connection, request: Request) -> Response {
             .sequence: Data(bytes: [PairVerifyStep.finishResponse.rawValue])
         ]
 
-        let response = Response(status: .OK)
+        let response = UpgradeResponse(cryptographer: Cryptographer(sharedKey: sharedSecret!))
         response.headers["Content-Type"] = "application/pairing+tlv8"
         response.body = encode(result)
         return response

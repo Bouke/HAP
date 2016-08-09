@@ -12,3 +12,12 @@ extension Integer {
         self.init(bytes: Array(data))
     }
 }
+
+extension UInt16 {
+    var bytes: [UInt8] {
+        return [
+            UInt8(truncatingBitPattern: self >> 8),
+            UInt8(truncatingBitPattern: self)
+        ]
+    }
+}

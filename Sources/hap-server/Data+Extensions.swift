@@ -9,7 +9,25 @@ func + (lhs: Data, rhs: Data) -> Data {
 
 // Removed in Xcode 8 beta 3
 extension Data {
-    init<S: Sequence where S.Iterator.Element == UInt8>(_ sequence: S) {
-        self = Data(bytes: Array(sequence))
+    init<C: Collection where C.Iterator.Element == UInt8>(_ collection: C) {
+        self = Data(bytes: Array(collection))
+    }
+}
+
+extension Data {
+    init?(hex: String) {
+        var result = [UInt8]()
+        var from = hex.characters.startIndex
+        while from < hex.characters.endIndex {
+            guard let to = hex.characters.index(from, offsetBy: 2, limitedBy: hex.characters.endIndex) else {
+                return nil
+            }
+            guard let num = UInt8(hex[from..<to], radix: 16) else {
+                return nil
+            }
+            result.append(num)
+            from = to
+        }
+        self = Data(result)
     }
 }
