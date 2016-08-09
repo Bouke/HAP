@@ -2,7 +2,7 @@ import CryptoSwift
 import Foundation
 
 class ChaCha20Poly1305 {
-    enum Error: ErrorProtocol {
+    enum Error: Swift.Error {
         case InvalidMessageAuthenticator
     }
 
@@ -30,8 +30,8 @@ class ChaCha20Poly1305 {
         let message = Data(cipher[0..<cipher.endIndex-16])
         let mac = Data(cipher[cipher.endIndex-16..<cipher.endIndex])
 
-        let polyMessage = add + Data(count: (16 - (add.count % 16)) % 16)! +
-            message + Data(count: (16 - (message.count % 16)) % 16)!  +
+        let polyMessage = add + Data(count: (16 - (add.count % 16)) % 16) +
+            message + Data(count: (16 - (message.count % 16)) % 16)  +
             Data(bytes: UInt64(add.count).bigEndian.bytes()) +
             Data(bytes: UInt64(message.count).bigEndian.bytes())
 
@@ -49,8 +49,8 @@ class ChaCha20Poly1305 {
     func encrypt(message: Data, add: Data = Data()) throws -> Data {
         let encrypted = Data(try chacha20.encrypt(Array(message)))
 
-        let polyMessage = add + Data(count: (16 - (add.count % 16)) % 16)! +
-            encrypted + Data(count: (16 - (encrypted.count % 16)) % 16)!  +
+        let polyMessage = add + Data(count: (16 - (add.count % 16)) % 16) +
+            encrypted + Data(count: (16 - (encrypted.count % 16)) % 16)  +
             Data(bytes: UInt64(add.count).bigEndian.bytes()) +
             Data(bytes: UInt64(encrypted.count).bigEndian.bytes())
 

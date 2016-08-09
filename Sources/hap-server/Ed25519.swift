@@ -11,7 +11,7 @@ import CLibSodium
 
 
 class Ed25519 {
-    enum Error: ErrorProtocol {
+    enum Error: Swift.Error {
         case invalidSignature
         case couldNotSign
     }
@@ -29,7 +29,7 @@ class Ed25519 {
     }
 
     static func sign(privateKey: Data, message: Data) throws -> Data {
-        var signature = Data(count: Int(crypto_sign_BYTES))!
+        var signature = Data(count: Int(crypto_sign_BYTES))
         guard signature.withUnsafeMutableBytes({ sig -> Int32 in
             message.withUnsafeBytes { m -> Int32 in
                 privateKey.withUnsafeBytes { sk -> Int32 in
@@ -43,8 +43,8 @@ class Ed25519 {
     }
 
     static func generateSignKeypair() -> (publicKey: Data, privateKey: Data) {
-        var pk = Data(count: Int(crypto_sign_PUBLICKEYBYTES))!
-        var sk = Data(count: 64)! // crypto_sign_SECRETKEYBYTES is not available
+        var pk = Data(count: Int(crypto_sign_PUBLICKEYBYTES))
+        var sk = Data(count: 64) // crypto_sign_SECRETKEYBYTES is not available
         precondition(pk.withUnsafeMutableBytes({ pk in
             sk.withUnsafeMutableBytes { sk in
                 crypto_sign_keypair(pk, sk)

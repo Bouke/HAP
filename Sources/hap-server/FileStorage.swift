@@ -9,7 +9,7 @@
 import Foundation
 
 class FileStorage {
-    enum Error: ErrorProtocol {
+    enum Error: Swift.Error {
         case couldNotCreateDirectory
     }
 
@@ -28,16 +28,14 @@ class FileStorage {
 
     subscript(key: String) -> Data? {
         get {
-            guard let entityPath = try? URL(fileURLWithPath: path).appendingPathComponent(key) else {
-                return nil
-            }
+            let entityPath = URL(fileURLWithPath: path).appendingPathComponent(key)
             guard let data = try? Data(contentsOf: entityPath, options: []) else {
                 return nil
             }
             return data
         }
         set {
-            let entityPath = try! URL(fileURLWithPath: path).appendingPathComponent(key)
+            let entityPath = URL(fileURLWithPath: path).appendingPathComponent(key)
             if let newValue = newValue {
                 try! newValue.write(to: entityPath)
             } else {

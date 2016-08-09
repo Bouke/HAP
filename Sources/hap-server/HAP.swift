@@ -10,7 +10,7 @@ import Foundation
 
 typealias PairTagTLV8 = [PairTag: Data]
 
-enum TLV8Error: ErrorProtocol {
+enum TLV8Error: Swift.Error {
     case UnknownKey(UInt8)
     case DecodeError
 }

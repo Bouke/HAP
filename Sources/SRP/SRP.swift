@@ -53,7 +53,7 @@ public func createSaltedVerificationKey(username: String, password: String, salt
 }
 
 func pad(_ data: Data, to size: Int) -> Data {
-    return Data(count: size - data.count)! + data
+    return Data(count: size - data.count) + data
 }
 
 //u = H(PAD(A) | PAD(B))

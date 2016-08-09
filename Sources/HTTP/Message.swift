@@ -80,7 +80,7 @@ extension Message: CustomDebugStringConvertible {
 
 
 public class Request: Message {
-    enum Error: ErrorProtocol {
+    enum Error: Swift.Error {
         case couldNotAppendData
     }
 

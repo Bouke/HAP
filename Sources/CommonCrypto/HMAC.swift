@@ -35,7 +35,7 @@ public class HMAC {
     typealias Context = UnsafeMutablePointer<CCHmacContext>
 
     var algorithm: Algorithm
-    var context = Context(allocatingCapacity: 1)
+    var context = Context.allocate(capacity: 1)
 
     public init(algorithm: Algorithm, key: Data) {
         self.algorithm = algorithm
@@ -53,7 +53,7 @@ public class HMAC {
     }
 
     public func final() -> Data {
-        var mac = Data(count: algorithm.length)!
+        var mac = Data(count: algorithm.length)
         mac.withUnsafeMutableBytes { pMac in
             CCHmacFinal(context, pMac)
         }

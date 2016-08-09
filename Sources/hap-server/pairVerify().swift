@@ -6,7 +6,7 @@ import CLibSodium
 
 let sk = generateRandomBytes(count: 32)
 let pk = { () -> Data in
-    var pk = Data(count: 32)!
+    var pk = Data(count: 32)
     guard pk.withUnsafeMutableBytes({ pk in
         sk.withUnsafeBytes { sk in
             crypto_scalarmult_curve25519_base(pk, sk)
@@ -30,7 +30,7 @@ func pairVerify(connection: Connection, request: Request) -> Response {
         otherPublicKey = clientPublicKey
 
         sharedSecret = { () -> Data in
-            var q = Data(count: 32)!
+            var q = Data(count: 32)
             guard q.withUnsafeMutableBytes({ q -> Int32 in
                 sk.withUnsafeBytes { sk in
                     clientPublicKey.withUnsafeBytes { p in

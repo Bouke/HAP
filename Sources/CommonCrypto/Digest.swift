@@ -28,7 +28,7 @@ public enum HashAlgorithm {
     }
 
     public func hash(_ data: Data) -> Data {
-        var digest = Data(count: length)!
+        var digest = Data(count: length)
         _ = data.withUnsafeBytes { pData in
             digest.withUnsafeMutableBytes { pDigest in
                 f(pData, CC_LONG(data.count), pDigest)

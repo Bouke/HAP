@@ -8,6 +8,6 @@
 
 import Foundation
 
-enum Error: ErrorProtocol {
+enum Error: Swift.Error {
     case authenticationFailed
 }
