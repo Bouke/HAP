@@ -1,6 +1,6 @@
 import Foundation
 
-public class Server: NSObject, StreamDelegate {
+public class Server {
     let application: Application
     let streamMiddleware: [StreamMiddleware]
 
@@ -19,5 +19,6 @@ public class Server: NSObject, StreamDelegate {
         if let index = connections.index(of: connection) {
             connections.remove(at: index)
         }
+        print("Connection closed, \(connections.count) clients remaining")
     }
 }

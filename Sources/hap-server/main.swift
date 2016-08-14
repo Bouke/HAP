@@ -69,7 +69,7 @@ let router = Router(routes: [
 
 let encryption = EncryptionMiddleware()
 
-let httpServer =  Server(application: router.application, streamMiddleware: [encryption])
+let httpServer = Server(application: router.application, streamMiddleware: [encryption])
 
 let delegate = Delegate(server: httpServer)
 
@@ -88,8 +88,7 @@ service.setTXTRecord(NetService.data(fromTXTRecord: config))
 service.delegate = delegate
 service.publish(options: [.listenForConnections])
 
-
-print(service.port)
+print("Listening on port \(service.port)")
 
 withExtendedLifetime((delegate, service)) {
     RunLoop.current.run()

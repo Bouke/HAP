@@ -6,13 +6,11 @@ public protocol StreamMiddleware {
 }
 
 
-
 public class Connection: NSObject, StreamDelegate {
     weak var server: Server?
 
     let inputStream: InputStream
     let outputStream: NSOutputStream
-//    var context: [ConnectionMiddleware: Context] = [:]
     public private(set) var request: Request
     public private(set) var response: Response?
 
@@ -84,7 +82,6 @@ public class Connection: NSObject, StreamDelegate {
             inputStream.schedule(in: .main, forMode: .defaultRunLoopMode)
 
         case (_, Stream.Event.endEncountered), (_, Stream.Event.errorOccurred):
-            print("end encountered, closing")
             close()
 
         default: break
@@ -92,14 +89,13 @@ public class Connection: NSObject, StreamDelegate {
     }
 
     func close() {
-        print("closing...")
-        server?.forget(connection: self)
         inputStream.close()
         outputStream.close()
+        server?.forget(connection: self)
     }
     
     deinit {
-        print("deinit, closing...")
-        close()
+        precondition(inputStream.streamStatus == .closed)
+        precondition(outputStream.streamStatus == .closed)
     }
 }
