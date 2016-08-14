@@ -28,11 +28,23 @@ import SRP
 import CryptoSwift
 
 let storage = try FileStorage(path: "Switch")
-let device = Device(name: "Switch", pin: "001-02-003", storage: storage)
 
-print(device.identifier)
-print(device.publicKey.count)
-print(device.privateKey.count)
+let livingRoomSwitch = { () -> Accessory in
+    let identify = Characteristic(id: 2, type: .identify, permissions: [.write], format: .bool)
+    let manufacturer = Characteristic(id: 3, type: .manufacturer, value: "Bouke", permissions: [.read], format: .string)
+    let model = Characteristic(id: 4, type: .model, value: "Switch 2000", permissions: [.read], format: .string)
+    let name = Characteristic(id: 5, type: .name, value: "Switch", permissions: [.read], format: .string)
+    let serialNumber = Characteristic(id: 6, type: .serialNumber, value: "undefined", permissions: [.read], format: .string)
+    let info = Service(id: 1, type: .info, characteristics: [identify, manufacturer, model, name, serialNumber])
+
+    let characteristic = Characteristic(id: 8, type: .on, value: false, permissions: [.read, .write, .events], format: .bool)
+
+    let service = Service(id: 7, type: .switch, characteristics: [characteristic])
+
+    return Accessory(id: 1, type: .switch, services: [info, service])
+}()
+
+let device = Device(name: "Switch", pin: "001-02-003", storage: storage, accessories: [livingRoomSwitch])
 
 //TODO: converge into "Device()"
 let username = "Pair-Setup"
@@ -64,7 +76,9 @@ let router = Router(routes: [
     ("/", root),
     ("/identify", identify),
     ("/pair-setup", pairSetup),
-    ("/pair-verify", pairVerify)
+    ("/pair-verify", pairVerify),
+    ("/accessories", accessories),
+    ("/characteristics", characteristics)
 ])
 
 let encryption = EncryptionMiddleware()
