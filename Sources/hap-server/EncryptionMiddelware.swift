@@ -22,10 +22,14 @@ class Cryptographer {
     }
 
     func decrypt(_ data: Data) throws -> Data {
+        if data.count == 0 {
+            print("skipping decryption, no data")
+            return data
+        }
         let length = Int(UInt16(data: Data(data[0..<2])))
         precondition(length + 2 + 16 == data.count)
 
-        let nonce = Data(bytes: decryptCount.bytes())
+        let nonce = Data(bytes: decryptCount.bigEndian.bytes())
         decryptCount += 1
 
         let encrypted = data[2..<(2 + length + 16)]
@@ -40,12 +44,12 @@ class Cryptographer {
     }
 
     func encrypt(_ data: Data) -> Data {
-        let nonce = Data(bytes: encryptCount.bytes())
+        let nonce = Data(bytes: encryptCount.bigEndian.bytes())
         encryptCount += 1
 
         let length = Data(UInt16(data.count).bytes.reversed())
 
-        guard let chacha = ChaCha20Poly1305(key: decryptKey, nonce: nonce) else { abort() }
+        guard let chacha = ChaCha20Poly1305(key: encryptKey, nonce: nonce) else { abort() }
 
         guard let encrypted = try? chacha.encrypt(message: data, add: length) else {
             abort()
