@@ -63,8 +63,8 @@ public class Connection: NSObject, StreamDelegate {
 
             if request.isHeaderComplete {
                 response = server?.application(self, request)
-                response!.headers["Connection"] = "Keep-Alive"
                 response!.headers["Date"] = dateFormatter.string(from: Date())
+                // @todo set Connection=Keep-Alive when appriopriate
 
                 inputStream.remove(from: .main, forMode: .defaultRunLoopMode)
                 outputStream.schedule(in: .main, forMode: .defaultRunLoopMode)
