@@ -6,7 +6,7 @@ class UpgradeResponse: Response {
     let cryptographer: Cryptographer
     init(cryptographer: Cryptographer) {
         self.cryptographer = cryptographer
-        super.init(status: .OK)
+        super.init(status: .ok)
     }
 }
 

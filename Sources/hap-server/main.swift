@@ -19,7 +19,7 @@ class Delegate: NSObject, NetServiceDelegate, StreamDelegate {
 }
 
 func root(connection: Connection, request: Request) -> Response {
-    return Response(status: .OK, text: "Nothing to see here. Pair this Homekit Accessory with an iOS device.")
+    return Response(status: .ok, text: "Nothing to see here. Pair this Homekit Accessory with an iOS device.")
 }
 
 import CLibSodium

@@ -78,10 +78,25 @@ extension Message: CustomDebugStringConvertible {
     }
 }
 
-
 public class Request: Message {
     enum Error: Swift.Error {
         case couldNotAppendData
+    }
+
+    public enum Method {
+        case GET
+        case POST
+        case PUT
+        case other(String)
+
+        init(rawValue: String) {
+            switch rawValue {
+            case "GET": self = .GET
+            case "POST": self = .POST
+            case "PUT": self = .PUT
+            default: self = .other(rawValue)
+            }
+        }
     }
 
     init() {
@@ -96,37 +111,52 @@ public class Request: Message {
         }
     }
 
-    public var requestMethod: String? {
+    public var method: Method? {
         precondition(isHeaderComplete)
-        return CFHTTPMessageCopyRequestMethod(boxed)?.takeRetainedValue() as String?
+        guard let rawValue = CFHTTPMessageCopyRequestMethod(boxed)?.takeRetainedValue() as String? else {
+            return nil
+        }
+        return Method(rawValue: rawValue)
     }
 
-    public var requestURL: URL? {
+    public var URL: URL? {
         precondition(isHeaderComplete)
-        return CFHTTPMessageCopyRequestURL(boxed)?.takeRetainedValue() as URL?
+        guard let URL = CFHTTPMessageCopyRequestURL(boxed)?.takeRetainedValue() as URL? else {
+            return nil
+        }
+        return URL
+    }
+}
+
+extension Request.Method: Equatable {
+    public static func == (lhs: Request.Method, rhs: Request.Method) -> Bool {
+        switch (lhs, rhs) {
+        case (.GET, .GET), (.POST, .POST), (.PUT, .PUT): return true
+        case (.other(let lhs), .other(let rhs)) where lhs == rhs: return true
+        default: return false
+        }
     }
 }
 
 
 public class Response: Message {
-
     public enum Status: Int, CustomDebugStringConvertible {
-        case OK = 200, Created = 201, Accepted = 202
-        case MovedPermanently = 301
-        case BadRequest = 400, Unauthorized = 401, Forbidden = 403, NotFound = 404
-        case InternalServerError = 500
+        case ok = 200, created = 201, accepted = 202
+        case movedPermanently = 301
+        case badRequest = 400, unauthorized = 401, forbidden = 403, notFound = 404
+        case internalServerError = 500
 
         public var description: String {
             switch self {
-            case .OK: return "OK"
-            case .Created: return "Created"
-            case .Accepted: return "Accepted"
-            case .MovedPermanently: return "Moved Permanently"
-            case .BadRequest: return "Bad Request"
-            case .Unauthorized: return "Unauthorized"
-            case .Forbidden: return "Forbidden"
-            case .NotFound: return "Not Found"
-            case .InternalServerError: return "Internal Server Error"
+            case .ok: return "OK"
+            case .created: return "Created"
+            case .accepted: return "Accepted"
+            case .movedPermanently: return "Moved Permanently"
+            case .badRequest: return "Bad Request"
+            case .unauthorized: return "Unauthorized"
+            case .forbidden: return "Forbidden"
+            case .notFound: return "Not Found"
+            case .internalServerError: return "Internal Server Error"
             }
         }
 
@@ -135,16 +165,31 @@ public class Response: Message {
         }
     }
 
-    public init(status: Status, text: String? = nil, mimeType: String? = "text/html") {
+    public init(status: Status) {
         super.init(boxed: CFHTTPMessageCreateResponse(nil, status.rawValue, status.description, kCFHTTPVersion1_1 as String).takeRetainedValue())
-        if let data = text?.data(using: .utf8), let mimeType = mimeType {
-            headers["Content-Type"] = "\(mimeType); charset=utf8"
-            headers["Content-Length"] = "\(data.count)"
-            self.body = data
+    }
+
+    public convenience init(status: Status = .ok, data: Data, mimeType: String) {
+        self.init(status: status)
+        headers["Content-Type"] = mimeType
+        headers["Content-Length"] = "\(data.count)"
+        self.body = data
+    }
+
+    public convenience init(status: Status = .ok, text: String, mimeType: String = "text/html") {
+        guard let data = text.data(using: .utf8) else {
+            abort()
         }
+        self.init(status: status, data: data, mimeType: "\(mimeType); charset=utf8")
     }
 
     var status: String? {
         return CFHTTPMessageCopyResponseStatusLine(boxed)?.takeRetainedValue() as String?
     }
+}
+
+extension Response {
+    public static let ok = Response(status: .ok)
+    public static let badRequest = Response(status: .badRequest)
+    public static let notFound = Response(status: .notFound)
 }

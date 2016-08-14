@@ -10,13 +10,13 @@ public class Router {
 
     public var application: Application {
         return { (connection, request) in
-            print("Request for \(request.requestURL!)")
+            print("Request for \(request.URL!)")
             for route in self.routes {
-                if route.path == request.requestURL?.path {
+                if route.path == request.URL?.path {
                     return route.application(connection, request)
                 }
             }
-            return Response(status: .NotFound)
+            return Response(status: .notFound)
         }
     }
 }

@@ -3,7 +3,7 @@ import HTTP
 import HKDF
 
 func pairSetup(connection: Connection, request: Request) -> Response {
-    guard let body = request.body, let data: PairTagTLV8 = try? decode(body) else { return Response(status: .BadRequest) }
+    guard let body = request.body, let data: PairTagTLV8 = try? decode(body) else { return Response(status: .badRequest) }
 
     switch PairSetupStep(rawValue: data[.sequence]![0]) {
     case .startRequest?:
@@ -15,21 +15,21 @@ func pairSetup(connection: Connection, request: Request) -> Response {
             .publicKey: server.B,
             .salt: salt,
         ]
-        let response = Response(status: .OK)
+        let response = Response(status: .ok)
         response.headers["Content-Type"] = "application/pairing+tlv8"
         response.body = encode(result)
         return response
 
     case .verifyRequest?:
         guard let A = data[.publicKey], let M = data[.proof] else {
-            return Response(status: .BadRequest)
+            return Response(status: .badRequest)
         }
 
         print("--> A", A)
         print("--> M", M)
 
         guard let HAMK = try? server.verifySession(A: A, M: M) else {
-            return Response(status: .BadRequest)
+            return Response(status: .badRequest)
         }
 
         print("<-- HAMK", HAMK)
@@ -39,28 +39,28 @@ func pairSetup(connection: Connection, request: Request) -> Response {
             .proof: HAMK
         ]
 
-        let response = Response(status: .OK)
+        let response = Response(status: .ok)
         response.headers["Content-Type"] = "application/pairing+tlv8"
         response.body = encode(result)
         return response
 
     case .keyExchangeRequest?:
         guard let encryptedData = data[.encryptedData] else {
-            return Response(status: .BadRequest)
+            return Response(status: .badRequest)
         }
 
         let encryptionKey = deriveKey(algorithm: .SHA512, seed: server.sessionKey!, info: "Pair-Setup-Encrypt-Info".data(using: .utf8)!, salt: "Pair-Setup-Encrypt-Salt".data(using: .utf8)!, count: 32)
 
         guard let plaintext = try? ChaCha20Poly1305(key: encryptionKey, nonce: "PS-Msg05".data(using: .utf8)!)!.decrypt(cipher: encryptedData) else {
-            return Response(status: .BadRequest)
+            return Response(status: .badRequest)
         }
 
         guard let data: PairTagTLV8 = try? decode(plaintext) else {
-            return Response(status: .BadRequest)
+            return Response(status: .badRequest)
         }
 
         guard let publicKey = data[.publicKey], let username = data[.username], let signatureIn = data[.signature] else {
-            return Response(status: .BadRequest)
+            return Response(status: .badRequest)
         }
 
         print("--> username", username, String(data: username, encoding: .utf8)!)
@@ -76,7 +76,7 @@ func pairSetup(connection: Connection, request: Request) -> Response {
         do {
             try Ed25519.verify(publicKey: publicKey, message: hashIn, signature: signatureIn)
         } catch {
-            return Response(status: .BadRequest)
+            return Response(status: .badRequest)
         }
 
         // At this point, the client has successfully verified.
@@ -90,7 +90,7 @@ func pairSetup(connection: Connection, request: Request) -> Response {
             device.publicKey
 
         guard let signatureOut = try? Ed25519.sign(privateKey: device.privateKey, message: hashOut) else {
-            return Response(status: .BadRequest)
+            return Response(status: .badRequest)
         }
 
         let resultInner: PairTagTLV8 = [
@@ -104,7 +104,7 @@ func pairSetup(connection: Connection, request: Request) -> Response {
         print("<-- signature", signatureOut)
 
         guard let encryptor = ChaCha20Poly1305(key: encryptionKey, nonce: "PS-Msg06".data(using: .utf8)!), let encryptedResultInner = try? encryptor.encrypt(message: encode(resultInner)) else {
-            return Response(status: .BadRequest)
+            return Response(status: .badRequest)
         }
 
         let resultOuter: PairTagTLV8 = [
@@ -112,7 +112,7 @@ func pairSetup(connection: Connection, request: Request) -> Response {
             .encryptedData: encryptedResultInner
         ]
 
-        let response = Response(status: .OK)
+        let response = Response(status: .ok)
         response.headers["Content-Type"] = "application/pairing+tlv8"
         response.body = encode(resultOuter)
         return response
@@ -120,5 +120,5 @@ func pairSetup(connection: Connection, request: Request) -> Response {
     case let step: print(request); print(step); print(data)
     }
     
-    return Response(status: .BadRequest, text: "Not sure what to do here...")
+    return Response(status: .badRequest, text: "Not sure what to do here...")
 }
