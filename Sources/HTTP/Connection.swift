@@ -17,6 +17,14 @@ public class Connection: NSObject, StreamDelegate {
     public typealias Context = [String: Any]
     public var context = Context()
 
+    public var dateFormatter = { () -> DateFormatter in
+        let f = DateFormatter()
+        f.timeZone = TimeZone(identifier: "GMT")
+        f.dateFormat = "EEE',' dd MMM yyyy HH':'mm':'ss zzz"
+        f.locale = Locale(identifier: "en_US")
+        return f
+    }()
+
     init(server: Server, inputStream: InputStream, outputStream: NSOutputStream) {
         self.server = server
         self.inputStream = inputStream
@@ -56,6 +64,7 @@ public class Connection: NSObject, StreamDelegate {
             if request.isHeaderComplete {
                 response = server?.application(self, request)
                 response!.headers["Connection"] = "Keep-Alive"
+                response!.headers["Date"] = dateFormatter.string(from: Date())
 
                 inputStream.remove(from: .main, forMode: .defaultRunLoopMode)
                 outputStream.schedule(in: .main, forMode: .defaultRunLoopMode)
