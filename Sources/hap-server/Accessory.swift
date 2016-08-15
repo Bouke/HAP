@@ -1,6 +1,10 @@
 import Foundation
 import CLibSodium
 import CommonCrypto
+import HTTP
+import func Evergreen.getLogger
+
+fileprivate let logger = getLogger("hap")
 
 func generateIdentifier() -> String {
     return (1...6).map({ _ in String(arc4random() & 255, radix: 16, uppercase: false) }).joined(separator: ":")
@@ -151,7 +155,6 @@ public class Characteristic {
         self.maxValue = maxValue
         self.minValue = minValue
         self.stepValue = stepValue
-
     }
 }
 
@@ -177,6 +180,18 @@ extension Characteristic: JSONSerializable {
     }
 }
 
+extension Characteristic: Hashable {
+    public var hashValue: Int {
+        return id
+    }
+}
+
+extension Characteristic: Equatable {
+    public static func == (lhs: Characteristic, rhs: Characteristic) -> Bool {
+        return lhs === rhs
+    }
+}
+
 public class Device {
     let name: String
     let identifier: String
@@ -186,6 +201,7 @@ public class Device {
     let storage: FileStorage
     let clients: Clients
     let accessories: [Accessory]
+    internal var characteristicEventListeners: [Characteristic: WeakObjectSet<Connection>]
 
     init(name: String, pin: String, storage: FileStorage, accessories: [Accessory]) {
         self.name = name
@@ -204,6 +220,7 @@ public class Device {
         }
         clients = Clients(storage: storage)
         self.accessories = accessories
+        characteristicEventListeners = [:]
     }
 
     public class Clients {
@@ -220,5 +237,28 @@ public class Device {
                 storage[username.toHexString()] = newValue
             }
         }
+    }
+
+    public func add(characteristic: Characteristic, listener: Connection) {
+        if let _ = characteristicEventListeners[characteristic] {
+            characteristicEventListeners[characteristic]!.addObject(object: listener)
+        } else {
+            characteristicEventListeners[characteristic] = [listener]
+        }
+    }
+
+    @discardableResult
+    public func remove(characteristic: Characteristic, listener connection: Connection) -> Connection? {
+        guard let _ = characteristicEventListeners[characteristic] else {
+            return nil
+        }
+        return characteristicEventListeners[characteristic]!.remove(connection)
+    }
+
+    public func notify(characteristicListeners characteristic: Characteristic, exceptListener except: Connection? = nil) {
+        guard let listeners = characteristicEventListeners[characteristic]?.filter({$0 != except}) else {
+            return
+        }
+        logger.info("Notifying \(listeners)")
     }
 }

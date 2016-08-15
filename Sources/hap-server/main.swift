@@ -91,8 +91,9 @@ let delegate = Delegate(server: httpServer)
 
 let service = NetService(domain: "local.", type: "_hap._tcp.", name: device.name, port: 8000)
 let config: [String: Data] = [
+    "pv": "1.0".data(using: .utf8)!, // state
     "id": device.identifier.data(using: .utf8)!, // identifier
-    "c#": "3".data(using: .utf8)!, // version
+    "c#": "1".data(using: .utf8)!, // version
     "s#": "1".data(using: .utf8)!, // state
     "sf": "1".data(using: .utf8)!, // discoverable
     "ff": "0".data(using: .utf8)!, // mfi compliant
