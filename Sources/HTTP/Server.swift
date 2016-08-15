@@ -13,12 +13,13 @@ public class Server {
 
     public func accept(inputStream: InputStream, outputStream: NSOutputStream) {
         connections.append(Connection(server: self, inputStream: inputStream, outputStream: outputStream))
+        logger.info("New connection, \(self.connections.count) clients")
     }
 
     func forget(connection: Connection) {
         if let index = connections.index(of: connection) {
             connections.remove(at: index)
         }
-        print("Connection closed, \(connections.count) clients remaining")
+        logger.info("Connection closed, \(self.connections.count) clients remaining")
     }
 }

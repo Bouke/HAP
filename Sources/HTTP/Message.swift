@@ -141,7 +141,7 @@ extension Request.Method: Equatable {
 
 public class Response: Message {
     public enum Status: Int, CustomDebugStringConvertible {
-        case ok = 200, created = 201, accepted = 202
+        case ok = 200, created = 201, accepted = 202, noContent = 204
         case movedPermanently = 301
         case badRequest = 400, unauthorized = 401, forbidden = 403, notFound = 404
         case internalServerError = 500
@@ -151,6 +151,7 @@ public class Response: Message {
             case .ok: return "OK"
             case .created: return "Created"
             case .accepted: return "Accepted"
+            case .noContent: return "No Content"
             case .movedPermanently: return "Moved Permanently"
             case .badRequest: return "Bad Request"
             case .unauthorized: return "Unauthorized"

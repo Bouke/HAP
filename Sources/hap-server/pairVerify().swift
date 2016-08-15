@@ -3,6 +3,9 @@ import HTTP
 import HKDF
 import CommonCrypto
 import CLibSodium
+import func Evergreen.getLogger
+
+fileprivate let logger = getLogger("hap.pairVerify")
 
 let sk = generateRandomBytes(count: 32)
 let pk = { () -> Data in
@@ -22,6 +25,8 @@ var sharedSecret: Data? = nil
 func pairVerify(connection: Connection, request: Request) -> Response {
     guard let body = request.body, let data: PairTagTLV8 = try? decode(body) else { return Response(status: .badRequest) }
     switch PairVerifyStep(rawValue: data[.sequence]![0]) {
+
+    logger.debug("data: \(data)")
 
     case .startRequest?:
         guard let clientPublicKey = data[.publicKey], clientPublicKey.count == 32 else {
@@ -50,7 +55,7 @@ func pairVerify(connection: Connection, request: Request) -> Response {
             .username: device.identifier.data(using: .utf8)!,
             .signature: signature
         ]
-        print("startRequest result:", resultInner)
+        logger.debug("startRequest result: \(resultInner)")
 
         let encryptionKey = HKDF.deriveKey(algorithm: .SHA512, seed: sharedSecret!, info: "Pair-Verify-Encrypt-Info".data(using: .utf8)!, salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8)!, count: 32)
 
@@ -86,13 +91,13 @@ func pairVerify(connection: Connection, request: Request) -> Response {
             return Response(status: .badRequest)
         }
 
-        print("--> username", username, String(data: username, encoding: .utf8)!)
-        print("--> signature", signatureIn)
+        logger.debug("--> username \(username) \(String(data: username, encoding: .utf8)!)")
+        logger.debug("--> signature \(signatureIn)")
 
         guard let publicKey = device.clients[username] else {
             return Response(status: .badRequest)
         }
-        print("--> public key", publicKey)
+        logger.debug("--> public key \(publicKey)")
 
         let material = otherPublicKey! + username + pk
         do {

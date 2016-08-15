@@ -1,5 +1,8 @@
 import CryptoSwift
 import Foundation
+import Evergreen
+
+fileprivate let logger = getLogger("chacha")
 
 class ChaCha20Poly1305 {
     enum Error: Swift.Error {
@@ -41,8 +44,10 @@ class ChaCha20Poly1305 {
 
         guard mac == Data(computedMac) else {
             throw Error.InvalidMessageAuthenticator
+        logger.debug("Verifying MAC; input: \(polyMessage), provided MAC: \(mac), computed MAC: \(Data(computedMac))")
         }
 
+        logger.debug("Valid MAC, decrypting cyphertext: \(message)")
         return Data(try chacha20.decrypt(Array(message)))
     }
 

@@ -62,6 +62,8 @@ public class Connection: NSObject, StreamDelegate {
             try! request.append(data: buffer)
 
             if request.isHeaderComplete {
+                logger.debug("Request \(self.request)")
+
                 response = server?.application(self, request)
                 response!.headers["Date"] = dateFormatter.string(from: Date())
                 // @todo set Connection=Keep-Alive when appriopriate
@@ -71,10 +73,10 @@ public class Connection: NSObject, StreamDelegate {
             }
 
         case (outputStream, Stream.Event.hasSpaceAvailable):
-            print(response?.status)
             guard let serialized = response?.serialized() else {
                 abort()
             }
+            logger.debug("Response \(self.response!)")
 
             let data = server!.streamMiddleware.reversed().reduce(serialized) { $1.parse(output: $0, forConnection: self) }
 

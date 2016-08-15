@@ -1,5 +1,6 @@
 import Foundation
 import HTTP
+import Evergreen
 
 class Delegate: NSObject, NetServiceDelegate, StreamDelegate {
     var server: HTTP.Server
@@ -102,7 +103,7 @@ service.setTXTRecord(NetService.data(fromTXTRecord: config))
 service.delegate = delegate
 service.publish(options: [.listenForConnections])
 
-print("Listening on port \(service.port)")
+log("Listening on port \(service.port)", forLevel: .info)
 
 withExtendedLifetime((delegate, service)) {
     RunLoop.current.run()
