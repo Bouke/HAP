@@ -48,7 +48,14 @@ func characteristics(connection: Connection, request: Request) -> Response {
                 // hc sets status to StatusServiceCommunicationFailure instead
                 return .notFound
             }
-            characteristic.value = value
+            if let value = item["value"] {
+                switch value {
+                case let value as NSNumber: characteristic.value = value
+                case is NSNull: characteristic.value = nil
+                default: return .badRequest
+                }
+                device.notify(characteristicListeners: characteristic, exceptListener: connection)
+            }
         }
 
         return Response(status: .ok, data: Data(), mimeType: "application/hap+json")
