@@ -12,9 +12,9 @@
     import Darwin
 #endif
 
-public protocol Cryptors: class {
-    associatedtype EncryptorType: Updatable
-    associatedtype DecryptorType: Updatable
+public protocol Cryptors {
+    associatedtype EncryptorType: UpdatableCryptor
+    associatedtype DecryptorType: UpdatableCryptor
 
     /// Cryptor suitable for encryption
     func makeEncryptor() -> EncryptorType

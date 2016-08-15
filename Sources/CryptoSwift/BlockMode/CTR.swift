@@ -8,12 +8,12 @@
 //  Counter (CTR)
 //
 
-struct CTRModeWorker: RandomAccessBlockModeWorker {
+struct CTRModeWorker: BlockModeWorker {
     typealias Element = Array<UInt8>
 
     let cipherOperation: CipherOperationOnBlock
     private let iv: Element
-    var counter: UInt = 0
+    private var counter: UInt = 0
 
     init(iv: Array<UInt8>, cipherOperation: CipherOperationOnBlock) {
         self.iv = iv
@@ -32,7 +32,13 @@ struct CTRModeWorker: RandomAccessBlockModeWorker {
     }
 
     mutating func decrypt(_ ciphertext: Array<UInt8>) -> Array<UInt8> {
-        return encrypt(ciphertext)
+        let nonce = buildNonce(iv, counter: UInt64(counter))
+        counter = counter + 1
+
+        guard let plaintext = cipherOperation(block: nonce) else {
+            return ciphertext
+        }
+        return xor(plaintext, ciphertext)
     }
 }
 

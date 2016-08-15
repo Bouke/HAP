@@ -11,7 +11,7 @@ public enum CipherError: Error {
     case decrypt
 }
 
-public protocol Cipher: class {
+public protocol Cipher {
     /// Encrypt given bytes at once
     ///
     /// - parameter bytes: Plaintext data

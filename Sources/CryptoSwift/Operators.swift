@@ -23,21 +23,21 @@ j &<<= 2        //shift left and assign
 */
 
 infix operator &<<= {
-  associativity none
-  precedence 160
+associativity none
+precedence 160
 }
 
 infix operator &<< {
-  associativity none
-  precedence 160
+associativity none
+precedence 160
 }
 
 infix operator &>>= {
-  associativity none
-  precedence 160
+associativity none
+precedence 160
 }
 
 infix operator &>> {
-  associativity none
-  precedence 160
+associativity none
+precedence 160
 }

@@ -15,7 +15,7 @@ class ChaCha20Poly1305 {
     init?(key: Data, nonce: Data) {
         precondition(key.count == 32, "encryption key must be 256 bit, but is \(key.count * 8) bits")
 
-        guard let chacha20 = try? ChaCha20(key: Array(key), iv: Array(nonce)) else {
+        guard let chacha20 = ChaCha20(key: Array(key), iv: Array(nonce)) else {
             return nil
         }
 

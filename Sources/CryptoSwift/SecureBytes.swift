@@ -15,7 +15,7 @@
     import Darwin
 #endif
 
-final class SecureBytes {
+class SecureBytes {
     private let bytes: Array<UInt8>
     let count: Int
 

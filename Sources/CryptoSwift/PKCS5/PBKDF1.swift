@@ -32,7 +32,7 @@ public extension PKCS5 {
                 }
             }
 
-            fileprivate func calculateHash(_ bytes:Array<UInt8>) -> Array<UInt8>? {
+            private func calculateHash(_ bytes:Array<UInt8>) -> Array<UInt8>? {
                 switch (self) {
                 case .sha1:
                     return Hash.sha1(bytes).calculate()
@@ -55,8 +55,6 @@ public extension PKCS5 {
         public init(password: Array<UInt8>, salt: Array<UInt8>, variant: Variant = .sha1, iterations: Int = 4096 /* c */, keyLength: Int? = nil /* dkLen */) throws {
             precondition(iterations > 0)
             precondition(salt.count == 8)
-            
-            let keyLength = keyLength ?? variant.size
 
             if (keyLength > variant.size) {
                 throw Error.derivedKeyTooLong
@@ -68,7 +66,7 @@ public extension PKCS5 {
 
             self.iterations = iterations
             self.variant = variant
-            self.keyLength = keyLength
+            self.keyLength = keyLength ?? variant.size
             self.t1 = t1
         }
 
