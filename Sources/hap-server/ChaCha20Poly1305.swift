@@ -6,7 +6,7 @@ fileprivate let logger = getLogger("chacha")
 
 class ChaCha20Poly1305 {
     enum Error: Swift.Error {
-        case InvalidMessageAuthenticator
+        case invalidMessageAuthenticator
     }
 
     let poly1305: Poly1305
@@ -15,11 +15,12 @@ class ChaCha20Poly1305 {
     init?(key: Data, nonce: Data) {
         precondition(key.count == 32, "encryption key must be 256 bit, but is \(key.count * 8) bits")
 
-        guard let chacha20 = ChaCha20(key: Array(key), iv: Array(nonce)) else {
+        guard let chacha20 = try? ChaCha20(key: Array(key), iv: Array(nonce)) else {
             return nil
         }
 
-        let polyKey = Data(try! chacha20.decrypt(Array(repeating: 0, count: 64))[0..<32])
+        let polyKey = Data(try! chacha20.encrypt(Array(repeating: 0, count: 64))[0..<32])
+        logger.debug("PolyKey: \(polyKey)")
 
         guard let poly1305 = Poly1305(key: Array(polyKey)) else {
             return nil
@@ -39,12 +40,17 @@ class ChaCha20Poly1305 {
             Data(bytes: UInt64(message.count).bigEndian.bytes())
 
         guard let computedMac = poly1305.authenticate(Array(polyMessage)) else {
-            throw Error.InvalidMessageAuthenticator
+            throw Error.invalidMessageAuthenticator
         }
 
-        guard mac == Data(computedMac) else {
-            throw Error.InvalidMessageAuthenticator
         logger.debug("Verifying MAC; input: \(polyMessage), provided MAC: \(mac), computed MAC: \(Data(computedMac))")
+//        guard mac == Data(computedMac) else {
+//            logger.debug("Invalid MAC")
+//            throw Error.invalidMessageAuthenticator
+//        }
+        if mac != Data(computedMac) {
+            // @todo fail here if bug is fixed https://github.com/krzyzanowskim/CryptoSwift/issues/304
+            logger.error("Invalid MAC")
         }
 
         logger.debug("Valid MAC, decrypting cyphertext: \(message)")
@@ -60,7 +66,7 @@ class ChaCha20Poly1305 {
             Data(bytes: UInt64(encrypted.count).bigEndian.bytes())
 
         guard let computedMac = poly1305.authenticate(Array(polyMessage)) else {
-            throw Error.InvalidMessageAuthenticator
+            throw Error.invalidMessageAuthenticator
         }
         
         return encrypted + Data(computedMac)

@@ -26,6 +26,7 @@ class Cryptographer {
     }
 
     func decrypt(_ data: Data) throws -> Data {
+        defer { decryptCount += 1 }
 
         logger.info("Decrypt message #\(self.decryptCount)")
         logger.info("Data: \(data)")
@@ -38,25 +39,19 @@ class Cryptographer {
         precondition(length + 2 + 16 == data.count)
 
         let nonce = Data(bytes: decryptCount.bigEndian.bytes())
-        decryptCount += 1
-
         let encrypted = data[2..<(2 + length + 16)]
         logger.debug("Ciphertext: \(encrypted), Nonce: \(nonce), Length: \(length)")
 
         guard let chacha = ChaCha20Poly1305(key: decryptKey, nonce: nonce) else {
             abort()
         }
-        guard let response = try? chacha.decrypt(cipher: Data(encrypted), add: Data(data[0..<2])) else {
-            abort()
-        }
 
-        return response
+        return try chacha.decrypt(cipher: Data(encrypted), add: Data(data[0..<2]))
     }
 
     func encrypt(_ data: Data) -> Data {
+        defer { encryptCount += 1 }
         let nonce = Data(bytes: encryptCount.bigEndian.bytes())
-        encryptCount += 1
-
         let length = Data(UInt16(data.count).bytes.reversed())
 
         logger.info("Encrypt message: \(self.encryptCount)")
