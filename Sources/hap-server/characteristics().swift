@@ -20,7 +20,7 @@ func characteristics(connection: Connection, request: Request) -> Response {
                 return .badRequest
             }
             guard let characteristic = device.accessories.first(where: {$0.id == path[0]})?.services.flatMap({$0.characteristics.filter({$0.id == path[1]})}).first else {
-                // hc sets status to StatusServiceCommunicationFailure instead
+                // @fixme: hc sets status to StatusServiceCommunicationFailure instead
                 return .notFound
             }
             serialized.append([
@@ -30,7 +30,7 @@ func characteristics(connection: Connection, request: Request) -> Response {
             ])
         }
 
-        let json = try! JSONSerialization.data(withJSONObject: serialized, options: [])
+        let json = try! JSONSerialization.data(withJSONObject: ["characteristics": serialized], options: [])
         return Response(data: json, mimeType: "application/hap+json")
 
     case .PUT?:
@@ -45,14 +45,31 @@ func characteristics(connection: Connection, request: Request) -> Response {
             guard let characteristic = device.accessories.first(where: {$0.id == aid})?.services.flatMap({$0.characteristics.filter({$0.id == iid})}).first else {
                 return .notFound
             }
+
+            // set new value
             if let value = item["value"] {
                 switch value {
                 case let value as NSNumber: characteristic.value = value
                 case is NSNull: characteristic.value = nil
                 default: return .badRequest
                 }
-                device.notify(characteristicListeners: characteristic, exceptListener: connection)
+
+                // notify listeners
+                let serialized: [String: [[String: AnyObject]]] = ["characteristics": [
+                    [
+                        "aid": aid,
+                        "iid": iid,
+                        "value": characteristic.value ?? NSNull()
+                    ]
+                ]]
+                guard let body = try? JSONSerialization.data(withJSONObject: serialized, options: []) else {
+                    abort()
+                }
+                let event = Event(status: .ok, body: body)
+                device.notify(characteristicListeners: characteristic, event: event, exceptListener: connection)
             }
+
+            // toggle events for this characteristic on this connection
             if let events = (item["ev"] as? NSNumber).flatMap({$0.boolValue}) {
                 if events {
                     device.add(characteristic: characteristic, listener: connection)

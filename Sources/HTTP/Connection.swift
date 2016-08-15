@@ -73,8 +73,15 @@ public class Connection: NSObject, StreamDelegate {
             }
 
         case (outputStream, Stream.Event.hasSpaceAvailable):
+            defer {
+                outputStream.remove(from: .main, forMode: .defaultRunLoopMode)
+                inputStream.schedule(in: .main, forMode: .defaultRunLoopMode)
+            }
+
             guard let serialized = response?.serialized() else {
-                abort()
+                logger.warning("Output stream was scheduled, but no bytes to be written")
+                return
+                //abort()
             }
             logger.debug("Response \(self.response!)")
 
@@ -89,9 +96,6 @@ public class Connection: NSObject, StreamDelegate {
 
             precondition(written == data.count)
 
-            outputStream.remove(from: .main, forMode: .defaultRunLoopMode)
-            inputStream.schedule(in: .main, forMode: .defaultRunLoopMode)
-
         case (_, Stream.Event.endEncountered), (_, Stream.Event.errorOccurred):
             close()
 
@@ -99,12 +103,20 @@ public class Connection: NSObject, StreamDelegate {
         }
     }
 
+    // Out-of-band messaging
+    public func write(_ data: Data) {
+        let written = data.withUnsafeBytes {
+            outputStream.write($0, maxLength: data.count)
+        }
+        precondition(written == data.count)
+    }
+
     func close() {
         inputStream.close()
         outputStream.close()
         server?.forget(connection: self)
     }
-    
+
     deinit {
         precondition(inputStream.streamStatus == .closed)
         precondition(outputStream.streamStatus == .closed)

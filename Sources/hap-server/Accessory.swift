@@ -255,10 +255,30 @@ public class Device {
         return characteristicEventListeners[characteristic]!.remove(connection)
     }
 
-    public func notify(characteristicListeners characteristic: Characteristic, exceptListener except: Connection? = nil) {
+    public func notify(characteristicListeners characteristic: Characteristic, event: Event, exceptListener except: Connection? = nil) {
         guard let listeners = characteristicEventListeners[characteristic]?.filter({$0 != except}) else {
             return
         }
-        logger.info("Notifying \(listeners)")
+        let data = event.serialized()
+
+        logger.info("Notifying \(listeners): \(event)")
+        for listener in listeners {
+            listener.write(data)
+        }
+    }
+}
+
+public struct Event {
+    var status: Response.Status
+    var body: Data
+
+    public init(status: Response.Status, body: Data) {
+        self.status = status
+        self.body = body
+    }
+
+    public func serialized() -> Data {
+        // @todo should set additional headers here as well?
+        return "EVENT/1.0 \(status.rawValue) \(status.description)\r\n\r\n".data(using: .utf8)! + body
     }
 }
