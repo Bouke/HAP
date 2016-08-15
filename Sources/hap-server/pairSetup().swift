@@ -80,7 +80,6 @@ func pairSetup(connection: Connection, request: Request) -> Response {
         }
 
         // At this point, the client has successfully verified.
-        //TODO: store the pairing (username and publickey of the client)
         device.clients[username] = publicKey
 
         let hashOut = deriveKey(algorithm: .SHA512, seed: server.sessionKey!,

@@ -79,7 +79,8 @@ let router = Router(routes: [
     ("/pair-setup", pairSetup),
     ("/pair-verify", pairVerify),
     ("/accessories", accessories),
-    ("/characteristics", characteristics)
+    ("/characteristics", characteristics),
+    ("/pairings", pairings)
 ])
 
 let encryption = EncryptionMiddleware()

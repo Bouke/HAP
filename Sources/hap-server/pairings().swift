@@ -1,0 +1,38 @@
+import Foundation
+import HTTP
+import func Evergreen.getLogger
+
+fileprivate let logger = getLogger("hap.pairings")
+
+func pairings(connection: Connection, request: Request) -> Response {
+    precondition(request.method == .POST)
+
+    guard
+        let body = request.body,
+        let data: PairTagTLV8 = try? decode(body),
+        data[.sequence]?[0] == PairStep.request.rawValue,
+        let method = data[.pairingMethod].flatMap({PairMethod(rawValue: $0[0])}),
+        let username = data[.username]
+        else {
+            return .badRequest
+    }
+    logger.debug("Updating pairings data: \(data), method: \(method)")
+
+    switch method {
+    case .add:
+        guard let publicKey = data[.publicKey] else {
+            return .badRequest
+        }
+        device.clients[username] = publicKey
+        logger.info("Added pairing for \(username)")
+    case .delete:
+        device.clients[username] = nil
+        logger.info("Removed pairing for \(username)")
+    default: return .badRequest
+    }
+
+    let result: PairTagTLV8 = [
+        .sequence: Data(bytes: [PairStep.response.rawValue])
+    ]
+    return Response(status: .ok, data: encode(result), mimeType: "application/pairing+tlv8")
+}

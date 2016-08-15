@@ -73,13 +73,17 @@ enum PairVerifyStep: UInt8 {
 enum PairTag: UInt8 {
     case pairingMethod = 0, username, salt, publicKey, proof, encryptedData, sequence, errorCode
     case signature = 0x0a
-//    case mfiCertificate = 0x09, mfiSignature = 0x0a // todo: cannot re-use the raw value of `signature`
+
+    // un-used
+    case mfiCertificate = 0x09
+    case mfiSignature = 0x0b // unsure, hc re-uses 0x0a -- /pairings received 0x0b one time, could it be 0x0b?
 }
 
 enum PairMethod: UInt8 {
     case `default` = 0, mfi, add = 3, delete
 }
 
-
-
-
+enum PairStep: UInt8 {
+    case request = 0x01
+    case response = 0x02
+}
