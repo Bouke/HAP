@@ -7,6 +7,7 @@ import func Evergreen.getLogger
 
 fileprivate let logger = getLogger("hap.pairVerify")
 
+//@todo where to place this? connection's context?
 let sk = generateRandomBytes(count: 32)
 let pk = { () -> Data in
     var pk = Data(count: 32)
@@ -19,18 +20,22 @@ let pk = { () -> Data in
     }
     return pk
 }()
+
+//@todo move into connection's context
 var otherPublicKey: Data? = nil
 var sharedSecret: Data? = nil
 
 func pairVerify(connection: Connection, request: Request) -> Response {
-    guard let body = request.body, let data: PairTagTLV8 = try? decode(body) else { return Response(status: .badRequest) }
-    switch PairVerifyStep(rawValue: data[.sequence]![0]) {
+    guard let body = request.body, let data: PairTagTLV8 = try? decode(body) else {
+        return .badRequest
+    }
 
     logger.debug("data: \(data)")
 
+    switch PairVerifyStep(rawValue: data[.sequence]![0]) {
     case .startRequest?:
         guard let clientPublicKey = data[.publicKey], clientPublicKey.count == 32 else {
-            return Response(status: .badRequest)
+            return .badRequest
         }
         otherPublicKey = clientPublicKey
 
@@ -74,28 +79,28 @@ func pairVerify(connection: Connection, request: Request) -> Response {
 
     case .finishRequest?:
         guard let encryptedData = data[.encryptedData] else {
-            return Response(status: .badRequest)
+            return .badRequest
         }
 
         let encryptionKey = HKDF.deriveKey(algorithm: .SHA512, seed: sharedSecret!, info: "Pair-Verify-Encrypt-Info".data(using: .utf8)!, salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8)!, count: 32)
 
         guard let plaintext = try? ChaCha20Poly1305(key: encryptionKey, nonce: "PV-Msg03".data(using: .utf8)!)!.decrypt(cipher: encryptedData) else {
-            return Response(status: .badRequest)
+            return .badRequest
         }
 
         guard let data: PairTagTLV8 = try? decode(plaintext) else {
-            return Response(status: .badRequest)
+            return .badRequest
         }
 
         guard let username = data[.username], let signatureIn = data[.signature] else {
-            return Response(status: .badRequest)
+            return .badRequest
         }
 
         logger.debug("--> username \(username) \(String(data: username, encoding: .utf8)!)")
         logger.debug("--> signature \(signatureIn)")
 
         guard let publicKey = device.clients[username] else {
-            return Response(status: .badRequest)
+            return .badRequest
         }
         logger.debug("--> public key \(publicKey)")
 
@@ -103,7 +108,7 @@ func pairVerify(connection: Connection, request: Request) -> Response {
         do {
             try Ed25519.verify(publicKey: publicKey, message: material, signature: signatureIn)
         } catch {
-            return Response(status: .badRequest)
+            return .badRequest
         }
 
         let result: PairTagTLV8 = [
@@ -115,9 +120,6 @@ func pairVerify(connection: Connection, request: Request) -> Response {
         response.body = encode(result)
         return response
 
-    case let x?: print(x, data)
-    default: return Response(status: .badRequest)
+    default: return .badRequest
     }
-
-    return Response(status: .badRequest)
 }
