@@ -105,6 +105,8 @@ public class Connection: NSObject, StreamDelegate {
 
     // Out-of-band messaging
     public func write(_ data: Data) {
+        let data = server!.streamMiddleware.reversed().reduce(data) { $1.parse(output: $0, forConnection: self) }
+
         let written = data.withUnsafeBytes {
             outputStream.write($0, maxLength: data.count)
         }
