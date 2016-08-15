@@ -65,7 +65,7 @@ func characteristics(connection: Connection, request: Request) -> Response {
                 guard let body = try? JSONSerialization.data(withJSONObject: serialized, options: []) else {
                     abort()
                 }
-                let event = Event(status: .ok, body: body)
+                let event = Event(status: .ok, body: body, mimeType: "application/hap+json")
                 device.notify(characteristicListeners: characteristic, event: event, exceptListener: connection)
             }
 
