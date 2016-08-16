@@ -1,9 +1,9 @@
 import Foundation
 
 protocol JSONSerializable {
-    func serialize() -> [String: AnyObject]
+    func serialized() -> [String: AnyObject]
 }
 
 protocol JSONDeserializable {
-    func deserialize(_ data: [String: AnyObject]) throws -> Self
+    init(_ data: [String: AnyObject]) throws
 }
