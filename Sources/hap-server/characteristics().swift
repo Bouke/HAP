@@ -24,8 +24,8 @@ func characteristics(connection: Connection, request: Request) -> Response {
                 return .notFound
             }
             serialized.append([
-                "aid": path[0],
-                "iid": path[1],
+                "aid": path[0] as AnyObject,
+                "iid": path[1] as AnyObject,
                 "value": characteristic.value ?? NSNull()
             ])
         }
@@ -57,8 +57,8 @@ func characteristics(connection: Connection, request: Request) -> Response {
                 // notify listeners
                 let serialized: [String: [[String: AnyObject]]] = ["characteristics": [
                     [
-                        "aid": aid,
-                        "iid": iid,
+                        "aid": aid as AnyObject,
+                        "iid": iid as AnyObject,
                         "value": characteristic.value ?? NSNull()
                     ]
                 ]]

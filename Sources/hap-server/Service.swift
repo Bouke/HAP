@@ -15,9 +15,9 @@ public struct Service {
 extension Service: JSONSerializable {
     func serialized() -> [String : AnyObject] {
         return [
-            "iid": id,
-            "type": type.rawValue,
-            "characteristics": characteristics.map { $0.serialized() }
+            "iid": id as AnyObject,
+            "type": type.rawValue as AnyObject,
+            "characteristics": characteristics.map { $0.serialized() } as AnyObject
         ]
     }
 }

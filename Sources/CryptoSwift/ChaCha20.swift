@@ -14,7 +14,7 @@ final public class ChaCha20: BlockCipher {
     
     static let blockSize = 64 // 512 / 8
     private let stateSize = 16
-    private var context:Context?
+    fileprivate var context:Context?
     
     final private class Context {
         var input:Array<UInt32> = Array<UInt32>(repeating: 0, count: 16)
@@ -112,7 +112,7 @@ final public class ChaCha20: BlockCipher {
         return ctx
     }
     
-    private final func encryptBytes(_ message:Array<UInt8>) throws -> Array<UInt8> {
+    fileprivate final func encryptBytes(_ message:Array<UInt8>) throws -> Array<UInt8> {
         
         guard let ctx = context else {
             throw Error.missingContext

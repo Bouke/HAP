@@ -20,7 +20,7 @@ public enum HashAlgorithm {
         }
     }
 
-    var f: (UnsafePointer<Void>, CC_LONG, UnsafeMutablePointer<UInt8>) -> UnsafeMutablePointer<UInt8>! {
+    var f: (UnsafeRawPointer, CC_LONG, UnsafeMutablePointer<UInt8>) -> UnsafeMutablePointer<UInt8>! {
         switch self {
         case .SHA1: return CC_SHA1
         case .SHA512: return CC_SHA512

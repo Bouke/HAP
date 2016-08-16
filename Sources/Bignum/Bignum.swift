@@ -10,7 +10,7 @@ import COpenSSL
 import Foundation
 
 public class Bignum {
-    private let ctx: UnsafeMutablePointer<BIGNUM>
+    internal let ctx: UnsafeMutablePointer<BIGNUM>
 
     init() {
         ctx = BN_new()
@@ -62,9 +62,9 @@ extension Bignum: CustomStringConvertible {
 
 internal let ctx = BN_CTX_new()
 
-public func operation(_ block: (result: Bignum) -> Int32) -> Bignum {
+public func operation(_ block: (_ result: Bignum) -> Int32) -> Bignum {
     let result = Bignum()
-    precondition(block(result: result) == 1)
+    precondition(block(result) == 1)
     return result
 }
 

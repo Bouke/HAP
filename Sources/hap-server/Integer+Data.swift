@@ -2,9 +2,11 @@ import Foundation
 
 extension Integer {
     init(bytes: [UInt8]) {
-        precondition(bytes.count == sizeof(Self.self), "incorrect number of bytes")
+        precondition(bytes.count == MemoryLayout<Self>.size, "incorrect number of bytes")
         self = bytes.withUnsafeBufferPointer() {
-            return UnsafePointer($0.baseAddress!).pointee
+            $0.baseAddress!.withMemoryRebound(to: Self.self, capacity: 1) { //(ptr) -> Result in
+                return $0.pointee
+            }
         }
     }
 

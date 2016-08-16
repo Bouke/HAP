@@ -28,6 +28,11 @@ public class Accessory {
     let services: [Service]
 
     init(id: Int, type: Type, services: [Service]) {
+        let ids: [Int] = services.reduce([], { (a: [Int], s: Service) -> [Int] in
+            return a + [s.id] + s.characteristics.map { $0.id }
+        })
+        precondition(Set(ids).count == ids.count, "Service and characteristic identifiers must be unique within an accessory")
+
         self.id = id
         self.type = type
         self.services = services
@@ -37,8 +42,8 @@ public class Accessory {
 extension Accessory: JSONSerializable {
     func serialized() -> [String : AnyObject] {
         return [
-            "aid": id,
-            "services": services.map { $0.serialized() }
+            "aid": id as AnyObject,
+            "services": services.map { $0.serialized() } as AnyObject
         ]
     }
 }

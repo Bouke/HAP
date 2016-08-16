@@ -55,7 +55,7 @@ public class Formatter {
                 case let error as NSError:
                     return error.localizedDescription
                 case let message:
-                    return String(message)
+                    return String(describing: message)
                 }
             case .function:
                 return event.function
@@ -88,7 +88,7 @@ public class Formatter {
             case let error as CustomStringConvertible:
                 errorMessage = error.description
             default:
-                errorMessage = String(error)
+                errorMessage = String(describing: error)
             }
             string += " [ERROR: \(errorMessage)]"
         }

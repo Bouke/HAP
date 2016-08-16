@@ -14,7 +14,7 @@ class Delegate: NSObject, NetServiceDelegate, StreamDelegate {
         abort()
     }
 
-    func netService(_ sender: NetService, didAcceptConnectionWith inputStream: InputStream, outputStream: NSOutputStream) {
+    func netService(_ sender: NetService, didAcceptConnectionWith inputStream: InputStream, outputStream: OutputStream) {
         server.accept(inputStream: inputStream, outputStream: outputStream)
     }
 }
@@ -32,13 +32,13 @@ let storage = try FileStorage(path: "Switch")
 
 let livingRoomSwitch = { () -> Accessory in
     let identify = Characteristic(id: 2, type: .identify, permissions: [.write], format: .bool)
-    let manufacturer = Characteristic(id: 3, type: .manufacturer, value: "Bouke", permissions: [.read], format: .string)
-    let model = Characteristic(id: 4, type: .model, value: "Switch 2000", permissions: [.read], format: .string)
-    let name = Characteristic(id: 5, type: .name, value: "Switch", permissions: [.read], format: .string)
-    let serialNumber = Characteristic(id: 6, type: .serialNumber, value: "undefined", permissions: [.read], format: .string)
+    let manufacturer = Characteristic(id: 3, type: .manufacturer, value: "Bouke" as NSObject?, permissions: [.read], format: .string)
+    let model = Characteristic(id: 4, type: .model, value: "Switch 2000" as NSObject?, permissions: [.read], format: .string)
+    let name = Characteristic(id: 5, type: .name, value: "Switch" as NSObject?, permissions: [.read], format: .string)
+    let serialNumber = Characteristic(id: 6, type: .serialNumber, value: "undefined" as NSObject?, permissions: [.read], format: .string)
     let info = Service(id: 1, type: .info, characteristics: [identify, manufacturer, model, name, serialNumber])
 
-    let characteristic = Characteristic(id: 8, type: .on, value: false, permissions: [.read, .write, .events], format: .bool)
+    let characteristic = Characteristic(id: 8, type: .on, value: false as NSObject?, permissions: [.read, .write, .events], format: .bool)
 
     let service = Service(id: 7, type: .switch, characteristics: [characteristic])
 

@@ -31,7 +31,7 @@ extension Int {
 /* array of bytes */
 extension Int {
     /** Array of bytes with optional padding (little-endian) */
-    public func bytes(totalBytes: Int = sizeof(Int.self)) -> Array<UInt8> {
+    public func bytes(totalBytes: Int = MemoryLayout<Int>.size) -> Array<UInt8> {
         return arrayOfBytes(value: self, length: totalBytes)
     }
 
@@ -51,17 +51,17 @@ extension Int {
 extension Int {
     
     /** Shift bits to the left. All bits are shifted (including sign bit) */
-    private mutating func shiftLeft(by count: Int) {
+    fileprivate mutating func shiftLeft(by count: Int) {
         self = CryptoSwift.shiftLeft(self, by: count) //FIXME: count:
     }
     
     /** Shift bits to the right. All bits are shifted (including sign bit) */
-    private mutating func shiftRight(by count: Int) {
+    fileprivate mutating func shiftRight(by count: Int) {
         if (self == 0) {
             return
         }
         
-        let bitsCount = sizeofValue(self) * 8
+        let bitsCount = MemoryLayout<Int>.size * 8
 
         if (count >= bitsCount) {
             return

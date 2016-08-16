@@ -24,7 +24,7 @@ struct CTRModeWorker: BlockModeWorker {
         let nonce = buildNonce(iv, counter: UInt64(counter))
         counter = counter + 1
 
-        guard let ciphertext = cipherOperation(block: nonce) else {
+        guard let ciphertext = cipherOperation(nonce) else {
             return plaintext
         }
 
@@ -35,7 +35,7 @@ struct CTRModeWorker: BlockModeWorker {
         let nonce = buildNonce(iv, counter: UInt64(counter))
         counter = counter + 1
 
-        guard let plaintext = cipherOperation(block: nonce) else {
+        guard let plaintext = cipherOperation(nonce) else {
             return ciphertext
         }
         return xor(plaintext, ciphertext)

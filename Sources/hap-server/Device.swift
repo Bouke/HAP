@@ -41,7 +41,7 @@ public class Device {
 
     public class Clients {
         private let storage: FileStorage
-        private init(storage: FileStorage) {
+        fileprivate init(storage: FileStorage) {
             self.storage = storage
         }
 

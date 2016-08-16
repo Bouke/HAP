@@ -1,6 +1,6 @@
 import Foundation
 
-public class Message {
+open class Message {
     internal var boxed: CFHTTPMessage
     public let headers: Headers
 
@@ -23,7 +23,7 @@ public class Message {
         }
         set {
             headers["Content-Length"] = "\(newValue?.count ?? 0)"
-            CFHTTPMessageSetBody(boxed, newValue ?? Data())
+            CFHTTPMessageSetBody(boxed, (newValue ?? Data()) as CFData)
         }
     }
 
@@ -55,10 +55,10 @@ public class Message {
 
         public subscript(key: Key) -> Value? {
             get {
-                return CFHTTPMessageCopyHeaderFieldValue(boxed, key)?.takeRetainedValue() as String?
+                return CFHTTPMessageCopyHeaderFieldValue(boxed, key as CFString)?.takeRetainedValue() as String?
             }
             set {
-                CFHTTPMessageSetHeaderFieldValue(boxed, key, newValue)
+                CFHTTPMessageSetHeaderFieldValue(boxed, key as CFString, newValue as CFString?)
             }
         }
 
@@ -74,7 +74,7 @@ extension Message: CustomDebugStringConvertible {
     public var debugDescription: String {
         precondition(isHeaderComplete)
         guard let serialized = serialized() else { return "Message (could not be serialized)" }
-        return serialized.withUnsafeBytes { String(cString: $0) }
+        return serialized.withUnsafeBytes { (ptr: UnsafePointer<UInt8>) in String(cString: ptr) }
     }
 }
 
@@ -139,7 +139,7 @@ extension Request.Method: Equatable {
 }
 
 
-public class Response: Message {
+open class Response: Message {
     public enum Status: Int, CustomDebugStringConvertible {
         case ok = 200, created = 201, accepted = 202, noContent = 204
         case movedPermanently = 301
@@ -167,7 +167,7 @@ public class Response: Message {
     }
 
     public init(status: Status) {
-        super.init(boxed: CFHTTPMessageCreateResponse(nil, status.rawValue, status.description, kCFHTTPVersion1_1 as String).takeRetainedValue())
+        super.init(boxed: CFHTTPMessageCreateResponse(nil, status.rawValue, status.description as CFString?, kCFHTTPVersion1_1).takeRetainedValue())
     }
 
     public convenience init(status: Status = .ok, data: Data, mimeType: String) {

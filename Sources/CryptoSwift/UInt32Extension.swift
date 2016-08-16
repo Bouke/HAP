@@ -18,7 +18,7 @@ extension UInt32: _UInt32Type {}
 
 /** array of bytes */
 extension UInt32 {
-    public func bytes(totalBytes: Int = sizeof(UInt32.self)) -> Array<UInt8> {
+    public func bytes(totalBytes: Int = MemoryLayout<UInt32>.size) -> Array<UInt8> {
         return arrayOfBytes(value: self, length: totalBytes)
     }
 
@@ -36,12 +36,12 @@ extension UInt32 {
 extension UInt32 {
     
     /** Shift bits to the left. All bits are shifted (including sign bit) */
-    private mutating func shiftLeft(by count: UInt32) {
+    fileprivate mutating func shiftLeft(by count: UInt32) {
         if (self == 0) {
             return
         }
         
-        let bitsCount = UInt32(sizeof(UInt32.self) * 8)
+        let bitsCount = UInt32(MemoryLayout<UInt32>.size * 8)
         let shiftCount = Swift.min(count, bitsCount - 1)
         var shiftedValue:UInt32 = 0;
         
@@ -62,12 +62,12 @@ extension UInt32 {
     }
     
     /** Shift bits to the right. All bits are shifted (including sign bit) */
-    private mutating func shiftRight(by count: UInt32) {
+    fileprivate mutating func shiftRight(by count: UInt32) {
         if (self == 0) {
             return
         }
         
-        let bitsCount = UInt32(sizeofValue(self) * 8)
+        let bitsCount = UInt32(MemoryLayout<UInt32>.size * 8)
 
         if (count >= bitsCount) {
             return

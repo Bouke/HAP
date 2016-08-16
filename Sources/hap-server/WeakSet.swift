@@ -1,14 +1,17 @@
 //adapted from: http://stackoverflow.com/a/36184182
 
-class WeakObject<T: AnyObject>: Equatable, Hashable {
+class WeakObject<T: AnyObject>: Equatable, Hashable where T: Hashable {
     weak var object: T?
     init(_ object: T) {
         self.object = object
     }
 
     var hashValue: Int {
-        if let object = self.object { return unsafeAddress(of: object).hashValue }
-        else { return 0 }
+        if let object = self.object {
+            return object.hashValue
+        } else {
+            return 0
+        }
     }
 
     static func == <T> (lhs: WeakObject<T>, rhs: WeakObject<T>) -> Bool {
@@ -17,7 +20,7 @@ class WeakObject<T: AnyObject>: Equatable, Hashable {
 }
 
 
-struct WeakObjectSet<T: AnyObject> {
+struct WeakObjectSet<T: AnyObject> where T: Hashable {
     var objects: Set<WeakObject<T>>
 
     init() {

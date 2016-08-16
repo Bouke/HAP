@@ -10,7 +10,7 @@ public class Connection: NSObject, StreamDelegate {
     weak var server: Server?
 
     let inputStream: InputStream
-    let outputStream: NSOutputStream
+    let outputStream: OutputStream
     public private(set) var request: Request
     public private(set) var response: Response?
 
@@ -25,7 +25,7 @@ public class Connection: NSObject, StreamDelegate {
         return f
     }()
 
-    init(server: Server, inputStream: InputStream, outputStream: NSOutputStream) {
+    init(server: Server, inputStream: InputStream, outputStream: OutputStream) {
         self.server = server
         self.inputStream = inputStream
         self.outputStream = outputStream

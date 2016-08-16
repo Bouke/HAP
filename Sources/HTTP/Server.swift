@@ -11,7 +11,7 @@ public class Server {
 
     var connections: [Connection] = []
 
-    public func accept(inputStream: InputStream, outputStream: NSOutputStream) {
+    public func accept(inputStream: InputStream, outputStream: OutputStream) {
         connections.append(Connection(server: self, inputStream: inputStream, outputStream: outputStream))
         logger.info("New connection, \(self.connections.count) clients")
     }

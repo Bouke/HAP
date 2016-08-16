@@ -78,15 +78,15 @@ public class Characteristic {
 extension Characteristic: JSONSerializable {
     func serialized() -> [String : AnyObject] {
         var serialized: [String : AnyObject] = [
-            "iid": id,
-            "type": type.rawValue,
-            "perms": permissions.map { $0.rawValue }
+            "iid": id as AnyObject,
+            "type": type.rawValue as AnyObject,
+            "perms": permissions.map { $0.rawValue } as AnyObject
         ]
         if let value = value { serialized["value"] = value }
 
-        if let description = description { serialized["description"] = description }
-        if let format = format { serialized["format"] = format.rawValue }
-        if let unit = unit { serialized["unit"] = unit.rawValue }
+        if let description = description { serialized["description"] = description as AnyObject }
+        if let format = format { serialized["format"] = format.rawValue as AnyObject }
+        if let unit = unit { serialized["unit"] = unit.rawValue as AnyObject }
 
         if let maxLength = maxLength { serialized["maxLength"] = maxLength as NSNumber }
         if let maxValue = maxValue { serialized["maxValue"] = maxValue }
