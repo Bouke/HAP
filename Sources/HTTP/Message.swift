@@ -190,7 +190,7 @@ open class Response: Message {
 }
 
 extension Response {
-    public static let ok = Response(status: .ok)
-    public static let badRequest = Response(status: .badRequest)
-    public static let notFound = Response(status: .notFound)
+    public static var ok: Response { return Response(status: .ok) }
+    public static var badRequest: Response { return  Response(status: .badRequest) }
+    public static var notFound: Response { return  Response(status: .notFound) }
 }

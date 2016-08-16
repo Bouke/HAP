@@ -1,71 +1,68 @@
 import Foundation
 import HTTP
 import HKDF
+import func Evergreen.getLogger
+
+fileprivate let logger = getLogger("hap.pairSetup")
 
 func pairSetup(connection: Connection, request: Request) -> Response {
-    guard let body = request.body, let data: PairTagTLV8 = try? decode(body) else { return Response(status: .badRequest) }
+    guard let body = request.body, let data: PairTagTLV8 = try? decode(body) else { return .badRequest }
 
     switch PairSetupStep(rawValue: data[.sequence]![0]) {
     case .startRequest?:
-        print("<-- B", server.B)
-        print("<-- s", salt)
+        logger.debug("<-- B \(server.B)")
+        logger.debug("<-- s \(salt)")
 
         let result: PairTagTLV8 = [
             .sequence: Data(bytes: [PairSetupStep.startResponse.rawValue]),
             .publicKey: server.B,
             .salt: salt,
         ]
-        let response = Response(status: .ok)
-        response.headers["Content-Type"] = "application/pairing+tlv8"
-        response.body = encode(result)
-        return response
+        return Response(status: .ok, data: encode(result), mimeType: "application/pairing+tlv8")
 
     case .verifyRequest?:
         guard let A = data[.publicKey], let M = data[.proof] else {
-            return Response(status: .badRequest)
+            return .badRequest
         }
 
-        print("--> A", A)
-        print("--> M", M)
+        logger.debug("--> A \(A)")
+        logger.debug("--> M \(M)")
 
         guard let HAMK = try? server.verifySession(A: A, M: M) else {
-            return Response(status: .badRequest)
+            return .badRequest
         }
 
-        print("<-- HAMK", HAMK)
+        logger.debug("<-- HAMK \(HAMK)")
 
         let result: PairTagTLV8 = [
             .sequence: Data(bytes: [PairSetupStep.verifyResponse.rawValue]),
             .proof: HAMK
         ]
 
-        let response = Response(status: .ok)
-        response.headers["Content-Type"] = "application/pairing+tlv8"
-        response.body = encode(result)
-        return response
+        return Response(status: .ok, data: encode(result), mimeType: "application/pairing+tlv8")
 
     case .keyExchangeRequest?:
         guard let encryptedData = data[.encryptedData] else {
-            return Response(status: .badRequest)
+            return .badRequest
         }
 
         let encryptionKey = deriveKey(algorithm: .SHA512, seed: server.sessionKey!, info: "Pair-Setup-Encrypt-Info".data(using: .utf8)!, salt: "Pair-Setup-Encrypt-Salt".data(using: .utf8)!, count: 32)
 
         guard let plaintext = try? ChaCha20Poly1305(key: encryptionKey, nonce: "PS-Msg05".data(using: .utf8)!)!.decrypt(cipher: encryptedData) else {
-            return Response(status: .badRequest)
+            return .badRequest
         }
 
         guard let data: PairTagTLV8 = try? decode(plaintext) else {
-            return Response(status: .badRequest)
+            return .badRequest
         }
 
         guard let publicKey = data[.publicKey], let username = data[.username], let signatureIn = data[.signature] else {
-            return Response(status: .badRequest)
+            return .badRequest
         }
 
-        print("--> username", username, String(data: username, encoding: .utf8)!)
-        print("--> public key", publicKey)
-        print("--> signature", signatureIn)
+        logger.debug("--> username \(username) \(String(data: username, encoding: .utf8)!)")
+        logger.debug("--> public key \(publicKey)")
+        logger.debug("--> signature \(signatureIn)")
 
         let hashIn = deriveKey(algorithm: .SHA512, seed: server.sessionKey!,
                                info: "Pair-Setup-Controller-Sign-Info".data(using: .utf8)!,
@@ -76,7 +73,7 @@ func pairSetup(connection: Connection, request: Request) -> Response {
         do {
             try Ed25519.verify(publicKey: publicKey, message: hashIn, signature: signatureIn)
         } catch {
-            return Response(status: .badRequest)
+            return .badRequest
         }
 
         // At this point, the client has successfully verified.
@@ -89,7 +86,7 @@ func pairSetup(connection: Connection, request: Request) -> Response {
             device.publicKey
 
         guard let signatureOut = try? Ed25519.sign(privateKey: device.privateKey, message: hashOut) else {
-            return Response(status: .badRequest)
+            return .badRequest
         }
 
         let resultInner: PairTagTLV8 = [
@@ -98,12 +95,12 @@ func pairSetup(connection: Connection, request: Request) -> Response {
             .signature: signatureOut
         ]
 
-        print("<-- username", device.identifier)
-        print("<-- public key", device.publicKey)
-        print("<-- signature", signatureOut)
+        logger.debug("<-- username \(device.identifier)")
+        logger.debug("<-- public key \(device.publicKey)")
+        logger.debug("<-- signature \(signatureOut)")
 
         guard let encryptor = ChaCha20Poly1305(key: encryptionKey, nonce: "PS-Msg06".data(using: .utf8)!), let encryptedResultInner = try? encryptor.encrypt(message: encode(resultInner)) else {
-            return Response(status: .badRequest)
+            return .badRequest
         }
 
         let resultOuter: PairTagTLV8 = [
@@ -111,13 +108,8 @@ func pairSetup(connection: Connection, request: Request) -> Response {
             .encryptedData: encryptedResultInner
         ]
 
-        let response = Response(status: .ok)
-        response.headers["Content-Type"] = "application/pairing+tlv8"
-        response.body = encode(resultOuter)
-        return response
-        
-    case let step: print(request); print(step); print(data)
+        return Response(status: .ok, data: encode(resultOuter), mimeType: "application/pairing+tlv8")
+
+    default: return .badRequest
     }
-    
-    return Response(status: .badRequest, text: "Not sure what to do here...")
 }

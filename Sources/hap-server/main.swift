@@ -1,6 +1,8 @@
 import Foundation
 import HTTP
-import Evergreen
+import func Evergreen.getLogger
+
+fileprivate let logger = getLogger("hap")
 
 class Delegate: NSObject, NetServiceDelegate, StreamDelegate {
     var server: HTTP.Server
@@ -10,7 +12,7 @@ class Delegate: NSObject, NetServiceDelegate, StreamDelegate {
     }
 
     func netService(_ sender: NetService, didNotPublish errorDict: [String : NSNumber]) {
-        print("didNotPublish", errorDict)
+        logger.error("didNotPublish: \(errorDict)")
         abort()
     }
 
@@ -97,7 +99,7 @@ service.setTXTRecord(NetService.data(fromTXTRecord: config))
 service.delegate = delegate
 service.publish(options: [.listenForConnections])
 
-log("Listening on port \(service.port)", forLevel: .info)
+logger.info("Listening on port \(service.port)")
 
 withExtendedLifetime((delegate, service)) {
     RunLoop.current.run()
