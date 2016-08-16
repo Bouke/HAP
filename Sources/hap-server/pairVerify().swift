@@ -34,6 +34,8 @@ func pairVerify(connection: Connection, request: Request) -> Response {
 
     switch PairVerifyStep(rawValue: data[.sequence]![0]) {
     case .startRequest?:
+        logger.info("Pair verify started")
+
         guard let clientPublicKey = data[.publicKey], clientPublicKey.count == 32 else {
             return .badRequest
         }
@@ -111,6 +113,7 @@ func pairVerify(connection: Connection, request: Request) -> Response {
             return .badRequest
         }
 
+        logger.info("Pair verify completed")
         let result: PairTagTLV8 = [
             .sequence: Data(bytes: [PairVerifyStep.finishResponse.rawValue])
         ]

@@ -10,6 +10,7 @@ func pairSetup(connection: Connection, request: Request) -> Response {
 
     switch PairSetupStep(rawValue: data[.sequence]![0]) {
     case .startRequest?:
+        logger.info("Pair setup started")
         logger.debug("<-- B \(server.B)")
         logger.debug("<-- s \(salt)")
 
@@ -98,6 +99,7 @@ func pairSetup(connection: Connection, request: Request) -> Response {
         logger.debug("<-- username \(device.identifier)")
         logger.debug("<-- public key \(device.publicKey)")
         logger.debug("<-- signature \(signatureOut)")
+        logger.info("Pair setup completed")
 
         guard let encryptor = ChaCha20Poly1305(key: encryptionKey, nonce: "PS-Msg06".data(using: .utf8)!), let encryptedResultInner = try? encryptor.encrypt(message: encode(resultInner)) else {
             return .badRequest
