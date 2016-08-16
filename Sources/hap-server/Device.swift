@@ -55,6 +55,11 @@ public class Device {
         }
     }
 
+    var isPaired: Bool {
+        // @todo if number of clients > 0 return true
+        return false
+    }
+
     public func add(characteristic: Characteristic, listener: Connection) {
         if let _ = characteristicEventListeners[characteristic] {
             characteristicEventListeners[characteristic]!.addObject(object: listener)

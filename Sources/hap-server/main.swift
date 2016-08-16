@@ -65,14 +65,6 @@ let (salt, verificationKey) = createSaltedVerificationKey(username: username, pa
 
 let server = Server(group: group, alg: alg, salt: salt, username: username, verificationKey: verificationKey)
 
-//let ESC = "\u{001B}"
-//let CSI = "\(ESC)["
-//print("\(CSI)30;47m                        \(CSI)0m")
-//print("\(CSI)30;47m    ┌──────────────┐    \(CSI)0m")
-//print("\(CSI)30;47m    | (\(password) |    \(CSI)0m")
-//print("\(CSI)30;47m    └──────────────┘    \(CSI)0m")
-//print("\(CSI)30;47m                        \(CSI)0m")
-
 let router = Router(routes: [
     ("/", root),
     ("/identify", identify),
@@ -95,10 +87,10 @@ let config: [String: Data] = [
     "id": device.identifier.data(using: .utf8)!, // identifier
     "c#": "1".data(using: .utf8)!, // version
     "s#": "1".data(using: .utf8)!, // state
-    "sf": "1".data(using: .utf8)!, // discoverable
+    "sf": (device.isPaired ? "1" : "0").data(using: .utf8)!, // discoverable
     "ff": "0".data(using: .utf8)!, // mfi compliant
     "md": device.name.data(using: .utf8)!, // name
-    "ci": "8".data(using: .utf8)!, // category identifier -- switch
+    "ci": device.accessories[0].type.rawValue.data(using: .utf8)!, // category identifier @todo use `bridge` if >1 accessory
 ]
 
 service.setTXTRecord(NetService.data(fromTXTRecord: config))

@@ -1,6 +1,7 @@
 public struct Service {
     public enum `Type`: String {
         case info = "3E"
+        case lightbulb = "43"
         case `switch` = "49"
         case thermostat = "4A"
     }

@@ -4,23 +4,23 @@ import CommonCrypto
 import HTTP
 
 public class Accessory {
-    public enum `Type` {
-        case other
-        case bridge
-        case fan
-        case garageDoorOpener
-        case lightbulb
-        case doorLock
-        case outlet
-        case `switch`
-        case thermostat
-        case sensor
-        case alarmSystem
-        case door
-        case window
-        case windowCovering
-        case programmableSwitch
-        case rangeExtender
+    public enum `Type`: String {
+        case other = "1"
+        case bridge = "2"
+        case fan = "3"
+        case garageDoorOpener = "4"
+        case lightbulb = "5"
+        case doorLock = "6"
+        case outlet = "7"
+        case `switch` = "8"
+        case thermostat = "9"
+        case sensor = "10"
+        case alarmSystem = "11"
+        case door = "12"
+        case window = "13"
+        case windowCovering = "14"
+        case programmableSwitch = "15"
+        case rangeExtender = "16"
     }
 
     let id: Int
