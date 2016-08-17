@@ -21,6 +21,7 @@ Currently ``GenericCharacteristic<T>`` is used, to allow for user-defined value 
 * [ ] Overall cleanup
 * [ ] Documentation
 * [ ] Tests
+* [ ] Verify authentication in /characteristic and /accessories
 
 **Usage:**
 
