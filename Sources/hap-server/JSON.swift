@@ -1,9 +1,9 @@
 import Foundation
 
-protocol JSONSerializable {
+public protocol JSONSerializable {
     func serialized() -> [String: AnyObject]
 }
 
-protocol JSONDeserializable {
+public protocol JSONDeserializable {
     init(_ data: [String: AnyObject]) throws
 }

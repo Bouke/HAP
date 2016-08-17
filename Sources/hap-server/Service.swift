@@ -1,4 +1,4 @@
-public struct Service {
+public class Service {
     public enum `Type`: String {
         case info = "3E"
         case lightbulb = "43"
@@ -6,14 +6,19 @@ public struct Service {
         case thermostat = "4A"
     }
 
-
-    let id: Int
+    var id: Int
     let type: Type
-    let characteristics: [Characteristic]
+    let characteristics: [AnyCharacteristic]
+
+    init(id: Int = 0, type: Type, characteristics: [AnyCharacteristic]) {
+        self.id = id
+        self.type = type
+        self.characteristics = characteristics
+    }
 }
 
 extension Service: JSONSerializable {
-    func serialized() -> [String : AnyObject] {
+    public func serialized() -> [String : AnyObject] {
         return [
             "iid": id as AnyObject,
             "type": type.rawValue as AnyObject,

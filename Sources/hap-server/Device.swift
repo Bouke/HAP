@@ -8,6 +8,22 @@ func generateIdentifier() -> String {
     return (1...6).map({ _ in String(arc4random() & 255, radix: 16, uppercase: false) }).joined(separator: ":")
 }
 
+struct Box<T: Any>: Hashable, Equatable {
+    let value: T
+
+    init(_ value: T) {
+        self.value = value
+    }
+
+    var hashValue: Int {
+        return ObjectIdentifier(value as AnyObject).hashValue
+    }
+
+    static func == (lhs: Box<T>, rhs: Box<T>) -> Bool {
+        return ObjectIdentifier(lhs.value as AnyObject) == ObjectIdentifier(rhs.value as AnyObject)
+    }
+}
+
 public class Device {
     let name: String
     let identifier: String
@@ -17,7 +33,7 @@ public class Device {
     let storage: FileStorage
     let clients: Clients
     let accessories: [Accessory]
-    internal var characteristicEventListeners: [Characteristic: WeakObjectSet<Connection>]
+    internal var characteristicEventListeners: [Box<AnyCharacteristic>: WeakObjectSet<Connection>]
 
     init(name: String, pin: String, storage: FileStorage, accessories: [Accessory]) {
         self.name = name
@@ -25,13 +41,13 @@ public class Device {
         self.storage = storage
         if let pk = storage["pk"], let sk = storage["sk"], let identifier = storage["uuid"] {
             self.identifier = String(data: identifier, encoding: .utf8)!
-            self.publicKey = pk
-            self.privateKey = sk
+            publicKey = pk
+            privateKey = sk
         } else {
-            (self.publicKey, self.privateKey) = Ed25519.generateSignKeypair()
-            self.identifier = generateIdentifier()
-            storage["pk"] = self.publicKey
-            storage["sk"] = self.privateKey
+            (publicKey, privateKey) = Ed25519.generateSignKeypair()
+            identifier = generateIdentifier()
+            storage["pk"] = publicKey
+            storage["sk"] = privateKey
             storage["uuid"] = identifier.data(using: .utf8)
         }
         clients = Clients(storage: storage)
@@ -60,24 +76,24 @@ public class Device {
         return false
     }
 
-    public func add(characteristic: Characteristic, listener: Connection) {
-        if let _ = characteristicEventListeners[characteristic] {
-            characteristicEventListeners[characteristic]!.addObject(object: listener)
+    public func add(characteristic: AnyCharacteristic, listener: Connection) {
+        if let _ = characteristicEventListeners[Box(characteristic)] {
+            characteristicEventListeners[Box(characteristic)]!.addObject(object: listener)
         } else {
-            characteristicEventListeners[characteristic] = [listener]
+            characteristicEventListeners[Box(characteristic)] = [listener]
         }
     }
 
     @discardableResult
-    public func remove(characteristic: Characteristic, listener connection: Connection) -> Connection? {
-        guard let _ = characteristicEventListeners[characteristic] else {
+    public func remove(characteristic: AnyCharacteristic, listener connection: Connection) -> Connection? {
+        guard let _ = characteristicEventListeners[Box(characteristic)] else {
             return nil
         }
-        return characteristicEventListeners[characteristic]!.remove(connection)
+        return characteristicEventListeners[Box(characteristic)]!.remove(connection)
     }
 
-    public func notify(characteristicListeners characteristic: Characteristic, event: Event, exceptListener except: Connection? = nil) {
-        guard let listeners = characteristicEventListeners[characteristic]?.filter({$0 != except}) else {
+    public func notify(characteristicListeners characteristic: AnyCharacteristic, event: Event, exceptListener except: Connection? = nil) {
+        guard let listeners = characteristicEventListeners[Box(characteristic)]?.filter({$0 != except}) else {
             return
         }
         let data = event.serialized()

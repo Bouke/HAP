@@ -1,6 +1,12 @@
 import Foundation
 
-public class Characteristic {
+public protocol AnyCharacteristic: class, JSONSerializable {
+    var id: Int { get set }
+    func setValue(fromNSObject newValue: NSObject?) throws -> ()
+    var valueAsNSObject: NSObject? { get }
+}
+
+public enum Characteristic {
     public enum `Type`: String {
         case on = "25"
         case currentTemperature = "11"
@@ -15,7 +21,7 @@ public class Characteristic {
         case serialNumber = "30"
     }
 
-    enum Permission: String {
+    public enum Permission: String {
         case read = "pr"
         case write = "pw"
         case events = "ev"
@@ -23,7 +29,7 @@ public class Characteristic {
         static let ReadWrite: [Permission] = [.read, .write, .events]
     }
 
-    enum Format: String {
+    public enum Format: String {
         case string = "string"
         case bool = "bool"
         case float = "float"
@@ -36,7 +42,7 @@ public class Characteristic {
         case tlv8 = "tlv8"
     }
 
-    enum Unit: String {
+    public enum Unit: String {
         case percentage = "percentage"
         case arcdegrees = "arcdegrees"
         case celcius = "celcius"
@@ -44,28 +50,32 @@ public class Characteristic {
         case seconds = "seconds"
     }
 
-    let id: Int
-    let type: Type
-    var value: NSObject?
-    let permissions: [Permission]
+}
+
+open class GenericCharacteristic<ValueType: NSObjectConvertible>: AnyCharacteristic {
+
+    public var id: Int
+    let type: Characteristic.`Type`
+    var value: ValueType?
+    let permissions: [Characteristic.Permission]
 
     let description: String?
-    let format: Format?
-    let unit: Unit?
+    let format: Characteristic.Format?
+    let unit: Characteristic.Unit?
 
     let maxLength: Int?
     let maxValue: NSNumber?
     let minValue: NSNumber?
     let stepValue: NSNumber?
 
-    init(id: Int, type: Type, value: NSObject? = nil, permissions: [Permission], description: String? = nil, format: Format? = nil, unit: Unit? = nil, maxLength: Int? = nil, maxValue: NSNumber? = nil, minValue: NSNumber? = nil, stepValue: NSNumber? = nil) {
+    init(id: Int = 0, type: Characteristic.`Type`, value: ValueType? = nil, permissions: [Characteristic.Permission] = [.read, .write, .events], description: String? = nil, format: Characteristic.Format? = nil, unit: Characteristic.Unit? = nil, maxLength: Int? = nil, maxValue: NSNumber? = nil, minValue: NSNumber? = nil, stepValue: NSNumber? = nil) {
         self.id = id
         self.type = type
         self.value = value
         self.permissions = permissions
 
         self.description = description
-        self.format = format
+        self.format = format ?? ValueType.format
         self.unit = unit
 
         self.maxLength = maxLength
@@ -73,16 +83,24 @@ public class Characteristic {
         self.minValue = minValue
         self.stepValue = stepValue
     }
+
+    public func setValue(fromNSObject newValue: NSObject?) throws {
+        value = try newValue.flatMap { try ValueType(withNSObject: $0) }
+    }
+
+    public var valueAsNSObject: NSObject? {
+        return value?.asNSObject
+    }
 }
 
-extension Characteristic: JSONSerializable {
-    func serialized() -> [String : AnyObject] {
+extension GenericCharacteristic: JSONSerializable {
+    public func serialized() -> [String : AnyObject] {
         var serialized: [String : AnyObject] = [
             "iid": id as AnyObject,
             "type": type.rawValue as AnyObject,
             "perms": permissions.map { $0.rawValue } as AnyObject
         ]
-        if let value = value { serialized["value"] = value }
+        if let value = value { serialized["value"] = value.asNSObject }
 
         if let description = description { serialized["description"] = description as AnyObject }
         if let format = format { serialized["format"] = format.rawValue as AnyObject }
@@ -97,14 +115,14 @@ extension Characteristic: JSONSerializable {
     }
 }
 
-extension Characteristic: Hashable {
+extension GenericCharacteristic: Hashable {
     public var hashValue: Int {
-        return id
+        return id.hashValue
     }
 }
 
-extension Characteristic: Equatable {
-    public static func == (lhs: Characteristic, rhs: Characteristic) -> Bool {
+extension GenericCharacteristic: Equatable {
+    public static func == (lhs: GenericCharacteristic, rhs: GenericCharacteristic) -> Bool {
         return lhs === rhs
     }
 }

@@ -79,9 +79,7 @@ public class Connection: NSObject, StreamDelegate {
             }
 
             guard let serialized = response?.serialized() else {
-                logger.warning("Output stream was scheduled, but no bytes to be written")
-                return
-                //abort()
+                abort()
             }
             logger.debug("Response \(self.response!)")
 
@@ -103,8 +101,9 @@ public class Connection: NSObject, StreamDelegate {
         }
     }
 
-    // Out-of-band messaging
+    // Out-of-band messaging (used for events)
     public func write(_ data: Data) {
+        // @todo use runloop to write the data
         let data = server!.streamMiddleware.reversed().reduce(data) { $1.parse(output: $0, forConnection: self) }
 
         let written = data.withUnsafeBytes {

@@ -15,7 +15,7 @@ enum TLV8Error: Swift.Error {
     case DecodeError
 }
 
-func decode<Key: Hashable where Key: RawRepresentable, Key.RawValue == UInt8>(_ data: Data) throws -> [Key: Data] {
+func decode<Key: Hashable>(_ data: Data) throws -> [Key: Data] where Key: RawRepresentable, Key.RawValue == UInt8 {
     var result = [Key: Data]()
     var index = data.startIndex
     while index < data.endIndex {
@@ -41,7 +41,7 @@ func decode<Key: Hashable where Key: RawRepresentable, Key.RawValue == UInt8>(_ 
     return result
 }
 
-func encode<Key: Hashable where Key: RawRepresentable, Key.RawValue == UInt8>(_ data: [Key: Data]) -> Data {
+func encode<Key: Hashable>(_ data: [Key: Data]) -> Data where Key: RawRepresentable, Key.RawValue == UInt8 {
     var result = Data()
     func append(type: UInt8, value: Data.SubSequence) {
         result.append(Data(bytes: [type, UInt8(value.count)] + value))

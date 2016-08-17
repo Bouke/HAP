@@ -9,7 +9,7 @@ func + (lhs: Data, rhs: Data) -> Data {
 
 // Removed in Xcode 8 beta 3
 extension Data {
-    init<C: Collection where C.Iterator.Element == UInt8>(_ collection: C) {
+    init<C: Collection>(_ collection: C) where C.Iterator.Element == UInt8 {
         self = Data(bytes: Array(collection))
     }
 }

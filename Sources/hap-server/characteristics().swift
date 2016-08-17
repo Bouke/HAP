@@ -26,7 +26,7 @@ func characteristics(connection: Connection, request: Request) -> Response {
             serialized.append([
                 "aid": path[0] as AnyObject,
                 "iid": path[1] as AnyObject,
-                "value": characteristic.value ?? NSNull()
+                "value": characteristic.valueAsNSObject ?? NSNull()
             ])
         }
 
@@ -48,10 +48,15 @@ func characteristics(connection: Connection, request: Request) -> Response {
 
             // set new value
             if let value = item["value"] {
-                switch value {
-                case let value as NSNumber: characteristic.value = value
-                case is NSNull: characteristic.value = nil
-                default: return .badRequest
+                do {
+                    switch value {
+                    case let value as NSNumber: try characteristic.setValue(fromNSObject: value)
+                    case let value as NSString: try characteristic.setValue(fromNSObject: value)
+                    case is NSNull: try characteristic.setValue(fromNSObject: nil)
+                    default: return .badRequest
+                    }
+                } catch {
+                    return .badRequest
                 }
 
                 // notify listeners
@@ -59,7 +64,7 @@ func characteristics(connection: Connection, request: Request) -> Response {
                     [
                         "aid": aid as AnyObject,
                         "iid": iid as AnyObject,
-                        "value": characteristic.value ?? NSNull()
+                        "value": characteristic.valueAsNSObject ?? NSNull()
                     ]
                 ]]
                 guard let body = try? JSONSerialization.data(withJSONObject: serialized, options: []) else {

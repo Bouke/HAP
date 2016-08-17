@@ -32,22 +32,14 @@ import CryptoSwift
 
 let storage = try FileStorage(path: "Switch")
 
-let livingRoomSwitch = { () -> Accessory in
-    let identify = Characteristic(id: 2, type: .identify, permissions: [.write], format: .bool)
-    let manufacturer = Characteristic(id: 3, type: .manufacturer, value: "Bouke" as NSObject?, permissions: [.read], format: .string)
-    let model = Characteristic(id: 4, type: .model, value: "Switch 2000" as NSObject?, permissions: [.read], format: .string)
-    let name = Characteristic(id: 5, type: .name, value: "Switch" as NSObject?, permissions: [.read], format: .string)
-    let serialNumber = Characteristic(id: 6, type: .serialNumber, value: "undefined" as NSObject?, permissions: [.read], format: .string)
-    let info = Service(id: 1, type: .info, characteristics: [identify, manufacturer, model, name, serialNumber])
+let livingRoomSwitch = Accessory.Switch(id: 1)
+livingRoomSwitch.info.manufacturer.value = "Bouke"
+livingRoomSwitch.info.model.value = "undefined"
+livingRoomSwitch.info.serialNumber.value = "undefined"
+livingRoomSwitch.info.name.value = "Switch"
+let bedroomNightStand = Accessory.Lightbulb(id: 2)
 
-    let characteristic = Characteristic(id: 8, type: .on, value: false as NSObject?, permissions: [.read, .write, .events], format: .bool)
-
-    let service = Service(id: 7, type: .switch, characteristics: [characteristic])
-
-    return Accessory(id: 1, type: .switch, services: [info, service])
-}()
-
-let device = Device(name: "Switch", pin: "001-02-003", storage: storage, accessories: [livingRoomSwitch])
+let device = Device(name: "Switch", pin: "001-02-003", storage: storage, accessories: [livingRoomSwitch, bedroomNightStand])
 
 //TODO: converge into "Device()"
 let username = "Pair-Setup"
@@ -89,10 +81,11 @@ let config: [String: Data] = [
     "id": device.identifier.data(using: .utf8)!, // identifier
     "c#": "1".data(using: .utf8)!, // version
     "s#": "1".data(using: .utf8)!, // state
-    "sf": (device.isPaired ? "1" : "0").data(using: .utf8)!, // discoverable
+    "sf": (device.isPaired ? "0" : "1").data(using: .utf8)!, // discoverable
     "ff": "0".data(using: .utf8)!, // mfi compliant
     "md": device.name.data(using: .utf8)!, // name
-    "ci": device.accessories[0].type.rawValue.data(using: .utf8)!, // category identifier @todo use `bridge` if >1 accessory
+//    "ci": device.accessories[0].type.rawValue.data(using: .utf8)! // category identifier @todo use `bridge` if >1 accessory
+    "ci": AccessoryType.bridge.rawValue.data(using: .utf8)!
 ]
 
 service.setTXTRecord(NetService.data(fromTXTRecord: config))

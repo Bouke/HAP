@@ -3,44 +3,51 @@ import CLibSodium
 import CommonCrypto
 import HTTP
 
-public class Accessory {
-    public enum `Type`: String {
-        case other = "1"
-        case bridge = "2"
-        case fan = "3"
-        case garageDoorOpener = "4"
-        case lightbulb = "5"
-        case doorLock = "6"
-        case outlet = "7"
-        case `switch` = "8"
-        case thermostat = "9"
-        case sensor = "10"
-        case alarmSystem = "11"
-        case door = "12"
-        case window = "13"
-        case windowCovering = "14"
-        case programmableSwitch = "15"
-        case rangeExtender = "16"
-    }
+public enum AccessoryType: String {
+    case other = "1"
+    case bridge = "2"
+    case fan = "3"
+    case garageDoorOpener = "4"
+    case lightbulb = "5"
+    case doorLock = "6"
+    case outlet = "7"
+    case `switch` = "8"
+    case thermostat = "9"
+    case sensor = "10"
+    case alarmSystem = "11"
+    case door = "12"
+    case window = "13"
+    case windowCovering = "14"
+    case programmableSwitch = "15"
+    case rangeExtender = "16"
+}
 
+public class Accessory {
     let id: Int
-    let type: Type
+    let type: AccessoryType
+    let info: Service.Info
     let services: [Service]
 
-    init(id: Int, type: Type, services: [Service]) {
-        let ids: [Int] = services.reduce([], { (a: [Int], s: Service) -> [Int] in
-            return a + [s.id] + s.characteristics.map { $0.id }
-        })
-        precondition(Set(ids).count == ids.count, "Service and characteristic identifiers must be unique within an accessory")
-
+    init(id: Int, type: AccessoryType, services: [Service]) {
         self.id = id
         self.type = type
-        self.services = services
+        info = .init()
+        self.services = [info] + services
+
+        var iid = 1
+        for service in self.services {
+            service.id = iid
+            iid += 1
+            for characteristic in service.characteristics {
+                characteristic.id = iid
+                iid += 1
+            }
+        }
     }
 }
 
 extension Accessory: JSONSerializable {
-    func serialized() -> [String : AnyObject] {
+    public func serialized() -> [String : AnyObject] {
         return [
             "aid": id as AnyObject,
             "services": services.map { $0.serialized() } as AnyObject
