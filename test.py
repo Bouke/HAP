@@ -17,7 +17,7 @@ MESSAGE = """PUT /characteristics HTTP/1.1
         }
     ]
 }
-"""
+""".encode()
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((TCP_IP, TCP_PORT))
