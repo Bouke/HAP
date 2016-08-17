@@ -3,11 +3,10 @@ import PackageDescription
 let package = Package(
     name: "HAP",
     targets: [
-        Target(name: "CommonCrypto"),
-        Target(name: "Bignum"),
+        Target(name: "HTTP", dependencies: ["Evergreen"]),
         Target(name: "HKDF", dependencies: ["CommonCrypto"]),
         Target(name: "SRP", dependencies: ["CommonCrypto", "Bignum"]),
-        Target(name: "hap-server", dependencies: ["HKDF", "HTTP", "SRP"]),
+        Target(name: "hap-server", dependencies: ["HKDF", "HTTP", "SRP", "CryptoSwift", "Evergreen"]),
         Target(name: "hap-browser"),
     ],
     dependencies: [
