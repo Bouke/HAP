@@ -43,53 +43,53 @@ public func getLoggerForFile(_ file: String = #file) -> Logger {
 
 /// Logs the event using a logger that is appropriate for the caller.
 /// - seealso: `Logger.log(_:, forLevel:)`
-public func log<M>( _ message: @autoclosure(escaping) () -> M, error: Error? = nil, forLevel logLevel: LogLevel? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line)
+public func log<M>( _ message: @autoclosure @escaping () -> M, error: Error? = nil, forLevel logLevel: LogLevel? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line)
 {
     Logger.loggerForFile(file).log(message, error: error, forLevel: logLevel, onceForKey: key, function: function, file: file, line: line)
 }
 
 /// Logs the event with the Verbose log level using a logger that is appropriate for the caller.
 /// - seealso: `Logger.log(_:, forLevel:)`
-public func verbose<M>( _ message: @autoclosure(escaping) () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
+public func verbose<M>( _ message: @autoclosure @escaping () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
     Evergreen.log(message, error: error, forLevel: .verbose, onceForKey: key, function: function, file: file, line: line)
 }
 /// Logs the event with the Debug log level using a logger that is appropriate for the caller.
 /// - seealso: `Logger.log(_:, forLevel:)`
-public func debug<M>( _ message: @autoclosure(escaping) () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
+public func debug<M>( _ message: @autoclosure @escaping () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
     Evergreen.log(message, error: error, forLevel: .debug, onceForKey: key, function: function, file: file, line: line)
 }
 /// Logs the event with the Info log level using a logger that is appropriate for the caller.
 /// - seealso: `Logger.log(_:, forLevel:)`
-public func info<M>( _ message: @autoclosure(escaping) () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
+public func info<M>( _ message: @autoclosure @escaping () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
     Evergreen.log(message, error: error, forLevel: .info, onceForKey: key, function: function, file: file, line: line)
 }
 /// Logs the event with the Warning log level using a logger that is appropriate for the caller.
 /// - seealso: `Logger.log(_:, forLevel:)`
-public func warning<M>( _ message: @autoclosure(escaping) () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
+public func warning<M>( _ message: @autoclosure @escaping () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
     Evergreen.log(message, error: error, forLevel: .warning, onceForKey: key, function: function, file: file, line: line)
 }
 /// Logs the event with the Error log level using a logger that is appropriate for the caller.
 /// - seealso: `Logger.log(_:, forLevel:)`
-public func error<M>( _ message: @autoclosure(escaping) () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
+public func error<M>( _ message: @autoclosure @escaping () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
     Evergreen.log(message, error: error, forLevel: .error, onceForKey: key, function: function, file: file, line: line)
 }
 /// Logs the event with the Critical log level using a logger that is appropriate for the caller.
 /// - seealso: `Logger.log(_:, forLevel:)`
-public func critical<M>( _ message: @autoclosure(escaping) () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
+public func critical<M>( _ message: @autoclosure @escaping () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
     Evergreen.log(message, error: error, forLevel: .critical, onceForKey: key, function: function, file: file, line: line)
 }
 
 
 /// Alias for `Logger.tic` for a logger that is appropriate for the caller.
 /// - seealso: `Logger.tic`
-public func tic<M>( andLog message: @autoclosure(escaping) () -> M, error: Error? = nil, forLevel logLevel: LogLevel? = nil, timerKey: String? = nil, function: String = #function, file: String = #file, line: Int = #line)
+public func tic<M>( andLog message: @autoclosure @escaping () -> M, error: Error? = nil, forLevel logLevel: LogLevel? = nil, timerKey: String? = nil, function: String = #function, file: String = #file, line: Int = #line)
 {
     Logger.loggerForFile(file).tic(andLog: message, error: error, forLevel: logLevel, timerKey: timerKey, function: function, file: file, line: line)
 }
 
 /// Alias for `Logger.toc` for a logger that is appropriate for the caller.
 /// - seealso: `Logger.toc`
-public func toc<M>( andLog message: @autoclosure(escaping) () -> M, error: Error? = nil, forLevel logLevel: LogLevel? = nil, timerKey: String? = nil, function: String = #function, file: String = #file, line: Int = #line)
+public func toc<M>( andLog message: @autoclosure @escaping () -> M, error: Error? = nil, forLevel logLevel: LogLevel? = nil, timerKey: String? = nil, function: String = #function, file: String = #file, line: Int = #line)
 {
     Logger.loggerForFile(file).toc(andLog: message, error: error, forLevel: logLevel, timerKey: timerKey, function: function, file: file, line: line)
 }
@@ -246,7 +246,7 @@ public final class Logger {
      - parameter logLevel: If the event's log level is lower than the receiving logger's `effectiveLogLevel`, the event will not be logged. The event will always be logged, if no log level is provided for either the event or the logger's `effectiveLogLevel`.
      - parameter key: Only logs the message if no logging calls with the same `key` have occured before.
      */
-    public func log<M>( _ message: @autoclosure(escaping) () -> M, error: Error? = nil, forLevel logLevel: LogLevel? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line)
+    public func log<M>( _ message: @autoclosure @escaping () -> M, error: Error? = nil, forLevel logLevel: LogLevel? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line)
     {
         if let key = key {
             if keysLoggedOnce.contains(key) {
@@ -261,32 +261,32 @@ public final class Logger {
 
     /// Logs the event with the Verbose log level.
     /// - seealso: `log(_:, forLevel:)`
-    public func verbose<M>( _ message: @autoclosure(escaping) () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
+    public func verbose<M>( _ message: @autoclosure @escaping () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
         self.log(message, error: error, forLevel: .verbose, onceForKey: key, function: function, file: file, line: line)
     }
     /// Logs the event with the Debug log level.
     /// - seealso: `log(_:, forLevel:)`
-    public func debug<M>( _ message: @autoclosure(escaping) () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
+    public func debug<M>( _ message: @autoclosure @escaping () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
         self.log(message, error: error, forLevel: .debug, onceForKey: key, function: function, file: file, line: line)
     }
     /// Logs the event with the Info log level.
     /// - seealso: `log(_:, forLevel:)`
-    public func info<M>( _ message: @autoclosure(escaping) () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
+    public func info<M>( _ message: @autoclosure @escaping () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
         self.log(message, error: error, forLevel: .info, onceForKey: key, function: function, file: file, line: line)
     }
     /// Logs the event with the Warning log level.
     /// - seealso: `log(_:, forLevel:)`
-    public func warning<M>( _ message: @autoclosure(escaping) () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
+    public func warning<M>( _ message: @autoclosure @escaping () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
         self.log(message, error: error, forLevel: .warning, onceForKey: key, function: function, file: file, line: line)
     }
     /// Logs the event with the Error log level.
     /// - seealso: `log(_:, forLevel:)`
-    public func error<M>( _ message: @autoclosure(escaping) () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
+    public func error<M>( _ message: @autoclosure @escaping () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
         self.log(message, error: error, forLevel: .error, onceForKey: key, function: function, file: file, line: line)
     }
     /// Logs the event with the Critical log level.
     /// - seealso: `log(_:, forLevel:)`
-    public func critical<M>( _ message: @autoclosure(escaping) () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
+    public func critical<M>( _ message: @autoclosure @escaping () -> M, error: Error? = nil, onceForKey key: String? = nil, function: String = #function, file: String = #file, line: Int = #line) {
         self.log(message, error: error, forLevel: .critical, onceForKey: key, function: function, file: file, line: line)
     }
 
@@ -337,7 +337,7 @@ public final class Logger {
      - seealso: `log(_:, forLevel:)`
      - seealso: `toc`
      */
-    public func tic<M>( andLog message: @autoclosure(escaping) () -> M, error: Error? = nil, forLevel logLevel: LogLevel? = nil, timerKey: String? = nil, function: String = #function, file: String = #file, line: Int = #line)
+    public func tic<M>( andLog message: @autoclosure @escaping () -> M, error: Error? = nil, forLevel logLevel: LogLevel? = nil, timerKey: String? = nil, function: String = #function, file: String = #file, line: Int = #line)
     {
         if let timerKey = timerKey {
             startDates[timerKey] = Date()
@@ -353,7 +353,7 @@ public final class Logger {
 
      - seealso: `tic`
      */
-    public func toc<M>( andLog message: @autoclosure(escaping) () -> M, error: Error? = nil, forLevel logLevel: LogLevel? = nil, timerKey: String? = nil, function: String = #function, file: String = #file, line: Int = #line)
+    public func toc<M>( andLog message: @autoclosure @escaping () -> M, error: Error? = nil, forLevel logLevel: LogLevel? = nil, timerKey: String? = nil, function: String = #function, file: String = #file, line: Int = #line)
     {
         var startDate: Date?
         if let timerKey = timerKey {
