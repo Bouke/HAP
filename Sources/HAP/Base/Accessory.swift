@@ -23,13 +23,13 @@ public enum AccessoryType: String {
 }
 
 public class Accessory {
-    let id: Int
-    let type: AccessoryType
-    let info: Service.Info
+    let aid: Int
+    public let type: AccessoryType
+    public let info: Service.Info
     let services: [Service]
 
-    init(id: Int, type: AccessoryType, services: [Service]) {
-        self.id = id
+    init(aid: Int, type: AccessoryType, services: [Service]) {
+        self.aid = aid
         self.type = type
         info = .init()
         self.services = [info] + services
@@ -39,7 +39,7 @@ public class Accessory {
             service.id = iid
             iid += 1
             for characteristic in service.characteristics {
-                characteristic.id = iid
+                characteristic.iid = iid
                 iid += 1
             }
         }
@@ -49,7 +49,7 @@ public class Accessory {
 extension Accessory: JSONSerializable {
     public func serialized() -> [String : AnyObject] {
         return [
-            "aid": id as AnyObject,
+            "aid": aid as AnyObject,
             "services": services.map { $0.serialized() } as AnyObject
         ]
     }

@@ -1,11 +1,3 @@
-//
-//  HAP.swift
-//  HAP
-//
-//  Created by Bouke Haarsma on 20-06-16.
-//
-//
-
 import Foundation
 
 typealias PairTagTLV8 = [PairTag: Data]

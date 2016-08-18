@@ -1,21 +1,13 @@
-//
-//  database.swift
-//  HAP
-//
-//  Created by Bouke Haarsma on 19-07-16.
-//
-//
-
 import Foundation
 
-class FileStorage {
-    enum Error: Swift.Error {
+public class FileStorage {
+    public enum Error: Swift.Error {
         case couldNotCreateDirectory
     }
 
     let path: String
 
-    init(path: String) throws {
+    public init(path: String) throws {
         if !FileManager.default.directoryExists(atPath: path) {
             do {
                 try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: false, attributes: nil)

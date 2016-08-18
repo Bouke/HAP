@@ -25,17 +25,17 @@ struct Box<T: Any>: Hashable, Equatable {
 }
 
 public class Device {
-    let name: String
-    let identifier: String
-    let publicKey: Data
+    public let name: String
+    public let identifier: String
+    public let publicKey: Data
     let privateKey: Data
-    let pin: String
+    public let pin: String
     let storage: FileStorage
     let clients: Clients
-    let accessories: [Accessory]
+    public let accessories: [Accessory]
     internal var characteristicEventListeners: [Box<AnyCharacteristic>: WeakObjectSet<Connection>]
 
-    init(name: String, pin: String, storage: FileStorage, accessories: [Accessory]) {
+    public init(name: String, pin: String, storage: FileStorage, accessories: [Accessory]) {
         self.name = name
         self.pin = pin
         self.storage = storage
@@ -71,12 +71,12 @@ public class Device {
         }
     }
 
-    var isPaired: Bool {
+    public var isPaired: Bool {
         // @todo if number of clients > 0 return true
         return false
     }
 
-    public func add(characteristic: AnyCharacteristic, listener: Connection) {
+    func add(characteristic: AnyCharacteristic, listener: Connection) {
         if let _ = characteristicEventListeners[Box(characteristic)] {
             characteristicEventListeners[Box(characteristic)]!.addObject(object: listener)
         } else {
@@ -85,14 +85,14 @@ public class Device {
     }
 
     @discardableResult
-    public func remove(characteristic: AnyCharacteristic, listener connection: Connection) -> Connection? {
+    func remove(characteristic: AnyCharacteristic, listener connection: Connection) -> Connection? {
         guard let _ = characteristicEventListeners[Box(characteristic)] else {
             return nil
         }
         return characteristicEventListeners[Box(characteristic)]!.remove(connection)
     }
 
-    public func notify(characteristicListeners characteristic: AnyCharacteristic, event: Event, exceptListener except: Connection? = nil) {
+    func notify(characteristicListeners characteristic: AnyCharacteristic, event: Event, exceptListener except: Connection? = nil) {
         guard let listeners = characteristicEventListeners[Box(characteristic)]?.filter({$0 != except}) else {
             return
         }

@@ -1,6 +1,7 @@
 import Foundation
 import HTTP
 import func Evergreen.getLogger
+import HAP
 
 fileprivate let logger = getLogger("hap")
 
@@ -21,57 +22,22 @@ class Delegate: NSObject, NetServiceDelegate, StreamDelegate {
     }
 }
 
-func root(connection: Connection, request: Request) -> Response {
-    return Response(status: .ok, text: "Nothing to see here. Pair this Homekit Accessory with an iOS device.")
-}
-
-import CLibSodium
-import HKDF
-import SRP
-import CryptoSwift
-
 let storage = try FileStorage(path: "Switch")
 
-let livingRoomSwitch = Accessory.Switch(id: 1)
+let livingRoomSwitch = Accessory.Switch(aid: 1)
 livingRoomSwitch.info.manufacturer.value = "Bouke"
 livingRoomSwitch.info.model.value = "undefined"
 livingRoomSwitch.info.serialNumber.value = "undefined"
 livingRoomSwitch.info.name.value = "Switch"
-let bedroomNightStand = Accessory.Lightbulb(id: 2)
+let bedroomNightStand = Accessory.Lightbulb(aid: 2)
 
 let device = Device(name: "Switch", pin: "001-02-003", storage: storage, accessories: [livingRoomSwitch, bedroomNightStand])
 
-//TODO: converge into "Device()"
-let username = "Pair-Setup"
-let password = device.pin
-
-import CommonCrypto
-
-let group = Group.N3072
-let alg = HashAlgorithm.SHA512
-
-/* Create a salt+verification key for the user's password. The salt and
- * key need to be computed at the time the user's password is set and
- * must be stored by the server-side application for use during the
- * authentication process.
- */
-let (salt, verificationKey) = createSaltedVerificationKey(username: username, password: password, group: group, alg: alg)
-
-let server = Server(group: group, alg: alg, salt: salt, username: username, verificationKey: verificationKey)
-
-let router = Router(routes: [
-    ("/", root),
-    ("/identify", identify),
-    ("/pair-setup", pairSetup),
-    ("/pair-verify", pairVerify),
-    ("/accessories", accessories),
-    ("/characteristics", characteristics),
-    ("/pairings", pairings)
-])
+let application = HAP.root(device: device)
 
 let encryption = EncryptionMiddleware()
 
-let httpServer = Server(application: router.application, streamMiddleware: [encryption])
+let httpServer = Server(application: application, streamMiddleware: [encryption])
 
 let delegate = Delegate(server: httpServer)
 

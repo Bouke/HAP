@@ -4,7 +4,8 @@ import func Evergreen.getLogger
 
 fileprivate let logger = getLogger("hap.pairings")
 
-func pairings(connection: Connection, request: Request) -> Response {
+func pairings(device: Device) -> Application {
+    return { (connection, request) in
     precondition(request.method == .POST)
 
     guard
@@ -35,4 +36,5 @@ func pairings(connection: Connection, request: Request) -> Response {
         .sequence: Data(bytes: [PairStep.response.rawValue])
     ]
     return Response(status: .ok, data: encode(result), mimeType: "application/pairing+tlv8")
+    }
 }

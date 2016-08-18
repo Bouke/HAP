@@ -1,11 +1,20 @@
 import Foundation
 import HTTP
 import HKDF
+import CommonCrypto
+import SRP
 import func Evergreen.getLogger
 
 fileprivate let logger = getLogger("hap.pairSetup")
 
-func pairSetup(connection: Connection, request: Request) -> Response {
+func pairSetup(device: Device) -> Application {
+    let group = Group.N3072
+    let alg = HashAlgorithm.SHA512
+
+    let (salt, verificationKey) = createSaltedVerificationKey(username: "Pair-Setup", password: device.pin, group: group, alg: alg)
+    let server = Server(group: group, alg: alg, salt: salt, username: "Pair-Setup", verificationKey: verificationKey)
+
+    return { (connection, request) in
     guard let body = request.body, let data: PairTagTLV8 = try? decode(body) else { return .badRequest }
 
     switch PairSetupStep(rawValue: data[.sequence]![0]) {
@@ -114,4 +123,5 @@ func pairSetup(connection: Connection, request: Request) -> Response {
 
     default: return .badRequest
     }
+}
 }

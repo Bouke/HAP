@@ -1,7 +1,7 @@
 import Foundation
 
-public protocol AnyCharacteristic: class, JSONSerializable {
-    var id: Int { get set }
+protocol AnyCharacteristic: class, JSONSerializable {
+    var iid: Int { get set }
     func setValue(fromNSObject newValue: NSObject?) throws -> ()
     var valueAsNSObject: NSObject? { get }
 }
@@ -54,9 +54,9 @@ public enum Characteristic {
 
 open class GenericCharacteristic<ValueType: NSObjectConvertible>: AnyCharacteristic {
 
-    public var id: Int
-    let type: Characteristic.`Type`
-    var value: ValueType?
+    var iid: Int
+    public let type: Characteristic.`Type`
+    public var value: ValueType?
     let permissions: [Characteristic.Permission]
 
     let description: String?
@@ -68,8 +68,8 @@ open class GenericCharacteristic<ValueType: NSObjectConvertible>: AnyCharacteris
     let minValue: NSNumber?
     let stepValue: NSNumber?
 
-    init(id: Int = 0, type: Characteristic.`Type`, value: ValueType? = nil, permissions: [Characteristic.Permission] = [.read, .write, .events], description: String? = nil, format: Characteristic.Format? = nil, unit: Characteristic.Unit? = nil, maxLength: Int? = nil, maxValue: NSNumber? = nil, minValue: NSNumber? = nil, stepValue: NSNumber? = nil) {
-        self.id = id
+    init(iid: Int = 0, type: Characteristic.`Type`, value: ValueType? = nil, permissions: [Characteristic.Permission] = [.read, .write, .events], description: String? = nil, format: Characteristic.Format? = nil, unit: Characteristic.Unit? = nil, maxLength: Int? = nil, maxValue: NSNumber? = nil, minValue: NSNumber? = nil, stepValue: NSNumber? = nil) {
+        self.iid = iid
         self.type = type
         self.value = value
         self.permissions = permissions
@@ -96,7 +96,7 @@ open class GenericCharacteristic<ValueType: NSObjectConvertible>: AnyCharacteris
 extension GenericCharacteristic: JSONSerializable {
     public func serialized() -> [String : AnyObject] {
         var serialized: [String : AnyObject] = [
-            "iid": id as AnyObject,
+            "iid": iid as AnyObject,
             "type": type.rawValue as AnyObject,
             "perms": permissions.map { $0.rawValue } as AnyObject
         ]
@@ -117,7 +117,7 @@ extension GenericCharacteristic: JSONSerializable {
 
 extension GenericCharacteristic: Hashable {
     public var hashValue: Int {
-        return id.hashValue
+        return iid.hashValue
     }
 }
 

@@ -5,7 +5,8 @@ import func Evergreen.getLogger
 
 fileprivate let logger = getLogger("hap")
 
-func characteristics(connection: Connection, request: Request) -> Response {
+func characteristics(device: Device) -> Application {
+    return { (connection, request) in
     switch request.method {
     case .GET?:
         guard let URL = request.URL, let components = URLComponents(url: URL, resolvingAgainstBaseURL: false), let id = components.queryItems?.first(where: {$0.name == "id"})?.value else {
@@ -19,7 +20,7 @@ func characteristics(connection: Connection, request: Request) -> Response {
             guard path.count == 2 else {
                 return .badRequest
             }
-            guard let characteristic = device.accessories.first(where: {$0.id == path[0]})?.services.flatMap({$0.characteristics.filter({$0.id == path[1]})}).first else {
+            guard let characteristic = device.accessories.first(where: {$0.aid == path[0]})?.services.flatMap({$0.characteristics.filter({$0.iid == path[1]})}).first else {
                 // @fixme: hc sets status to StatusServiceCommunicationFailure instead
                 return .notFound
             }
@@ -42,7 +43,7 @@ func characteristics(connection: Connection, request: Request) -> Response {
             guard let aid = (item["aid"] as? NSNumber).flatMap({$0.intValue}), let iid = (item["iid"] as? NSNumber).flatMap({$0.intValue}) else {
                 return .badRequest
             }
-            guard let characteristic = device.accessories.first(where: {$0.id == aid})?.services.flatMap({$0.characteristics.filter({$0.id == iid})}).first else {
+            guard let characteristic = device.accessories.first(where: {$0.aid == aid})?.services.flatMap({$0.characteristics.filter({$0.iid == iid})}).first else {
                 return .notFound
             }
 
@@ -90,5 +91,6 @@ func characteristics(connection: Connection, request: Request) -> Response {
 
     default:
         return .badRequest
+    }
     }
 }

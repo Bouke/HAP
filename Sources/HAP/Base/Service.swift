@@ -7,7 +7,7 @@ public class Service {
     }
 
     var id: Int
-    let type: Type
+    public let type: Type
     let characteristics: [AnyCharacteristic]
 
     init(id: Int = 0, type: Type, characteristics: [AnyCharacteristic]) {

@@ -68,10 +68,10 @@ class Cryptographer {
     }
 }
 
-class EncryptionMiddleware: StreamMiddleware {
-    init() { }
+public class EncryptionMiddleware: StreamMiddleware {
+    public init() { }
 
-    func parse(input data: Data, forConnection connection: Connection) -> Data {
+    public func parse(input data: Data, forConnection connection: Connection) -> Data {
         if let cryptographer = connection.context["cryptographer"] as? Cryptographer {
             return try! cryptographer.decrypt(data)
         }
@@ -79,7 +79,7 @@ class EncryptionMiddleware: StreamMiddleware {
         return data
     }
 
-    func parse(output data: Data, forConnection connection: Connection) -> Data {
+    public func parse(output data: Data, forConnection connection: Connection) -> Data {
         if let cryptographer = connection.context["cryptographer"] as? Cryptographer {
             return cryptographer.encrypt(data)
         }

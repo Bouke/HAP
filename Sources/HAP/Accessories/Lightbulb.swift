@@ -1,21 +1,21 @@
 extension Accessory {
-    class Lightbulb: Accessory {
+    public class Lightbulb: Accessory {
         let `switch` = Service.Lightbulb()
 
-        init(id: Int) {
-            super.init(id: id, type: .lightbulb, services: [`switch`])
+        public init(aid: Int) {
+            super.init(aid: aid, type: .lightbulb, services: [`switch`])
         }
     }
 }
 
 extension Service {
-    class Lightbulb: Service {
+    public class Lightbulb: Service {
         let on = GenericCharacteristic<Bool>(type: .on)
         let brightness = GenericCharacteristic<Int>(type: .on)
         let saturation = GenericCharacteristic<Int>(type: .on)
         let hue = GenericCharacteristic<Int>(type: .on)
 
-        init() {
+        public init() {
             super.init(type: .lightbulb, characteristics: [on, brightness, saturation, hue])
         }
     }

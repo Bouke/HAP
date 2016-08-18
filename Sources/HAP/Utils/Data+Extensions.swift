@@ -30,4 +30,8 @@ extension Data {
         }
         self = Data(result)
     }
+
+    func toHexString() -> String {
+        return self.reduce("") { $0 + String(format:"%02x", $1) }
+    }
 }

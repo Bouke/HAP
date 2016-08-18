@@ -7,25 +7,26 @@ import func Evergreen.getLogger
 
 fileprivate let logger = getLogger("hap.pairVerify")
 
-//@todo where to place this? connection's context?
-let sk = generateRandomBytes(count: 32)
-let pk = { () -> Data in
-    var pk = Data(count: 32)
-    guard pk.withUnsafeMutableBytes({ pk in
-        sk.withUnsafeBytes { sk in
-            crypto_scalarmult_curve25519_base(pk, sk)
+func pairVerify(device: Device) -> Application {
+    //@todo where to place this? connection's context?
+    let sk = generateRandomBytes(count: 32)
+    let pk = { () -> Data in
+        var pk = Data(count: 32)
+        guard pk.withUnsafeMutableBytes({ pk in
+            sk.withUnsafeBytes { sk in
+                crypto_scalarmult_curve25519_base(pk, sk)
+            }
+        }) == 0 else {
+            abort()
         }
-    }) == 0 else {
-        abort()
-    }
-    return pk
-}()
+        return pk
+    }()
 
-//@todo move into connection's context
-var otherPublicKey: Data? = nil
-var sharedSecret: Data? = nil
+    //@todo move into connection's context
+    var otherPublicKey: Data? = nil
+    var sharedSecret: Data? = nil
 
-func pairVerify(connection: Connection, request: Request) -> Response {
+    return { (connection, request) in
     guard let body = request.body, let data: PairTagTLV8 = try? decode(body) else {
         return .badRequest
     }
@@ -125,4 +126,5 @@ func pairVerify(connection: Connection, request: Request) -> Response {
 
     default: return .badRequest
     }
+}
 }
