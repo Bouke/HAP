@@ -31,6 +31,10 @@ livingRoomSwitch.info.serialNumber.value = "undefined"
 livingRoomSwitch.info.name.value = "Switch"
 let bedroomNightStand = Accessory.Lightbulb(aid: 2)
 
+livingRoomSwitch.`switch`.on.onValueChange.append({ value in
+    logger.info("Switch changed value: \(value)")
+})
+
 let device = Device(name: "Switch", pin: "001-02-003", storage: storage, accessories: [livingRoomSwitch, bedroomNightStand])
 
 let application = HAP.root(device: device)
@@ -60,9 +64,17 @@ service.publish(options: [.listenForConnections])
 
 logger.info("Listening on port \(service.port)")
 
+let timer = DispatchSource.makeTimerSource()
+timer.scheduleRepeating(deadline: .now() + .seconds(5), interval: 5)
+timer.setEventHandler(handler: {
+    livingRoomSwitch.switch.on.value = !(livingRoomSwitch.switch.on.value ?? false)
+})
+timer.resume()
+
 withExtendedLifetime((delegate, service)) {
     RunLoop.current.run()
 }
+
 
 // see https://github.com/krzyzanowskim/CryptoSwift/issues/304
 //let c = Cryptographer(sharedKey: Data(hex: "352ce52e8d7a6b964c061faba60c806271ae47b1391c36169050f150fac5c770")!)
