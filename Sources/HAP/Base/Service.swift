@@ -1,16 +1,18 @@
+public enum ServiceType: String {
+    case info = "3E"
+    case lightbulb = "43"
+    case `switch` = "49"
+    case thermostat = "4A"
+}
+
 public class Service {
-    public enum `Type`: String {
-        case info = "3E"
-        case lightbulb = "43"
-        case `switch` = "49"
-        case thermostat = "4A"
-    }
+    weak var accessory: Accessory?
 
     var id: Int
-    public let type: Type
+    public let type: ServiceType
     let characteristics: [AnyCharacteristic]
 
-    init(id: Int = 0, type: Type, characteristics: [AnyCharacteristic]) {
+    init(id: Int = 0, type: ServiceType, characteristics: [AnyCharacteristic]) {
         self.id = id
         self.type = type
         self.characteristics = characteristics

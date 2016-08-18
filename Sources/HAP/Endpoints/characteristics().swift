@@ -51,9 +51,9 @@ func characteristics(device: Device) -> Application {
             if let value = item["value"] {
                 do {
                     switch value {
-                    case let value as NSNumber: try characteristic.setValue(fromNSObject: value)
-                    case let value as NSString: try characteristic.setValue(fromNSObject: value)
-                    case is NSNull: try characteristic.setValue(fromNSObject: nil)
+                    case let value as NSNumber: try characteristic.setValue(withNSObject: value, fromConnection: connection)
+                    case let value as NSString: try characteristic.setValue(withNSObject: value, fromConnection: connection)
+                    case is NSNull: try characteristic.setValue(withNSObject: nil, fromConnection: connection)
                     default: return .badRequest
                     }
                 } catch {
@@ -61,18 +61,7 @@ func characteristics(device: Device) -> Application {
                 }
 
                 // notify listeners
-                let serialized: [String: [[String: AnyObject]]] = ["characteristics": [
-                    [
-                        "aid": aid as AnyObject,
-                        "iid": iid as AnyObject,
-                        "value": characteristic.valueAsNSObject ?? NSNull()
-                    ]
-                ]]
-                guard let body = try? JSONSerialization.data(withJSONObject: serialized, options: []) else {
-                    abort()
-                }
-                let event = Event(status: .ok, body: body, mimeType: "application/hap+json")
-                device.notify(characteristicListeners: characteristic, event: event, exceptListener: connection)
+                device.notify(characteristicListeners: characteristic, exceptListener: connection)
             }
 
             // toggle events for this characteristic on this connection

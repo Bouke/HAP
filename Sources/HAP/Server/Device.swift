@@ -53,6 +53,10 @@ public class Device {
         clients = Clients(storage: storage)
         self.accessories = accessories
         characteristicEventListeners = [:]
+
+        for accessory in accessories {
+            accessory.device = self
+        }
     }
 
     public class Clients {
@@ -92,12 +96,12 @@ public class Device {
         return characteristicEventListeners[Box(characteristic)]!.remove(connection)
     }
 
-    func notify(characteristicListeners characteristic: AnyCharacteristic, event: Event, exceptListener except: Connection? = nil) {
-        guard let listeners = characteristicEventListeners[Box(characteristic)]?.filter({$0 != except}) else {
+    func notify(characteristicListeners characteristic: AnyCharacteristic, exceptListener except: Connection? = nil) {
+        guard let listeners = characteristicEventListeners[Box(characteristic)]?.filter({$0 != except}), listeners.count > 0, let event = Event(valueChangedOfCharacteristic: characteristic) else {
+            logger.warning("Value changed, but not notifying (either no listeners or could not serialize)")
             return
         }
         let data = event.serialized()
-
         logger.info("Notifying \(listeners): \(event)")
         for listener in listeners {
             listener.write(data)

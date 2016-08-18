@@ -23,6 +23,7 @@ public enum AccessoryType: String {
 }
 
 public class Accessory {
+    weak var device: Device?
     let aid: Int
     public let type: AccessoryType
     public let info: Service.Info
@@ -37,9 +38,11 @@ public class Accessory {
         var iid = 1
         for service in self.services {
             service.id = iid
+            service.accessory = self
             iid += 1
             for characteristic in service.characteristics {
                 characteristic.iid = iid
+                characteristic.service = service
                 iid += 1
             }
         }

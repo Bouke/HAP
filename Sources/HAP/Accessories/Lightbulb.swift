@@ -1,6 +1,6 @@
 extension Accessory {
     public class Lightbulb: Accessory {
-        let `switch` = Service.Lightbulb()
+        public let `switch` = Service.Lightbulb()
 
         public init(aid: Int) {
             super.init(aid: aid, type: .lightbulb, services: [`switch`])

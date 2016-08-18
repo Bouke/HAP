@@ -1,8 +1,10 @@
 import Foundation
+import class HTTP.Connection
 
 protocol AnyCharacteristic: class, JSONSerializable {
     var iid: Int { get set }
-    func setValue(fromNSObject newValue: NSObject?) throws -> ()
+    weak var service: Service? { get set }
+    func setValue(withNSObject newValue: NSObject?, fromConnection connection: Connection) throws -> ()
     var valueAsNSObject: NSObject? { get }
 }
 
@@ -53,10 +55,25 @@ public enum Characteristic {
 }
 
 open class GenericCharacteristic<ValueType: NSObjectConvertible>: AnyCharacteristic {
+    weak var service: Service?
 
     var iid: Int
     public let type: Characteristic.`Type`
-    public var value: ValueType?
+
+    internal var _value: ValueType?
+    public var value: ValueType? {
+        get {
+            return _value
+        }
+        set {
+            _value = newValue
+            guard let device = service?.accessory?.device else { return }
+            device.notify(characteristicListeners: self)
+            _ = onValueChange.map { $0(newValue) }
+        }
+    }
+    public var onValueChange: [(ValueType?) -> ()] = []
+
     let permissions: [Characteristic.Permission]
 
     let description: String?
@@ -71,7 +88,7 @@ open class GenericCharacteristic<ValueType: NSObjectConvertible>: AnyCharacteris
     init(iid: Int = 0, type: Characteristic.`Type`, value: ValueType? = nil, permissions: [Characteristic.Permission] = [.read, .write, .events], description: String? = nil, format: Characteristic.Format? = nil, unit: Characteristic.Unit? = nil, maxLength: Int? = nil, maxValue: NSNumber? = nil, minValue: NSNumber? = nil, stepValue: NSNumber? = nil) {
         self.iid = iid
         self.type = type
-        self.value = value
+        self._value = value
         self.permissions = permissions
 
         self.description = description
@@ -84,8 +101,9 @@ open class GenericCharacteristic<ValueType: NSObjectConvertible>: AnyCharacteris
         self.stepValue = stepValue
     }
 
-    public func setValue(fromNSObject newValue: NSObject?) throws {
-        value = try newValue.flatMap { try ValueType(withNSObject: $0) }
+    public func setValue(withNSObject newValue: NSObject?, fromConnection connection: Connection) throws {
+        _value = try newValue.flatMap { try ValueType(withNSObject: $0) }
+        _ = onValueChange.map { $0(_value) }
     }
 
     public var valueAsNSObject: NSObject? {

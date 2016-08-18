@@ -15,7 +15,7 @@ Currently ``GenericCharacteristic<T>`` is used, to allow for user-defined value 
 * [x] Notifications
 * [x] Split ``hap-server`` into executable and library
 * [ ] Include all Accessories, Services and Characteristics
-* [ ] API (update value from code, and send notifications)
+* [x] API (update value from code, and send notifications)
 * [ ] Cleanup encryption; currently OpenSSL + libsodium + CryptoSwift are used, would prefer a single dependency
 * [ ] Cleanup runloop, put some work on a queue?
 * [ ] Cleanup server instantiation
