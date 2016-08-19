@@ -1,6 +1,6 @@
 import HTTP
 
-public func root(device: Device) -> Application {
+func root(device: Device) -> Application {
     return Router(routes: [
         ("/", { _ in Response(status: .ok, text: "Nothing to see here. Pair this Homekit Accessory with an iOS device.") }),
         ("/identify", identify(device: device)),

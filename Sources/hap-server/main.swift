@@ -5,23 +5,6 @@ import HAP
 
 fileprivate let logger = getLogger("hap")
 
-class Delegate: NSObject, NetServiceDelegate, StreamDelegate {
-    var server: HTTP.Server
-
-    init(server: HTTP.Server) {
-        self.server = server
-    }
-
-    func netService(_ sender: NetService, didNotPublish errorDict: [String : NSNumber]) {
-        logger.error("didNotPublish: \(errorDict)")
-        abort()
-    }
-
-    func netService(_ sender: NetService, didAcceptConnectionWith inputStream: InputStream, outputStream: OutputStream) {
-        server.accept(inputStream: inputStream, outputStream: outputStream)
-    }
-}
-
 let storage = try FileStorage(path: "Switch")
 
 let livingRoomSwitch = Accessory.Switch(aid: 1)
@@ -37,33 +20,6 @@ livingRoomSwitch.`switch`.on.onValueChange.append({ value in
 
 let device = Device(name: "Switch", pin: "001-02-003", storage: storage, accessories: [livingRoomSwitch, bedroomNightStand])
 
-let application = HAP.root(device: device)
-
-let encryption = EncryptionMiddleware()
-
-let httpServer = Server(application: application, streamMiddleware: [encryption])
-
-let delegate = Delegate(server: httpServer)
-
-let service = NetService(domain: "local.", type: "_hap._tcp.", name: device.name, port: 8000)
-let config: [String: Data] = [
-    "pv": "1.0".data(using: .utf8)!, // state
-    "id": device.identifier.data(using: .utf8)!, // identifier
-    "c#": "1".data(using: .utf8)!, // version
-    "s#": "1".data(using: .utf8)!, // state
-    "sf": (device.isPaired ? "0" : "1").data(using: .utf8)!, // discoverable
-    "ff": "0".data(using: .utf8)!, // mfi compliant
-    "md": device.name.data(using: .utf8)!, // name
-//    "ci": device.accessories[0].type.rawValue.data(using: .utf8)! // category identifier @todo use `bridge` if >1 accessory
-    "ci": AccessoryType.bridge.rawValue.data(using: .utf8)!
-]
-
-service.setTXTRecord(NetService.data(fromTXTRecord: config))
-service.delegate = delegate
-service.publish(options: [.listenForConnections])
-
-logger.info("Listening on port \(service.port)")
-
 let timer = DispatchSource.makeTimerSource()
 timer.scheduleRepeating(deadline: .now() + .seconds(5), interval: 5)
 timer.setEventHandler(handler: {
@@ -71,11 +27,14 @@ timer.setEventHandler(handler: {
 })
 timer.resume()
 
-withExtendedLifetime((delegate, service)) {
-    RunLoop.current.run()
-}
+let server = Server(device: device, port: 8000)
+server.publish()
+server.listen()
 
-
+//or run the runloop yourself:
+//withExtendedLifetime(server) {
+//    RunLoop.current.run()
+//}
 // see https://github.com/krzyzanowskim/CryptoSwift/issues/304
 //let c = Cryptographer(sharedKey: Data(hex: "352ce52e8d7a6b964c061faba60c806271ae47b1391c36169050f150fac5c770")!)
 //print(try c.decrypt(Data()))

@@ -20,7 +20,7 @@ class ChaCha20Poly1305 {
         }
 
         let polyKey = Data(try! chacha20.encrypt(Array(repeating: 0, count: 64))[0..<32])
-        logger.debug("PolyKey: \(polyKey)")
+        logger.debug("PolyKey: \(polyKey.toHexString())")
 
         guard let poly1305 = Poly1305(key: Array(polyKey)) else {
             return nil
@@ -43,7 +43,7 @@ class ChaCha20Poly1305 {
             throw Error.invalidMessageAuthenticator
         }
 
-        logger.debug("Verifying MAC; input: \(polyMessage), provided MAC: \(mac), computed MAC: \(Data(computedMac))")
+        logger.debug("Verifying MAC; input: \(polyMessage.toHexString()), provided MAC: \(mac.toHexString()), computed MAC: \(Data(computedMac).toHexString())")
 //        guard mac == Data(computedMac) else {
 //            logger.debug("Invalid MAC")
 //            throw Error.invalidMessageAuthenticator

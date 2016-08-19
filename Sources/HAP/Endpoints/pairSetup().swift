@@ -12,7 +12,7 @@ func pairSetup(device: Device) -> Application {
     let alg = HashAlgorithm.SHA512
 
     let (salt, verificationKey) = createSaltedVerificationKey(username: "Pair-Setup", password: device.pin, group: group, alg: alg)
-    let server = Server(group: group, alg: alg, salt: salt, username: "Pair-Setup", verificationKey: verificationKey)
+    let server = SRP.Server(group: group, alg: alg, salt: salt, username: "Pair-Setup", verificationKey: verificationKey)
 
     return { (connection, request) in
     guard let body = request.body, let data: PairTagTLV8 = try? decode(body) else { return .badRequest }

@@ -107,5 +107,19 @@ public class Device {
             listener.write(data)
         }
     }
-}
 
+    var config: [String: Data] {
+        let category: AccessoryType = accessories.count == 1 ? accessories[0].type : .bridge
+
+        return [
+            "pv": "1.0".data(using: .utf8)!, // state
+            "id": identifier.data(using: .utf8)!, // identifier
+            "c#": "1".data(using: .utf8)!, // version
+            "s#": "1".data(using: .utf8)!, // state
+            "sf": (isPaired ? "0" : "1").data(using: .utf8)!, // discoverable
+            "ff": "0".data(using: .utf8)!, // mfi compliant
+            "md": name.data(using: .utf8)!, // name
+            "ci": category.rawValue.data(using: .utf8)! // category identifier
+        ]
+    }
+}
