@@ -16,6 +16,8 @@ Currently ``GenericCharacteristic<T>`` is used, to allow for user-defined value 
 * [x] Split ``hap-server`` into executable and library
 * [ ] Include all Accessories, Services and Characteristics
 * [x] API (update value from code, and send notifications)
+* [ ] Device identify callback (/identify) (forward to all accessories?)
+* [ ] Accessory identify callback (on self.info.identify)
 * [ ] Cleanup encryption; currently OpenSSL + libsodium + CryptoSwift are used, would prefer a single dependency
 * [ ] Cleanup runloop, put some work on a queue?
 * [ ] Cleanup server instantiation

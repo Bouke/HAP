@@ -6,35 +6,35 @@ fileprivate let logger = getLogger("hap.pairings")
 
 func pairings(device: Device) -> Application {
     return { (connection, request) in
-    precondition(request.method == .POST)
+        precondition(request.method == .POST)
 
-    guard
-        let body = request.body,
-        let data: PairTagTLV8 = try? decode(body),
-        data[.sequence]?[0] == PairStep.request.rawValue,
-        let method = data[.pairingMethod].flatMap({PairMethod(rawValue: $0[0])}),
-        let username = data[.username]
-        else {
-            return .badRequest
-    }
-    logger.debug("Updating pairings data: \(data), method: \(method)")
-
-    switch method {
-    case .add:
-        guard let publicKey = data[.publicKey] else {
-            return .badRequest
+        guard
+            let body = request.body,
+            let data: PairTagTLV8 = try? decode(body),
+            data[.sequence]?[0] == PairStep.request.rawValue,
+            let method = data[.pairingMethod].flatMap({PairMethod(rawValue: $0[0])}),
+            let username = data[.username]
+            else {
+                return .badRequest
         }
-        device.clients[username] = publicKey
-        logger.info("Added pairing for \(username)")
-    case .delete:
-        device.clients[username] = nil
-        logger.info("Removed pairing for \(username)")
-    default: return .badRequest
-    }
+        logger.debug("Updating pairings data: \(data), method: \(method)")
 
-    let result: PairTagTLV8 = [
-        .sequence: Data(bytes: [PairStep.response.rawValue])
-    ]
-    return Response(status: .ok, data: encode(result), mimeType: "application/pairing+tlv8")
+        switch method {
+        case .add:
+            guard let publicKey = data[.publicKey] else {
+                return .badRequest
+            }
+            device.clients[username] = publicKey
+            logger.info("Added pairing for \(username)")
+        case .delete:
+            device.clients[username] = nil
+            logger.info("Removed pairing for \(username)")
+        default: return .badRequest
+        }
+
+        let result: PairTagTLV8 = [
+            .sequence: Data(bytes: [PairStep.response.rawValue])
+        ]
+        return Response(status: .ok, data: encode(result), mimeType: "application/pairing+tlv8")
     }
 }
