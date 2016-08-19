@@ -3,27 +3,34 @@ import HTTP
 import func Evergreen.getLogger
 import HAP
 
-fileprivate let logger = getLogger("hap")
+fileprivate let logger = getLogger("demo")
 
-let storage = try FileStorage(path: "Switch")
+let storage = try FileStorage(path: "Bridge")
 
-let livingRoomSwitch = Accessory.Switch(aid: 1)
-livingRoomSwitch.info.manufacturer.value = "Bouke"
-livingRoomSwitch.info.model.value = "undefined"
-livingRoomSwitch.info.serialNumber.value = "undefined"
-livingRoomSwitch.info.name.value = "Switch"
-let bedroomNightStand = Accessory.Lightbulb(aid: 2)
-
-livingRoomSwitch.`switch`.on.onValueChange.append({ value in
-    logger.info("Switch changed value: \(value)")
+let livingRoomLightbulb = Accessory.Lightbulb(aid: 1)
+livingRoomLightbulb.info.manufacturer.value = "Bouke"
+livingRoomLightbulb.info.model.value = "undefined"
+livingRoomLightbulb.info.serialNumber.value = "undefined"
+livingRoomLightbulb.info.name.value = "Living Room"
+livingRoomLightbulb.lightbulb.on.onValueChange.append({ value in
+    logger.info("livingRoomSwitch changed value: \(value)")
 })
 
-let device = Device(name: "Switch", pin: "001-02-003", storage: storage, accessories: [livingRoomSwitch, bedroomNightStand])
+let bedroomNightStand = Accessory.Lightbulb(aid: 2)
+bedroomNightStand.info.name.value = "Bedroom"
+bedroomNightStand.lightbulb.on.onValueChange.append({ value in
+    logger.info("bedroomNightStand changed value: \(value)")
+})
+
+let device = Device(name: "Bridge", pin: "001-02-003", storage: storage, accessories: [livingRoomLightbulb, bedroomNightStand])
+device.onIdentify.append({
+    logger.info("Got identified")
+})
 
 let timer = DispatchSource.makeTimerSource()
 timer.scheduleRepeating(deadline: .now() + .seconds(5), interval: 5)
 timer.setEventHandler(handler: {
-    livingRoomSwitch.switch.on.value = !(livingRoomSwitch.switch.on.value ?? false)
+    livingRoomLightbulb.lightbulb.on.value = !(livingRoomLightbulb.lightbulb.on.value ?? false)
 })
 timer.resume()
 

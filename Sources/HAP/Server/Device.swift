@@ -34,6 +34,7 @@ public class Device {
     let clients: Clients
     public let accessories: [Accessory]
     internal var characteristicEventListeners: [Box<AnyCharacteristic>: WeakObjectSet<Connection>]
+    public var onIdentify: [() -> ()] = []
 
     public init(name: String, pin: String, storage: FileStorage, accessories: [Accessory]) {
         self.name = name
