@@ -1,5 +1,4 @@
 import Foundation
-import CLibSodium
 import CommonCrypto
 import HTTP
 

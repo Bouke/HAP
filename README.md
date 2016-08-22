@@ -26,6 +26,21 @@ Currently ``GenericCharacteristic<T>`` is used, to allow for user-defined value 
 * [ ] Tests
 * [ ] Verify authentication in /characteristic and /accessories
 
+**How to build:** (as of Xcode 8 beta 6)
+
+Install libsodium (used for Curve25519 and Ed25519):
+
+    brew install libsodium
+    brew link libsodium
+
+Install openssl (used for bignum) and symlink the pkg-config files so SwiftPM can discover the correct compiler flags:
+
+    brew install openssl && ln -s /usr/local/opt/openssl/lib/pkgconfig/*.pc /usr/local/lib/pkgconfig
+
+And then build the project itself:
+
+    swift build
+
 **Usage:**
 
 Run ``swift build`` to compile and ``.build/debug/hap-server`` to run. Modify ``Sources/hap-server/main.swift`` to include your own accessories.
