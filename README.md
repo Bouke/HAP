@@ -25,7 +25,7 @@ Currently ``GenericCharacteristic<T>`` is used, to allow for user-defined value 
 * [ ] Documentation
 * [ ] Tests
 * [ ] Verify authentication in /characteristic and /accessories
-* [ ] Release SRP package separately
+* [x] Release SRP package separately
 
 **How to build:** (as of Xcode 8 beta 6)
 
@@ -36,7 +36,8 @@ Install libsodium (used for Curve25519 and Ed25519):
 
 Install openssl (used for bignum) and symlink the pkg-config files so SwiftPM can discover the correct compiler flags:
 
-    brew install openssl && ln -s /usr/local/opt/openssl/lib/pkgconfig/*.pc /usr/local/lib/pkgconfig
+    brew install openssl
+    ln -s /usr/local/opt/openssl/lib/pkgconfig/*.pc /usr/local/lib/pkgconfig
 
 And then build the project itself:
 

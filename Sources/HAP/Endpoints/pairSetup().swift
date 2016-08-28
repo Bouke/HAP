@@ -9,7 +9,7 @@ fileprivate let logger = getLogger("hap.pairSetup")
 
 func pairSetup(device: Device) -> Application {
     let group = Group.N3072
-    let alg = HashAlgorithm.SHA512
+    let alg = Digest.SHA512
 
     let (salt, verificationKey) = createSaltedVerificationKey(username: "Pair-Setup", password: device.pin, group: group, alg: alg)
     let server = SRP.Server(group: group, alg: alg, salt: salt, username: "Pair-Setup", verificationKey: verificationKey)
