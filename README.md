@@ -46,3 +46,7 @@ And then build the project itself:
 **Usage:**
 
 Run ``swift build`` to compile and ``.build/debug/hap-server`` to run. Modify ``Sources/hap-server/main.swift`` to include your own accessories.
+
+**Dependencies:**
+
+![HAP dependencies](http://swiftpm-deps.honza.tech/dependencies/Bouke/hap?format=png)
