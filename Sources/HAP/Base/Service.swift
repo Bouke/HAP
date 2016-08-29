@@ -3,6 +3,12 @@ public enum ServiceType: String {
     case lightbulb = "43"
     case `switch` = "49"
     case thermostat = "4A"
+    case door = "81"
+    case smokeSensor = "87"
+    case airQualitySensor = "8D"
+    case batteryService = "96"
+    case bridgeConfiguration = "A1"
+    case bridgingState = "62"
 }
 
 public class Service {

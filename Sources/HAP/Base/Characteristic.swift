@@ -21,6 +21,21 @@ public enum Characteristic {
         case model = "21"
         case name = "23"
         case serialNumber = "30"
+        case currentPosition = "6D"
+        case positionState = "72"
+        case targetPosition = "7C"
+        case airQuality = "95"
+        case batteryLevel = "68"
+        case chargingState = "8F"
+        case statusLowBattery = "79"
+        case configureBridgedAccessoryStatus = "9D"
+        case discoverBridgedAccessories = "9E"
+        case discoveredBridgedAccessories = "9F"
+        case configureBridgedAccessory = "A0"
+        case reachable = "63"
+        case linkQuality = "9C"
+        case accessoryIdentifier = "57"
+        case category = "A3"
     }
 
     public enum Permission: String {
@@ -101,8 +116,8 @@ open class GenericCharacteristic<ValueType: NSObjectConvertible>: AnyCharacteris
         self.stepValue = stepValue
     }
 
-    public func setValue(withNSObject newValue: NSObject?, fromConnection connection: Connection) throws {
-        _value = try newValue.flatMap { try ValueType(withNSObject: $0) }
+    public func setValue(withNSObject newValue: NSObject?, fromConnection connection: Connection) {
+        _value = newValue.flatMap { ValueType(withNSObject: $0) }
         _ = onValueChange.map { $0(_value) }
     }
 

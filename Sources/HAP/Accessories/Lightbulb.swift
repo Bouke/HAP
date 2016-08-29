@@ -8,9 +8,13 @@ extension Accessory {
     }
 }
 
+public enum State: Int, NSObjectConvertible {
+    case on = 1, off = 0
+}
+
 extension Service {
     public class Lightbulb: Service {
-        public let on = GenericCharacteristic<Bool>(type: .on)
+        public let on = GenericCharacteristic<State>(type: .on)
         public let brightness = GenericCharacteristic<Int>(type: .on)
         public let saturation = GenericCharacteristic<Int>(type: .on)
         public let hue = GenericCharacteristic<Int>(type: .on)
