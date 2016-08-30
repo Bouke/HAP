@@ -25,10 +25,10 @@ func pairings(device: Device) -> Application {
                 return .badRequest
             }
             device.clients[username] = publicKey
-            logger.info("Added pairing for \(username)")
+            logger.info("Added pairing for \(String(data: username, encoding: .utf8)!)")
         case .delete:
             device.clients[username] = nil
-            logger.info("Removed pairing for \(username)")
+            logger.info("Removed pairing for \(String(data: username, encoding: .utf8)!)")
         default: return .badRequest
         }
 

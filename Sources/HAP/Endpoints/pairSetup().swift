@@ -11,8 +11,9 @@ func pairSetup(device: Device) -> Application {
     let group = Group.N3072
     let alg = Digest.SHA512
 
-    let (salt, verificationKey) = createSaltedVerificationKey(username: "Pair-Setup", password: device.pin, group: group, alg: alg)
-    let server = SRP.Server(group: group, alg: alg, salt: salt, username: "Pair-Setup", verificationKey: verificationKey)
+    let username = "Pair-Setup"
+    let (salt, verificationKey) = createSaltedVerificationKey(username: username, password: device.pin, group: group, alg: alg)
+    let server = SRP.Server(group: group, alg: alg, salt: salt, username: username, verificationKey: verificationKey)
 
     return { (connection, request) in
         guard let body = request.body, let data: PairTagTLV8 = try? decode(body) else { return .badRequest }
@@ -20,8 +21,8 @@ func pairSetup(device: Device) -> Application {
         switch PairSetupStep(rawValue: data[.sequence]![0]) {
         case .startRequest?:
             logger.info("Pair setup started")
-            logger.debug("<-- B \(server.B)")
-            logger.debug("<-- s \(salt)")
+            logger.debug("<-- B \(server.B.hex)")
+            logger.debug("<-- s \(salt.hex)")
 
             let result: PairTagTLV8 = [
                 .sequence: Data(bytes: [PairSetupStep.startResponse.rawValue]),
@@ -32,17 +33,19 @@ func pairSetup(device: Device) -> Application {
 
         case .verifyRequest?:
             guard let A = data[.publicKey], let M = data[.proof] else {
+                logger.warning("Invalid parameters")
                 return .badRequest
             }
 
-            logger.debug("--> A \(A)")
-            logger.debug("--> M \(M)")
+            logger.debug("--> A \(A.hex)")
+            logger.debug("--> M \(M.hex)")
 
             guard let HAMK = try? server.verifySession(A: A, M: M) else {
+                logger.warning("Invalid PIN")
                 return .badRequest
             }
 
-            logger.debug("<-- HAMK \(HAMK)")
+            logger.debug("<-- HAMK \(HAMK.hex)")
 
             let result: PairTagTLV8 = [
                 .sequence: Data(bytes: [PairSetupStep.verifyResponse.rawValue]),
@@ -53,26 +56,31 @@ func pairSetup(device: Device) -> Application {
 
         case .keyExchangeRequest?:
             guard let encryptedData = data[.encryptedData] else {
+                logger.warning("Invalid parameters")
                 return .badRequest
             }
 
             let encryptionKey = deriveKey(algorithm: .SHA512, seed: server.sessionKey!, info: "Pair-Setup-Encrypt-Info".data(using: .utf8)!, salt: "Pair-Setup-Encrypt-Salt".data(using: .utf8)!, count: 32)
-
-            guard let plaintext = try? ChaCha20Poly1305(key: encryptionKey, nonce: "PS-Msg05".data(using: .utf8)!)!.decrypt(cipher: encryptedData) else {
+            
+            guard let plaintext = try? ChaCha20Poly1305.decrypt(cipher: encryptedData, nonce: "PS-Msg05".data(using: .utf8)!, key: encryptionKey) else {
+//            guard let plaintext = try? ChaCha20Poly1305(key: encryptionKey, nonce: )!.decrypt(cipher: encryptedData) else {
+                logger.warning("Could not decrypt message")
                 return .badRequest
             }
 
             guard let data: PairTagTLV8 = try? decode(plaintext) else {
+                logger.warning("Could not decode message")
                 return .badRequest
             }
 
             guard let publicKey = data[.publicKey], let username = data[.username], let signatureIn = data[.signature] else {
+                logger.warning("Invalid parameters")
                 return .badRequest
             }
 
-            logger.debug("--> username \(username) \(String(data: username, encoding: .utf8)!)")
-            logger.debug("--> public key \(publicKey)")
-            logger.debug("--> signature \(signatureIn)")
+            logger.debug("--> username \(String(data: username, encoding: .utf8)!)")
+            logger.debug("--> public key \(publicKey.hex)")
+            logger.debug("--> signature \(signatureIn.hex)")
 
             let hashIn = deriveKey(algorithm: .SHA512, seed: server.sessionKey!,
                                    info: "Pair-Setup-Controller-Sign-Info".data(using: .utf8)!,
@@ -83,6 +91,7 @@ func pairSetup(device: Device) -> Application {
             do {
                 try Ed25519.verify(publicKey: publicKey, message: hashIn, signature: signatureIn)
             } catch {
+                logger.warning("Invalid signature")
                 return .badRequest
             }
 
@@ -96,6 +105,7 @@ func pairSetup(device: Device) -> Application {
                 device.publicKey
 
             guard let signatureOut = try? Ed25519.sign(privateKey: device.privateKey, message: hashOut) else {
+                logger.warning("Could not sign")
                 return .badRequest
             }
 
@@ -106,11 +116,13 @@ func pairSetup(device: Device) -> Application {
             ]
 
             logger.debug("<-- username \(device.identifier)")
-            logger.debug("<-- public key \(device.publicKey)")
-            logger.debug("<-- signature \(signatureOut)")
+            logger.debug("<-- public key \(device.publicKey.hex)")
+            logger.debug("<-- signature \(signatureOut.hex)")
             logger.info("Pair setup completed")
 
-            guard let encryptor = ChaCha20Poly1305(key: encryptionKey, nonce: "PS-Msg06".data(using: .utf8)!), let encryptedResultInner = try? encryptor.encrypt(message: encode(resultInner)) else {
+            guard let encryptedResultInner = try? ChaCha20Poly1305.encrypt(message: encode(resultInner), nonce: "PS-Msg06".data(using: .utf8)!, key: encryptionKey) else {
+//            guard let encryptor = ChaCha20Poly1305(key: encryptionKey, nonce: "PS-Msg06".data(using: .utf8)!), let encryptedResultInner = try? encryptor.encrypt(message: encode(resultInner)) else {
+                logger.warning("Could not encrypt")
                 return .badRequest
             }
 

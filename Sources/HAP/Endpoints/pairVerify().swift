@@ -28,16 +28,16 @@ func pairVerify(device: Device) -> Application {
 
     return { (connection, request) in
         guard let body = request.body, let data: PairTagTLV8 = try? decode(body) else {
+            logger.warning("Could not decode message")
             return .badRequest
         }
-
-        logger.debug("data: \(data)")
 
         switch PairVerifyStep(rawValue: data[.sequence]![0]) {
         case .startRequest?:
             logger.info("Pair verify started")
 
             guard let clientPublicKey = data[.publicKey], clientPublicKey.count == 32 else {
+                logger.warning("Invalid parameters")
                 return .badRequest
             }
             otherPublicKey = clientPublicKey
@@ -67,7 +67,10 @@ func pairVerify(device: Device) -> Application {
 
             let encryptionKey = HKDF.deriveKey(algorithm: .SHA512, seed: sharedSecret!, info: "Pair-Verify-Encrypt-Info".data(using: .utf8)!, salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8)!, count: 32)
 
-            let encryptedResultInner = try! ChaCha20Poly1305(key: encryptionKey, nonce: "PV-Msg02".data(using: .utf8)!)!.encrypt(message: encode(resultInner))
+            guard let encryptedResultInner = try? ChaCha20Poly1305.encrypt(message: encode(resultInner), nonce: "PV-Msg02".data(using: .utf8)!, key: encryptionKey) else {
+                logger.warning("Could not encrypt")
+                return .badRequest
+            }
 
             let resultOuter: PairTagTLV8 = [
                 .sequence: Data(bytes: [PairVerifyStep.startResponse.rawValue]),
@@ -82,35 +85,41 @@ func pairVerify(device: Device) -> Application {
 
         case .finishRequest?:
             guard let encryptedData = data[.encryptedData] else {
+                logger.warning("Invalid parameters")
                 return .badRequest
             }
 
             let encryptionKey = HKDF.deriveKey(algorithm: .SHA512, seed: sharedSecret!, info: "Pair-Verify-Encrypt-Info".data(using: .utf8)!, salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8)!, count: 32)
 
-            guard let plaintext = try? ChaCha20Poly1305(key: encryptionKey, nonce: "PV-Msg03".data(using: .utf8)!)!.decrypt(cipher: encryptedData) else {
+            guard let plaintext = try? ChaCha20Poly1305.decrypt(cipher: encryptedData, nonce: "PV-Msg03".data(using: .utf8)!, key: encryptionKey) else {
+                logger.warning("Could not decrypt message")
                 return .badRequest
             }
 
             guard let data: PairTagTLV8 = try? decode(plaintext) else {
+                logger.warning("Could not decode message")
                 return .badRequest
             }
 
             guard let username = data[.username], let signatureIn = data[.signature] else {
+                logger.warning("Invalid parameters")
                 return .badRequest
             }
 
-            logger.debug("--> username \(username) \(String(data: username, encoding: .utf8)!)")
-            logger.debug("--> signature \(signatureIn)")
+            logger.debug("--> username \(String(data: username, encoding: .utf8)!)")
+            logger.debug("--> signature \(signatureIn.hex)")
 
             guard let publicKey = device.clients[username] else {
+                logger.warning("No public key found for user")
                 return .badRequest
             }
-            logger.debug("--> public key \(publicKey)")
+            logger.debug("--> public key \(publicKey.hex)")
 
             let material = otherPublicKey! + username + pk
             do {
                 try Ed25519.verify(publicKey: publicKey, message: material, signature: signatureIn)
             } catch {
+                logger.warning("Could not verify signature")
                 return .badRequest
             }
 
