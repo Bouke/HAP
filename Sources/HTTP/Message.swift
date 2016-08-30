@@ -168,6 +168,7 @@ open class Response: Message {
 
     public init(status: Status) {
         super.init(boxed: CFHTTPMessageCreateResponse(nil, status.rawValue, status.description as CFString?, kCFHTTPVersion1_1).takeRetainedValue())
+        headers["Content-Length"] = "0"
     }
 
     public convenience init(status: Status = .ok, data: Data, mimeType: String) {
