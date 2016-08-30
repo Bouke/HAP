@@ -18,7 +18,7 @@ Currently ``GenericCharacteristic<T>`` is used, to allow for user-defined value 
 * [x] API (update value from code, and send notifications)
 * [x] Device identify callback (/identify)
 * [ ] Accessory identify callback (on self.info.identify)
-* [ ] Cleanup encryption; currently OpenSSL + libsodium + CryptoSwift are used, would prefer a single dependency
+* [ ] Cleanup encryption; currently OpenSSL + libsodium are used, would prefer a single dependency
 * [ ] Cleanup runloop, put some work on a queue?
 * [x] Cleanup server instantiation
 * [ ] Overall cleanup

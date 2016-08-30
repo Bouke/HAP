@@ -15,11 +15,12 @@ extension Integer {
     }
 }
 
-extension UInt16 {
-    var bytes: [UInt8] {
-        return [
-            UInt8(truncatingBitPattern: self >> 8),
-            UInt8(truncatingBitPattern: self)
-        ]
+extension UnsignedInteger {
+    var bytes: Data {
+        var copy = self
+        // is this a good solution regarding LE/BE?
+        return withUnsafePointer(to: &copy) {
+            Data(Data(bytes: $0, count: MemoryLayout<Self>.size).reversed())
+        }
     }
 }

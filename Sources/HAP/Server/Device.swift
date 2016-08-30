@@ -68,10 +68,10 @@ public class Device {
 
         public subscript(username: Data) -> Data? {
             get {
-                return storage[username.toHexString()]
+                return storage[username.hex]
             }
             set {
-                storage[username.toHexString()] = newValue
+                storage[username.hex] = newValue
             }
         }
     }

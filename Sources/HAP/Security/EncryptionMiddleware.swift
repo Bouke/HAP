@@ -2,7 +2,6 @@ import Foundation
 import HTTP
 import HKDF
 import Evergreen
-import CryptoSwift
 
 fileprivate let logger = getLogger("encryption")
 
@@ -41,7 +40,7 @@ public class Cryptographer {
         let length = Int(UInt16(data: Data(data[0..<2])))
         precondition(length + 2 + 16 == data.count)
 
-        let nonce = Data(bytes: decryptCount.bigEndian.bytes())
+        let nonce = decryptCount.bigEndian.bytes
         let encrypted = data[2..<(2 + length + 16)]
         logger.debug("Ciphertext: \(encrypted.hex), Nonce: \(nonce.hex), Length: \(length)")
         
@@ -52,8 +51,8 @@ public class Cryptographer {
         defer { encryptCount += 1 }
         logger.info("Encrypt message: \(self.encryptCount)")
 
-        let nonce = Data(bytes: encryptCount.bigEndian.bytes())
-        let length = Data(UInt16(data.count).bytes.reversed())
+        let nonce = encryptCount.bigEndian.bytes
+        let length = UInt16(data.count).bigEndian.bytes
         logger.debug("Message: \(data.hex), Nonce: \(nonce.hex), Length: \(length.hex)")
 
         let encrypted = try ChaCha20Poly1305.encrypt(message: data, additional: length, nonce: nonce, key: encryptKey)
