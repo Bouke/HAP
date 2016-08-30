@@ -1,74 +1,56 @@
-import CryptoSwift
+import CLibSodium
 import Foundation
-import Evergreen
-
-fileprivate let logger = getLogger("chacha")
 
 class ChaCha20Poly1305 {
     enum Error: Swift.Error {
-        case invalidMessageAuthenticator
+        case couldNotDecrypt, couldNotEncrypt
+    }
+    
+    private static func upgradeNonce(_ nonce: Data) -> Data {
+        switch nonce.count {
+        case 12: return nonce
+        case 8: return Data(count: 4) + nonce
+        default: abort()
+        }
+    }
+    
+    static func encrypt(message: Data, additional: Data = Data(), nonce: Data, key: Data) throws -> Data {
+        let nonce = upgradeNonce(nonce)
+        var cipher = Data(count: message.count + Int(crypto_aead_chacha20poly1305_ABYTES))
+        let result = cipher.withUnsafeMutableBytes { c in
+            message.withUnsafeBytes { m in
+                additional.withUnsafeBytes { ad in
+                    nonce.withUnsafeBytes { npub in
+                        key.withUnsafeBytes { k in
+                            crypto_aead_chacha20poly1305_ietf_encrypt(c, nil, m, UInt64(message.count), ad, UInt64(additional.count), nil, npub, k)
+                        }
+                    }
+                }
+            }
+        }
+        guard result == 0 else {
+            throw Error.couldNotEncrypt
+        }
+        return cipher
     }
 
-    let poly1305: Poly1305
-    let chacha20: ChaCha20
-
-    init?(key: Data, nonce: Data) {
-        precondition(key.count == 32, "encryption key must be 256 bit, but is \(key.count * 8) bits")
-
-        guard let chacha20 = ChaCha20(key: Array(key), iv: Array(nonce)) else {
-            return nil
+    static func decrypt(cipher: Data, additional: Data = Data(), nonce: Data, key: Data) throws -> Data {
+        let nonce = upgradeNonce(nonce)
+        var message = Data(count: cipher.count - Int(crypto_aead_chacha20poly1305_ietf_ABYTES))
+        let result = message.withUnsafeMutableBytes { m in
+            cipher.withUnsafeBytes { c in
+                additional.withUnsafeBytes { ad in
+                    nonce.withUnsafeBytes { npub in
+                        key.withUnsafeBytes { k in
+                            crypto_aead_chacha20poly1305_ietf_decrypt(m, nil, nil, c, UInt64(cipher.count), ad, UInt64(additional.count), npub, k)
+                        }
+                    }
+                }
+            }
         }
-
-        let polyKey = Data(try! chacha20.encrypt(Array(repeating: 0, count: 64))[0..<32])
-        logger.debug("PolyKey: \(polyKey.toHexString())")
-
-        guard let poly1305 = Poly1305(key: Array(polyKey)) else {
-            return nil
+        guard result == 0 else {
+            throw Error.couldNotDecrypt
         }
-
-        self.poly1305 = poly1305
-        self.chacha20 = chacha20
-    }
-
-    func decrypt(cipher: Data, add: Data = Data()) throws -> Data {
-        let message = Data(cipher[0..<cipher.endIndex-16])
-        let mac = Data(cipher[cipher.endIndex-16..<cipher.endIndex])
-
-        let polyMessage = add + Data(count: (16 - (add.count % 16)) % 16) +
-            message + Data(count: (16 - (message.count % 16)) % 16)  +
-            Data(bytes: UInt64(add.count).bigEndian.bytes()) +
-            Data(bytes: UInt64(message.count).bigEndian.bytes())
-
-        guard let computedMac = poly1305.authenticate(Array(polyMessage)) else {
-            throw Error.invalidMessageAuthenticator
-        }
-
-        logger.debug("Verifying MAC; input: \(polyMessage.toHexString()), provided MAC: \(mac.toHexString()), computed MAC: \(Data(computedMac).toHexString())")
-//        guard mac == Data(computedMac) else {
-//            logger.debug("Invalid MAC")
-//            throw Error.invalidMessageAuthenticator
-//        }
-        if mac != Data(computedMac) {
-            // @todo fail here if bug is fixed https://github.com/krzyzanowskim/CryptoSwift/issues/304
-            logger.error("Invalid MAC")
-        }
-
-        logger.debug("Valid MAC, decrypting cyphertext: \(message)")
-        return Data(try chacha20.decrypt(Array(message)))
-    }
-
-    func encrypt(message: Data, add: Data = Data()) throws -> Data {
-        let encrypted = Data(try chacha20.encrypt(Array(message)))
-
-        let polyMessage = add + Data(count: (16 - (add.count % 16)) % 16) +
-            encrypted + Data(count: (16 - (encrypted.count % 16)) % 16)  +
-            Data(bytes: UInt64(add.count).bigEndian.bytes()) +
-            Data(bytes: UInt64(encrypted.count).bigEndian.bytes())
-
-        guard let computedMac = poly1305.authenticate(Array(polyMessage)) else {
-            throw Error.invalidMessageAuthenticator
-        }
-        
-        return encrypted + Data(computedMac)
+        return message
     }
 }

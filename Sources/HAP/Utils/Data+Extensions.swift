@@ -30,8 +30,10 @@ extension Data {
         }
         self = Data(result)
     }
+}
 
-    func toHexString() -> String {
+extension RandomAccessCollection where Iterator.Element == UInt8 {
+    var hex: String {
         return self.reduce("") { $0 + String(format:"%02x", $1) }
     }
 }

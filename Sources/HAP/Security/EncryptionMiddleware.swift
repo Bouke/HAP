@@ -2,6 +2,7 @@ import Foundation
 import HTTP
 import HKDF
 import Evergreen
+import CryptoSwift
 
 fileprivate let logger = getLogger("encryption")
 
@@ -13,25 +14,27 @@ class UpgradeResponse: Response {
     }
 }
 
-class Cryptographer {
+public class Cryptographer {
     var encryptCount: UInt64 = 0
     var decryptCount: UInt64 = 0
     let decryptKey: Data
     let encryptKey: Data
 
-    init(sharedKey: Data) {
-        logger.info("Shared key: \(sharedKey)")
+    public init(sharedKey: Data) {
+        logger.info("Shared key: \(sharedKey.hex)")
         decryptKey = HKDF.deriveKey(algorithm: .SHA512, seed: sharedKey, info: "Control-Write-Encryption-Key".data(using: .utf8)!, salt: "Control-Salt".data(using: .utf8)!, count: 32)
         encryptKey = HKDF.deriveKey(algorithm: .SHA512, seed: sharedKey, info: "Control-Read-Encryption-Key".data(using: .utf8)!, salt: "Control-Salt".data(using: .utf8)!, count: 32)
+        logger.debug("Decrypt key: \(self.decryptKey.hex)")
+        logger.debug("Encrypt key: \(self.encryptKey.hex)")
     }
 
-    func decrypt(_ data: Data) throws -> Data {
+    public func decrypt(_ data: Data) throws -> Data {
         defer { decryptCount += 1 }
 
         logger.info("Decrypt message #\(self.decryptCount)")
-        logger.info("Data: \(data)")
+        logger.info("Data: \(data.hex)")
         guard data.count > 0 else {
-            logger.info("No ciphertext")
+            logger.warning("No ciphertext")
             return data
         }
 
@@ -40,30 +43,22 @@ class Cryptographer {
 
         let nonce = Data(bytes: decryptCount.bigEndian.bytes())
         let encrypted = data[2..<(2 + length + 16)]
-        logger.debug("Ciphertext: \(encrypted), Nonce: \(nonce), Length: \(length)")
-
-        guard let chacha = ChaCha20Poly1305(key: decryptKey, nonce: nonce) else {
-            abort()
-        }
-
-        return try chacha.decrypt(cipher: Data(encrypted), add: Data(data[0..<2]))
+        logger.debug("Ciphertext: \(encrypted.hex), Nonce: \(nonce.hex), Length: \(length)")
+        
+        return try ChaCha20Poly1305.decrypt(cipher: Data(encrypted), additional: Data(data[0..<2]), nonce: nonce, key: decryptKey)
     }
 
-    func encrypt(_ data: Data) -> Data {
+    public func encrypt(_ data: Data) throws -> Data {
         defer { encryptCount += 1 }
+        logger.info("Encrypt message: \(self.encryptCount)")
+
         let nonce = Data(bytes: encryptCount.bigEndian.bytes())
         let length = Data(UInt16(data.count).bytes.reversed())
+        logger.debug("Message: \(data.hex), Nonce: \(nonce.hex), Length: \(length.hex)")
 
-        logger.info("Encrypt message: \(self.encryptCount)")
-        logger.debug("Message: \(data), Nonce: \(nonce), Length: \(length)")
-
-        guard let chacha = ChaCha20Poly1305(key: encryptKey, nonce: nonce) else { abort() }
-
-        guard let encrypted = try? chacha.encrypt(message: data, add: length) else {
-            abort()
-        }
-        logger.debug("Ciphertext: \(encrypted)")
-
+        let encrypted = try ChaCha20Poly1305.encrypt(message: data, additional: length, nonce: nonce, key: encryptKey)
+        logger.debug("Cipher: \((length + encrypted).hex)")
+        
         return length + encrypted
     }
 }
@@ -75,13 +70,12 @@ public class EncryptionMiddleware: StreamMiddleware {
         if let cryptographer = connection.context["cryptographer"] as? Cryptographer {
             return try! cryptographer.decrypt(data)
         }
-
         return data
     }
 
     public func parse(output data: Data, forConnection connection: Connection) -> Data {
         if let cryptographer = connection.context["cryptographer"] as? Cryptographer {
-            return cryptographer.encrypt(data)
+            return try! cryptographer.encrypt(data)
         }
         if let response = connection.response as? UpgradeResponse {
             connection.context["cryptographer"] = response.cryptographer
