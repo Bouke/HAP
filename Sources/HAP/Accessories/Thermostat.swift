@@ -29,7 +29,7 @@ extension Service {
         let targetHeatingCoolingState = GenericCharacteristic<TargetHeatingCoolingState>(type: .targetHeatingCoolingState, value: .off)
         let currentTemperature = GenericCharacteristic<CurrentTemperature>(type: .currentTemperature, value: 0, permissions: [.read, .events], maxValue: 100, minValue: -100)
         let targetTemperature = GenericCharacteristic<TargetTemperature>(type: .targetTemperature, value: 20, maxValue: 30, minValue: 0, minStep: 0.1)
-        let temperatureDisplayUnits = GenericCharacteristic<TemperatureDisplayUnits>(type: .temperatureDisplayUnits, value: .celcius, permissions: [.read, .events])
+        let temperatureDisplayUnits = GenericCharacteristic<TemperatureDisplayUnits>(type: .temperatureDisplayUnits, value: .celcius, permissions: [.read, .write, .events])
         
         public init() {
             super.init(type: .thermostat, characteristics: [currentHeatingCoolingState, targetHeatingCoolingState, currentTemperature, targetTemperature, temperatureDisplayUnits])
