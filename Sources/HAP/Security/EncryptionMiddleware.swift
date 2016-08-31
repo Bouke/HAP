@@ -3,7 +3,7 @@ import HTTP
 import HKDF
 import Evergreen
 
-fileprivate let logger = getLogger("encryption")
+fileprivate let logger = getLogger("hap.encryption")
 
 class UpgradeResponse: Response {
     let cryptographer: Cryptographer
@@ -20,7 +20,7 @@ public class Cryptographer {
     let encryptKey: Data
 
     public init(sharedKey: Data) {
-        logger.info("Shared key: \(sharedKey.hex)")
+        logger.debug("Shared key: \(sharedKey.hex)")
         decryptKey = HKDF.deriveKey(algorithm: .SHA512, seed: sharedKey, info: "Control-Write-Encryption-Key".data(using: .utf8)!, salt: "Control-Salt".data(using: .utf8)!, count: 32)
         encryptKey = HKDF.deriveKey(algorithm: .SHA512, seed: sharedKey, info: "Control-Read-Encryption-Key".data(using: .utf8)!, salt: "Control-Salt".data(using: .utf8)!, count: 32)
         logger.debug("Decrypt key: \(self.decryptKey.hex)")
@@ -30,8 +30,8 @@ public class Cryptographer {
     public func decrypt(_ data: Data) throws -> Data {
         defer { decryptCount += 1 }
 
-        logger.info("Decrypt message #\(self.decryptCount)")
-        logger.info("Data: \(data.hex)")
+        logger.debug("Decrypt message #\(self.decryptCount)")
+        logger.debug("Data: \(data.hex)")
         guard data.count > 0 else {
             logger.warning("No ciphertext")
             return data
@@ -49,7 +49,7 @@ public class Cryptographer {
 
     public func encrypt(_ data: Data) throws -> Data {
         defer { encryptCount += 1 }
-        logger.info("Encrypt message: \(self.encryptCount)")
+        logger.debug("Encrypt message: \(self.encryptCount)")
 
         let nonce = encryptCount.bigEndian.bytes
         let length = UInt16(data.count).bigEndian.bytes

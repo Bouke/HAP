@@ -6,6 +6,9 @@ import HAP
 fileprivate let logger = getLogger("demo")
 
 let storage = try FileStorage(path: "Bridge")
+getLogger("hap").logLevel = .info
+getLogger("http").logLevel = .info
+
 
 let livingRoomLightbulb = Accessory.Lightbulb(aid: 1)
 livingRoomLightbulb.info.manufacturer.value = "Bouke"
