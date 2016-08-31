@@ -99,7 +99,7 @@ public class Device {
 
     func notify(characteristicListeners characteristic: AnyCharacteristic, exceptListener except: Connection? = nil) {
         guard let listeners = characteristicEventListeners[Box(characteristic)]?.filter({$0 != except}), listeners.count > 0, let event = Event(valueChangedOfCharacteristic: characteristic) else {
-            logger.debug("Value changed, but not notifying (either no listeners or could not serialize)")
+            logger.info("Value changed, not notifying any listener(s)")
             return
         }
         let data = event.serialized()
