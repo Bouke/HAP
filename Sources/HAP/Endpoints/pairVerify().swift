@@ -7,25 +7,27 @@ import func Evergreen.getLogger
 
 fileprivate let logger = getLogger("hap.pairVerify")
 
-func pairVerify(device: Device) -> Application {
-    //@todo where to place this? connection's context?
-    let sk = generateRandomBytes(count: 32)
-    let pk = { () -> Data in
-        var pk = Data(count: 32)
-        guard pk.withUnsafeMutableBytes({ pk in
-            sk.withUnsafeBytes { sk in
-                crypto_scalarmult_curve25519_base(pk, sk)
-            }
-        }) == 0 else {
-            abort()
+struct Session {
+    let secretKey: Data
+    let publicKey: Data
+    let otherPublicKey: Data
+    let sharedSecret: Data
+    
+    init?(clientPublicKey otherPublicKey: Data) {
+        let secretKey = generateRandomBytes(count: 32)
+        guard let publicKey = crypto(crypto_scalarmult_curve25519_base, Data(count: Int(crypto_scalarmult_curve25519_BYTES)), secretKey),
+            let sharedSecret = crypto(crypto_scalarmult, Data(count: Int(crypto_scalarmult_BYTES)), secretKey, otherPublicKey)
+        else {
+            return nil
         }
-        return pk
-    }()
+        self.secretKey = secretKey
+        self.publicKey = publicKey
+        self.otherPublicKey = otherPublicKey
+        self.sharedSecret = sharedSecret
+    }
+}
 
-    //@todo move into connection's context
-    var otherPublicKey: Data? = nil
-    var sharedSecret: Data? = nil
-
+func pairVerify(device: Device) -> Application {
     return { (connection, request) in
         guard let body = request.body, let data: PairTagTLV8 = try? decode(body) else {
             logger.warning("Could not decode message")
@@ -40,23 +42,13 @@ func pairVerify(device: Device) -> Application {
                 logger.warning("Invalid parameters")
                 return .badRequest
             }
-            otherPublicKey = clientPublicKey
+            
+            guard let session = Session(clientPublicKey: clientPublicKey) else {
+                logger.error("Could not setup session")
+                return .badRequest
+            }
 
-            sharedSecret = { () -> Data in
-                var q = Data(count: 32)
-                guard q.withUnsafeMutableBytes({ q -> Int32 in
-                    sk.withUnsafeBytes { sk in
-                        clientPublicKey.withUnsafeBytes { p in
-                            crypto_scalarmult(q, sk, p)
-                        }
-                    }
-                }) == 0 else {
-                    abort()
-                }
-                return q
-            }()
-
-            let material = pk + device.identifier.data(using: .utf8)! + clientPublicKey
+            let material = session.publicKey + device.identifier.data(using: .utf8)! + clientPublicKey
             let signature = try! Ed25519.sign(privateKey: device.privateKey, message: material)
 
             let resultInner: PairTagTLV8 = [
@@ -65,7 +57,7 @@ func pairVerify(device: Device) -> Application {
             ]
             logger.debug("startRequest result: \(resultInner)")
 
-            let encryptionKey = HKDF.deriveKey(algorithm: .SHA512, seed: sharedSecret!, info: "Pair-Verify-Encrypt-Info".data(using: .utf8)!, salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8)!, count: 32)
+            let encryptionKey = HKDF.deriveKey(algorithm: .SHA512, seed: session.sharedSecret, info: "Pair-Verify-Encrypt-Info".data(using: .utf8)!, salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8)!, count: 32)
 
             guard let encryptedResultInner = try? ChaCha20Poly1305.encrypt(message: encode(resultInner), nonce: "PV-Msg02".data(using: .utf8)!, key: encryptionKey) else {
                 logger.warning("Could not encrypt")
@@ -74,22 +66,29 @@ func pairVerify(device: Device) -> Application {
 
             let resultOuter: PairTagTLV8 = [
                 .sequence: Data(bytes: [PairVerifyStep.startResponse.rawValue]),
-                .publicKey: pk,
+                .publicKey: session.publicKey,
                 .encryptedData: encryptedResultInner
             ]
 
+            connection.context["hap.pairVerify.session"] = session
+            
             let response = Response(status: .ok)
             response.headers["Content-Type"] = "application/pairing+tlv8"
             response.body = encode(resultOuter)
             return response
 
         case .finishRequest?:
+            guard let session = connection.context["hap.pairVerify.session"] as? Session else {
+                logger.warning("No session")
+                return .badRequest
+            }
+            
             guard let encryptedData = data[.encryptedData] else {
                 logger.warning("Invalid parameters")
                 return .badRequest
             }
 
-            let encryptionKey = HKDF.deriveKey(algorithm: .SHA512, seed: sharedSecret!, info: "Pair-Verify-Encrypt-Info".data(using: .utf8)!, salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8)!, count: 32)
+            let encryptionKey = HKDF.deriveKey(algorithm: .SHA512, seed: session.sharedSecret, info: "Pair-Verify-Encrypt-Info".data(using: .utf8)!, salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8)!, count: 32)
 
             guard let plaintext = try? ChaCha20Poly1305.decrypt(cipher: encryptedData, nonce: "PV-Msg03".data(using: .utf8)!, key: encryptionKey) else {
                 logger.warning("Could not decrypt message")
@@ -115,7 +114,7 @@ func pairVerify(device: Device) -> Application {
             }
             logger.debug("--> public key \(publicKey.hex)")
 
-            let material = otherPublicKey! + username + pk
+            let material = session.otherPublicKey + username + session.publicKey
             do {
                 try Ed25519.verify(publicKey: publicKey, message: material, signature: signatureIn)
             } catch {
@@ -128,7 +127,7 @@ func pairVerify(device: Device) -> Application {
                 .sequence: Data(bytes: [PairVerifyStep.finishResponse.rawValue])
             ]
 
-            let response = UpgradeResponse(cryptographer: Cryptographer(sharedKey: sharedSecret!))
+            let response = UpgradeResponse(cryptographer: Cryptographer(sharedKey: session.sharedSecret))
             response.headers["Content-Type"] = "application/pairing+tlv8"
             response.body = encode(result)
             return response

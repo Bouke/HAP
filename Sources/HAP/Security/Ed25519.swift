@@ -1,11 +1,3 @@
-//
-//  Ed25519.swift
-//  HAP
-//
-//  Created by Bouke Haarsma on 17-07-16.
-//
-//
-
 import Foundation
 import CLibSodium
 
