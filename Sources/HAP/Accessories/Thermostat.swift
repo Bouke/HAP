@@ -26,7 +26,7 @@ public enum TemperatureDisplayUnits: Int, NSObjectConvertible {
 extension Service {
     public class Thermostat: Service {
         let currentHeatingCoolingState = GenericCharacteristic<CurrentHeatingCoolingState>(type: .currentHeatingCoolingState, value: .off, permissions: [.read, .events])
-        let targetHeatingCoolingState = GenericCharacteristic<TargetHeatingCoolingState>(type: .targetHeatingCoolingState, value: .off)
+        let targetHeatingCoolingState = GenericCharacteristic<TargetHeatingCoolingState>(type: .targetHeatingCoolingState, value: .auto)
         let currentTemperature = GenericCharacteristic<CurrentTemperature>(type: .currentTemperature, value: 0, permissions: [.read, .events], maxValue: 100, minValue: -100)
         let targetTemperature = GenericCharacteristic<TargetTemperature>(type: .targetTemperature, value: 20, maxValue: 30, minValue: 0, minStep: 0.1)
         let temperatureDisplayUnits = GenericCharacteristic<TemperatureDisplayUnits>(type: .temperatureDisplayUnits, value: .celcius, permissions: [.read, .write, .events])
