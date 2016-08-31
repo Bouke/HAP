@@ -10,7 +10,7 @@ public class FileStorage {
     public init(path: String) throws {
         if !FileManager.default.directoryExists(atPath: path) {
             do {
-                try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: false, attributes: nil)
+                try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
             } catch {
                 throw Error.couldNotCreateDirectory
             }
