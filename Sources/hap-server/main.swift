@@ -5,27 +5,25 @@ import HAP
 
 fileprivate let logger = getLogger("demo")
 
-let storage = try FileStorage(path: "Bridge")
 getLogger("hap").logLevel = .info
 getLogger("http").logLevel = .info
 
+let storage = try FileStorage(path: "db")
 
 let livingRoomLightbulb = Accessory.Lightbulb(aid: 1)
-livingRoomLightbulb.info.manufacturer.value = "Bouke"
-livingRoomLightbulb.info.model.value = "undefined"
-livingRoomLightbulb.info.serialNumber.value = "undefined"
-livingRoomLightbulb.info.name.value = "Living Room"
 livingRoomLightbulb.lightbulb.on.onValueChange.append({ value in
     logger.info("livingRoomSwitch changed value: \(value)")
 })
 
 let bedroomNightStand = Accessory.Lightbulb(aid: 2)
-bedroomNightStand.info.name.value = "Bedroom"
 bedroomNightStand.lightbulb.on.onValueChange.append({ value in
     logger.info("bedroomNightStand changed value: \(value)")
 })
 
-let device = Device(name: "Bridge", pin: "001-02-003", storage: storage, accessories: [livingRoomLightbulb, bedroomNightStand])
+let device = Device(name: "Bridge", pin: "123-44-321", storage: storage, accessories: [
+    livingRoomLightbulb,
+    bedroomNightStand,
+])
 device.onIdentify.append({ acc in
     logger.info("Got identified: \(acc)")
 })
