@@ -32,6 +32,8 @@ let device = Device(name: "Bridge", pin: "123-44-321", storage: storage, accesso
     .WindowCovering(info: .init(name: "Shades")),
     .Fan(info: .init(name: "Living Room Ceiling Fan")),
     .GarageDoorOpener(info: .init(name: "Garage")),
+    .LockMechanism(info: .init(name: "Front Door Lock")),
+    .SecuritySystem(info: .init(name: "Alarm")),
 ])
 device.onIdentify.append({ acc in
     logger.info("Got identified: \(acc)")

@@ -43,6 +43,10 @@ public enum Characteristic {
         case currentDoorState = "E"
         case targetDoorState = "32"
         case obstructionDetected = "24"
+        case lockCurrentState = "1D"
+        case lockTargetState = "1E"
+        case securitySystemCurrentState = "66"
+        case securitySystemTargetState = "67"
     }
 
     public enum Permission: String {
