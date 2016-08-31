@@ -51,6 +51,21 @@ extension Int: NSObjectConvertible {
     }
 }
 
+extension Float: NSObjectConvertible {
+    public var asNSObject: NSObject {
+        return self as NSObject
+    }
+    public init?(withNSObject object: NSObject) {
+        guard let float = object as? Float else {
+            return nil
+        }
+        self = float
+    }
+    static public var format: Characteristic.Format? {
+        return .float
+    }
+}
+
 extension Data: NSObjectConvertible {
     public var asNSObject: NSObject {
         return self as NSObject

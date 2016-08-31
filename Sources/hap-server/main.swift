@@ -23,6 +23,9 @@ bedroomNightStand.lightbulb.on.onValueChange.append({ value in
 let device = Device(name: "Bridge", pin: "123-44-321", storage: storage, accessories: [
     livingRoomLightbulb,
     bedroomNightStand,
+    .Door(info: .init(name: "Front Door")),
+    .Switch(info: .init(name: "Garden Lights")),
+    .Thermostat(info: .init(name: "Living Room Thermostat")),
 ])
 device.onIdentify.append({ acc in
     logger.info("Got identified: \(acc)")

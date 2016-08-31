@@ -10,7 +10,7 @@ extension Accessory {
 
 extension Service {
     public class Switch: Service {
-        public let on = GenericCharacteristic<Bool>(type: .on)
+        public let on = GenericCharacteristic<Bool>(type: .on, value: false)
 
         public init() {
             super.init(type: .switch, characteristics: [on])
