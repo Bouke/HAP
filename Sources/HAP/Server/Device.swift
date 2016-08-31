@@ -55,7 +55,8 @@ public class Device {
         self.accessories = accessories
         characteristicEventListeners = [:]
 
-        for accessory in accessories {
+        for (offset, accessory) in accessories.enumerated() {
+            accessory.aid = offset + 1
             accessory.device = self
         }
     }

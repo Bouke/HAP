@@ -2,8 +2,8 @@ extension Accessory {
     public class Door: Accessory {
         public let door = Service.Door()
         
-        public init(aid: Int) {
-            super.init(aid: aid, type: .door, services: [door])
+        public init(info: Service.Info) {
+            super.init(info: info, type: .door, services: [door])
         }
     }
 }

@@ -2,8 +2,8 @@ extension Accessory {
     public class Switch: Accessory {
         public let `switch` = Service.Switch()
 
-        public init(aid: Int) {
-            super.init(aid: aid, type: .switch, services: [`switch`])
+        public init(info: Service.Info) {
+            super.init(info: info, type: .switch, services: [`switch`])
         }
     }
 }

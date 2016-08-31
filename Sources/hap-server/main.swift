@@ -10,12 +10,12 @@ getLogger("http").logLevel = .info
 
 let storage = try FileStorage(path: "db")
 
-let livingRoomLightbulb = Accessory.Lightbulb(aid: 1)
+let livingRoomLightbulb = Accessory.Lightbulb(info: .init(name: "Living Room"))
 livingRoomLightbulb.lightbulb.on.onValueChange.append({ value in
     logger.info("livingRoomSwitch changed value: \(value)")
 })
 
-let bedroomNightStand = Accessory.Lightbulb(aid: 2)
+let bedroomNightStand = Accessory.Lightbulb(info: .init(name: "Bedroom"))
 bedroomNightStand.lightbulb.on.onValueChange.append({ value in
     logger.info("bedroomNightStand changed value: \(value)")
 })

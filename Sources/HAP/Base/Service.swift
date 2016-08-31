@@ -14,12 +14,12 @@ public enum ServiceType: String {
 public class Service {
     weak var accessory: Accessory?
 
-    var id: Int
+    var iid: Int
     public let type: ServiceType
     let characteristics: [AnyCharacteristic]
 
-    init(id: Int = 0, type: ServiceType, characteristics: [AnyCharacteristic]) {
-        self.id = id
+    init(iid: Int = 0, type: ServiceType, characteristics: [AnyCharacteristic]) {
+        self.iid = iid
         self.type = type
         self.characteristics = characteristics
     }
@@ -28,7 +28,7 @@ public class Service {
 extension Service: JSONSerializable {
     public func serialized() -> [String : AnyObject] {
         return [
-            "iid": id as AnyObject,
+            "iid": iid as AnyObject,
             "type": type.rawValue as AnyObject,
             "characteristics": characteristics.map { $0.serialized() } as AnyObject
         ]
