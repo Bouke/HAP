@@ -40,6 +40,9 @@ public enum Characteristic {
         case accessoryIdentifier = "57"
         case category = "A3"
         case outletInUse = "26"
+        case currentDoorState = "E"
+        case targetDoorState = "32"
+        case obstructionDetected = "24"
     }
 
     public enum Permission: String {

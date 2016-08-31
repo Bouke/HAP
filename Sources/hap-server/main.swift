@@ -28,6 +28,10 @@ let device = Device(name: "Bridge", pin: "123-44-321", storage: storage, accesso
     .Thermostat(info: .init(name: "Living Room Thermostat")),
     .Thermometer(info: .init(name: "Office Thermometer")),
     .Outlet(info: .init(name: "Coffee Machine")),
+    .Window(info: .init(name: "Toilet Window")),
+    .WindowCovering(info: .init(name: "Shades")),
+    .Fan(info: .init(name: "Living Room Ceiling Fan")),
+    .GarageDoorOpener(info: .init(name: "Garage")),
 ])
 device.onIdentify.append({ acc in
     logger.info("Got identified: \(acc)")
