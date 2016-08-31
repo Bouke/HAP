@@ -119,7 +119,7 @@ public class Connection: NSObject, StreamDelegate {
     }
 
     deinit {
-        precondition(inputStream.streamStatus == .closed)
-        precondition(outputStream.streamStatus == .closed)
+        precondition(inputStream.streamStatus == .closed || inputStream.streamStatus == .error)
+        precondition(outputStream.streamStatus == .closed || outputStream.streamStatus == .error)
     }
 }
