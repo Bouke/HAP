@@ -11,6 +11,9 @@ protocol AnyCharacteristic: class, JSONSerializable {
 public enum Characteristic {
     public enum `Type`: String {
         case on = "25"
+        case brightness = "8"
+        case saturation = "2F"
+        case hue = "13"
         case currentTemperature = "11"
         case targetTemperature = "35"
         case currentHeatingCoolingState = "F"
@@ -98,9 +101,9 @@ open class GenericCharacteristic<ValueType: NSObjectConvertible>: AnyCharacteris
     let maxLength: Int?
     let maxValue: NSNumber?
     let minValue: NSNumber?
-    let stepValue: NSNumber?
+    let minStep: NSNumber?
 
-    init(iid: Int = 0, type: Characteristic.`Type`, value: ValueType? = nil, permissions: [Characteristic.Permission] = [.read, .write, .events], description: String? = nil, format: Characteristic.Format? = nil, unit: Characteristic.Unit? = nil, maxLength: Int? = nil, maxValue: NSNumber? = nil, minValue: NSNumber? = nil, stepValue: NSNumber? = nil) {
+    init(iid: Int = 0, type: Characteristic.`Type`, value: ValueType? = nil, permissions: [Characteristic.Permission] = [.read, .write, .events], description: String? = nil, format: Characteristic.Format? = nil, unit: Characteristic.Unit? = nil, maxLength: Int? = nil, maxValue: NSNumber? = nil, minValue: NSNumber? = nil, minStep: NSNumber? = nil) {
         self.iid = iid
         self.type = type
         self._value = value
@@ -113,7 +116,7 @@ open class GenericCharacteristic<ValueType: NSObjectConvertible>: AnyCharacteris
         self.maxLength = maxLength
         self.maxValue = maxValue
         self.minValue = minValue
-        self.stepValue = stepValue
+        self.minStep = minStep
     }
 
     public func setValue(withNSObject newValue: NSObject?, fromConnection connection: Connection) {
@@ -142,7 +145,7 @@ extension GenericCharacteristic: JSONSerializable {
         if let maxLength = maxLength { serialized["maxLength"] = maxLength as NSNumber }
         if let maxValue = maxValue { serialized["maxValue"] = maxValue }
         if let minValue = minValue { serialized["minValue"] = minValue }
-        if let stepValue = stepValue { serialized["stepValue"] = stepValue }
+        if let minStep = minStep { serialized["minStep"] = minStep }
 
         return serialized
     }

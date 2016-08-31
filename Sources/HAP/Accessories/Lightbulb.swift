@@ -8,16 +8,17 @@ extension Accessory {
     }
 }
 
-public enum State: Int, NSObjectConvertible {
-    case on = 1, off = 0
-}
+public typealias On = Bool
+public typealias Brightness = Int
+public typealias Saturation = Int
+public typealias Hue = Int
 
 extension Service {
     public class Lightbulb: Service {
-        public let on = GenericCharacteristic<State>(type: .on)
-        public let brightness = GenericCharacteristic<Int>(type: .on)
-        public let saturation = GenericCharacteristic<Int>(type: .on)
-        public let hue = GenericCharacteristic<Int>(type: .on)
+        public let on = GenericCharacteristic<On>(type: .on, value: false)
+        public let brightness = GenericCharacteristic<Brightness>(type: .brightness, value: 100, maxValue: 100, minValue: 0, minStep: 1)
+        public let saturation = GenericCharacteristic<Saturation>(type: .saturation, value: 0, unit: .percentage, maxValue: 100, minValue: 0, minStep: 1)
+        public let hue = GenericCharacteristic<Hue>(type: .hue, value: 0, unit: .arcdegrees, maxValue: 360, minValue: 0, minStep: 1)
 
         public init() {
             super.init(type: .lightbulb, characteristics: [on, brightness, saturation, hue])
