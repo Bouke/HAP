@@ -8,6 +8,10 @@ extension Service {
 
         public init() {
             super.init(type: .info, characteristics: [identify, manufacturer, model, name, serialNumber])
+            identify.onValueChange.append({ _ in
+                guard let accessory = self.accessory else { return }
+                _ = accessory.device?.onIdentify.map { $0(accessory) }
+            })
         }
     }
 }

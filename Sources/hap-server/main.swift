@@ -23,8 +23,8 @@ bedroomNightStand.lightbulb.on.onValueChange.append({ value in
 })
 
 let device = Device(name: "Bridge", pin: "001-02-003", storage: storage, accessories: [livingRoomLightbulb, bedroomNightStand])
-device.onIdentify.append({
-    logger.info("Got identified")
+device.onIdentify.append({ acc in
+    logger.info("Got identified: \(acc)")
 })
 
 let timer = DispatchSource.makeTimerSource()
