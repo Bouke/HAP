@@ -10,6 +10,7 @@ public enum ServiceType: String {
     case bridgeConfiguration = "A1"
     case bridgingState = "62"
     case temperatureSensor = "8A"
+    case outlet = "47"
 }
 
 public class Service {

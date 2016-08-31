@@ -39,6 +39,7 @@ public enum Characteristic {
         case linkQuality = "9C"
         case accessoryIdentifier = "57"
         case category = "A3"
+        case outletInUse = "26"
     }
 
     public enum Permission: String {
