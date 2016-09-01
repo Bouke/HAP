@@ -49,6 +49,10 @@ And then build the project itself:
 
 Run ``swift build`` to compile and ``.build/debug/hap-server`` to run. Modify ``Sources/hap-server/main.swift`` to include your own accessories.
 
+**Linux:**
+
+Currently Linux is not supported due to use of NetService, which is not (yet) available in Swift-Foundation. Patches welcome.
+
 **Dependencies:**
 
 ![HAP dependencies](http://swiftpm-deps.honza.tech/dependencies/Bouke/hap?format=png)
