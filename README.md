@@ -14,20 +14,16 @@ Currently ``GenericCharacteristic<T>`` is used, to allow for user-defined value 
 * [x] Updating values
 * [x] Notifications
 * [x] Split ``hap-server`` into executable and library
-* [ ] Include all Accessories, Services and Characteristics
-* [x] API (update value from code, and send notifications)
-* [x] Device identify callback (/identify)
-* [ ] Accessory identify callback (on self.info.identify)
-* [ ] Cleanup encryption; currently OpenSSL + libsodium are used, would prefer a single dependency
-* [ ] Cleanup runloop, put some work on a queue?
-* [x] Cleanup server instantiation
+* [x] Accessory identify callback
+* [½] Include all Accessories, Services and Characteristics
+* [ ] Drop OpenSSL? Currently only used for Bignum (SRP)
 * [ ] Overall cleanup
 * [ ] Documentation
 * [ ] Tests
 * [ ] Verify authentication in /characteristic and /accessories
-* [x] Release SRP package separately
 * [ ] Validate characteristic's permissions before setting new value
 * [ ] Callbacks for when characteristic is subscribed to (only update when needed)
+* [ ] Characteristic's value should only be nillable for write-only values
 
 **How to build:** (as of Xcode 8 beta 6)
 
