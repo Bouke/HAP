@@ -13,7 +13,7 @@ public enum AirQuality: Int, NSObjectConvertible {
 }
 
 extension Service {
-    public class AirQualitySensor: Service {
+    open class AirQualitySensor: Service {
         public let airQuality = GenericCharacteristic<AirQuality>(type: .airQuality, permissions: [.read, .events])
         
         public init() {

@@ -1,5 +1,5 @@
 extension Accessory {
-    public class GarageDoorOpener: Accessory {
+    open class GarageDoorOpener: Accessory {
         public let garageDoorOpener = Service.GarageDoorOpener()
 
         public init(info: Service.Info) {
@@ -19,7 +19,7 @@ public enum TargetDoorState: Int, NSObjectConvertible {
 public typealias ObstructionDetected = Bool
 
 extension Service {
-    public class GarageDoorOpener: Service {
+    open class GarageDoorOpener: Service {
         public let currentDoorState = GenericCharacteristic<CurrentDoorState>(type: .currentDoorState, value: .closed, permissions: [.read, .events])
         public let targetDoorState = GenericCharacteristic<TargetDoorState>(type: .targetDoorState, value: .closed)
         public let obstructionDetected = GenericCharacteristic<ObstructionDetected>(type: .obstructionDetected, value: false, permissions: [.read, .events])

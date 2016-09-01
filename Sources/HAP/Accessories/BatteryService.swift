@@ -19,7 +19,7 @@ public enum StatusLowBattery: Int, NSObjectConvertible {
 }
 
 extension Service {
-    public class BatteryService: Service {
+    open class BatteryService: Service {
         public let batteryLevel = GenericCharacteristic<BatteryLevel>(type: .batteryLevel, permissions: [.read, .events])
         public let chargingState = GenericCharacteristic<ChargingState>(type: .chargingState, permissions: [.read, .events])
         public let statusLowBattery = GenericCharacteristic<StatusLowBattery>(type: .statusLowBattery, permissions: [.read, .events])

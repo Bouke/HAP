@@ -22,7 +22,7 @@ public typealias ConfigureBridgedAccessory = Data
 
 
 extension Service {
-    public class BridgeConfiguration: Service {
+    open class BridgeConfiguration: Service {
         public let configureBridgedAccessoryStatus = GenericCharacteristic<ConfigureBridgedAccessoryStatus>(type: .configureBridgedAccessoryStatus, permissions: [.read, .events])
         public let discoverBridgedAccessories = GenericCharacteristic<DiscoverBridgedAccessories>(type: .discoverBridgedAccessories, permissions: [.read, .events])
         public let discoveredBridgedAccessories = GenericCharacteristic<DiscoveredBridgedAccessories>(type: .discoveredBridgedAccessories, permissions: [.read, .events])

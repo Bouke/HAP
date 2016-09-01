@@ -19,7 +19,7 @@ public enum ServiceType: String {
     case securitySystem = "7E"
 }
 
-public class Service {
+open class Service {
     weak var accessory: Accessory?
 
     var iid: Int

@@ -1,5 +1,5 @@
 extension Accessory {
-    public class Lightbulb: Accessory {
+    open class Lightbulb: Accessory {
         public let lightbulb = Service.Lightbulb()
 
         public init(info: Service.Info) {
@@ -14,7 +14,7 @@ public typealias Saturation = Int
 public typealias Hue = Int
 
 extension Service {
-    public class Lightbulb: Service {
+    open class Lightbulb: Service {
         public let on = GenericCharacteristic<On>(type: .on, value: false)
         public let brightness = GenericCharacteristic<Brightness>(type: .brightness, value: 100, unit: .percentage, maxValue: 100, minValue: 0, minStep: 1)
         public let saturation = GenericCharacteristic<Saturation>(type: .saturation, value: 0, unit: .percentage, maxValue: 100, minValue: 0, minStep: 1)

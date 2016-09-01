@@ -1,5 +1,5 @@
 extension Accessory {
-    public class SecuritySystem: Accessory {
+    open class SecuritySystem: Accessory {
         public let securitySystem = Service.SecuritySystem()
 
         public init(info: Service.Info) {
@@ -17,7 +17,7 @@ public enum SecuritySystemTargetState: Int, NSObjectConvertible {
 }
 
 extension Service {
-    public class SecuritySystem: Service {
+    open class SecuritySystem: Service {
         public let securitySystemCurrentState = GenericCharacteristic<SecuritySystemCurrentState>(type: .securitySystemCurrentState, value: .disarmed, permissions: [.read, .events])
         public let securitySystemTargetState = GenericCharacteristic<SecuritySystemTargetState>(type: .securitySystemTargetState, value: .disarmed)
 

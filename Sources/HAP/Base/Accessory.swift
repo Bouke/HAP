@@ -21,7 +21,7 @@ public enum AccessoryType: String {
     case rangeExtender = "16"
 }
 
-public class Accessory {
+open class Accessory {
     weak var device: Device?
     var aid: Int
     public let type: AccessoryType

@@ -1,5 +1,5 @@
 extension Accessory {
-    public class Outlet: Accessory {
+    open class Outlet: Accessory {
         public let outlet = Service.Outlet()
         
         public init(info: Service.Info) {
@@ -9,7 +9,7 @@ extension Accessory {
 }
 
 extension Service {
-    public class Outlet: Service {
+    open class Outlet: Service {
         public let on = GenericCharacteristic<Bool>(type: .on, value: false)
         public let inUse = GenericCharacteristic<Bool>(type: .outletInUse, value: true, permissions: [.read, .events])
         

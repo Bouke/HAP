@@ -1,5 +1,5 @@
 extension Accessory {
-    public class Switch: Accessory {
+    open class Switch: Accessory {
         public let `switch` = Service.Switch()
 
         public init(info: Service.Info) {
@@ -9,7 +9,7 @@ extension Accessory {
 }
 
 extension Service {
-    public class Switch: Service {
+    open class Switch: Service {
         public let on = GenericCharacteristic<Bool>(type: .on, value: false)
 
         public init() {

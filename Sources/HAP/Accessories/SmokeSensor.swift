@@ -13,7 +13,7 @@ public enum SmokeDetected: Int, NSObjectConvertible {
 }
 
 extension Service {
-    public class SmokeSensor: Service {
+    open class SmokeSensor: Service {
         public let smokeDetected = GenericCharacteristic<SmokeDetected>(type: .currentPosition, permissions: [.read, .events])
         
         public init() {

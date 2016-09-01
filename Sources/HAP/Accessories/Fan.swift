@@ -1,5 +1,5 @@
 extension Accessory {
-    public class Fan: Accessory {
+    open class Fan: Accessory {
         public let fan = Service.Fan()
 
         public init(info: Service.Info) {
@@ -10,7 +10,7 @@ extension Accessory {
 
 extension Service {
     public class Fan: Service {
-        public let on = GenericCharacteristic<On>(type: .on, value: false)
+        open let on = GenericCharacteristic<On>(type: .on, value: false)
 
         public init() {
             super.init(type: .fan, characteristics: [on])

@@ -14,7 +14,7 @@ public typealias AccessoryIdentifier = String
 public typealias Category = Int
 
 extension Service {
-    public class BridgingState: Service {
+    open class BridgingState: Service {
         public let reachable = GenericCharacteristic<Reachable>(type: .reachable, permissions: [.read, .events])
         public let linkQuality = GenericCharacteristic<LinkQuality>(type: .linkQuality, permissions: [.read, .events])
         public let accessoryIdentifier = GenericCharacteristic<AccessoryIdentifier>(type: .accessoryIdentifier, permissions: [.read, .events])
