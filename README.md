@@ -27,6 +27,7 @@ Currently ``GenericCharacteristic<T>`` is used, to allow for user-defined value 
 * [ ] Verify authentication in /characteristic and /accessories
 * [x] Release SRP package separately
 * [ ] Validate characteristic's permissions before setting new value
+* [ ] Callbacks for when characteristic is subscribed to (only update when needed)
 
 **How to build:** (as of Xcode 8 beta 6)
 

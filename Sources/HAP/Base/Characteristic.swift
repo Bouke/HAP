@@ -95,9 +95,10 @@ open class GenericCharacteristic<ValueType: NSObjectConvertible>: AnyCharacteris
             _value = newValue
             guard let device = service?.accessory?.device else { return }
             device.notify(characteristicListeners: self)
-            _ = onValueChange.map { $0(newValue) }
         }
     }
+    
+    // Subscribe a listener to value changes from (remote) clients.
     public var onValueChange: [(ValueType?) -> ()] = []
 
     let permissions: [Characteristic.Permission]
