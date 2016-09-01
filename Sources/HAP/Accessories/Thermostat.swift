@@ -16,8 +16,8 @@ public enum TargetHeatingCoolingState: Int, NSObjectConvertible {
     case off = 0, heat, cool, auto
 }
 
-public typealias CurrentTemperature = Float
-public typealias TargetTemperature = Float
+public typealias CurrentTemperature = Double
+public typealias TargetTemperature = Double
 
 public enum TemperatureDisplayUnits: Int, NSObjectConvertible {
     case celcius = 0, fahrenheit
