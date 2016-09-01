@@ -80,7 +80,7 @@ public enum Characteristic {
 
 }
 
-open class GenericCharacteristic<ValueType: NSObjectConvertible>: AnyCharacteristic {
+open class GenericCharacteristic<ValueType: NSObjectConvertible>: AnyCharacteristic where ValueType: Equatable {
     weak var service: Service?
 
     var iid: Int
@@ -92,6 +92,7 @@ open class GenericCharacteristic<ValueType: NSObjectConvertible>: AnyCharacteris
             return _value
         }
         set {
+            guard newValue != _value else { return }
             _value = newValue
             guard let device = service?.accessory?.device else { return }
             device.notify(characteristicListeners: self)
@@ -129,7 +130,9 @@ open class GenericCharacteristic<ValueType: NSObjectConvertible>: AnyCharacteris
     }
 
     public func setValue(withNSObject newValue: NSObject?, fromConnection connection: Connection) {
-        _value = newValue.flatMap { ValueType(withNSObject: $0) }
+        let newValue = newValue.flatMap { ValueType(withNSObject: $0) }
+        guard newValue != _value else { return }
+        _value = newValue
         _ = onValueChange.map { $0(_value) }
     }
 
