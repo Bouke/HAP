@@ -22,11 +22,11 @@ public enum AccessoryType: String {
 }
 
 open class Accessory {
-    weak var device: Device?
+    public weak var device: Device?
     var aid: Int
     public let type: AccessoryType
-    public let info: Service.Info
-    let services: [Service]
+    private let info: Service.Info
+    internal let services: [Service]
 
     init(aid: Int = 0, info: Service.Info, type: AccessoryType, services: [Service]) {
         self.aid = aid
