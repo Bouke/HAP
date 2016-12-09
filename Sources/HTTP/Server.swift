@@ -4,7 +4,7 @@ public class Server {
     let application: Application
     let streamMiddleware: [StreamMiddleware]
 
-    public init(application: Application, streamMiddleware: [StreamMiddleware]) {
+    public init(application: @escaping Application, streamMiddleware: [StreamMiddleware]) {
         self.application = application
         self.streamMiddleware = streamMiddleware
     }
