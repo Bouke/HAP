@@ -47,8 +47,4 @@ Run ``swift build`` to compile and ``.build/debug/hap-server`` to run. Modify ``
 
 **Linux:**
 
-Currently Linux is not supported due to use of NetService, which is not (yet) available in Swift-Foundation. Patches welcome.
-
-**Dependencies:**
-
-![HAP dependencies](http://swiftpm-deps.honza.tech/dependencies/Bouke/hap?format=png)
+Currently Linux is not supported due to use of NetService, which is not (yet) available in Swift-Foundation. Also there is a dependency on CommonCrypto, an Apple specific library to handle crypto stuff. Patches welcome.
