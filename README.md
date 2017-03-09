@@ -16,7 +16,7 @@ Currently ``GenericCharacteristic<T>`` is used, to allow for user-defined value 
 * [x] Split ``hap-server`` into executable and library
 * [x] Accessory identify callback
 * [½] Include all Accessories, Services and Characteristics
-* [ ] Drop OpenSSL? Currently only used for Bignum (SRP)
+* [x] Replaced OpenSSL with portable BlueCryptor
 * [ ] Overall cleanup
 * [ ] Documentation
 * [ ] Tests
@@ -32,7 +32,7 @@ Install libsodium (used for Curve25519 and Ed25519):
     brew install libsodium
     brew link libsodium
 
-Install openssl (used for bignum) and symlink the pkg-config files so SwiftPM can discover the correct compiler flags:
+Linux only: install OpenSSL (used for SRP / HKDF) and symlink the pkg-config files so SwiftPM can discover the correct compiler flags (this might not be needed anymore since my patch to SwiftPM):
 
     brew install openssl
     ln -s /usr/local/opt/openssl/lib/pkgconfig/*.pc /usr/local/lib/pkgconfig
@@ -47,7 +47,9 @@ Run ``swift build`` to compile and ``.build/debug/hap-server`` to run. Modify ``
 
 ## Linux
 
-Currently Linux is not supported due to use of NetService, which is not (yet) available in Swift-Foundation. Also there is a dependency on CommonCrypto, an Apple specific library to handle crypto stuff. Patches welcome.
+Currently Linux is not supported due to use of NetService, which is not (yet) available in Swift-Foundation. I've been working on implementing NetService, but the implementation isn't complete yet. Patches welcome.
+
+CommonCrypto has been replaced with the portable BlueCryptor; it uses CommonCrypto on Apple platforms and OpenSSL on Linux. 
 
 ## Credits
 
