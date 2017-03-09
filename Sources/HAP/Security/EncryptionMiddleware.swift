@@ -21,8 +21,16 @@ public class Cryptographer {
 
     public init(sharedKey: Data) {
         logger.debug("Shared key: \(sharedKey.hex)")
-        decryptKey = HKDF.deriveKey(algorithm: .SHA512, seed: sharedKey, info: "Control-Write-Encryption-Key".data(using: .utf8)!, salt: "Control-Salt".data(using: .utf8)!, count: 32)
-        encryptKey = HKDF.deriveKey(algorithm: .SHA512, seed: sharedKey, info: "Control-Read-Encryption-Key".data(using: .utf8)!, salt: "Control-Salt".data(using: .utf8)!, count: 32)
+        decryptKey = HKDF.deriveKey(algorithm: .sha512,
+                                    seed: sharedKey,
+                                    info: "Control-Write-Encryption-Key".data(using: .utf8),
+                                    salt: "Control-Salt".data(using: .utf8),
+                                    count: 32)
+        encryptKey = HKDF.deriveKey(algorithm: .sha512,
+                                    seed: sharedKey,
+                                    info: "Control-Read-Encryption-Key".data(using: .utf8),
+                                    salt: "Control-Salt".data(using: .utf8),
+                                    count: 32)
         logger.debug("Decrypt key: \(self.decryptKey.hex)")
         logger.debug("Encrypt key: \(self.encryptKey.hex)")
     }

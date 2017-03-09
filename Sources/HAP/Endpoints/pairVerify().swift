@@ -1,7 +1,7 @@
 import Foundation
 import HTTP
 import HKDF
-import CommonCrypto
+import Cryptor
 import CLibSodium
 import func Evergreen.getLogger
 
@@ -14,7 +14,7 @@ struct Session {
     let sharedSecret: Data
     
     init?(clientPublicKey otherPublicKey: Data) {
-        let secretKey = generateRandomBytes(count: 32)
+        let secretKey = Data(bytes: try! Random.generate(byteCount: 32))
         guard let publicKey = crypto(crypto_scalarmult_curve25519_base, Data(count: Int(crypto_scalarmult_curve25519_BYTES)), secretKey),
             let sharedSecret = crypto(crypto_scalarmult, Data(count: Int(crypto_scalarmult_BYTES)), secretKey, otherPublicKey)
         else {
@@ -57,7 +57,11 @@ func pairVerify(device: Device) -> Application {
             ]
             logger.debug("startRequest result: \(resultInner)")
 
-            let encryptionKey = HKDF.deriveKey(algorithm: .SHA512, seed: session.sharedSecret, info: "Pair-Verify-Encrypt-Info".data(using: .utf8)!, salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8)!, count: 32)
+            let encryptionKey = HKDF.deriveKey(algorithm: .sha512,
+                                               seed: session.sharedSecret,
+                                               info: "Pair-Verify-Encrypt-Info".data(using: .utf8),
+                                               salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8),
+                                               count: 32)
 
             guard let encryptedResultInner = try? ChaCha20Poly1305.encrypt(message: encode(resultInner), nonce: "PV-Msg02".data(using: .utf8)!, key: encryptionKey) else {
                 logger.warning("Could not encrypt")
@@ -88,7 +92,11 @@ func pairVerify(device: Device) -> Application {
                 return .badRequest
             }
 
-            let encryptionKey = HKDF.deriveKey(algorithm: .SHA512, seed: session.sharedSecret, info: "Pair-Verify-Encrypt-Info".data(using: .utf8)!, salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8)!, count: 32)
+            let encryptionKey = HKDF.deriveKey(algorithm: .sha512,
+                                               seed: session.sharedSecret,
+                                               info: "Pair-Verify-Encrypt-Info".data(using: .utf8),
+                                               salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8),
+                                               count: 32)
 
             guard let plaintext = try? ChaCha20Poly1305.decrypt(cipher: encryptedData, nonce: "PV-Msg03".data(using: .utf8)!, key: encryptionKey) else {
                 logger.warning("Could not decrypt message")

@@ -1,5 +1,4 @@
 import Foundation
-import CommonCrypto
 import HTTP
 
 public enum AccessoryType: String {
