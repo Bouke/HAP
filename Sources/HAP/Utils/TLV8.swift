@@ -79,3 +79,12 @@ enum PairStep: UInt8 {
     case request = 0x01
     case response = 0x02
 }
+
+enum PairError: UInt8 {
+    case unknown = 0x01
+    case authenticationFailed = 0x02
+    case tooManyAttempts = 0x03
+    case unknownPeer = 0x04
+    case maxPeer = 0x05
+    case maxAuthenticationAttempts = 0x06
+}

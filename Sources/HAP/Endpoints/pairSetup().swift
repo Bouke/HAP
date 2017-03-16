@@ -52,7 +52,11 @@ func pairSetup(device: Device) -> Application {
             guard let serverKeyProof = try? server.verifySession(publicKey: clientPublicKey,
                                                                  keyProof: clientKeyProof) else {
                 logger.warning("Invalid PIN")
-                return .badRequest
+                let result: PairTagTLV8 = [
+                    .sequence: Data(bytes: [PairSetupStep.verifyResponse.rawValue]),
+                    .errorCode: Data(bytes: [PairError.authenticationFailed.rawValue])
+                ]
+                return Response(status: .ok, data: encode(result), mimeType: "application/pairing+tlv8")
             }
 
             logger.debug("<-- HAMK \(serverKeyProof.hex)")
