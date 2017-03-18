@@ -3,7 +3,7 @@ import PackageDescription
 let package = Package(
     name: "HAP",
     targets: [
-        Target(name: "HAP", dependencies: ["HTTP"]),
+        Target(name: "HAP", dependencies: ["HTTPServer"]),
         Target(name: "hap-server", dependencies: ["HAP"]),
     ],
     dependencies: [

@@ -1,5 +1,5 @@
 import Foundation
-import HTTP
+import HTTPServer
 import HKDF
 import Cryptor
 import CLibSodium

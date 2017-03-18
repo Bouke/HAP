@@ -1,4 +1,4 @@
-import HTTP
+import HTTPServer
 
 func root(device: Device) -> Application {
     return Router(routes: [
