@@ -6,7 +6,6 @@ public protocol StreamMiddleware {
     func parse(output data: Data, forConnection connection: Connection) -> Data
 }
 
-
 public class Connection: NSObject, StreamDelegate {
     weak var server: Server?
 
@@ -113,6 +112,12 @@ public class Connection: NSObject, StreamDelegate {
         default: break
         }
     }
+    
+    #if os(Linux)
+        public func stream(_ aStream: Stream, handleEvent eventCode: Stream.Event) {
+            stream(aStream, handle: eventCode)
+        }
+    #endif
 
     // Out-of-band messaging (used for events)
     public func write(_ data: Data) {
