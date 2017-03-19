@@ -10,9 +10,9 @@ public class Router {
 
     public var application: Application {
         return { (connection, request) in
-            logger.info("\(request.method!) \(request.URL!.path)")
+            logger.info("\(request.method) \(request.urlURL.path)")
             for route in self.routes {
-                if route.path == request.URL?.path {
+                if route.path == request.urlURL.path {
                     return route.application(connection, request)
                 }
             }

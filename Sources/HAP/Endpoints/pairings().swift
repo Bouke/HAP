@@ -6,10 +6,10 @@ fileprivate let logger = getLogger("hap.pairings")
 
 func pairings(device: Device) -> Application {
     return { (connection, request) in
-        precondition(request.method == .POST)
-
+        var body = Data()
         guard
-            let body = request.body,
+            request.method == "POST",
+            let _ = try? request.readAllData(into: &body),
             let data: PairTagTLV8 = try? decode(body),
             data[.sequence]?[0] == PairStep.request.rawValue,
             let method = data[.pairingMethod].flatMap({PairMethod(rawValue: $0[0])}),

@@ -46,8 +46,8 @@
     {
       "package": "Kitura-net",
       "reason": null,
-      "repositoryURL": "https://github.com/IBM-Swift/Kitura-net.git",
-      "version": "1.6.2"
+      "repositoryURL": "https://github.com/Bouke/Kitura-net.git",
+      "version": "1.7.0"
     },
     {
       "package": "LoggerAPI",

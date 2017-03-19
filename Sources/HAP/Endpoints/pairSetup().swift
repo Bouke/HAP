@@ -23,7 +23,8 @@ func pairSetup(device: Device) -> Application {
                             algorithm: algorithm)
 
     return { (connection, request) in
-        guard let body = request.body, let data: PairTagTLV8 = try? decode(body) else { return .badRequest }
+        var body = Data()
+        guard let _ = try? request.readAllData(into: &body), let data: PairTagTLV8 = try? decode(body) else { return .badRequest }
 
         switch PairSetupStep(rawValue: data[.sequence]![0]) {
         case .startRequest?:

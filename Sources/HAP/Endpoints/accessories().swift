@@ -4,7 +4,7 @@ import HKDF
 
 func accessories(device: Device) -> Application {
     return { (connection, request) in
-        precondition(request.method == .GET)
+        precondition(request.method == "GET")
         let serialized: [String: AnyObject] = [
             "accessories": device.accessories.map { $0.serialized() } as AnyObject
         ]

@@ -29,7 +29,8 @@ struct Session {
 
 func pairVerify(device: Device) -> Application {
     return { (connection, request) in
-        guard let body = request.body, let data: PairTagTLV8 = try? decode(body) else {
+        var body = Data()
+        guard let _ = try? request.read(into: &body), let data: PairTagTLV8 = try? decode(body) else {
             logger.warning("Could not decode message")
             return .badRequest
         }

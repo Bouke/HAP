@@ -1,4 +1,5 @@
 import Foundation
+import KituraNet
 
 public protocol StreamMiddleware {
     func parse(input data: Data, forConnection connection: Connection) -> Data
@@ -11,11 +12,12 @@ public class Connection: NSObject, StreamDelegate {
 
     let inputStream: InputStream
     let outputStream: OutputStream
-    public private(set) var request: Request
     public private(set) var response: Response?
 
     public typealias Context = [String: Any]
     public var context = Context()
+
+    let parser: HTTPParser
 
     public var dateFormatter = { () -> DateFormatter in
         let f = DateFormatter()
@@ -29,9 +31,10 @@ public class Connection: NSObject, StreamDelegate {
         self.server = server
         self.inputStream = inputStream
         self.outputStream = outputStream
-        self.request = Request()
+        self.parser = HTTPParser(isRequest: true)
         super.init()
         open()
+
     }
 
     func open() {
@@ -59,15 +62,21 @@ public class Connection: NSObject, StreamDelegate {
                 buffer = middleware.parse(input: buffer, forConnection: self)
             }
 
-            try! request.append(data: buffer)
+            _ = buffer.withUnsafeBytes {
+                parser.execute($0, length: buffer.count)
+            }
 
-            if request.isHeaderComplete {
-                logger.debug("Request \(self.request)")
+            if parser.completed {
+                logger.debug("Request \(self.parser.urlString)")
+
+                let request = HTTPServerRequest(httpParser: parser)
+                request.parsingCompleted()
 
                 response = server?.application(self, request)
                 response!.headers["Date"] = dateFormatter.string(from: Date())
                 // @todo set Connection=Keep-Alive when appriopriate
 
+                parser.reset()
                 inputStream.remove(from: .main, forMode: .defaultRunLoopMode)
                 outputStream.schedule(in: .main, forMode: .defaultRunLoopMode)
             }
@@ -90,7 +99,6 @@ public class Connection: NSObject, StreamDelegate {
             }
 
             response = nil
-            request = Request()
 
             precondition(written == data.count)
 

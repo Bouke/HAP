@@ -1,5 +1,4 @@
 import Foundation
-import HTTP
 
 public enum AccessoryType: String {
     case other = "1"

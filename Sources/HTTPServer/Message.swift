@@ -78,66 +78,6 @@ extension Message: CustomDebugStringConvertible {
     }
 }
 
-public class Request: Message {
-    enum Error: Swift.Error {
-        case couldNotAppendData
-    }
-
-    public enum Method {
-        case GET
-        case POST
-        case PUT
-        case other(String)
-
-        init(rawValue: String) {
-            switch rawValue {
-            case "GET": self = .GET
-            case "POST": self = .POST
-            case "PUT": self = .PUT
-            default: self = .other(rawValue)
-            }
-        }
-    }
-
-    init() {
-        super.init(boxed: CFHTTPMessageCreateEmpty(nil, true).takeRetainedValue())
-    }
-
-    func append(data: Data) throws {
-        guard data.withUnsafeBytes({
-            CFHTTPMessageAppendBytes(boxed, $0, data.count)
-        }) else {
-            throw Error.couldNotAppendData
-        }
-    }
-
-    public var method: Method? {
-        precondition(isHeaderComplete)
-        guard let rawValue = CFHTTPMessageCopyRequestMethod(boxed)?.takeRetainedValue() as String? else {
-            return nil
-        }
-        return Method(rawValue: rawValue)
-    }
-
-    public var URL: URL? {
-        precondition(isHeaderComplete)
-        guard let URL = CFHTTPMessageCopyRequestURL(boxed)?.takeRetainedValue() as URL? else {
-            return nil
-        }
-        return URL
-    }
-}
-
-extension Request.Method: Equatable {
-    public static func == (lhs: Request.Method, rhs: Request.Method) -> Bool {
-        switch (lhs, rhs) {
-        case (.GET, .GET), (.POST, .POST), (.PUT, .PUT): return true
-        case (.other(let lhs), .other(let rhs)) where lhs == rhs: return true
-        default: return false
-        }
-    }
-}
-
 
 open class Response: Message {
     public enum Status: Int, CustomDebugStringConvertible {
