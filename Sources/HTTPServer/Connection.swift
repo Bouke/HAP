@@ -12,12 +12,14 @@ public class Connection: NSObject, StreamDelegate {
 
     let inputStream: InputStream
     let outputStream: OutputStream
+
+    let httpParser = HTTPParser(isRequest: true)
+    public private(set) var request: HTTPServerRequest
     public private(set) var response: Response?
 
     public typealias Context = [String: Any]
     public var context = Context()
 
-    let parser: HTTPParser
 
     public var dateFormatter = { () -> DateFormatter in
         let f = DateFormatter()
@@ -31,7 +33,7 @@ public class Connection: NSObject, StreamDelegate {
         self.server = server
         self.inputStream = inputStream
         self.outputStream = outputStream
-        self.parser = HTTPParser(isRequest: true)
+        self.request = HTTPServerRequest(httpParser: httpParser)
         super.init()
         open()
 
@@ -63,20 +65,20 @@ public class Connection: NSObject, StreamDelegate {
             }
 
             _ = buffer.withUnsafeBytes {
-                parser.execute($0, length: buffer.count)
+                httpParser.execute($0, length: buffer.count)
             }
+            print("Got \(buffer.count) bytes, complete? \(httpParser.completed)")
 
-            if parser.completed {
-                logger.debug("Request \(self.parser.urlString)")
-
-                let request = HTTPServerRequest(httpParser: parser)
+            if httpParser.completed {
                 request.parsingCompleted()
 
+                logger.debug("Request \(self.httpParser.urlString)")
+
                 response = server?.application(self, request)
-                response!.headers["Date"] = dateFormatter.string(from: Date())
+                response?.headers["Date"] = dateFormatter.string(from: Date())
                 // @todo set Connection=Keep-Alive when appriopriate
 
-                parser.reset()
+                httpParser.reset()
                 inputStream.remove(from: .main, forMode: .defaultRunLoopMode)
                 outputStream.schedule(in: .main, forMode: .defaultRunLoopMode)
             }
@@ -87,18 +89,18 @@ public class Connection: NSObject, StreamDelegate {
                 inputStream.schedule(in: .main, forMode: .defaultRunLoopMode)
             }
 
-            guard let serialized = response?.serialized() else {
-                abort()
-            }
-            logger.debug("Response \(self.response!)")
+            logger.debug("Response \(self.response)")
+            logger.debug(String(data: self.response!.serialized(), encoding: .utf8))
+            
+            precondition(response != nil)
 
-            let data = server!.streamMiddleware.reversed().reduce(serialized) { $1.parse(output: $0, forConnection: self) }
+            let data = server!.streamMiddleware.reversed().reduce(response!.serialized()) {
+                $1.parse(output: $0, forConnection: self)
+            }
 
             let written = data.withUnsafeBytes {
                 outputStream.write($0, maxLength: data.count)
             }
-
-            response = nil
 
             precondition(written == data.count)
 

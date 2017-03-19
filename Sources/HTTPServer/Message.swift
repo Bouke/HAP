@@ -1,85 +1,29 @@
 import Foundation
 
-open class Message {
-    internal var boxed: CFHTTPMessage
-    public let headers: Headers
+open class Response {
+    public var status = Status.ok
 
-    internal init(boxed: CFHTTPMessage) {
-        self.boxed = boxed
-        headers = Headers(boxed: boxed)
-    }
-
-    public var isHeaderComplete: Bool {
-        return CFHTTPMessageIsHeaderComplete(boxed)
-    }
-
-    public var isRequest: Bool {
-        return CFHTTPMessageIsRequest(boxed)
-    }
-
-    public var body: Data? {
-        get {
-            return CFHTTPMessageCopyBody(boxed)?.takeRetainedValue() as Data?
-        }
-        set {
-            headers["Content-Length"] = "\(newValue?.count ?? 0)"
-            CFHTTPMessageSetBody(boxed, (newValue ?? Data()) as CFData)
-        }
-    }
-
+    public var headers = [String: String]()
+    
+    public var body: Data?
+    
     public var text: String? {
-        get {
-            guard let body = body else { return nil }
-            // todo use correct encoding...
-            return String(data: body, encoding: .utf8)
+        guard let body = body else { return nil }
+        return String(data: body, encoding: .utf8)
+    }
+    
+    func serialized() -> Data {
+        var header = "HTTP/1.1 \(status)\r\n"
+        for (key, value) in headers {
+            header.append(key)
+            header.append(": ")
+            header.append(value)
+            header.append("\r\n")
         }
+        header.append("\r\n")
+        return header.data(using: .utf8)! + (body ?? Data())
     }
-
-    func serialized() -> Data? {
-        return CFHTTPMessageCopySerializedMessage(boxed)?.takeRetainedValue() as Data?
-    }
-
-    public var httpVersion: String {
-        return CFHTTPMessageCopyVersion(boxed).takeRetainedValue() as String
-    }
-
-    public class Headers {
-        public typealias Key = String
-        public typealias Value = String
-
-        internal var boxed: CFHTTPMessage
-
-        init(boxed: CFHTTPMessage) {
-            self.boxed = boxed
-        }
-
-        public subscript(key: Key) -> Value? {
-            get {
-                return CFHTTPMessageCopyHeaderFieldValue(boxed, key as CFString)?.takeRetainedValue() as String?
-            }
-            set {
-                CFHTTPMessageSetHeaderFieldValue(boxed, key as CFString, newValue as CFString?)
-            }
-        }
-
-        // replace with Collection protocol implementation
-        public func copy() -> [Key: Value] {
-            let cf = CFHTTPMessageCopyAllHeaderFields(self.boxed)?.takeRetainedValue() as Dictionary?
-            return cf as! [Key: Value]
-        }
-    }
-}
-
-extension Message: CustomDebugStringConvertible {
-    public var debugDescription: String {
-        precondition(isHeaderComplete)
-        guard let serialized = serialized() else { return "Message (could not be serialized)" }
-        return serialized.withUnsafeBytes { (ptr: UnsafePointer<UInt8>) in String(cString: ptr) }
-    }
-}
-
-
-open class Response: Message {
+    
     public enum Status: Int, CustomDebugStringConvertible {
         case ok = 200, created = 201, accepted = 202, noContent = 204
         case movedPermanently = 301
@@ -88,16 +32,16 @@ open class Response: Message {
 
         public var description: String {
             switch self {
-            case .ok: return "OK"
-            case .created: return "Created"
-            case .accepted: return "Accepted"
-            case .noContent: return "No Content"
-            case .movedPermanently: return "Moved Permanently"
-            case .badRequest: return "Bad Request"
-            case .unauthorized: return "Unauthorized"
-            case .forbidden: return "Forbidden"
-            case .notFound: return "Not Found"
-            case .internalServerError: return "Internal Server Error"
+            case .ok: return "200 OK"
+            case .created: return "201 Created"
+            case .accepted: return "202 Accepted"
+            case .noContent: return "204 No Content"
+            case .movedPermanently: return "301 Moved Permanently"
+            case .badRequest: return "400 Bad Request"
+            case .unauthorized: return "401 Unauthorized"
+            case .forbidden: return "403 Forbidden"
+            case .notFound: return "404 Not Found"
+            case .internalServerError: return "500 Internal Server Error"
             }
         }
 
@@ -107,7 +51,7 @@ open class Response: Message {
     }
 
     public init(status: Status) {
-        super.init(boxed: CFHTTPMessageCreateResponse(nil, status.rawValue, status.description as CFString?, kCFHTTPVersion1_1).takeRetainedValue())
+        self.status = status
         headers["Content-Length"] = "0"
     }
 
@@ -123,10 +67,6 @@ open class Response: Message {
             abort()
         }
         self.init(status: status, data: data, mimeType: "\(mimeType); charset=utf8")
-    }
-
-    var status: String? {
-        return CFHTTPMessageCopyResponseStatusLine(boxed)?.takeRetainedValue() as String?
     }
 }
 
