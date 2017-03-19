@@ -88,13 +88,16 @@ public class Connection: NSObject, StreamDelegate {
                 outputStream.remove(from: .main, forMode: .defaultRunLoopMode)
                 inputStream.schedule(in: .main, forMode: .defaultRunLoopMode)
             }
-
-            logger.debug("Response \(self.response)")
-            logger.debug(String(data: self.response!.serialized(), encoding: .utf8))
+            guard let response = response else {
+                preconditionFailure("No response available")
+            }
             
-            precondition(response != nil)
+            logger.debug("Response \(response)")
+            if let responseText = String(data: response.serialized(), encoding: .utf8) {
+                logger.debug(responseText)
+            }
 
-            let data = server!.streamMiddleware.reversed().reduce(response!.serialized()) {
+            let data = server!.streamMiddleware.reversed().reduce(response.serialized()) {
                 $1.parse(output: $0, forConnection: self)
             }
 

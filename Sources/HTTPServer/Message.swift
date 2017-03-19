@@ -24,7 +24,7 @@ open class Response {
         return header.data(using: .utf8)! + (body ?? Data())
     }
     
-    public enum Status: Int, CustomDebugStringConvertible {
+    public enum Status: Int, CustomStringConvertible {
         case ok = 200, created = 201, accepted = 202, noContent = 204
         case movedPermanently = 301
         case badRequest = 400, unauthorized = 401, forbidden = 403, notFound = 404
@@ -43,10 +43,6 @@ open class Response {
             case .notFound: return "404 Not Found"
             case .internalServerError: return "500 Internal Server Error"
             }
-        }
-
-        public var debugDescription: String {
-            return "\(rawValue) (\(description))"
         }
     }
 
