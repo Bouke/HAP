@@ -14,3 +14,7 @@ let package = Package(
         .Package(url: "https://github.com/Bouke/Kitura-net.git", majorVersion: 1, minor: 7),
     ]
 )
+
+#if os(Linux)
+    package.dependencies.append(.Package(url: "https://github.com/Bouke/NetService.git", majorVersion: 0, minor: 1))
+#endif
