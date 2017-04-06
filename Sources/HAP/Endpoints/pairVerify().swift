@@ -33,9 +33,12 @@ func pairVerify(device: Device) -> Application {
             logger.warning("Could not decode message")
             return .badRequest
         }
+        guard let sequence = data[.sequence]?.first.flatMap({ PairVerifyStep(rawValue: $0) }) else {
+            return .badRequest
+        }
 
-        switch PairVerifyStep(rawValue: data[.sequence]![0]) {
-        case .startRequest?:
+        switch sequence {
+        case .startRequest:
             logger.info("Pair verify started")
 
             guard let clientPublicKey = data[.publicKey], clientPublicKey.count == 32 else {
@@ -81,7 +84,7 @@ func pairVerify(device: Device) -> Application {
             response.body = encode(resultOuter)
             return response
 
-        case .finishRequest?:
+        case .finishRequest:
             guard let session = connection.context["hap.pairVerify.session"] as? Session else {
                 logger.warning("No session")
                 return .badRequest

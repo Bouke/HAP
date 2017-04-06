@@ -23,10 +23,15 @@ func pairSetup(device: Device) -> Application {
 
     return { (connection, request) in
         var body = Data()
-        guard let _ = try? request.readAllData(into: &body), let data: PairTagTLV8 = try? decode(body) else { return .badRequest }
+        guard let _ = try? request.readAllData(into: &body), let data: PairTagTLV8 = try? decode(body) else {
+            return .badRequest
+        }
+        guard let sequence = data[.sequence]?.first.flatMap({ PairSetupStep(rawValue: $0) }) else {
+            return .badRequest
+        }
 
-        switch PairSetupStep(rawValue: data[.sequence]![0]) {
-        case .startRequest?:
+        switch sequence {
+        case .startRequest:
             let (salt, serverPublicKey) = server.getChallenge()
 
             logger.info("Pair setup started")
@@ -40,7 +45,7 @@ func pairSetup(device: Device) -> Application {
             ]
             return Response(status: .ok, data: encode(result), mimeType: "application/pairing+tlv8")
 
-        case .verifyRequest?:
+        case .verifyRequest:
             guard let clientPublicKey = data[.publicKey], let clientKeyProof = data[.proof] else {
                 logger.warning("Invalid parameters")
                 return .badRequest
@@ -153,7 +158,8 @@ func pairSetup(device: Device) -> Application {
 
             return Response(status: .ok, data: encode(resultOuter), mimeType: "application/pairing+tlv8")
 
-        default: return .badRequest
+        default:
+            return .badRequest
         }
     }
 }
