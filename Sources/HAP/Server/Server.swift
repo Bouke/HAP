@@ -31,36 +31,39 @@ public class Server: NSObject, NetServiceDelegate {
             self.request = HTTPServerRequest(socket: socket, httpParser: httpParser)
             super.init()
             queue.async {
-                while socket.isConnected {
-                    while !self.httpParser.completed && socket.isConnected {
-                        var buffer = Data()
-                        print("reading...")
-                        _ = try! socket.read(into: &buffer)
-                        print("did read \(buffer.count) bytes")
-                        if let cryptographer = self.cryptographer {
-                            buffer = try! cryptographer.decrypt(buffer)
-                        }
-                        _ = buffer.withUnsafeBytes {
-                            self.httpParser.execute($0, length: buffer.count)
-                        }
+                while !socket.remoteConnectionClosed {
+                    var readBuffer = Data()
+                    _ = try! socket.read(into: &readBuffer)
+                    if let cryptographer = self.cryptographer {
+                        readBuffer = try! cryptographer.decrypt(readBuffer)
                     }
+                    _ = readBuffer.withUnsafeBytes {
+                        self.httpParser.execute($0, length: readBuffer.count)
+                    }
+
+                    guard self.httpParser.completed else {
+                        break
+                    }
+
                     self.request.parsingCompleted()
                     var response: Response! = nil
                     DispatchQueue.main.sync {
                         response = application(self, self.request)
                     }
                     response?.headers["Date"] = self.dateFormatter.string(from: Date())
-                    var buffer = response.serialized()
+
+                    var writeBuffer = response.serialized()
                     if let cryptographer = self.cryptographer {
-                        buffer = try! cryptographer.encrypt(buffer)
+                        writeBuffer = try! cryptographer.encrypt(writeBuffer)
                     }
                     if let response = response as? UpgradeResponse {
                         self.cryptographer = response.cryptographer
                         // todo?: override response
                     }
-                    try! socket.write(from: buffer)
+                    try! socket.write(from: writeBuffer)
                     self.httpParser.reset()
                 }
+                socket.close()
             }
         }
     }
