@@ -8,6 +8,9 @@ getLogger("hap").logLevel = .info
 getLogger("http").logLevel = .info
 
 let storage = try FileStorage(path: "db")
+if CommandLine.arguments.contains("--recreate") {
+    try storage.removeAll()
+}
 
 let livingRoomLightbulb = Accessory.Lightbulb(info: .init(name: "Living Room"))
 livingRoomLightbulb.lightbulb.on.onValueChange.append({ value in
