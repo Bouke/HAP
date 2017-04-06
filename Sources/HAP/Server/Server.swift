@@ -82,8 +82,6 @@ public class Server: NSObject, NetServiceDelegate {
 
         service = NetService(domain: "local.", type: "_hap._tcp.", name: device.name, port: socket.listeningPort)
         service.setTXTRecord(NetService.data(fromTXTRecord: device.config))
-        
-//        let httpServer = HTTPServer.Server(application: application, streamMiddleware: [encryption])
 
         super.init()
         service.delegate = self
