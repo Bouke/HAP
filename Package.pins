@@ -29,7 +29,7 @@
       "package": "Cryptor",
       "reason": null,
       "repositoryURL": "https://github.com/IBM-Swift/BlueCryptor.git",
-      "version": "0.8.8"
+      "version": "0.8.9"
     },
     {
       "package": "Evergreen",
@@ -65,7 +65,7 @@
       "package": "SSLService",
       "reason": null,
       "repositoryURL": "https://github.com/IBM-Swift/BlueSSLService.git",
-      "version": "0.12.26"
+      "version": "0.12.31"
     },
     {
       "package": "SipHash",
@@ -77,7 +77,7 @@
       "package": "Socket",
       "reason": null,
       "repositoryURL": "https://github.com/IBM-Swift/BlueSocket.git",
-      "version": "0.12.36"
+      "version": "0.12.43"
     }
   ],
   "version": 1

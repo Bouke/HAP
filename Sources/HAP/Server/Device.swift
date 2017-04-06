@@ -1,5 +1,4 @@
 import Foundation
-import HTTPServer
 import func Evergreen.getLogger
 
 fileprivate let logger = getLogger("hap")
@@ -33,7 +32,7 @@ public class Device {
     let storage: FileStorage
     let clients: Clients
     public let accessories: [Accessory]
-    internal var characteristicEventListeners: [Box<AnyCharacteristic>: WeakObjectSet<Connection>]
+    internal var characteristicEventListeners: [Box<AnyCharacteristic>: WeakObjectSet<Server.Connection>]
     public var onIdentify: [(Accessory?) -> ()] = []
 
     public init(name: String, pin: String, storage: FileStorage, accessories: [Accessory]) {
@@ -82,7 +81,7 @@ public class Device {
         return false
     }
 
-    func add(characteristic: AnyCharacteristic, listener: Connection) {
+    func add(characteristic: AnyCharacteristic, listener: Server.Connection) {
         if let _ = characteristicEventListeners[Box(characteristic)] {
             characteristicEventListeners[Box(characteristic)]!.addObject(object: listener)
         } else {
@@ -91,26 +90,28 @@ public class Device {
     }
 
     @discardableResult
-    func remove(characteristic: AnyCharacteristic, listener connection: Connection) -> Connection? {
+    func remove(characteristic: AnyCharacteristic, listener connection: Server.Connection) -> Server.Connection? {
         guard let _ = characteristicEventListeners[Box(characteristic)] else {
             return nil
         }
         return characteristicEventListeners[Box(characteristic)]!.remove(connection)
     }
 
-    func notify(characteristicListeners characteristic: AnyCharacteristic, exceptListener except: Connection? = nil) {
-        guard let listeners = characteristicEventListeners[Box(characteristic)]?.filter({$0 != except}), listeners.count > 0 else {
-            return logger.info("Value changed, but nobody listening")
-        }
-        guard let event = Event(valueChangedOfCharacteristic: characteristic) else {
-            return logger.error("Could not create value change event")
-        }
-        let data = event.serialized()
-        logger.info("Value changed, notifying \(listeners.count) listener(s)")
-        logger.debug("Listeners: \(listeners), event: \(event)")
-        for listener in listeners {
-            listener.write(data)
-        }
+    func notify(characteristicListeners characteristic: AnyCharacteristic, exceptListener except: Server.Connection? = nil) {
+        NSLog("Device.notify(characteristicListeners:exceptListener:) is not implemented")
+//        fatalError("Not implemented")
+//        guard let listeners = characteristicEventListeners[Box(characteristic)]?.filter({$0 != except}), listeners.count > 0 else {
+//            return logger.info("Value changed, but nobody listening")
+//        }
+//        guard let event = Event(valueChangedOfCharacteristic: characteristic) else {
+//            return logger.error("Could not create value change event")
+//        }
+//        let data = event.serialized()
+//        logger.info("Value changed, notifying \(listeners.count) listener(s)")
+//        logger.debug("Listeners: \(listeners), event: \(event)")
+//        for listener in listeners {
+//            listener.write(data)
+//        }
     }
 
     var config: [String: Data] {

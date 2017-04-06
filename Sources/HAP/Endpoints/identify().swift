@@ -1,5 +1,4 @@
 import Foundation
-import HTTPServer
 
 func identify(device: Device) -> Application {
     return { (connection, request) in

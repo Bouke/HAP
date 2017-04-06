@@ -45,11 +45,9 @@ timer.setEventHandler(handler: {
 })
 timer.resume()
 
-let server = Server(device: device, port: 8000)
-server.publish()
-server.listen()
+let server = try Server(device: device, port: 8000)
+try server.start()
 
-//or run the runloop yourself:
-//withExtendedLifetime(server) {
-//    RunLoop.current.run()
-//}
+withExtendedLifetime(server) {
+    RunLoop.current.run()
+}

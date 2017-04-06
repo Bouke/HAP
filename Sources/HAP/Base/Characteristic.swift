@@ -4,7 +4,7 @@ import class HTTPServer.Connection
 protocol AnyCharacteristic: class, JSONSerializable {
     var iid: Int { get set }
     weak var service: Service? { get set }
-    func setValue(withNSObject newValue: NSObject?, fromConnection connection: Connection) throws -> ()
+    func setValue(withNSObject newValue: NSObject?, fromConnection connection: Server.Connection) throws -> ()
     var valueAsNSObject: NSObject? { get }
 }
 
@@ -129,7 +129,7 @@ open class GenericCharacteristic<ValueType: NSObjectConvertible>: AnyCharacteris
         self.minStep = minStep
     }
 
-    public func setValue(withNSObject newValue: NSObject?, fromConnection connection: Connection) {
+    public func setValue(withNSObject newValue: NSObject?, fromConnection connection: Server.Connection) {
         let newValue = newValue.flatMap { ValueType(withNSObject: $0) }
         guard newValue != _value else { return }
         _value = newValue

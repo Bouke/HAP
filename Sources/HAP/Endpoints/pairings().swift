@@ -1,5 +1,4 @@
 import Foundation
-import HTTPServer
 import func Evergreen.getLogger
 
 fileprivate let logger = getLogger("hap.pairings")

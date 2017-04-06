@@ -1,4 +1,3 @@
-import HTTPServer
 import Foundation
 
 struct Event {

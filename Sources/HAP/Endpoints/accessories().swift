@@ -1,5 +1,4 @@
 import Foundation
-import HTTPServer
 import HKDF
 
 func accessories(device: Device) -> Application {

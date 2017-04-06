@@ -1,5 +1,4 @@
 import Foundation
-import HTTPServer
 import HKDF
 import Evergreen
 
@@ -10,6 +9,9 @@ class UpgradeResponse: Response {
     init(cryptographer: Cryptographer) {
         self.cryptographer = cryptographer
         super.init(status: .ok)
+    }
+    override func serialized() -> Data {
+        fatalError("Sentinel")
     }
 }
 
@@ -67,26 +69,5 @@ public class Cryptographer {
         logger.debug("Cipher: \((length + encrypted).hex)")
         
         return length + encrypted
-    }
-}
-
-public class EncryptionMiddleware: StreamMiddleware {
-    public init() { }
-
-    public func parse(input data: Data, forConnection connection: Connection) -> Data {
-        if let cryptographer = connection.context["cryptographer"] as? Cryptographer {
-            return try! cryptographer.decrypt(data)
-        }
-        return data
-    }
-
-    public func parse(output data: Data, forConnection connection: Connection) -> Data {
-        if let cryptographer = connection.context["cryptographer"] as? Cryptographer {
-            return try! cryptographer.encrypt(data)
-        }
-        if let response = connection.response as? UpgradeResponse {
-            connection.context["cryptographer"] = response.cryptographer
-        }
-        return data
     }
 }

@@ -1,5 +1,9 @@
 import Foundation
 
+import func Evergreen.getLogger
+
+fileprivate let logger = getLogger("hap.http.router")
+
 public class Router {
     public typealias Route = (path: String, application: Application)
 
