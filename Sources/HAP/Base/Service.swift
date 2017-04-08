@@ -34,11 +34,11 @@ open class Service {
 }
 
 extension Service: JSONSerializable {
-    public func serialized() -> [String : AnyObject] {
+    public func serialized() -> [String : Any] {
         return [
-            "iid": iid as AnyObject,
-            "type": type.rawValue as AnyObject,
-            "characteristics": characteristics.map { $0.serialized() } as AnyObject
+            "iid": iid,
+            "type": type.rawValue,
+            "characteristics": characteristics.map { $0.serialized() }
         ]
     }
 }

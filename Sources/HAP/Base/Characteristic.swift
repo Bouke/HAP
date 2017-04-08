@@ -108,11 +108,11 @@ open class GenericCharacteristic<ValueType: NSObjectConvertible>: AnyCharacteris
     let unit: Characteristic.Unit?
 
     let maxLength: Int?
-    let maxValue: NSNumber?
-    let minValue: NSNumber?
-    let minStep: NSNumber?
+    let maxValue: Double?
+    let minValue: Double?
+    let minStep: Double?
 
-    init(iid: Int = 0, type: Characteristic.`Type`, value: ValueType? = nil, permissions: [Characteristic.Permission] = [.read, .write, .events], description: String? = nil, format: Characteristic.Format? = nil, unit: Characteristic.Unit? = nil, maxLength: Int? = nil, maxValue: NSNumber? = nil, minValue: NSNumber? = nil, minStep: NSNumber? = nil) {
+    init(iid: Int = 0, type: Characteristic.`Type`, value: ValueType? = nil, permissions: [Characteristic.Permission] = [.read, .write, .events], description: String? = nil, format: Characteristic.Format? = nil, unit: Characteristic.Unit? = nil, maxLength: Int? = nil, maxValue: Double? = nil, minValue: Double? = nil, minStep: Double? = nil) {
         self.iid = iid
         self.type = type
         self._value = value
@@ -141,19 +141,19 @@ open class GenericCharacteristic<ValueType: NSObjectConvertible>: AnyCharacteris
 }
 
 extension GenericCharacteristic: JSONSerializable {
-    public func serialized() -> [String : AnyObject] {
-        var serialized: [String : AnyObject] = [
-            "iid": iid as AnyObject,
-            "type": type.rawValue as AnyObject,
-            "perms": permissions.map { $0.rawValue } as AnyObject
+    public func serialized() -> [String : Any] {
+        var serialized: [String : Any] = [
+            "iid": iid,
+            "type": type.rawValue,
+            "perms": permissions.map { $0.rawValue }
         ]
         if let value = value { serialized["value"] = value.asNSObject }
 
-        if let description = description { serialized["description"] = description as AnyObject }
-        if let format = format { serialized["format"] = format.rawValue as AnyObject }
-        if let unit = unit { serialized["unit"] = unit.rawValue as AnyObject }
+        if let description = description { serialized["description"] = description }
+        if let format = format { serialized["format"] = format.rawValue }
+        if let unit = unit { serialized["unit"] = unit.rawValue }
 
-        if let maxLength = maxLength { serialized["maxLength"] = maxLength as NSNumber }
+        if let maxLength = maxLength { serialized["maxLength"] = maxLength }
         if let maxValue = maxValue { serialized["maxValue"] = maxValue }
         if let minValue = minValue { serialized["minValue"] = minValue }
         if let minStep = minStep { serialized["minStep"] = minStep }

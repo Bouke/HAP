@@ -47,10 +47,10 @@ open class Accessory {
 }
 
 extension Accessory: JSONSerializable {
-    public func serialized() -> [String : AnyObject] {
+    public func serialized() -> [String : Any] {
         return [
-            "aid": aid as AnyObject,
-            "services": services.map { $0.serialized() } as AnyObject
+            "aid": aid,
+            "services": services.map { $0.serialized() }
         ]
     }
 }
