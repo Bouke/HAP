@@ -5,6 +5,7 @@ import func Evergreen.getLogger
 
 #if os(Linux)
     import Dispatch
+    import NetService
 #endif
 
 fileprivate let logger = getLogger("hap")
