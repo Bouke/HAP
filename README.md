@@ -46,6 +46,16 @@ Install dependencies:
 
     sudo apt-get install openssl libssl-dev libsodium-dev libcurl4-openssl-dev
 
+Make sure you have libsodium 1.0.9 or above. Ubuntu 16.10 or later suffices.
+Otherwise you have to compile and install libsodium from source;
+
+    wget https://download.libsodium.org/libsodium/releases/libsodium-1.0.12.tar.gz
+    tar xzf libsodium-1.0.12.tar.gz
+    cd libsodium-1.0.12
+    ./configure
+    make && make check
+    sudo make install
+
 And then build the project itself:
 
     swift build
