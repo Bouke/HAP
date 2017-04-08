@@ -25,17 +25,24 @@ Currently ``GenericCharacteristic<T>`` is used, to allow for user-defined value 
 * [ ] Callbacks for when characteristic is subscribed to (only update when needed)
 * [ ] Characteristic's value should only be nillable for write-only values
 
-## How to build (as of Xcode 8 beta 6)
+## How to build
+
+### MacOS
 
 Install libsodium (used for Curve25519 and Ed25519):
 
     brew install libsodium
     brew link libsodium
 
-Linux only: install OpenSSL (used for SRP / HKDF) and symlink the pkg-config files so SwiftPM can discover the correct compiler flags (this might not be needed anymore since my patch to SwiftPM):
+And then build the project itself:
 
-    brew install openssl
-    ln -s /usr/local/opt/openssl/lib/pkgconfig/*.pc /usr/local/lib/pkgconfig
+    swift build
+
+### Linux
+
+Install dependencies:
+
+    sudo apt-get install openssl libssl-dev libsodium-dev libcurl4-openssl-dev
 
 And then build the project itself:
 
