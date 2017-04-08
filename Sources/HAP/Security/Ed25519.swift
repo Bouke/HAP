@@ -9,6 +9,9 @@ class Ed25519 {
     }
 
     static func verify(publicKey: Data, message: Data, signature: Data) throws {
+        guard signature.count == Int(crypto_sign_BYTES) else {
+            throw Error.invalidSignature
+        }
         guard signature.withUnsafeBytes({ pSignature in
             message.withUnsafeBytes { pMessage in
                 publicKey.withUnsafeBytes { pPublicKey in

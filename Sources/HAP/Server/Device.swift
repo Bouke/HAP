@@ -29,13 +29,13 @@ public class Device {
     public let publicKey: Data
     let privateKey: Data
     public let pin: String
-    let storage: FileStorage
+    let storage: Storage
     let clients: Clients
     public let accessories: [Accessory]
     internal var characteristicEventListeners: [Box<AnyCharacteristic>: WeakObjectSet<Server.Connection>]
     public var onIdentify: [(Accessory?) -> ()] = []
 
-    public init(name: String, pin: String, storage: FileStorage, accessories: [Accessory]) {
+    public init(name: String, pin: String, storage: Storage, accessories: [Accessory]) {
         self.name = name
         self.pin = pin
         self.storage = storage
@@ -61,8 +61,8 @@ public class Device {
     }
 
     public class Clients {
-        private let storage: FileStorage
-        fileprivate init(storage: FileStorage) {
+        private let storage: Storage
+        fileprivate init(storage: Storage) {
             self.storage = storage
         }
 

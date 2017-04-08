@@ -6,7 +6,7 @@ import func Evergreen.getLogger
 
 fileprivate let logger = getLogger("hap.pairVerify")
 
-struct Session {
+fileprivate struct Session {
     let secretKey: Data
     let publicKey: Data
     let otherPublicKey: Data

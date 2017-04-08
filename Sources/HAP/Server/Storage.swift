@@ -1,6 +1,11 @@
 import Foundation
 
-public class FileStorage {
+public protocol Storage: class {
+    subscript(key: String) -> Data? { get set }
+    func removeAll() throws
+}
+
+public class FileStorage: Storage {
     public enum Error: Swift.Error {
         case couldNotCreateDirectory
     }
@@ -18,7 +23,7 @@ public class FileStorage {
         self.path = path
     }
 
-    subscript(key: String) -> Data? {
+    public subscript(key: String) -> Data? {
         get {
             let entityPath = URL(fileURLWithPath: path).appendingPathComponent(key)
             guard let data = try? Data(contentsOf: entityPath, options: []) else {
@@ -40,5 +45,20 @@ public class FileStorage {
         for file in try FileManager.default.contentsOfDirectory(atPath: path) {
             try FileManager.default.removeItem(atPath: "\(path)/\(file)")
         }
+    }
+}
+
+public class MemoryStorage: Storage {
+    var memory = [String: Data]()
+    public subscript(key: String) -> Data? {
+        get {
+            return memory[key]
+        }
+        set {
+            memory[key] = newValue
+        }
+    }
+    public func removeAll() throws {
+        memory = [:]
     }
 }
