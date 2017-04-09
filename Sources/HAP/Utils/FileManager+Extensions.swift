@@ -9,9 +9,17 @@
 import Foundation
 
 extension FileManager {
-    func directoryExists(atPath path: String) -> Bool {
-        var isDirectory = ObjCBool(false)
-        fileExists(atPath: path, isDirectory: &isDirectory)
-        return isDirectory.boolValue
-    }
+    #if os(macOS)
+        func directoryExists(atPath path: String) -> Bool {
+            var isDirectory = ObjCBool(false)
+            _ = fileExists(atPath: path, isDirectory: &isDirectory)
+            return isDirectory.boolValue
+        }
+    #elseif os(Linux)
+        func directoryExists(atPath path: String) -> Bool {
+            var isDirectory = false
+            _ = fileExists(atPath: path, isDirectory: &isDirectory)
+            return isDirectory
+        }
+    #endif
 }
