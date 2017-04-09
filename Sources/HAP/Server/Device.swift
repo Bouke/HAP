@@ -1,10 +1,13 @@
+import Cryptor
 import Foundation
 import func Evergreen.getLogger
 
 fileprivate let logger = getLogger("hap")
 
 func generateIdentifier() -> String {
-    return (1...6).map({ _ in String(arc4random() & 255, radix: 16, uppercase: false) }).joined(separator: ":")
+    return try! Random.generate(byteCount: 6)
+        .map { String($0, radix: 16, uppercase: false) }
+        .joined(separator: ":")
 }
 
 struct Box<T: Any>: Hashable, Equatable {
