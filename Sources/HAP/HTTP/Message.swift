@@ -5,7 +5,11 @@ open class Response {
 
     public var headers = [String: String]()
     
-    public var body: Data?
+    public var body: Data? {
+        didSet {
+            headers["Content-Length"] = "\(body?.count ?? 0)"
+        }
+    }
     
     public var text: String? {
         guard let body = body else { return nil }
@@ -54,8 +58,10 @@ open class Response {
     public convenience init(status: Status = .ok, data: Data, mimeType: String) {
         self.init(status: status)
         headers["Content-Type"] = mimeType
-        headers["Content-Length"] = "\(data.count)"
-        self.body = data
+        // Defer setting body, so that body.didSet will be called.
+        defer {
+            self.body = data
+        }
     }
 
     public convenience init(status: Status = .ok, text: String, mimeType: String = "text/html") {

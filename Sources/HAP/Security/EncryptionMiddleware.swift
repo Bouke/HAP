@@ -10,9 +10,6 @@ class UpgradeResponse: Response {
         self.cryptographer = cryptographer
         super.init(status: .ok)
     }
-    override func serialized() -> Data {
-        fatalError("Sentinel")
-    }
 }
 
 public class Cryptographer {
