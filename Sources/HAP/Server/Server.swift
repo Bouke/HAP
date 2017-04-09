@@ -76,16 +76,17 @@ public class Server: NSObject, NetServiceDelegate {
         try socket.listen(on: port)
 
         service = NetService(domain: "local.", type: "_hap._tcp.", name: device.name, port: socket.listeningPort)
-        service.setTXTRecord(NetService.data(fromTXTRecord: device.config))
+        #if os(macOS)
+            let record = device.config.dictionary(key: { $0.key }, value: { $0.value.data(using: .utf8)! })
+            service.setTXTRecord(NetService.data(fromTXTRecord: record))
+        #elseif os(Linux)
+            service.setTXTRecord(device.config)
+        #endif
 
         super.init()
         service.delegate = self
     }
     
-    public func netService(_ sender: NetService, didNotPublish errorDict: [String : NSNumber]) {
-        logger.error("didNotPublish: \(errorDict)")
-    }
-
     public func start() {
         service.publish()
         logger.info("Listening on port \(self.socket.listeningPort)")
@@ -104,4 +105,28 @@ public class Server: NSObject, NetServiceDelegate {
     public func stop() {
         
     }
+    
+    
+    #if os(macOS)
+        // MARK: Using Network Services
+        public func netService(_ sender: NetService, didNotPublish errorDict: [String : NSNumber]) {
+            logger.error("didNotPublish: \(errorDict)")
+        }
+    #elseif os(Linux)
+        // MARK: Using Network Services
+        public func netServiceWillPublish(_ sender: NetService) { }
+        
+        public func netServiceDidPublish(_ sender: NetService) { }
+        
+        public func netService(_ sender: NetService,
+                               didNotPublish error: Swift.Error) {
+            logger.error("didNotPublish: \(error)")
+        }
+        
+        public func netServiceDidStop(_ sender: NetService) { }
+        
+        // MARK: Accepting Connections
+        public func netService(_ sender: NetService,
+                               didAcceptConnectionWith socket: Socket) {  }
+    #endif
 }
