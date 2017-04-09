@@ -16,13 +16,21 @@ struct Box<T: Any>: Hashable, Equatable {
     init(_ value: T) {
         self.value = value
     }
+    
+    var object: AnyObject {
+        #if os(macOS)
+            return value as AnyObject
+        #elseif os(Linux)
+            return value as! AnyObject
+        #endif
+    }
 
     var hashValue: Int {
-        return ObjectIdentifier(value as AnyObject).hashValue
+        return ObjectIdentifier(object).hashValue
     }
 
     static func == (lhs: Box<T>, rhs: Box<T>) -> Bool {
-        return ObjectIdentifier(lhs.value as AnyObject) == ObjectIdentifier(rhs.value as AnyObject)
+        return ObjectIdentifier(lhs.object) == ObjectIdentifier(rhs.object)
     }
 }
 
