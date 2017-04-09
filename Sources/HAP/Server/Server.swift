@@ -103,7 +103,8 @@ public class Server: NSObject, NetServiceDelegate {
     }
     
     public func stop() {
-        
+        service.stop()
+        socket.close()
     }
     
     
