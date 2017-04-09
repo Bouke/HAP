@@ -4,6 +4,10 @@ import HAP
 
 fileprivate let logger = getLogger("demo")
 
+#if os(Linux)
+    import Dispatch
+#endif
+
 getLogger("hap").logLevel = .info
 getLogger("http").logLevel = .info
 
