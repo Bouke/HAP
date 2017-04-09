@@ -13,56 +13,50 @@ fileprivate let logger = getLogger("hap")
 
 public class Server: NSObject, NetServiceDelegate {
     public class Connection: NSObject {
-        let httpParser = HTTPParser(isRequest: true)
-        let socket: Socket
-        let queue: DispatchQueue
-        let request: HTTPServerRequest
         var context = [String: Any]()
-        var cryptographer: Cryptographer? = nil
-        public var dateFormatter = { () -> DateFormatter in
-            let f = DateFormatter()
-            f.timeZone = TimeZone(identifier: "GMT")
-            f.dateFormat = "EEE',' dd MMM yyyy HH':'mm':'ss zzz"
-            f.locale = Locale(identifier: "en_US")
-            return f
-        }()
-        init(socket: Socket, queue: DispatchQueue, application: @escaping Application) {
-            self.socket = socket
-            self.queue = queue
-            self.request = HTTPServerRequest(socket: socket, httpParser: httpParser)
-            super.init()
+        func listen(socket: Socket, queue: DispatchQueue, application: @escaping Application) {
+            let httpParser = HTTPParser(isRequest: true)
+            var cryptographer: Cryptographer? = nil
+            let request = HTTPServerRequest(socket: socket, httpParser: httpParser)
+            let dateFormatter = { () -> DateFormatter in
+                let f = DateFormatter()
+                f.timeZone = TimeZone(identifier: "GMT")
+                f.dateFormat = "EEE',' dd MMM yyyy HH':'mm':'ss zzz"
+                f.locale = Locale(identifier: "en_US")
+                return f
+            }()
             queue.async {
                 while !socket.remoteConnectionClosed {
                     var readBuffer = Data()
                     _ = try! socket.read(into: &readBuffer)
-                    if let cryptographer = self.cryptographer {
+                    if let cryptographer = cryptographer {
                         readBuffer = try! cryptographer.decrypt(readBuffer)
                     }
                     _ = readBuffer.withUnsafeBytes {
-                        self.httpParser.execute($0, length: readBuffer.count)
+                        httpParser.execute($0, length: readBuffer.count)
                     }
 
-                    guard self.httpParser.completed else {
+                    guard httpParser.completed else {
                         break
                     }
 
-                    self.request.parsingCompleted()
+                    request.parsingCompleted()
                     var response: Response! = nil
                     DispatchQueue.main.sync {
-                        response = application(self, self.request)
+                        response = application(self, request)
                     }
-                    response?.headers["Date"] = self.dateFormatter.string(from: Date())
+                    response?.headers["Date"] = dateFormatter.string(from: Date())
 
                     var writeBuffer = response.serialized()
-                    if let cryptographer = self.cryptographer {
+                    if let cryptographer = cryptographer {
                         writeBuffer = try! cryptographer.encrypt(writeBuffer)
                     }
                     if let response = response as? UpgradeResponse {
-                        self.cryptographer = response.cryptographer
+                        cryptographer = response.cryptographer
                         // todo?: override response
                     }
                     try! socket.write(from: writeBuffer)
-                    self.httpParser.reset()
+                    httpParser.reset()
                 }
                 socket.close()
             }
@@ -100,7 +94,7 @@ public class Server: NSObject, NetServiceDelegate {
             while self.socket.isListening {
                 let client = try! self.socket.acceptClientConnection()
                 DispatchQueue.main.async {
-                    _ = Connection(socket: client, queue: self.queue, application: self.application)
+                    _ = Connection().listen(socket: client, queue: self.queue, application: self.application)
                 }
             }
         }

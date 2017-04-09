@@ -3,4 +3,6 @@ import XCTest
 
 XCTMain([
      testCase(PairSetupControllerTests.allTests),
+    testCase(EndpointTests.allTests),
+    testCase(PairSetupControllerTests.allTests),
 ])

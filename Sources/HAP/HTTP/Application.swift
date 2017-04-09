@@ -1,4 +1,4 @@
 import Foundation
 import KituraNet
 
-public typealias Application = (Server.Connection, HTTPServerRequest) -> Response
+public typealias Application = (Server.Connection, ServerRequest) -> Response
