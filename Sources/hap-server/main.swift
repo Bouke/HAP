@@ -12,11 +12,12 @@ fileprivate let logger = getLogger("demo")
     import Dispatch
 #endif
 
-getLogger("hap").logLevel = .info
-getLogger("http").logLevel = .info
+getLogger("hap").logLevel = .debug
+getLogger("http").logLevel = .debug
 
 let storage = try FileStorage(path: "db")
 if CommandLine.arguments.contains("--recreate") {
+    logger.info("Dropping all pairings, keys")
     try storage.removeAll()
 }
 
