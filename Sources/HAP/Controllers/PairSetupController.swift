@@ -35,8 +35,8 @@ class PairSetupController {
         let (salt, serverPublicKey) = session.server.getChallenge()
         
         logger.info("Pair setup started")
-        logger.debug("<-- B \(salt.hex)")
-        logger.debug("<-- s \(serverPublicKey.hex)")
+        logger.debug("<-- s \(salt.hex)")
+        logger.debug("<-- B \(serverPublicKey.hex)")
         
         let result: PairTagTLV8 = [
             .sequence: Data(bytes: [PairSetupStep.startResponse.rawValue]),
