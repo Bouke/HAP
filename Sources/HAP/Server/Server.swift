@@ -8,13 +8,15 @@ import func Evergreen.getLogger
     import NetService
 #endif
 
-fileprivate let logger = getLogger("hap")
+fileprivate let logger = getLogger("hap.http")
 
 
 public class Server: NSObject, NetServiceDelegate {
     public class Connection: NSObject {
         var context = [String: Any]()
+        var socket: Socket?
         func listen(socket: Socket, queue: DispatchQueue, application: @escaping Application) {
+            self.socket = socket
             let httpParser = HTTPParser(isRequest: true)
             var cryptographer: Cryptographer? = nil
             let request = HTTPServerRequest(socket: socket, httpParser: httpParser)
@@ -58,7 +60,9 @@ public class Server: NSObject, NetServiceDelegate {
                     try! socket.write(from: writeBuffer)
                     httpParser.reset()
                 }
+                logger.debug("Closed connection to \(socket.remoteHostname)")
                 socket.close()
+                self.socket = nil
             }
         }
     }
@@ -94,6 +98,7 @@ public class Server: NSObject, NetServiceDelegate {
         queue.async {
             while self.socket.isListening {
                 let client = try! self.socket.acceptClientConnection()
+                logger.info("Accepted connection from \(client.remoteHostname)")
                 DispatchQueue.main.async {
                     _ = Connection().listen(socket: client, queue: self.queue, application: self.application)
                 }
