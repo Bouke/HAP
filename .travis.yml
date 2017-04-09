@@ -21,3 +21,4 @@ matrix:
         - make && make check
         - sudo make install
         - cd ..
+        - sudo ldconfig

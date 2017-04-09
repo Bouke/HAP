@@ -55,6 +55,7 @@ Otherwise you have to compile and install libsodium from source;
     ./configure
     make && make check
     sudo make install
+    sudo ldconfig
 
 And then build the project itself:
 
