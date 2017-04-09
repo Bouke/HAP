@@ -25,16 +25,18 @@ class EndpointTests: XCTestCase {
         guard let services = accessory["services"] as? [[String: Any]] else {
             return XCTFail("No services")
         }
+        
         guard let metaService = services.first(where: { ($0["type"] as? String) == "3E" }) else {
             return XCTFail("No meta")
         }
         XCTAssertEqual(metaService["iid"] as? Int, 1)
-        XCTAssertEqual((metaService["characteristics"] as? NSArray)?.count, 5)
+        XCTAssertEqual((metaService["characteristics"] as? [Any])?.count, 5)
+        
         guard let lampService = services.first(where: { ($0["type"] as? String) == "43" }) else {
             return XCTFail("No lamp")
         }
         XCTAssertEqual(lampService["iid"] as? Int, 7)
-        XCTAssertEqual((lampService["characteristics"] as? NSArray)?.count, 4)
+        XCTAssertEqual((lampService["characteristics"] as? [Any])?.count, 4)
     }
 
     
