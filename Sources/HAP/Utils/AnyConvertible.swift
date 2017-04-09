@@ -11,10 +11,11 @@ extension Bool: AnyConvertible {
         return self as Any
     }
     public init?(value: Any) {
-        guard let bool = value as? Bool else {
-            return nil
+        switch value {
+        case let value as Int: self = value == 1
+        case let value as Bool: self = value
+        default: return nil
         }
-        self = bool
     }
     static public var format: Characteristic.Format? {
         return .bool

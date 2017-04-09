@@ -39,32 +39,47 @@ func characteristics(device: Device) -> Application {
 
         case "PUT":
             var body = Data()
-            guard
-                let _  = try? request.readAllData(into: &body),
+            guard let _  = try? request.readAllData(into: &body),
                 let deserialized = try? JSONSerialization.jsonObject(with: body, options: []),
                 let dict = deserialized as? [String: [[String: Any]]],
-                let items = dict["characteristics"] else {
-                    return .badRequest
+                let items = dict["characteristics"] else
+            {
+                logger.warning("Could not decode JSON")
+                return .badRequest
             }
 
             for item in items {
-                guard let aid = (item["aid"] as? NSNumber).flatMap({$0.intValue}), let iid = (item["iid"] as? NSNumber).flatMap({$0.intValue}) else {
+                print(item)
+                guard let aid = item["aid"] as? Int,
+                    let iid = item["iid"] as? Int else
+                {
+                    logger.warning("Missing either aid/iid keys")
                     return .badRequest
                 }
-                guard let characteristic = device.accessories.first(where: {$0.aid == aid})?.services.flatMap({$0.characteristics.filter({$0.iid == iid})}).first else {
+                guard let characteristic = device.accessories
+                    .first(where: {$0.aid == aid})?
+                    .services
+                    .flatMap({$0.characteristics.filter({$0.iid == iid})})
+                    .first else
+                {
                     return .notFound
                 }
 
                 // set new value
                 if let value = item["value"] {
                     do {
+                        logger.debug("Setting \(characteristic) to new value \(value) (type: \(type(of: value)))")
                         switch value {
-                        case let value as NSNumber: try characteristic.setValue(value, fromConnection: connection)
-                        case let value as NSString: try characteristic.setValue(value, fromConnection: connection)
+                        case let value as Int: try characteristic.setValue(value, fromConnection: connection)
+                        case let value as Double: try characteristic.setValue(value, fromConnection: connection)
+                        case let value as String: try characteristic.setValue(value, fromConnection: connection)
                         case is NSNull: try characteristic.setValue(nil, fromConnection: connection)
-                        default: return .badRequest
+                        default:
+                            logger.error("Unexpected new value type: \(type(of: value))")
+                            return .badRequest
                         }
                     } catch {
+                        logger.error("Error while trying to set new value: \(error)")
                         return .badRequest
                     }
 
