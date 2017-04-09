@@ -4,7 +4,11 @@ import HAP
 
 fileprivate let logger = getLogger("demo")
 
-#if os(Linux)
+
+#if os(macOS)
+    import Darwin
+#elseif os(Linux)
+    import Glibc
     import Dispatch
 #endif
 
@@ -52,9 +56,20 @@ timer.setEventHandler(handler: {
 })
 timer.resume()
 
-let server = try Server(device: device, port: 8000)
-try server.start()
-
-withExtendedLifetime(server) {
-    RunLoop.current.run()
+var keepRunning = true
+signal(SIGINT) { _ in
+    logger.info("Caught interrupt, stopping...")
+    DispatchQueue.main.async {
+        keepRunning = false
+    }
 }
+
+let server = try Server(device: device, port: 8000)
+server.start()
+
+while keepRunning {
+    RunLoop.current.run(until: Date().addingTimeInterval(2))
+}
+
+server.stop()
+logger.info("Stopped")
