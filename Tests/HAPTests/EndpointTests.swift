@@ -7,7 +7,8 @@ class EndpointTests: XCTestCase {
     static var allTests : [(String, (EndpointTests) -> () throws -> Void)] {
         return [
             ("testAccessories", testAccessories),
-            ("testCharacteristics", testCharacteristics),
+            ("testGetCharacteristics", testGetCharacteristics),
+            ("testPutCharacteristics", testPutCharacteristics),
             ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests),
         ]
     }
@@ -36,13 +37,17 @@ class EndpointTests: XCTestCase {
             return XCTFail("No lamp")
         }
         XCTAssertEqual(lampService["iid"] as? Int, 7)
-        XCTAssertEqual((lampService["characteristics"] as? [Any])?.count, 4)
+        
+        guard let lampCharacteristics = lampService["characteristics"] as? [[String: Any]] else {
+            return XCTFail("No lamp characteristics")
+        }
+        XCTAssertEqual(lampCharacteristics.count, 4)
     }
 
     
     /// This test assumes that 1.3 and 1.5 are respectively `manufacturer` and
     /// `name`. This does not need to be the case.
-    func testCharacteristics() {
+    func testGetCharacteristics() {
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", manufacturer: "Bouke"))
         let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [lamp])
         let application = characteristics(device: device)
@@ -53,15 +58,80 @@ class EndpointTests: XCTestCase {
         guard let characteristics = jsonObject["characteristics"] else {
             return XCTFail("No characteristics")
         }
+        
         guard let manufacturerCharacteristic = characteristics.first(where: { $0["iid"] as? Int == 3 }) else {
             return XCTFail("No manufacturer")
         }
         XCTAssertEqual(manufacturerCharacteristic["value"] as? String, "Bouke")
+        
         guard let nameCharacteristic = characteristics.first(where: { $0["iid"] as? Int == 5 }) else {
             return XCTFail("No name")
         }
         XCTAssertEqual(nameCharacteristic["value"] as? String, "Night stand left")
     }
+    
+    /// This test assumes that 1.3 and 1.5 are respectively `manufacturer` and
+    /// `name`. This does not need to be the case.
+    func testPutCharacteristics() {
+        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", manufacturer: "Bouke"))
+        let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [lamp])
+        let application = characteristics(device: device)
+        
+        lamp.lightbulb.on.value = false
+        lamp.lightbulb.brightness.value = 0
+
+        // turn lamp on
+        do {
+            let jsonObject: [String: [[String: Any]]] = [
+                "characteristics": [
+                    [
+                        "aid": 1,
+                        "iid": 8,
+                        "value": 1
+                    ]
+                ]
+            ]
+            let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            XCTAssertEqual(response.status, .noContent)
+            XCTAssertEqual(lamp.lightbulb.on.value, true)
+        }
+        
+        // 50% brightness
+        do {
+            let jsonObject: [String: [[String: Any]]] = [
+                "characteristics": [
+                    [
+                        "aid": 1,
+                        "iid": 9,
+                        "value": Double(50)
+                    ]
+                ]
+            ]
+            let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            XCTAssertEqual(response.status, .noContent)
+            XCTAssertEqual(lamp.lightbulb.brightness.value, 50)
+        }
+        
+        // 100% brightness
+        do {
+            let jsonObject: [String: [[String: Any]]] = [
+                "characteristics": [
+                    [
+                        "aid": 1,
+                        "iid": 9,
+                        "value": Double(100)
+                    ]
+                ]
+            ]
+            let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            XCTAssertEqual(response.status, .noContent)
+            XCTAssertEqual(lamp.lightbulb.brightness.value, 100)
+        }
+    }
+
 
     // from: https://oleb.net/blog/2017/03/keeping-xctest-in-sync/#appendix-code-generation-with-sourcery
     func testLinuxTestSuiteIncludesAllTests() {
