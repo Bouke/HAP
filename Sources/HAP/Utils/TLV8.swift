@@ -71,7 +71,7 @@ enum PairTag: UInt8 {
     case mfiSignature = 0x0b // unsure, hc re-uses 0x0a -- /pairings received 0x0b one time, could it be 0x0b?
 }
 
-enum PairMethod: UInt8 {
+enum PairingMethod: UInt8 {
     case `default` = 0, mfi, add = 3, delete
 }
 

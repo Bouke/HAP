@@ -39,7 +39,7 @@ func pairSetup(device: Device) -> Application {
         do {
             switch sequence {
             case .startRequest:
-                response = controller.startRequest(data, session)
+                response = try controller.startRequest(data, session)
             case .verifyRequest:
                 response = controller.verifyRequest(data, session)
             case .keyExchangeRequest:

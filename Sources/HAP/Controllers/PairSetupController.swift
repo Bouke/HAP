@@ -12,6 +12,7 @@ class PairSetupController {
     }
     enum Error: Swift.Error {
         case invalidParameters
+        case invalidPairingMethod
         case couldNotDecryptMessage
         case couldNotDecodeMessage
         case couldNotSign
@@ -23,7 +24,14 @@ class PairSetupController {
         self.device = device
     }
 
-    func startRequest(_ data: PairTagTLV8, _ session: Session) -> PairTagTLV8 {
+    func startRequest(_ data: PairTagTLV8, _ session: Session) throws -> PairTagTLV8 {
+        guard let method = data[.pairingMethod]?.first.flatMap({ PairingMethod(rawValue: $0) }) else {
+            throw Error.invalidParameters
+        }
+        guard method == .default else {
+            throw Error.invalidPairingMethod
+        }
+
         let (salt, serverPublicKey) = session.server.getChallenge()
         
         logger.info("Pair setup started")

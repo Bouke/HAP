@@ -11,7 +11,7 @@ func pairings(device: Device) -> Application {
             let _ = try? request.readAllData(into: &body),
             let data: PairTagTLV8 = try? decode(body),
             data[.sequence]?[0] == PairStep.request.rawValue,
-            let method = data[.pairingMethod].flatMap({PairMethod(rawValue: $0[0])}),
+            let method = data[.pairingMethod].flatMap({PairingMethod(rawValue: $0[0])}),
             let username = data[.username]
             else {
                 return .badRequest
