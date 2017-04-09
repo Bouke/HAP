@@ -65,6 +65,9 @@ public class Server: NSObject, NetServiceDelegate {
                 self.socket = nil
             }
         }
+        func writeOutOfBand(_ data: Data) {
+            try! self.socket?.write(from: data)
+        }
     }
     
     

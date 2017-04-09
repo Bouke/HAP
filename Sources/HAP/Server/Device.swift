@@ -109,20 +109,18 @@ public class Device {
     }
 
     func notify(characteristicListeners characteristic: AnyCharacteristic, exceptListener except: Server.Connection? = nil) {
-        NSLog("Device.notify(characteristicListeners:exceptListener:) is not implemented")
-//        fatalError("Not implemented")
-//        guard let listeners = characteristicEventListeners[Box(characteristic)]?.filter({$0 != except}), listeners.count > 0 else {
-//            return logger.info("Value changed, but nobody listening")
-//        }
-//        guard let event = Event(valueChangedOfCharacteristic: characteristic) else {
-//            return logger.error("Could not create value change event")
-//        }
-//        let data = event.serialized()
-//        logger.info("Value changed, notifying \(listeners.count) listener(s)")
-//        logger.debug("Listeners: \(listeners), event: \(event)")
-//        for listener in listeners {
-//            listener.write(data)
-//        }
+        guard let listeners = characteristicEventListeners[Box(characteristic)]?.filter({$0 != except}), listeners.count > 0 else {
+            return logger.info("Value changed, but nobody listening")
+        }
+        guard let event = Event(valueChangedOfCharacteristic: characteristic) else {
+            return logger.error("Could not create value change event")
+        }
+        let data = event.serialized()
+        logger.info("Value changed, notifying \(listeners.count) listener(s)")
+        logger.debug("Listeners: \(listeners), event: \(event)")
+        for listener in listeners {
+            listener.writeOutOfBand(data)
+        }
     }
 
     var config: [String: String] {
