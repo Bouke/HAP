@@ -8,11 +8,11 @@ extension Accessory {
     }
 }
 
-public enum SecuritySystemCurrentState: Int, NSObjectConvertible {
+public enum SecuritySystemCurrentState: Int, AnyConvertible {
     case stayArm = 0, awayArm, nightArm, disarmed, alarmTriggered
 }
 
-public enum SecuritySystemTargetState: Int, NSObjectConvertible {
+public enum SecuritySystemTargetState: Int, AnyConvertible {
     case stayArm = 0, awayArm, nightArm, disarmed
 }
 

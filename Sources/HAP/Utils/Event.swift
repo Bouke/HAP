@@ -22,11 +22,11 @@ struct Event {
         guard let aid = characteristic.service?.accessory?.aid else {
             return nil
         }
-        let serialized: [String: [[String: AnyObject]]] = ["characteristics": [
+        let serialized: [String: [[String: Any]]] = ["characteristics": [
             [
-                "aid": aid as AnyObject,
-                "iid": characteristic.iid as AnyObject,
-                "value": characteristic.valueAsNSObject ?? NSNull()
+                "aid": aid,
+                "iid": characteristic.iid,
+                "value": characteristic.valueAsAny ?? NSNull()
             ]
             ]]
         guard let body = try? JSONSerialization.data(withJSONObject: serialized, options: []) else {

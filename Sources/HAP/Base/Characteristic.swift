@@ -3,8 +3,8 @@ import Foundation
 protocol AnyCharacteristic: class, JSONSerializable {
     var iid: Int { get set }
     weak var service: Service? { get set }
-    func setValue(withNSObject newValue: NSObject?, fromConnection connection: Server.Connection) throws -> ()
-    var valueAsNSObject: NSObject? { get }
+    func setValue(_: Any?, fromConnection connection: Server.Connection) throws -> ()
+    var valueAsAny: Any? { get }
 }
 
 public enum Characteristic {
@@ -79,7 +79,7 @@ public enum Characteristic {
 
 }
 
-open class GenericCharacteristic<ValueType: NSObjectConvertible>: AnyCharacteristic where ValueType: Equatable {
+open class GenericCharacteristic<ValueType: AnyConvertible>: AnyCharacteristic where ValueType: Equatable {
     weak var service: Service?
 
     var iid: Int
@@ -128,15 +128,15 @@ open class GenericCharacteristic<ValueType: NSObjectConvertible>: AnyCharacteris
         self.minStep = minStep
     }
 
-    public func setValue(withNSObject newValue: NSObject?, fromConnection connection: Server.Connection) {
-        let newValue = newValue.flatMap { ValueType(withNSObject: $0) }
+    public func setValue(_ newValue: Any?, fromConnection connection: Server.Connection) {
+        let newValue = newValue.flatMap { ValueType(value: $0) }
         guard newValue != _value else { return }
         _value = newValue
         _ = onValueChange.map { $0(_value) }
     }
 
-    public var valueAsNSObject: NSObject? {
-        return value?.asNSObject
+    public var valueAsAny: Any? {
+        return value
     }
 }
 
@@ -147,7 +147,7 @@ extension GenericCharacteristic: JSONSerializable {
             "type": type.rawValue,
             "perms": permissions.map { $0.rawValue }
         ]
-        if let value = value { serialized["value"] = value.asNSObject }
+        if let value = value { serialized["value"] = value.asAny }
 
         if let description = description { serialized["description"] = description }
         if let format = format { serialized["format"] = format.rawValue }

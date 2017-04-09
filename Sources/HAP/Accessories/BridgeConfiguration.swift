@@ -12,7 +12,7 @@ import Foundation
 
 public typealias ConfigureBridgedAccessoryStatus = Data
 
-public enum DiscoverBridgedAccessories: Int, NSObjectConvertible {
+public enum DiscoverBridgedAccessories: Int, AnyConvertible {
     case startDiscovery = 0, stopDiscovery
 }
 

@@ -10,11 +10,11 @@
 
 public typealias BatteryLevel = Int
 
-public enum ChargingState: Int, NSObjectConvertible {
+public enum ChargingState: Int, AnyConvertible {
     case notCharging = 0, charging
 }
 
-public enum StatusLowBattery: Int, NSObjectConvertible {
+public enum StatusLowBattery: Int, AnyConvertible {
     case batteryLevelNormal = 0, batteryLevelLow
 }
 

@@ -8,7 +8,7 @@
 //    }
 //}
 
-public enum AirQuality: Int, NSObjectConvertible {
+public enum AirQuality: Int, AnyConvertible {
     case unknown = 0, excellent, good, fair, inferior, poor
 }
 

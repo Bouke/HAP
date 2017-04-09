@@ -8,18 +8,18 @@ extension Accessory {
     }
 }
 
-public enum CurrentHeatingCoolingState: Int, NSObjectConvertible {
+public enum CurrentHeatingCoolingState: Int, AnyConvertible {
     case off = 0, heat, cool
 }
 
-public enum TargetHeatingCoolingState: Int, NSObjectConvertible {
+public enum TargetHeatingCoolingState: Int, AnyConvertible {
     case off = 0, heat, cool, auto
 }
 
 public typealias CurrentTemperature = Double
 public typealias TargetTemperature = Double
 
-public enum TemperatureDisplayUnits: Int, NSObjectConvertible {
+public enum TemperatureDisplayUnits: Int, AnyConvertible {
     case celcius = 0, fahrenheit
 }
 

@@ -8,11 +8,11 @@ extension Accessory {
     }
 }
 
-public enum CurrentDoorState: Int, NSObjectConvertible {
+public enum CurrentDoorState: Int, AnyConvertible {
     case open = 0, closed, opening, closing, stopped
 }
 
-public enum TargetDoorState: Int, NSObjectConvertible {
+public enum TargetDoorState: Int, AnyConvertible {
     case open = 0, closed
 }
 

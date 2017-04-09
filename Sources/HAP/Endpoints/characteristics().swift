@@ -16,7 +16,7 @@ func characteristics(device: Device) -> Application {
 
             let paths = id.components(separatedBy: ",").map { $0.components(separatedBy: ".").flatMap { Int($0) } }
 
-            var serialized: [[String: AnyObject]] = []
+            var serialized: [[String: Any]] = []
             for path in paths {
                 guard path.count == 2 else {
                     return .badRequest
@@ -28,9 +28,9 @@ func characteristics(device: Device) -> Application {
                         return .notFound
                 }
                 serialized.append([
-                    "aid": path[0] as AnyObject,
-                    "iid": path[1] as AnyObject,
-                    "value": characteristic.valueAsNSObject ?? NSNull()
+                    "aid": path[0],
+                    "iid": path[1],
+                    "value": characteristic.valueAsAny ?? NSNull()
                 ])
             }
 
@@ -42,7 +42,7 @@ func characteristics(device: Device) -> Application {
             guard
                 let _  = try? request.readAllData(into: &body),
                 let deserialized = try? JSONSerialization.jsonObject(with: body, options: []),
-                let dict = deserialized as? [String: [[String: AnyObject]]],
+                let dict = deserialized as? [String: [[String: Any]]],
                 let items = dict["characteristics"] else {
                     return .badRequest
             }
@@ -59,9 +59,9 @@ func characteristics(device: Device) -> Application {
                 if let value = item["value"] {
                     do {
                         switch value {
-                        case let value as NSNumber: try characteristic.setValue(withNSObject: value, fromConnection: connection)
-                        case let value as NSString: try characteristic.setValue(withNSObject: value, fromConnection: connection)
-                        case is NSNull: try characteristic.setValue(withNSObject: nil, fromConnection: connection)
+                        case let value as NSNumber: try characteristic.setValue(value, fromConnection: connection)
+                        case let value as NSString: try characteristic.setValue(value, fromConnection: connection)
+                        case is NSNull: try characteristic.setValue(nil, fromConnection: connection)
                         default: return .badRequest
                         }
                     } catch {

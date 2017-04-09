@@ -8,11 +8,11 @@ extension Accessory {
     }
 }
 
-public enum LockCurrentState: Int, NSObjectConvertible {
+public enum LockCurrentState: Int, AnyConvertible {
     case unsecured = 0, secured, jammed, unknown
 }
 
-public enum LockTargetState: Int, NSObjectConvertible {
+public enum LockTargetState: Int, AnyConvertible {
     case unsecured = 0, secured
 }
 

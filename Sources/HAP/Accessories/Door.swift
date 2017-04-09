@@ -10,7 +10,7 @@ extension Accessory {
 
 public typealias CurrentPosition = Int
 
-public enum PositionState: Int, NSObjectConvertible {
+public enum PositionState: Int, AnyConvertible {
     case decreasing = 0, increasing, stopped
 }
 

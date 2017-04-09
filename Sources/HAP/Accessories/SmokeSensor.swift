@@ -8,7 +8,7 @@
 //    }
 //}
 
-public enum SmokeDetected: Int, NSObjectConvertible {
+public enum SmokeDetected: Int, AnyConvertible {
     case smokeNotDetected = 0, smokeDetected
 }
 

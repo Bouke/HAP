@@ -1,17 +1,17 @@
 import Foundation
 
-public protocol NSObjectConvertible {
-    init?(withNSObject object: NSObject)
-    var asNSObject: NSObject { get }
+public protocol AnyConvertible {
+    init?(value: Any)
+    var asAny: Any { get }
     static var format: Characteristic.Format? { get }
 }
 
-extension Bool: NSObjectConvertible {
-    public var asNSObject: NSObject {
-        return self as NSObject
+extension Bool: AnyConvertible {
+    public var asAny: Any {
+        return self as Any
     }
-    public init?(withNSObject object: NSObject) {
-        guard let bool = object as? Bool else {
+    public init?(value: Any) {
+        guard let bool = value as? Bool else {
             return nil
         }
         self = bool
@@ -21,12 +21,12 @@ extension Bool: NSObjectConvertible {
     }
 }
 
-extension String: NSObjectConvertible {
-    public var asNSObject: NSObject {
-        return self as NSObject
+extension String: AnyConvertible {
+    public var asAny: Any {
+        return self as Any
     }
-    public init?(withNSObject object: NSObject) {
-        guard let string = object as? String else {
+    public init?(value: Any) {
+        guard let string = value as? String else {
             return nil
         }
         self = string
@@ -36,12 +36,12 @@ extension String: NSObjectConvertible {
     }
 }
 
-extension Int: NSObjectConvertible {
-    public var asNSObject: NSObject {
-        return self as NSObject
+extension Int: AnyConvertible {
+    public var asAny: Any {
+        return self as Any
     }
-    public init?(withNSObject object: NSObject) {
-        guard let int = object as? Int else {
+    public init?(value: Any) {
+        guard let int = value as? Int else {
             return nil
         }
         self = int
@@ -51,12 +51,12 @@ extension Int: NSObjectConvertible {
     }
 }
 
-extension Double: NSObjectConvertible {
-    public var asNSObject: NSObject {
-        return self as NSObject
+extension Double: AnyConvertible {
+    public var asAny: Any {
+        return self as Any
     }
-    public init?(withNSObject object: NSObject) {
-        guard let double = object as? Double else {
+    public init?(value: Any) {
+        guard let double = value as? Double else {
             return nil
         }
         self = double
@@ -66,12 +66,12 @@ extension Double: NSObjectConvertible {
     }
 }
 
-extension Float: NSObjectConvertible {
-    public var asNSObject: NSObject {
-        return self as NSObject
+extension Float: AnyConvertible {
+    public var asAny: Any {
+        return self as Any
     }
-    public init?(withNSObject object: NSObject) {
-        guard let float = object as? Float else {
+    public init?(value: Any) {
+        guard let float = value as? Float else {
             return nil
         }
         self = float
@@ -81,12 +81,12 @@ extension Float: NSObjectConvertible {
     }
 }
 
-extension Data: NSObjectConvertible {
-    public var asNSObject: NSObject {
-        return self as NSObject
+extension Data: AnyConvertible {
+    public var asAny: Any {
+        return self as Any
     }
-    public init?(withNSObject object: NSObject) {
-        guard let data = object as? Data else {
+    public init?(value: Any) {
+        guard let data = value as? Data else {
             return nil
         }
         self = data
@@ -96,15 +96,15 @@ extension Data: NSObjectConvertible {
     }
 }
 
-extension RawRepresentable where RawValue: NSObjectConvertible {
-    public init?(withNSObject object: NSObject) {
-        guard let rawValue = object as? RawValue else {
+extension RawRepresentable where RawValue: AnyConvertible {
+    public init?(value: Any) {
+        guard let rawValue = value as? RawValue else {
             return nil
         }
         self.init(rawValue: rawValue)
     }
-    public var asNSObject: NSObject {
-        return rawValue.asNSObject
+    public var asAny: Any {
+        return rawValue.asAny
     }
     public static var format: Characteristic.Format? {
         return RawValue.format
