@@ -8,18 +8,18 @@ extension Accessory {
     }
 }
 
-public enum CurrentHeatingCoolingState: Int, AnyConvertible {
+public enum CurrentHeatingCoolingState: Int, CharacteristicValueType {
     case off = 0, heat, cool
 }
 
-public enum TargetHeatingCoolingState: Int, AnyConvertible {
+public enum TargetHeatingCoolingState: Int, CharacteristicValueType {
     case off = 0, heat, cool, auto
 }
 
 public typealias CurrentTemperature = Double
 public typealias TargetTemperature = Double
 
-public enum TemperatureDisplayUnits: Int, AnyConvertible {
+public enum TemperatureDisplayUnits: Int, CharacteristicValueType {
     case celcius = 0, fahrenheit
 }
 

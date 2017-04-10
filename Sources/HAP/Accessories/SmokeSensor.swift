@@ -8,7 +8,7 @@
 //    }
 //}
 
-public enum SmokeDetected: Int, AnyConvertible {
+public enum SmokeDetected: Int, CharacteristicValueType {
     case smokeNotDetected = 0, smokeDetected
 }
 

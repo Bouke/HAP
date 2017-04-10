@@ -10,7 +10,7 @@ extension Accessory {
 
 public typealias CurrentPosition = Int
 
-public enum PositionState: Int, AnyConvertible {
+public enum PositionState: Int, CharacteristicValueType {
     case decreasing = 0, increasing, stopped
 }
 

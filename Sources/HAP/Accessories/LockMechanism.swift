@@ -8,11 +8,11 @@ extension Accessory {
     }
 }
 
-public enum LockCurrentState: Int, AnyConvertible {
+public enum LockCurrentState: Int, CharacteristicValueType {
     case unsecured = 0, secured, jammed, unknown
 }
 
-public enum LockTargetState: Int, AnyConvertible {
+public enum LockTargetState: Int, CharacteristicValueType {
     case unsecured = 0, secured
 }
 

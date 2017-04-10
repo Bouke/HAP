@@ -8,7 +8,7 @@
 //    }
 //}
 
-public enum AirQuality: Int, AnyConvertible {
+public enum AirQuality: Int, CharacteristicValueType {
     case unknown = 0, excellent, good, fair, inferior, poor
 }
 

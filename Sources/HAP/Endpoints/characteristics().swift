@@ -30,7 +30,7 @@ func characteristics(device: Device) -> Application {
                 serialized.append([
                     "aid": path[0],
                     "iid": path[1],
-                    "value": characteristic.valueAsAny ?? NSNull()
+                    "value": characteristic.getValue() ?? NSNull()
                 ])
             }
 
@@ -67,19 +67,17 @@ func characteristics(device: Device) -> Application {
 
                 // set new value
                 if let value = item["value"] {
+                    NSLog("Do not send value update to connection it came from")
+                    logger.debug("Setting \(characteristic) to new value \(value) (type: \(type(of: value)))")
                     do {
-                        logger.debug("Setting \(characteristic) to new value \(value) (type: \(type(of: value)))")
                         switch value {
-                        case let value as Int: try characteristic.setValue(value, fromConnection: connection)
-                        case let value as Double: try characteristic.setValue(value, fromConnection: connection)
-                        case let value as String: try characteristic.setValue(value, fromConnection: connection)
-                        case is NSNull: try characteristic.setValue(nil, fromConnection: connection)
+                        case is NSNull:
+                            try characteristic.setValue(nil, fromConnection: connection)
                         default:
-                            logger.error("Unexpected new value type: \(type(of: value))")
-                            return .badRequest
+                            try characteristic.setValue(value, fromConnection: connection)
                         }
                     } catch {
-                        logger.error("Error while trying to set new value: \(error)")
+                        NSLog("Could not set value: \(error)")
                         return .badRequest
                     }
 

@@ -43,7 +43,7 @@ public class Device {
     let storage: Storage
     let clients: Clients
     public let accessories: [Accessory]
-    internal var characteristicEventListeners: [Box<AnyCharacteristic>: WeakObjectSet<Server.Connection>]
+    internal var characteristicEventListeners: [Box<Characteristic>: WeakObjectSet<Server.Connection>]
     public var onIdentify: [(Accessory?) -> ()] = []
 
     public init(name: String, pin: String, storage: Storage, accessories: [Accessory]) {
@@ -92,7 +92,7 @@ public class Device {
         return false
     }
 
-    func add(characteristic: AnyCharacteristic, listener: Server.Connection) {
+    func add(characteristic: Characteristic, listener: Server.Connection) {
         if let _ = characteristicEventListeners[Box(characteristic)] {
             characteristicEventListeners[Box(characteristic)]!.addObject(object: listener)
         } else {
@@ -101,14 +101,14 @@ public class Device {
     }
 
     @discardableResult
-    func remove(characteristic: AnyCharacteristic, listener connection: Server.Connection) -> Server.Connection? {
+    func remove(characteristic: Characteristic, listener connection: Server.Connection) -> Server.Connection? {
         guard let _ = characteristicEventListeners[Box(characteristic)] else {
             return nil
         }
         return characteristicEventListeners[Box(characteristic)]!.remove(connection)
     }
 
-    func notify(characteristicListeners characteristic: AnyCharacteristic, exceptListener except: Server.Connection? = nil) {
+    func notify(characteristicListeners characteristic: Characteristic, exceptListener except: Server.Connection? = nil) {
         guard let listeners = characteristicEventListeners[Box(characteristic)]?.filter({$0 != except}), listeners.count > 0 else {
             return logger.info("Value changed, but nobody listening")
         }

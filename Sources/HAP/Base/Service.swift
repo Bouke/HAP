@@ -24,9 +24,9 @@ open class Service {
 
     var iid: Int
     public let type: ServiceType
-    let characteristics: [AnyCharacteristic]
+    let characteristics: [Characteristic]
 
-    init(iid: Int = 0, type: ServiceType, characteristics: [AnyCharacteristic]) {
+    init(iid: Int = 0, type: ServiceType, characteristics: [Characteristic]) {
         self.iid = iid
         self.type = type
         self.characteristics = characteristics

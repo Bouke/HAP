@@ -10,11 +10,11 @@
 
 public typealias BatteryLevel = Int
 
-public enum ChargingState: Int, AnyConvertible {
+public enum ChargingState: Int, CharacteristicValueType {
     case notCharging = 0, charging
 }
 
-public enum StatusLowBattery: Int, AnyConvertible {
+public enum StatusLowBattery: Int, CharacteristicValueType {
     case batteryLevelNormal = 0, batteryLevelLow
 }
 

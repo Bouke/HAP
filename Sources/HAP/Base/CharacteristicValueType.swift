@@ -1,12 +1,13 @@
 import Foundation
 
-public protocol AnyConvertible {
+public protocol CharacteristicValueType: Equatable {
     init?(value: Any)
     var asAny: Any { get }
-    static var format: Characteristic.Format? { get }
+    static var format: CharacteristicFormat { get }
 }
 
-extension Bool: AnyConvertible {
+
+extension Bool: CharacteristicValueType {
     public var asAny: Any {
         return self as Any
     }
@@ -17,12 +18,10 @@ extension Bool: AnyConvertible {
         default: return nil
         }
     }
-    static public var format: Characteristic.Format? {
-        return .bool
-    }
+    static public let format = CharacteristicFormat.bool
 }
 
-extension String: AnyConvertible {
+extension String: CharacteristicValueType {
     public var asAny: Any {
         return self as Any
     }
@@ -32,12 +31,10 @@ extension String: AnyConvertible {
         }
         self = string
     }
-    static public var format: Characteristic.Format? {
-        return .string
-    }
+    static public let format = CharacteristicFormat.string
 }
 
-extension Int: AnyConvertible {
+extension Int: CharacteristicValueType {
     public var asAny: Any {
         return self as Any
     }
@@ -47,12 +44,10 @@ extension Int: AnyConvertible {
         }
         self = int
     }
-    static public var format: Characteristic.Format? {
-        return .uint64
-    }
+    static public let format = CharacteristicFormat.uint64
 }
 
-extension Double: AnyConvertible {
+extension Double: CharacteristicValueType {
     public var asAny: Any {
         return self as Any
     }
@@ -62,12 +57,10 @@ extension Double: AnyConvertible {
         }
         self = double
     }
-    static public var format: Characteristic.Format? {
-        return .float
-    }
+    static public let format = CharacteristicFormat.float
 }
 
-extension Float: AnyConvertible {
+extension Float: CharacteristicValueType {
     public var asAny: Any {
         return self as Any
     }
@@ -77,12 +70,10 @@ extension Float: AnyConvertible {
         }
         self = float
     }
-    static public var format: Characteristic.Format? {
-        return .float
-    }
+    static public let format = CharacteristicFormat.float
 }
 
-extension Data: AnyConvertible {
+extension Data: CharacteristicValueType {
     public var asAny: Any {
         return self as Any
     }
@@ -92,12 +83,10 @@ extension Data: AnyConvertible {
         }
         self = data
     }
-    static public var format: Characteristic.Format? {
-        return .data
-    }
+    static public let format = CharacteristicFormat.data
 }
 
-extension RawRepresentable where RawValue: AnyConvertible {
+extension RawRepresentable where RawValue: CharacteristicValueType {
     public init?(value: Any) {
         guard let rawValue = value as? RawValue else {
             return nil
@@ -107,7 +96,7 @@ extension RawRepresentable where RawValue: AnyConvertible {
     public var asAny: Any {
         return rawValue.asAny
     }
-    public static var format: Characteristic.Format? {
+    public static var format: CharacteristicFormat {
         return RawValue.format
     }
 }

@@ -8,11 +8,11 @@ extension Accessory {
     }
 }
 
-public enum SecuritySystemCurrentState: Int, AnyConvertible {
+public enum SecuritySystemCurrentState: Int, CharacteristicValueType {
     case stayArm = 0, awayArm, nightArm, disarmed, alarmTriggered
 }
 
-public enum SecuritySystemTargetState: Int, AnyConvertible {
+public enum SecuritySystemTargetState: Int, CharacteristicValueType {
     case stayArm = 0, awayArm, nightArm, disarmed
 }
 

@@ -18,7 +18,7 @@ struct Event {
         return "EVENT/1.0 \(status.rawValue) \(status.description)\r\n\(headers)\r\n".data(using: .utf8)! + body
     }
 
-    init?(valueChangedOfCharacteristic characteristic: AnyCharacteristic) {
+    init?(valueChangedOfCharacteristic characteristic: Characteristic) {
         guard let aid = characteristic.service?.accessory?.aid else {
             return nil
         }
@@ -26,7 +26,7 @@ struct Event {
             [
                 "aid": aid,
                 "iid": characteristic.iid,
-                "value": characteristic.valueAsAny ?? NSNull()
+                "value": characteristic.getValue() ?? NSNull()
             ]
             ]]
         guard let body = try? JSONSerialization.data(withJSONObject: serialized, options: []) else {

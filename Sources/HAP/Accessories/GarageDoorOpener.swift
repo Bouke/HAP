@@ -8,11 +8,11 @@ extension Accessory {
     }
 }
 
-public enum CurrentDoorState: Int, AnyConvertible {
+public enum CurrentDoorState: Int, CharacteristicValueType {
     case open = 0, closed, opening, closing, stopped
 }
 
-public enum TargetDoorState: Int, AnyConvertible {
+public enum TargetDoorState: Int, CharacteristicValueType {
     case open = 0, closed
 }
 
