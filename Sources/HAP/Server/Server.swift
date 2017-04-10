@@ -15,10 +15,10 @@ public class Server: NSObject, NetServiceDelegate {
     public class Connection: NSObject {
         var context = [String: Any]()
         var socket: Socket?
+        var cryptographer: Cryptographer? = nil
         func listen(socket: Socket, queue: DispatchQueue, application: @escaping Application) {
             self.socket = socket
             let httpParser = HTTPParser(isRequest: true)
-            var cryptographer: Cryptographer? = nil
             let request = HTTPServerRequest(socket: socket, httpParser: httpParser)
             let dateFormatter = { () -> DateFormatter in
                 let f = DateFormatter()
@@ -31,7 +31,7 @@ public class Server: NSObject, NetServiceDelegate {
                 while !socket.remoteConnectionClosed {
                     var readBuffer = Data()
                     _ = try! socket.read(into: &readBuffer)
-                    if let cryptographer = cryptographer {
+                    if let cryptographer = self.cryptographer {
                         readBuffer = try! cryptographer.decrypt(readBuffer)
                     }
                     _ = readBuffer.withUnsafeBytes {
@@ -50,11 +50,11 @@ public class Server: NSObject, NetServiceDelegate {
                     response?.headers["Date"] = dateFormatter.string(from: Date())
 
                     var writeBuffer = response.serialized()
-                    if let cryptographer = cryptographer {
+                    if let cryptographer = self.cryptographer {
                         writeBuffer = try! cryptographer.encrypt(writeBuffer)
                     }
                     if let response = response as? UpgradeResponse {
-                        cryptographer = response.cryptographer
+                        self.cryptographer = response.cryptographer
                         // todo?: override response
                     }
                     try! socket.write(from: writeBuffer)
@@ -66,7 +66,11 @@ public class Server: NSObject, NetServiceDelegate {
             }
         }
         func writeOutOfBand(_ data: Data) {
-            try! self.socket?.write(from: data)
+            var writeBuffer = data
+            if let cryptographer = cryptographer {
+                writeBuffer = try! cryptographer.encrypt(writeBuffer)
+            }
+            try! self.socket?.write(from: writeBuffer)
         }
     }
     
