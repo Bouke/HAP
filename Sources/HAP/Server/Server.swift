@@ -20,13 +20,6 @@ public class Server: NSObject, NetServiceDelegate {
             self.socket = socket
             let httpParser = HTTPParser(isRequest: true)
             let request = HTTPServerRequest(socket: socket, httpParser: httpParser)
-            let dateFormatter = { () -> DateFormatter in
-                let f = DateFormatter()
-                f.timeZone = TimeZone(identifier: "GMT")
-                f.dateFormat = "EEE',' dd MMM yyyy HH':'mm':'ss zzz"
-                f.locale = Locale(identifier: "en_US")
-                return f
-            }()
             queue.async {
                 while !socket.remoteConnectionClosed {
                     var readBuffer = Data()
@@ -52,7 +45,6 @@ public class Server: NSObject, NetServiceDelegate {
                     DispatchQueue.main.sync {
                         response = application(self, request)
                     }
-                    response?.headers["Date"] = dateFormatter.string(from: Date())
 
                     do {
                         var writeBuffer = response.serialized()
