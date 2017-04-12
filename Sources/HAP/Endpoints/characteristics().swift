@@ -86,7 +86,7 @@ func characteristics(device: Device) -> Application {
                 }
 
                 // toggle events for this characteristic on this connection
-                if let events = (item["ev"] as? NSNumber).flatMap({$0.boolValue}) {
+                if let events = item["ev"] as? Bool {
                     if events {
                         device.add(characteristic: characteristic, listener: connection)
                         logger.info("Added listener for \(characteristic)")
