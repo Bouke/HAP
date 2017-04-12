@@ -68,6 +68,7 @@ public class Server: NSObject, NetServiceDelegate {
             }
         }
         func writeOutOfBand(_ data: Data) {
+            // TODO: resolve race conditions with the read/write loop
             guard let socket = socket else {
                 return
             }
