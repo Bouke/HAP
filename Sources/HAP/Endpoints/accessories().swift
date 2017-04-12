@@ -1,5 +1,8 @@
+import func Evergreen.getLogger
 import Foundation
 import HKDF
+
+fileprivate let logger = getLogger("hap.endpoints.accessories")
 
 func accessories(device: Device) -> Application {
     return { (connection, request) in
@@ -7,7 +10,12 @@ func accessories(device: Device) -> Application {
         let serialized: [String: Any] = [
             "accessories": device.accessories.map { $0.serialized() }
         ]
-        let json = try! JSONSerialization.data(withJSONObject: serialized, options: [])
-        return Response(data: json, mimeType: "application/hap+json")
+        do {
+            let json = try JSONSerialization.data(withJSONObject: serialized, options: [])
+            return Response(data: json, mimeType: "application/hap+json")
+        } catch {
+            logger.error("Could not serialize object", error: error)
+            return .internalServerError
+        }
     }
 }

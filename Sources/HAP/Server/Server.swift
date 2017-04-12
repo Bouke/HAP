@@ -30,12 +30,17 @@ public class Server: NSObject, NetServiceDelegate {
             queue.async {
                 while !socket.remoteConnectionClosed {
                     var readBuffer = Data()
-                    _ = try! socket.read(into: &readBuffer)
-                    if let cryptographer = self.cryptographer {
-                        readBuffer = try! cryptographer.decrypt(readBuffer)
-                    }
-                    _ = readBuffer.withUnsafeBytes {
-                        httpParser.execute($0, length: readBuffer.count)
+                    do {
+                        _ = try socket.read(into: &readBuffer)
+                        if let cryptographer = self.cryptographer {
+                            readBuffer = try cryptographer.decrypt(readBuffer)
+                        }
+                        _ = readBuffer.withUnsafeBytes {
+                            httpParser.execute($0, length: readBuffer.count)
+                        }
+                    } catch {
+                        logger.error("Error while reading from socket", error: error)
+                        break
                     }
 
                     guard httpParser.completed else {
@@ -49,16 +54,21 @@ public class Server: NSObject, NetServiceDelegate {
                     }
                     response?.headers["Date"] = dateFormatter.string(from: Date())
 
-                    var writeBuffer = response.serialized()
-                    if let cryptographer = self.cryptographer {
-                        writeBuffer = try! cryptographer.encrypt(writeBuffer)
+                    do {
+                        var writeBuffer = response.serialized()
+                        if let cryptographer = self.cryptographer {
+                            writeBuffer = try cryptographer.encrypt(writeBuffer)
+                        }
+                        if let response = response as? UpgradeResponse {
+                            self.cryptographer = response.cryptographer
+                            // todo?: override response
+                        }
+                        try socket.write(from: writeBuffer)
+                        httpParser.reset()
+                    } catch {
+                        logger.error("Error while writing to socket", error: error)
+                        break
                     }
-                    if let response = response as? UpgradeResponse {
-                        self.cryptographer = response.cryptographer
-                        // todo?: override response
-                    }
-                    try! socket.write(from: writeBuffer)
-                    httpParser.reset()
                 }
                 logger.debug("Closed connection to \(socket.remoteHostname)")
                 socket.close()
@@ -66,11 +76,19 @@ public class Server: NSObject, NetServiceDelegate {
             }
         }
         func writeOutOfBand(_ data: Data) {
-            var writeBuffer = data
-            if let cryptographer = cryptographer {
-                writeBuffer = try! cryptographer.encrypt(writeBuffer)
+            guard let socket = socket else {
+                return
             }
-            try! self.socket?.write(from: writeBuffer)
+            do {
+                var writeBuffer = data
+                if let cryptographer = cryptographer {
+                    writeBuffer = try cryptographer.encrypt(writeBuffer)
+                }
+                try socket.write(from: writeBuffer)
+            } catch {
+                logger.error("Error while writing to socket", error: error)
+                socket.close()
+            }
         }
     }
     
@@ -104,12 +122,18 @@ public class Server: NSObject, NetServiceDelegate {
         
         queue.async {
             while self.socket.isListening {
-                let client = try! self.socket.acceptClientConnection()
-                logger.info("Accepted connection from \(client.remoteHostname)")
-                DispatchQueue.main.async {
-                    _ = Connection().listen(socket: client, queue: self.queue, application: self.application)
+                do {
+                    let client = try self.socket.acceptClientConnection()
+                    logger.info("Accepted connection from \(client.remoteHostname)")
+                    DispatchQueue.main.async {
+                        _ = Connection().listen(socket: client, queue: self.queue, application: self.application)
+                    }
+                } catch {
+                    logger.error("Could not accept connections for listening socket", error: error)
+                    break
                 }
             }
+            self.stop()
         }
         
     }

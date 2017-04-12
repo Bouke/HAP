@@ -76,4 +76,5 @@ extension Response {
     public static var ok: Response { return Response(status: .ok) }
     public static var badRequest: Response { return  Response(status: .badRequest) }
     public static var notFound: Response { return  Response(status: .notFound) }
+    public static var internalServerError: Response { return  Response(status: .internalServerError) }
 }

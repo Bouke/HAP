@@ -2,7 +2,7 @@ import Foundation
 import HKDF
 import func Evergreen.getLogger
 
-fileprivate let logger = getLogger("hap")
+fileprivate let logger = getLogger("hap.endpoints.characteristics")
 
 func characteristics(device: Device) -> Application {
     return { (connection, request) in
@@ -34,8 +34,13 @@ func characteristics(device: Device) -> Application {
                 ])
             }
 
-            let json = try! JSONSerialization.data(withJSONObject: ["characteristics": serialized], options: [])
-            return Response(data: json, mimeType: "application/hap+json")
+            do {
+                let json = try JSONSerialization.data(withJSONObject: ["characteristics": serialized], options: [])
+                return Response(data: json, mimeType: "application/hap+json")
+            } catch {
+                logger.error("Could not serialize object", error: error)
+                return .internalServerError
+            }
 
         case "PUT":
             var body = Data()
@@ -47,7 +52,6 @@ func characteristics(device: Device) -> Application {
                 logger.warning("Could not decode JSON")
                 return .badRequest
             }
-
             for item in items {
                 print(item)
                 guard let aid = item["aid"] as? Int,

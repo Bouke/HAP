@@ -33,10 +33,14 @@ public class FileStorage: Storage {
         }
         set {
             let entityPath = URL(fileURLWithPath: path).appendingPathComponent(key)
-            if let newValue = newValue {
-                try! newValue.write(to: entityPath)
-            } else {
-                try! FileManager.default.removeItem(at: entityPath)
+            do {
+                if let newValue = newValue {
+                    try newValue.write(to: entityPath)
+                } else {
+                    try FileManager.default.removeItem(at: entityPath)
+                }
+            } catch {
+                fatalError("Could not write to storage: \(error)")
             }
         }
     }

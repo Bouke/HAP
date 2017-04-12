@@ -15,8 +15,8 @@ class PairVerifyController {
         let sharedSecret: Data
         
         init?(clientPublicKey otherPublicKey: Data) {
-            let secretKey = Data(bytes: try! Random.generate(byteCount: 32))
-            guard let publicKey = crypto(crypto_scalarmult_curve25519_base, Data(count: Int(crypto_scalarmult_curve25519_BYTES)), secretKey),
+            guard let secretKey = (try? Random.generate(byteCount: 32)).flatMap({ Data(bytes: $0) }),
+                let publicKey = crypto(crypto_scalarmult_curve25519_base, Data(count: Int(crypto_scalarmult_curve25519_BYTES)), secretKey),
                 let sharedSecret = crypto(crypto_scalarmult, Data(count: Int(crypto_scalarmult_BYTES)), secretKey, otherPublicKey)
                 else {
                     return nil
@@ -53,7 +53,7 @@ class PairVerifyController {
         }
         
         let material = session.publicKey + device.identifier.data(using: .utf8)! + clientPublicKey
-        let signature = try! Ed25519.sign(privateKey: device.privateKey, message: material)
+        let signature = try Ed25519.sign(privateKey: device.privateKey, message: material)
         
         let resultInner: PairTagTLV8 = [
             .username: device.identifier.data(using: .utf8)!,

@@ -5,9 +5,13 @@ import func Evergreen.getLogger
 fileprivate let logger = getLogger("hap")
 
 func generateIdentifier() -> String {
-    return try! Random.generate(byteCount: 6)
-        .map { String($0, radix: 16, uppercase: false) }
-        .joined(separator: ":")
+    do {
+        return Data(bytes: try Random.generate(byteCount: 6))
+            .map { String($0, radix: 16, uppercase: false) }
+            .joined(separator: ":")
+    } catch {
+        fatalError("Could not generate identifier: \(error)")
+    }
 }
 
 struct Box<T: Any>: Hashable, Equatable {
