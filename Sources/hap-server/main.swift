@@ -13,7 +13,8 @@ fileprivate let logger = getLogger("demo")
 #endif
 
 getLogger("hap").logLevel = .debug
-getLogger("http").logLevel = .debug
+getLogger("hap.encryption").logLevel = .info
+getLogger("hap.pair-verify").logLevel = .info
 
 let storage = try FileStorage(path: "db")
 if CommandLine.arguments.contains("--recreate") {
@@ -23,12 +24,12 @@ if CommandLine.arguments.contains("--recreate") {
 
 let livingRoomLightbulb = Accessory.Lightbulb(info: .init(name: "Living Room"))
 livingRoomLightbulb.lightbulb.on.onValueChange.append({ value in
-    logger.info("livingRoomSwitch changed value: \(value)")
+    logger.info("livingRoomSwitch changed value: \(String(describing: value))")
 })
 
 let bedroomNightStand = Accessory.Lightbulb(info: .init(name: "Bedroom"))
 bedroomNightStand.lightbulb.on.onValueChange.append({ value in
-    logger.info("bedroomNightStand changed value: \(value)")
+    logger.info("bedroomNightStand changed value: \(String(describing: value))")
 })
 
 let device = Device(name: "Bridge", pin: "123-44-321", storage: storage, accessories: [
@@ -47,7 +48,7 @@ let device = Device(name: "Bridge", pin: "123-44-321", storage: storage, accesso
     .SecuritySystem(info: .init(name: "Alarm")),
 ])
 device.onIdentify.append({ acc in
-    logger.info("Got identified: \(acc)")
+    logger.info("Got identified: \(String(describing: acc))")
 })
 
 let timer = DispatchSource.makeTimerSource()

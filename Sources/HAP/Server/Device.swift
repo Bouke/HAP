@@ -2,7 +2,7 @@ import Cryptor
 import Foundation
 import func Evergreen.getLogger
 
-fileprivate let logger = getLogger("hap")
+fileprivate let logger = getLogger("hap.device")
 
 func generateIdentifier() -> String {
     do {
