@@ -1,0 +1,57 @@
+xcodebuild_arguments:
+  - -scheme
+  - HAP
+module: HAP
+author: Bouke Haarsma
+author_url: https://twitter.com/BoukeHaarsma
+output: ../HAP-Docs/master
+theme: fullwidth
+clean: true
+github_url: https://github.com/Bouke/HAP
+dash_url: http://boukehaarsma.nl/HAP/HAP.xml
+custom_categories:
+  - name: Accessory
+    children:
+      - Accessory
+      - AccessoryType
+  - name: Service
+    children:
+      - Service
+      - ServiceType
+  - name: Characteristic
+    children:
+      - Characteristic
+      - GenericCharacteristic
+      - CharacteristicFormat
+      - CharacteristicPermission
+      - CharacteristicType
+      - CharacteristicUnit
+      - CharacteristicValueType
+  - name: Characteristic Enums
+    children:
+      - AirQuality
+      - ChargingState
+      - CurrentDoorState
+      - CurrentHeatingCoolingState
+      - DiscoverBridgedAccessories
+      - LockCurrentState
+      - LockTargetState
+      - PositionState
+      - SecuritySystemCurrentState
+      - SecuritySystemTargetState
+      - SmokeDetected
+      - StatusLowBattery
+      - TargetDoorState
+      - TargetHeatingCoolingState
+      - TemperatureDisplayUnits
+  - name: Server
+    children:
+      - Cryptographer
+      - Device
+      - Server
+  - name: Storage
+    children:
+      - Storage
+      - FileStorage
+      - MemoryStorage
+      - PrefixedKeyStorage
