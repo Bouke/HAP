@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 
 import socket
+import sys
 
+if(len(sys.argv) != 3):
+    print("expected 2 arguments")
+    sys.exit(-1)
 
-TCP_IP = '127.0.0.1'
-TCP_PORT = 8000
+TCP_IP = sys.argv[1]
+TCP_PORT = int(sys.argv[2])
 BUFFER_SIZE = 1024
 MESSAGE = """PUT /characteristics HTTP/1.1\r\nContent-Length: 121\r\n\r\n{
     "characteristics": [
