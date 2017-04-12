@@ -115,8 +115,8 @@ class PairSetupController {
         
         try Ed25519.verify(publicKey: publicKey, message: hashIn, signature: signatureIn)
         
-        // At this point, the client has successfully verified.
-        device.clients[username] = publicKey
+        // At this point, the pairing has completed.
+        device.pairings[username] = publicKey
         
         let hashOut = deriveKey(algorithm: .sha512,
                                 seed: session.server.sessionKey!,

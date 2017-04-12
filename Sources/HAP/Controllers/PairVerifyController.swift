@@ -106,7 +106,7 @@ class PairVerifyController {
         logger.debug("--> username \(String(data: username, encoding: .utf8)!)")
         logger.debug("--> signature \(signatureIn.hex)")
         
-        guard let publicKey = device.clients[username] else {
+        guard let publicKey = device.pairings[username] else {
             throw Error.noPublicKeyForUser
         }
         logger.debug("--> public key \(publicKey.hex)")

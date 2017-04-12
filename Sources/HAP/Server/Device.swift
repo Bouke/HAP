@@ -45,7 +45,7 @@ public class Device {
     let privateKey: Data
     public let pin: String
     let storage: Storage
-    let clients: Clients
+    let pairings: Pairings
     public let accessories: [Accessory]
     internal var characteristicEventListeners: [Box<Characteristic>: WeakObjectSet<Server.Connection>]
     public var onIdentify: [(Accessory?) -> ()] = []
@@ -65,7 +65,7 @@ public class Device {
             storage["sk"] = privateKey
             storage["uuid"] = identifier.data(using: .utf8)
         }
-        clients = Clients(storage: storage)
+        pairings = Pairings(storage: storage)
         self.accessories = accessories
         characteristicEventListeners = [:]
 
@@ -75,7 +75,7 @@ public class Device {
         }
     }
 
-    public class Clients {
+    public class Pairings {
         private let storage: Storage
         fileprivate init(storage: Storage) {
             self.storage = storage
