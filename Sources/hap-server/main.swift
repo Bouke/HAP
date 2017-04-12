@@ -66,11 +66,16 @@ signal(SIGINT) { _ in
     }
 }
 
-let server = try Server(device: device, port: 8000)
+let server = try Server(device: device, port: 0)
 server.start()
 
-while keepRunning {
-    RunLoop.current.run(until: Date().addingTimeInterval(2))
+if CommandLine.arguments.contains("--test") {
+    print("Running runloop for 10 seconds...")
+    RunLoop.main.run(until: Date(timeIntervalSinceNow: 10))
+} else {
+    while keepRunning {
+        RunLoop.current.run(until: Date().addingTimeInterval(2))
+    }
 }
 
 server.stop()
