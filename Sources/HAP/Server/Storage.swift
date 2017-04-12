@@ -43,7 +43,7 @@ public class FileStorage: Storage {
     public init(path: String) throws {
         if !FileManager.default.directoryExists(atPath: path) {
             do {
-                try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
+                try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: false, attributes: nil)
             } catch {
                 throw Error.couldNotCreateDirectory
             }
