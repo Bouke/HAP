@@ -12,13 +12,13 @@ class UpgradeResponse: Response {
     }
 }
 
-public class Cryptographer {
+class Cryptographer {
     var encryptCount: UInt64 = 0
     var decryptCount: UInt64 = 0
     let decryptKey: Data
     let encryptKey: Data
 
-    public init(sharedKey: Data) {
+    init(sharedKey: Data) {
         logger.debug("Shared key: \(sharedKey.hex)")
         decryptKey = HKDF.deriveKey(algorithm: .sha512,
                                     seed: sharedKey,
@@ -34,7 +34,7 @@ public class Cryptographer {
         logger.debug("Encrypt key: \(self.encryptKey.hex)")
     }
 
-    public func decrypt(_ data: Data) throws -> Data {
+    func decrypt(_ data: Data) throws -> Data {
         defer { decryptCount += 1 }
 
         logger.debug("Decrypt message #\(self.decryptCount)")
@@ -54,7 +54,7 @@ public class Cryptographer {
         return try ChaCha20Poly1305.decrypt(cipher: Data(encrypted), additional: Data(data[0..<2]), nonce: nonce, key: decryptKey)
     }
 
-    public func encrypt(_ data: Data) throws -> Data {
+    func encrypt(_ data: Data) throws -> Data {
         defer { encryptCount += 1 }
         logger.debug("Encrypt message: \(self.encryptCount)")
 

@@ -4,15 +4,15 @@ import func Evergreen.getLogger
 
 fileprivate let logger = getLogger("hap.http.router")
 
-public class Router {
-    public typealias Route = (path: String, application: Application)
+class Router {
+    typealias Route = (path: String, application: Application)
 
     let routes: [Route]
-    public init(routes: [Route]) {
+    init(routes: [Route]) {
         self.routes = routes
     }
 
-    public var application: Application {
+    var application: Application {
         return { (connection, request) in
             logger.info("\(request.method) \(request.urlURL.path)")
             for route in self.routes {

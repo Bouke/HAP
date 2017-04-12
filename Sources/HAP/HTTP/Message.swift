@@ -1,17 +1,17 @@
 import Foundation
 
-open class Response {
-    public var status = Status.ok
+class Response {
+    var status = Status.ok
 
-    public var headers = [String: String]()
+    var headers = [String: String]()
     
-    public var body: Data? {
+    var body: Data? {
         didSet {
             headers["Content-Length"] = "\(body?.count ?? 0)"
         }
     }
     
-    public var text: String? {
+    var text: String? {
         guard let body = body else { return nil }
         return String(data: body, encoding: .utf8)
     }
@@ -28,7 +28,7 @@ open class Response {
         return header.data(using: .utf8)! + (body ?? Data())
     }
     
-    public enum Status: Int, CustomStringConvertible {
+    enum Status: Int, CustomStringConvertible {
         case ok = 200, created = 201, accepted = 202, noContent = 204
         case movedPermanently = 301
         case badRequest = 400, unauthorized = 401, forbidden = 403, notFound = 404
@@ -50,12 +50,12 @@ open class Response {
         }
     }
 
-    public init(status: Status) {
+    init(status: Status) {
         self.status = status
         headers["Content-Length"] = "0"
     }
 
-    public convenience init(status: Status = .ok, data: Data, mimeType: String) {
+    convenience init(status: Status = .ok, data: Data, mimeType: String) {
         self.init(status: status)
         headers["Content-Type"] = mimeType
         // Defer setting body, so that body.didSet will be called.
@@ -64,7 +64,7 @@ open class Response {
         }
     }
 
-    public convenience init(status: Status = .ok, text: String, mimeType: String = "text/html") {
+    convenience init(status: Status = .ok, text: String, mimeType: String = "text/html") {
         guard let data = text.data(using: .utf8) else {
             abort()
         }
@@ -73,8 +73,8 @@ open class Response {
 }
 
 extension Response {
-    public static var ok: Response { return Response(status: .ok) }
-    public static var badRequest: Response { return  Response(status: .badRequest) }
-    public static var notFound: Response { return  Response(status: .notFound) }
-    public static var internalServerError: Response { return  Response(status: .internalServerError) }
+    static var ok: Response { return Response(status: .ok) }
+    static var badRequest: Response { return  Response(status: .badRequest) }
+    static var notFound: Response { return  Response(status: .notFound) }
+    static var internalServerError: Response { return  Response(status: .internalServerError) }
 }
