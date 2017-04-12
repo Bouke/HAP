@@ -9,24 +9,6 @@ The goal of this package is to provide a complete implementation of the Homekit 
 
 Currently ``GenericCharacteristic<T>`` is used, to allow for user-defined value types. As Swift requires homegenous arrays, a protocol ``AnyCharacteristic`` is introduced. I don't like the resulting implementation as the generics result in a cascade of workarounds (boxing + ``ObjectIdentifier()``).
 
-## Status
-
-* [x] Setup
-* [x] Pairing
-* [x] Updating values
-* [x] Notifications
-* [x] Split ``hap-server`` into executable and library
-* [x] Accessory identify callback
-* [½] Include all Accessories, Services and Characteristics
-* [x] Replaced OpenSSL with portable BlueCryptor
-* [ ] Overall cleanup
-* [ ] Documentation
-* [ ] Tests
-* [ ] Verify authentication in /characteristic and /accessories
-* [ ] Validate characteristic's permissions before setting new value
-* [ ] Callbacks for when characteristic is subscribed to (only update when needed)
-* [ ] Characteristic's value should only be nillable for write-only values
-
 ## How to build
 
 ### MacOS
