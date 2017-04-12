@@ -3,6 +3,34 @@ import Foundation
 public protocol Storage: class {
     subscript(key: String) -> Data? { get set }
     func removeAll() throws
+    var keys: [String] { get }
+}
+
+public class PrefixedKeyStorage: Storage {
+    let prefix: String
+    let backing: Storage
+    init(prefix: String, backing: Storage) {
+        self.prefix = prefix
+        self.backing = backing
+    }
+    public subscript(key: String) -> Data? {
+        get {
+            return backing["\(prefix)\(key)"]
+        }
+        set {
+            backing["\(prefix)\(key)"] = newValue
+        }
+    }
+    public func removeAll() throws {
+        keys.forEach {
+            backing["\(prefix)\($0)"] = nil
+        }
+    }
+    public var keys: [String] {
+        return backing.keys
+            .filter { $0.hasPrefix(prefix) }
+            .map { $0.replacingOccurrences(of: prefix, with: "") }
+    }
 }
 
 public class FileStorage: Storage {
@@ -50,6 +78,14 @@ public class FileStorage: Storage {
             try FileManager.default.removeItem(atPath: "\(path)/\(file)")
         }
     }
+
+    public var keys: [String] {
+        do {
+            return try FileManager.default.contentsOfDirectory(atPath: path)
+        } catch {
+            fatalError("Could not get keys: \(error)")
+        }
+    }
 }
 
 public class MemoryStorage: Storage {
@@ -64,5 +100,8 @@ public class MemoryStorage: Storage {
     }
     public func removeAll() throws {
         memory = [:]
+    }
+    public var keys: [String] {
+        return Array(memory.keys)
     }
 }

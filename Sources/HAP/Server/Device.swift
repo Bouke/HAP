@@ -65,7 +65,7 @@ public class Device {
             storage["sk"] = privateKey
             storage["uuid"] = identifier.data(using: .utf8)
         }
-        pairings = Pairings(storage: storage)
+        pairings = Pairings(storage: PrefixedKeyStorage(prefix: "pairing.", backing: storage))
         self.accessories = accessories
         characteristicEventListeners = [:]
 
@@ -75,8 +75,8 @@ public class Device {
         }
     }
 
-    public class Pairings {
-        private let storage: Storage
+    class Pairings {
+        fileprivate let storage: Storage
         fileprivate init(storage: Storage) {
             self.storage = storage
         }
@@ -92,8 +92,7 @@ public class Device {
     }
 
     public var isPaired: Bool {
-        // @todo if number of clients > 0 return true
-        return false
+        return !pairings.storage.keys.isEmpty
     }
 
     func add(characteristic: Characteristic, listener: Server.Connection) {
