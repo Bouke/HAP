@@ -8,7 +8,8 @@ class EndpointTests: XCTestCase {
         return [
             ("testAccessories", testAccessories),
             ("testGetCharacteristics", testGetCharacteristics),
-            ("testPutCharacteristics", testPutCharacteristics),
+            ("testPutBoolAndIntCharacteristics", testPutBoolAndIntCharacteristics),
+            ("testPutDoubleAndEnumCharacteristics", testPutDoubleAndEnumCharacteristics),
             ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests),
         ]
     }
@@ -72,7 +73,7 @@ class EndpointTests: XCTestCase {
     
     /// This test assumes that 1.3 and 1.5 are respectively `manufacturer` and
     /// `name`. This does not need to be the case.
-    func testPutCharacteristics() {
+    func testPutBoolAndIntCharacteristics() {
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", manufacturer: "Bouke"))
         let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [lamp])
         let application = characteristics(device: device)
@@ -129,6 +130,43 @@ class EndpointTests: XCTestCase {
             let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .noContent)
             XCTAssertEqual(lamp.lightbulb.brightness.value, 100)
+        }
+    }
+
+    /// This test assumes that 1.3 and 1.5 are respectively `manufacturer` and
+    /// `name`. This does not need to be the case.
+    func testPutDoubleAndEnumCharacteristics() {
+        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat", manufacturer: "Bouke"))
+        let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [thermostat])
+        let application = characteristics(device: device)
+        
+        thermostat.thermostat.currentHeatingCoolingState.value = .off
+        thermostat.thermostat.currentTemperature.value = 18
+
+        thermostat.thermostat.targetHeatingCoolingState.value = .off
+        thermostat.thermostat.targetTemperature.value = 15
+        
+        // turn up the heat
+        do {
+            let jsonObject: [String: [[String: Any]]] = [
+                "characteristics": [
+                    [
+                        "aid": 1,
+                        "iid": 11,
+                        "value": 19.5
+                    ],
+                    [
+                        "aid": 1,
+                        "iid": 9,
+                        "value": 3
+                    ]
+                ]
+            ]
+            let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            XCTAssertEqual(response.status, .noContent)
+            XCTAssertEqual(thermostat.thermostat.targetTemperature.value, 19.5)
+            XCTAssertEqual(thermostat.thermostat.targetHeatingCoolingState.value, .auto)
         }
     }
 

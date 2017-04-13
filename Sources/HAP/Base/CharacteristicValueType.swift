@@ -1,17 +1,12 @@
 import Foundation
 
 public protocol CharacteristicValueType: Equatable, JSONValueTypeConvertible {
-    init?(value: JSONValueType)
-    var asAny: Any { get }
+    init?(value: Any)
     static var format: CharacteristicFormat { get }
 }
 
-
 extension Bool: CharacteristicValueType {
-    public var asAny: Any {
-        return self as Any
-    }
-    public init?(value: JSONValueType) {
+    public init?(value: Any) {
         switch value {
         case let value as Int: self = value == 1
         case let value as Bool: self = value
@@ -25,10 +20,7 @@ extension Bool: CharacteristicValueType {
 }
 
 extension String: CharacteristicValueType {
-    public var asAny: Any {
-        return self as Any
-    }
-    public init?(value: JSONValueType) {
+    public init?(value: Any) {
         guard let string = value as? String else {
             return nil
         }
@@ -41,10 +33,7 @@ extension String: CharacteristicValueType {
 }
 
 extension Int: CharacteristicValueType {
-    public var asAny: Any {
-        return self as Any
-    }
-    public init?(value: JSONValueType) {
+    public init?(value: Any) {
         guard let int = value as? Int else {
             return nil
         }
@@ -57,10 +46,7 @@ extension Int: CharacteristicValueType {
 }
 
 extension Double: CharacteristicValueType {
-    public var asAny: Any {
-        return self as Any
-    }
-    public init?(value: JSONValueType) {
+    public init?(value: Any) {
         guard let double = value as? Double else {
             return nil
         }
@@ -73,10 +59,7 @@ extension Double: CharacteristicValueType {
 }
 
 extension Float: CharacteristicValueType {
-    public var asAny: Any {
-        return self as Any
-    }
-    public init?(value: JSONValueType) {
+    public init?(value: Any) {
         guard let double = value as? Double else {
             return nil
         }
@@ -89,10 +72,7 @@ extension Float: CharacteristicValueType {
 }
 
 extension Data: CharacteristicValueType, JSONValueTypeConvertible {
-    public var asAny: Any {
-        return self as Any
-    }
-    public init?(value: JSONValueType) {
+    public init?(value: Any) {
         fatalError("How does deserialization of Data work?")
         guard let data = value as? Data else {
             return nil
@@ -106,14 +86,11 @@ extension Data: CharacteristicValueType, JSONValueTypeConvertible {
 }
 
 extension RawRepresentable where RawValue: CharacteristicValueType & JSONValueType {
-    public init?(value: JSONValueType) {
+    public init?(value: Any) {
         guard let rawValue = value as? RawValue else {
             return nil
         }
         self.init(rawValue: rawValue)
-    }
-    public var asAny: Any {
-        return rawValue.asAny
     }
     public static var format: CharacteristicFormat {
         return RawValue.format

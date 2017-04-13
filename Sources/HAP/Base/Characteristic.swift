@@ -6,7 +6,7 @@ protocol Characteristic: class, JSONSerializable {
     var type: CharacteristicType { get }
     var permissions: [CharacteristicPermission] { get }
     func getValue() -> JSONValueType?
-    func setValue(_:JSONValueType?, fromConnection: Server.Connection?) throws
+    func setValue(_: Any?, fromConnection: Server.Connection?) throws
     var description: String? { get }
     var format: CharacteristicFormat? { get }
     var unit: CharacteristicUnit? { get }
@@ -65,7 +65,7 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
         return value?.jsonValueType
     }
     
-    func setValue(_ newValue: JSONValueType?, fromConnection connection: Server.Connection?) throws {
+    func setValue(_ newValue: Any?, fromConnection connection: Server.Connection?) throws {
         switch newValue {
         case let some?:
             guard let newValue = T(value: some) else {
@@ -77,6 +77,7 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
         }
         guard let device = service?.accessory?.device else { return }
         device.notify(characteristicListeners: self, exceptListener: connection)
+        _ = onValueChange.map { $0(_value) }
     }
     
     // Subscribe a listener to value changes from (remote) clients.
@@ -107,13 +108,6 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
         self.maxValue = maxValue
         self.minValue = minValue
         self.minStep = minStep
-    }
-
-    public func setValue(_ newValue: JSONValueType?, fromConnection connection: Server.Connection) {
-        let newValue = newValue.flatMap { T(value: $0) }
-        guard newValue != _value else { return }
-        _value = newValue
-        _ = onValueChange.map { $0(_value) }
     }
 }
 

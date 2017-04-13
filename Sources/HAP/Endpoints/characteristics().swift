@@ -77,11 +77,8 @@ func characteristics(device: Device) -> Application {
                         switch value {
                         case is NSNull:
                             try characteristic.setValue(nil, fromConnection: connection)
-                        case let value as JSONValueType:
-                            try characteristic.setValue(value, fromConnection: connection)
                         default:
-                            logger.warning("Could not set value: invalid type '\(type(of: value))'")
-                            return .badRequest
+                            try characteristic.setValue(value, fromConnection: connection)
                         }
                     } catch {
                         logger.warning("Could not set value: \(error)")
