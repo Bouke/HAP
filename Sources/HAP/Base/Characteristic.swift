@@ -5,8 +5,8 @@ protocol Characteristic: class, JSONSerializable {
     var iid: Int { get set }
     var type: CharacteristicType { get }
     var permissions: [CharacteristicPermission] { get }
-    func getValue() -> Any?
-    func setValue(_:Any?, fromConnection: Server.Connection?) throws
+    func getValue() -> JSONValueType?
+    func setValue(_:JSONValueType?, fromConnection: Server.Connection?) throws
     var description: String? { get }
     var format: CharacteristicFormat? { get }
     var unit: CharacteristicUnit? { get }
@@ -17,8 +17,8 @@ protocol Characteristic: class, JSONSerializable {
 }
 
 extension Characteristic {
-    public func serialized() -> [String : Any] {
-        var serialized: [String : Any] = [
+    public func serialized() -> [String: JSONValueType] {
+        var serialized: [String: JSONValueType] = [
             "iid": iid,
             "type": type.rawValue,
             "perms": permissions.map { $0.rawValue }
@@ -61,11 +61,11 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
         }
     }
 
-    func getValue() -> Any? {
-        return value
+    func getValue() -> JSONValueType? {
+        return value?.jsonValueType
     }
     
-    func setValue(_ newValue: Any?, fromConnection connection: Server.Connection?) throws {
+    func setValue(_ newValue: JSONValueType?, fromConnection connection: Server.Connection?) throws {
         switch newValue {
         case let some?:
             guard let newValue = T(value: some) else {
@@ -109,7 +109,7 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
         self.minStep = minStep
     }
 
-    public func setValue(_ newValue: T?, fromConnection connection: Server.Connection) {
+    public func setValue(_ newValue: JSONValueType?, fromConnection connection: Server.Connection) {
         let newValue = newValue.flatMap { T(value: $0) }
         guard newValue != _value else { return }
         _value = newValue

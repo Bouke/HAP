@@ -47,7 +47,7 @@ open class Accessory {
 }
 
 extension Accessory: JSONSerializable {
-    public func serialized() -> [String : Any] {
+    public func serialized() -> [String: JSONValueType] {
         return [
             "aid": aid,
             "services": services.map { $0.serialized() }
