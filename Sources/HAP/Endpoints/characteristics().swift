@@ -53,7 +53,6 @@ func characteristics(device: Device) -> Application {
                 return .badRequest
             }
             for item in items {
-                print(item)
                 guard let aid = item["aid"] as? Int,
                     let iid = item["iid"] as? Int else
                 {
