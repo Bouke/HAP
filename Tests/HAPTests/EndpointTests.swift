@@ -158,7 +158,7 @@ class EndpointTests: XCTestCase {
                     [
                         "aid": 1,
                         "iid": 9,
-                        "value": 3
+                        "value": TargetHeatingCoolingState.auto.rawValue
                     ]
                 ]
             ]
@@ -167,6 +167,40 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(response.status, .noContent)
             XCTAssertEqual(thermostat.thermostat.targetTemperature.value, 19.5)
             XCTAssertEqual(thermostat.thermostat.targetHeatingCoolingState.value, .auto)
+        }
+        
+        // turn up the heat some more (value is an Int on Linux, needs to be cast to Double)
+        do {
+            let jsonObject: [String: [[String: Any]]] = [
+                "characteristics": [
+                    [
+                        "aid": 1,
+                        "iid": 11,
+                        "value": 20
+                    ]
+                ]
+            ]
+            let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            XCTAssertEqual(response.status, .noContent)
+            XCTAssertEqual(thermostat.thermostat.targetTemperature.value, 20)
+        }
+        
+        // turn off
+        do {
+            let jsonObject: [String: [[String: Any]]] = [
+                "characteristics": [
+                    [
+                        "aid": 1,
+                        "iid": 9,
+                        "value": TargetHeatingCoolingState.off.rawValue
+                    ]
+                ]
+            ]
+            let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            XCTAssertEqual(response.status, .noContent)
+            XCTAssertEqual(thermostat.thermostat.targetHeatingCoolingState.value, .off)
         }
     }
 
