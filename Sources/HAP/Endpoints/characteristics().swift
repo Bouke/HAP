@@ -80,7 +80,7 @@ func characteristics(device: Device) -> Application {
                             try characteristic.setValue(value, fromConnection: connection)
                         }
                     } catch {
-                        logger.warning("Could not set value: \(error)")
+                        logger.warning("Could not set value of type \(type(of: value)): \(error)")
                         return .badRequest
                     }
 
