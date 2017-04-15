@@ -47,10 +47,11 @@ extension Int: CharacteristicValueType {
 
 extension Double: CharacteristicValueType {
     public init?(value: Any) {
-        guard let double = value as? Double else {
-            return nil
+        switch value {
+        case let value as Double: self = value
+        case let value as Int: self = Double(value)
+        default: return nil
         }
-        self = double
     }
     static public let format = CharacteristicFormat.float
     public var jsonValueType: JSONValueType {
