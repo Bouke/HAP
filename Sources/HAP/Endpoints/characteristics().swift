@@ -70,7 +70,6 @@ func characteristics(device: Device) -> Application {
 
                 // set new value
                 if let value = item["value"] {
-                    NSLog("Do not send value update to connection it came from")
                     logger.debug("Setting \(characteristic) to new value \(value) (type: \(type(of: value)))")
                     do {
                         switch value {
