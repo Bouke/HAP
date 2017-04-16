@@ -45,7 +45,7 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
     
     weak var service: Service?
 
-    var iid: Int
+    public internal(set) var iid: Int
     public let type: CharacteristicType
 
     internal var _value: T?
@@ -83,18 +83,18 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
     // Subscribe a listener to value changes from (remote) clients.
     public var onValueChange: [(T?) -> ()] = []
 
-    let permissions: [CharacteristicPermission]
+    public let permissions: [CharacteristicPermission]
 
-    let description: String?
-    let format: CharacteristicFormat?
-    let unit: CharacteristicUnit?
+    public var description: String?
+    public let format: CharacteristicFormat?
+    public let unit: CharacteristicUnit?
 
-    let maxLength: Int?
-    let maxValue: Double?
-    let minValue: Double?
-    let minStep: Double?
+    public let maxLength: Int?
+    public var maxValue: Double?
+    public var minValue: Double?
+    public var minStep: Double?
 
-    init(iid: Int = 0, type: CharacteristicType, value: T? = nil, permissions: [CharacteristicPermission] = [.read, .write, .events], description: String? = nil, format: CharacteristicFormat? = nil, unit: CharacteristicUnit? = nil, maxLength: Int? = nil, maxValue: Double? = nil, minValue: Double? = nil, minStep: Double? = nil) {
+    public init(iid: Int = 0, type: CharacteristicType, value: T? = nil, permissions: [CharacteristicPermission] = [.read, .write, .events], description: String? = nil, format: CharacteristicFormat? = nil, unit: CharacteristicUnit? = nil, maxLength: Int? = nil, maxValue: Double? = nil, minValue: Double? = nil, minStep: Double? = nil) {
         self.iid = iid
         self.type = type
         self._value = value
