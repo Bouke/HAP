@@ -26,7 +26,7 @@ open class Accessory {
     private let info: Service.Info
     internal let services: [Service]
 
-    init(aid: Int = 0, info: Service.Info, type: AccessoryType, services: [Service]) {
+    public init(aid: Int = 0, info: Service.Info, type: AccessoryType, services: [Service]) {
         self.aid = aid
         self.type = type
         self.info = info
