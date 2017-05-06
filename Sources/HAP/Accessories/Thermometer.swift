@@ -10,7 +10,7 @@ extension Accessory {
 
 extension Service {
     open class TemperatureSensor: Service {
-        let currentTemperature = GenericCharacteristic<CurrentTemperature>(type: .currentTemperature, value: 0, permissions: [.read, .events], maxValue: 100, minValue: -100)
+        public let currentTemperature = GenericCharacteristic<CurrentTemperature>(type: .currentTemperature, value: 0, permissions: [.read, .events], maxValue: 100, minValue: -100)
         
         public init() {
             super.init(type: .temperatureSensor, characteristics: [currentTemperature])
