@@ -3,6 +3,7 @@ public enum CharacteristicType: String {
     case brightness = "8"
     case saturation = "2F"
     case hue = "13"
+    case currentHumidity = "10"
     case currentTemperature = "11"
     case targetTemperature = "35"
     case currentHeatingCoolingState = "F"
