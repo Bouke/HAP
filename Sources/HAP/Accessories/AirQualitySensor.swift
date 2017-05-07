@@ -1,12 +1,12 @@
-//extension Accessory {
-//    public class AirQualitySensor: Accessory {
-//        public let airQualitySensor = Service.AirQualitySensor()
-//
-//        public init(aid: Int) {
-//            super.init(aid: aid, type: .airQuality, services: [airQualitySensor])
-//        }
-//    }
-//}
+extension Accessory {
+    open class AirQualitySensor: Accessory {
+        public let airQualitySensor = Service.AirQualitySensor()
+
+        public init(info: Service.Info) {
+            super.init(info: info, type: .door, services: [airQualitySensor])
+        }
+    }
+}
 
 public enum AirQuality: Int, CharacteristicValueType {
     case unknown = 0, excellent, good, fair, inferior, poor

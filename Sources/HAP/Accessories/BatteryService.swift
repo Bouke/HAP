@@ -1,12 +1,12 @@
-//extension Accessory {
-//    public class BatteryService: Accessory {
-//        public let batteryService = Service.BatteryService()
-//
-//        public init(aid: Int) {
-//            super.init(aid: aid, type: .airQuality, services: [batteryService])
-//        }
-//    }
-//}
+extension Accessory {
+    open class BatteryService: Accessory {
+        public let batteryService = Service.BatteryService()
+
+        public init(info: Service.Info) {
+            super.init(info: info, type: .door, services: [batteryService])
+        }
+    }
+}
 
 public typealias BatteryLevel = Int
 

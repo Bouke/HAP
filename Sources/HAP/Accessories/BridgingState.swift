@@ -1,12 +1,12 @@
-//extension Accessory {
-//    public class BridgingState: Accessory {
-//        public let bridgingState = Service.BridgingState()
-//
-//        public init(aid: Int) {
-//            super.init(aid: aid, type: .bridgingState, services: [bridgingState])
-//        }
-//    }
-//}
+extension Accessory {
+    open class BridgingState: Accessory {
+        public let bridgingState = Service.BridgingState()
+
+        public init(info: Service.Info) {
+            super.init(info: info, type: .door, services: [bridgingState])
+        }
+    }
+}
 
 public typealias Reachable = Bool
 public typealias LinkQuality = Int

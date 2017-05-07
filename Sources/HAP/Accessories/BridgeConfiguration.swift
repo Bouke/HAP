@@ -1,14 +1,14 @@
 import Foundation
 
-//extension Accessory {
-//    public class BridgeConfiguration: Accessory {
-//        public let bridgeConfiguration = Service.BridgeConfiguration()
-//
-//        public init(aid: Int) {
-//            super.init(aid: aid, type: .airQuality, services: [bridgeConfiguration])
-//        }
-//    }
-//}
+extension Accessory {
+    open class BridgeConfiguration: Accessory {
+        public let bridgeConfiguration = Service.BridgeConfiguration()
+
+        public init(info: Service.Info) {
+            super.init(info: info, type: .door, services: [bridgeConfiguration])
+        }
+    }
+}
 
 public typealias ConfigureBridgedAccessoryStatus = Data
 
