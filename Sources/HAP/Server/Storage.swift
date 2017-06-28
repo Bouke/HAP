@@ -64,7 +64,7 @@ public class FileStorage: Storage {
             do {
                 if let newValue = newValue {
                     try newValue.write(to: entityPath)
-                } else {
+                } else if FileManager.default.fileExists(atPath: entityPath.absoluteString) {
                     try FileManager.default.removeItem(at: entityPath)
                 }
             } catch {
