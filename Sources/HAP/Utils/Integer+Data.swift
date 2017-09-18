@@ -1,6 +1,6 @@
 import Foundation
 
-extension Integer {
+extension BinaryInteger {
     init(bytes: [UInt8]) {
         precondition(bytes.count == MemoryLayout<Self>.size, "incorrect number of bytes")
         self = bytes.withUnsafeBufferPointer() {
