@@ -20,10 +20,12 @@ let package = Package(
     targets: [
         .target(name: "HAP", dependencies: ["SRP", "Cryptor", "Evergreen", "HKDF", "Kitura-net", "Socket"]),
         .target(name: "hap-server", dependencies: ["HAP"]),
+        .testTarget(name: "HAPTests", dependencies: ["HAP"]),
     ],
     swiftLanguageVersions: [4]
 )
 
 #if os(Linux)
     package.dependencies.append(.package(url: "https://github.com/Bouke/NetService.git", from: "0.3.0"))
+    package.targets[0].dependencies.append("NetService")
 #endif
