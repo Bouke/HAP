@@ -19,7 +19,7 @@ let package = Package(
     ],
     targets: [
         .target(name: "HAP", dependencies: ["SRP", "Cryptor", "Evergreen", "HKDF", "Kitura-net", "Socket"]),
-        .target(name: "hap-server", dependencies: ["HAP"]),
+        .target(name: "hap-server", dependencies: ["HAP", "Evergreen"]),
         .testTarget(name: "HAPTests", dependencies: ["HAP"]),
     ],
     swiftLanguageVersions: [4]
