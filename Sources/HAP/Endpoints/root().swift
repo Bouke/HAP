@@ -1,4 +1,4 @@
-
+// TODO: some of the endpoints should be available only after authorization.
 func root(device: Device) -> Application {
     return Router(routes: [
         ("/", { _,_  in Response(status: .ok, text: "Nothing to see here. Pair this Homekit Accessory with an iOS device.") }),
