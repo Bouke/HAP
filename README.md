@@ -26,7 +26,7 @@ And then build the project itself:
 
 Install dependencies:
 
-    sudo apt-get install openssl libssl-dev libsodium-dev libcurl4-openssl-dev
+    sudo apt install openssl libssl-dev libsodium-dev libcurl4-openssl-dev
 
 Make sure you have libsodium 1.0.9 or above. Ubuntu 16.10 or later suffices.
 Otherwise you have to compile and install libsodium from source;

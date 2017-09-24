@@ -10,8 +10,8 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/Bouke/CLibSodium.git", from: "1.0.0"),
-        .package(url: "https://github.com/Bouke/SRP.git", from: "3.0.0"),
-        .package(url: "https://github.com/Bouke/HKDF.git", from: "3.0.0"),
+        .package(url: "https://github.com/Bouke/SRP.git", from: "3.0.1"),
+        .package(url: "https://github.com/Bouke/HKDF.git", from: "3.0.1"),
         .package(url: "https://github.com/knly/Evergreen.git", .branch("swift4")),
         .package(url: "https://github.com/Bouke/Kitura-net.git", from: "1.7.0"),
         .package(url: "https://github.com/IBM-Swift/BlueSocket.git", from: "0.12.0"),
