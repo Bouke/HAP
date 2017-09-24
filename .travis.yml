@@ -1,18 +1,19 @@
 language: generic
 sudo: required
-install:
-  - eval "$(curl -sL https://gist.githubusercontent.com/kylef/5c0475ff02b7c7671d2a/raw/9f442512a46d7a2af7b850d65a7e9bd31edfb09b/swiftenv-install.sh)"
 script: swift test -c release -Xswiftc -enable-testing
 matrix:
   include:
     - os: osx
       osx_image: xcode9
-      before_install:
+      install:
         - brew update
         - brew install libsodium
     - os: linux
       dist: trusty
-      before_install:
+      install:
+        - wget https://swift.org/builds/swift-4.0-release/ubuntu1404/swift-4.0-RELEASE/swift-4.0-RELEASE-ubuntu14.04.tar.gz
+        - tar xzf swift-4.0-RELEASE-ubuntu14.04.tar.gz
+        - export PATH=`pwd`/swift-4.0-RELEASE-ubuntu14.04/usr/bin:"${PATH}"
         - sudo apt-get install -y libssl-dev
         - wget https://download.libsodium.org/libsodium/releases/libsodium-1.0.12.tar.gz
         - tar xzf libsodium-1.0.12.tar.gz
@@ -22,3 +23,4 @@ matrix:
         - sudo make install
         - cd ..
         - sudo ldconfig
+
