@@ -33,7 +33,7 @@ func decode<Key: Hashable>(_ data: Data) throws -> [Key: Data] where Key: RawRep
     return result
 }
 
-func encode<Key: Hashable>(_ data: [Key: Data]) -> Data where Key: RawRepresentable, Key.RawValue == UInt8 {
+func encode<Key>(_ data: [Key: Data]) -> Data where Key: RawRepresentable, Key.RawValue == UInt8 {
     var result = Data()
     func append(type: UInt8, value: Data.SubSequence) {
         result.append(Data(bytes: [type, UInt8(value.count)] + value))

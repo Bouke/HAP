@@ -18,9 +18,11 @@ extension BinaryInteger {
 extension UnsignedInteger {
     var bytes: Data {
         var copy = self
-        // is this a good solution regarding LE/BE?
+        // TODO: optimize this
+        // TODO: is this a good solution regarding LE/BE?
         return withUnsafePointer(to: &copy) {
-            Data(Data(bytes: $0, count: MemoryLayout<Self>.size).reversed())
+            let reversed: ReversedRandomAccessCollection<Data> = Data(bytes: $0, count: MemoryLayout<Self>.size).reversed()
+            return Data(reversed)
         }
     }
 }
