@@ -4,18 +4,18 @@ class Response {
     var status = Status.ok
 
     var headers = [String: String]()
-    
+
     var body: Data? {
         didSet {
             headers["Content-Length"] = "\(body?.count ?? 0)"
         }
     }
-    
+
     var text: String? {
         guard let body = body else { return nil }
         return String(data: body, encoding: .utf8)
     }
-    
+
     func serialized() -> Data {
         var header = "HTTP/1.1 \(status)\r\n"
         for (key, value) in headers {
@@ -27,7 +27,7 @@ class Response {
         header.append("\r\n")
         return header.data(using: .utf8)! + (body ?? Data())
     }
-    
+
     enum Status: Int, CustomStringConvertible {
         case ok = 200, created = 201, accepted = 202, noContent = 204, multiStatus = 207
         case movedPermanently = 301

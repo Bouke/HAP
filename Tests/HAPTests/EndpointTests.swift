@@ -59,8 +59,7 @@ class EndpointTests: XCTestCase {
         XCTAssertEqual(lampCharacteristics.count, 4)
     }
 
-    /// This test assumes that 1.3 and 1.5 are respectively `manufacturer` and
-    /// `name`. This does not need to be the case.
+
     func testGetCharacteristics() {
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", manufacturer: "Bouke"))
         let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [lamp])
@@ -73,19 +72,17 @@ class EndpointTests: XCTestCase {
             return XCTFail("No characteristics")
         }
 
-        guard let manufacturerCharacteristic = characteristics.first(where: { $0["iid"] as? Int == 3 }) else {
+        guard let manufacturerCharacteristic = characteristics.first(where: { $0["iid"] as? Int == lamp.info.manufacturer.iid }) else {
             return XCTFail("No manufacturer")
         }
         XCTAssertEqual(manufacturerCharacteristic["value"] as? String, "Bouke")
 
-        guard let nameCharacteristic = characteristics.first(where: { $0["iid"] as? Int == 5 }) else {
+        guard let nameCharacteristic = characteristics.first(where: { $0["iid"] as? Int == lamp.info.name.iid }) else {
             return XCTFail("No name")
         }
         XCTAssertEqual(nameCharacteristic["value"] as? String, "Night stand left")
     }
 
-    /// This test assumes that 1.3 and 1.5 are respectively `manufacturer` and
-    /// `name`. This does not need to be the case.
     func testPutBoolAndIntCharacteristics() {
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", manufacturer: "Bouke"))
         let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [lamp])
@@ -517,11 +514,6 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(lightVal, lightsensor.lightSensor.currentLight.value)
             XCTAssertEqual(thermVal, thermostat.thermostat.currentTemperature.value)
             XCTAssertEqual(lampaVal, lamp.lightbulb.brightness.value)
-
-            XCTAssertEqual(lightVal, lightsensor.lightSensor.currentLight.value)
-            XCTAssertEqual(thermVal, thermostat.thermostat.currentTemperature.value)
-            XCTAssertEqual(lampaVal, lamp.lightbulb.brightness.value)
-
         }
 
         // trying to read write only access

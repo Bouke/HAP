@@ -8,7 +8,6 @@ func characteristics(device: Device) -> Application {
     return { (connection, request) in
         switch request.method {
         case "GET":
-
             let queryItems = request.urlComponents.queryItems
 
             guard
@@ -29,6 +28,8 @@ func characteristics(device: Device) -> Application {
                 guard path.count == 2 else {
                     return .badRequest
                 }
+
+
                 guard
                     let characteristic = device.accessories.first(where: {$0.aid == path[0]})?.services.flatMap({$0.characteristics.filter({$0.iid == path[1]})}).first
                     else {
@@ -68,7 +69,6 @@ func characteristics(device: Device) -> Application {
                 if ev {
                     body["ev"] = characteristic.permissions.contains(.events)
                 }
-
                 serialized.append(body)
             }
 
