@@ -23,7 +23,7 @@ open class Accessory {
     public weak var device: Device?
     var aid: Int
     public let type: AccessoryType
-    private let info: Service.Info
+    public let info: Service.Info
     internal let services: [Service]
 
     public init(aid: Int = 0, info: Service.Info, type: AccessoryType, services: [Service]) {

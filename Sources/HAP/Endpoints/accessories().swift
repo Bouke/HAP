@@ -6,7 +6,9 @@ fileprivate let logger = getLogger("hap.endpoints.accessories")
 
 func accessories(device: Device) -> Application {
     return { (connection, request) in
-        precondition(request.method == "GET")
+        guard request.method == "GET" else {
+            return .badRequest
+        }
         let serialized: [String: Any] = [
             "accessories": device.accessories.map { $0.serialized() }
         ]
