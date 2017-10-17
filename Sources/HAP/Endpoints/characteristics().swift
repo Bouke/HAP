@@ -8,15 +8,15 @@ func characteristics(device: Device) -> Application {
     return { (connection, request) in
         switch request.method {
         case "GET":
-            
+
             let queryItems = request.urlComponents.queryItems
-            
+
             guard
                 let id = queryItems?.first(where: {$0.name == "id"})?.value
                 else {
                     return .badRequest
             }
-            
+
             let meta = queryItems?.first(where: {$0.name == "meta"})?.value == "1"
             let perms = queryItems?.first(where: {$0.name == "perms"})?.value == "1"
             let type = queryItems?.first(where: {$0.name == "type"})?.value == "1"
@@ -29,22 +29,18 @@ func characteristics(device: Device) -> Application {
                 guard path.count == 2 else {
                     return .badRequest
                 }
-                
-                
                 guard
                     let characteristic = device.accessories.first(where: {$0.aid == path[0]})?.services.flatMap({$0.characteristics.filter({$0.iid == path[1]})}).first
                     else {
                         serialized.append(["aid": path[0], "iid": path[1], "status": HAPStatusCodes.resourceDoesNotExist.rawValue])
                         break
                 }
-                
                 guard characteristic.permissions.contains(.read) else {
                     logger.info("\(characteristic) has no read permission")
                     serialized.append(["aid": path[0], "iid": path[1], "status": HAPStatusCodes.writeOnly.rawValue])
                     continue
                 }
 
-                
                 var body = ["aid": path[0], "iid": path[1], "value": characteristic.getValue() ?? NSNull()]
                 if meta {
                     if let maxValue = characteristic.maxValue {
@@ -72,10 +68,10 @@ func characteristics(device: Device) -> Application {
                 if ev {
                     body["ev"] = characteristic.permissions.contains(.events)
                 }
-                
+
                 serialized.append(body)
             }
-            
+
             /* HAP Specification 5.7.3.2
              If all reads succeed, the accessory must respond with a 200 OK HTTP Status Code and a JSON body.
              The body must contain a JSON object with the value and instance ID of each characteristic.
@@ -88,7 +84,7 @@ func characteristics(device: Device) -> Application {
              Characteristics that were read unsuccessfully must contain
              a non-zero "status" entry and must not contain a "value" entry.
              */
-            
+
             var responseStatus : Response.Status = .ok
             if serialized.first(where: {$0.keys.contains("status")}) != nil {
                 for (index,element) in serialized.enumerated() {
@@ -117,7 +113,7 @@ func characteristics(device: Device) -> Application {
                 logger.warning("Could not decode JSON")
                 return .badRequest
             }
-            
+
             var serialized: [[String: Any]] = []
 
             for item in items {
@@ -135,7 +131,7 @@ func characteristics(device: Device) -> Application {
                 {
                     return .unprocessableEntity
                 }
-                
+
                 // At least one of "value" or "ev" will be present in the characteristic write request object
                 guard item["value"] != nil || item["ev"] != nil else {
                     return .badRequest
@@ -148,7 +144,7 @@ func characteristics(device: Device) -> Application {
                         serialized.append(["aid": aid, "iid": iid, "status": HAPStatusCodes.readOnly.rawValue])
                         break VALUE  // continue and process other items
                     }
-                    
+
                     logger.debug("Setting \(characteristic) to new value \(value) (type: \(type(of: value)))")
                     do {
                         switch value {
@@ -158,7 +154,6 @@ func characteristics(device: Device) -> Application {
                             try characteristic.setValue(value, fromConnection: connection)
                         }
                         serialized.append(["aid": aid, "iid": iid, "status": HAPStatusCodes.success.rawValue])
-
                     } catch {
                         logger.warning("Could not set value of type \(type(of: value)): \(error)")
                         serialized.append(["aid": aid, "iid": iid, "status": HAPStatusCodes.invalidValue.rawValue])
@@ -185,7 +180,7 @@ func characteristics(device: Device) -> Application {
                     serialized.append(["aid": aid, "iid": iid, "status": HAPStatusCodes.success.rawValue])
                 }
             }
-            
+
             /* HAP Specification 5.7.2.3
              If an error occurs when attempting to write any characteristics, e.g. the physical devices
              represented by the characteristics to be written were unreachable,
@@ -193,15 +188,15 @@ func characteristics(device: Device) -> Application {
              and each response object must contain a "status" entry.
              Characteristics that were written successfully must have a "status" of 0 and
              characteristics that failed to be written must have a non-zero "status" entry.
-             
+
              For single write the error code is 400 Bad Request
              */
-            
+
             let multiStatusResponse = !serialized
                 .map{ $0["status"] as? HAPStatusCodes.RawValue }
                 .flatMap{$0}
                 .filter{HAPStatusCodes(rawValue: $0) != .success}.isEmpty
-            
+
             if multiStatusResponse {
                 do {
                     let json = try JSONSerialization.data(withJSONObject: ["characteristics": serialized], options: [])
@@ -215,7 +210,6 @@ func characteristics(device: Device) -> Application {
             /* HAP Specification 5.7.2.2
              If no error occurs, the accessory must send an HTTP response with a 204 No Content status code and an empty body.
              */
-            
             return Response(status: .noContent)
 
         default:
