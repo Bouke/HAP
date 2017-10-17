@@ -8,11 +8,16 @@ func characteristics(device: Device) -> Application {
     return { (connection, request) in
         switch request.method {
         case "GET":
+            
+            let queryItems = request.urlComponents.queryItems
+            
             guard
-                let id = request.urlComponents.queryItems?.first(where: {$0.name == "id"})?.value
+                let id = queryItems?.first(where: {$0.name == "id"})?.value
                 else {
                     return .badRequest
             }
+            
+            let meta = queryItems?.first(where: {$0.name == "meta"})?.value == "1"
 
             let paths = id.components(separatedBy: ",").map { $0.components(separatedBy: ".").flatMap { Int($0) } }
 
@@ -27,11 +32,27 @@ func characteristics(device: Device) -> Application {
                         // @fixme: hc sets status to StatusServiceCommunicationFailure instead
                         return .notFound
                 }
-                serialized.append([
-                    "aid": path[0],
-                    "iid": path[1],
-                    "value": characteristic.getValue() ?? NSNull()
-                ])
+                
+                var body = ["aid": path[0],"iid": path[1],"value": characteristic.getValue() ?? NSNull()]
+                if meta {
+                    if let maxValue = characteristic.maxValue {
+                        body["maxValue"] = maxValue.jsonValueType
+                    }
+                    if let minValue = characteristic.minValue {
+                        body["minValue"] = minValue.jsonValueType
+                    }
+                    if let unit = characteristic.unit {
+                        body["unit"] = unit.jsonValueType
+                    }
+                    if let minStep = characteristic.minStep {
+                        body["minStep"] = minStep.jsonValueType
+                    }
+                    if let maxLen = characteristic.maxLength {
+                        body["maxLen"] = maxLen.jsonValueType
+                    }
+                }
+                
+                serialized.append(body)
             }
 
             do {
@@ -52,6 +73,10 @@ func characteristics(device: Device) -> Application {
                 logger.warning("Could not decode JSON")
                 return .badRequest
             }
+            
+            var serialized: [[String: Any]] = []
+            var multiStatusResponse = false
+
             for item in items {
                 guard let aid = item["aid"] as? Int,
                     let iid = item["iid"] as? Int else
@@ -65,11 +90,18 @@ func characteristics(device: Device) -> Application {
                     .flatMap({$0.characteristics.filter({$0.iid == iid})})
                     .first else
                 {
-                    return .notFound
+                    return .invalidParameters
                 }
 
                 // set new value
                 if let value = item["value"] {
+                    guard characteristic.permissions.contains(.write) else {
+                        logger.info("\(characteristic) has no write permission")
+                        serialized.append(["aid": aid,"iid": iid,"status": HAPStatusCodes.readOnly.rawValue])
+                        multiStatusResponse = true
+                        break
+                    }
+                    
                     logger.debug("Setting \(characteristic) to new value \(value) (type: \(type(of: value)))")
                     do {
                         switch value {
@@ -78,6 +110,8 @@ func characteristics(device: Device) -> Application {
                         default:
                             try characteristic.setValue(value, fromConnection: connection)
                         }
+                        serialized.append(["aid": aid,"iid": iid,"status": 0])
+
                     } catch {
                         logger.warning("Could not set value of type \(type(of: value)): \(error)")
                         return .badRequest
@@ -98,6 +132,17 @@ func characteristics(device: Device) -> Application {
                     }
                 }
             }
+            
+            if multiStatusResponse {
+                do {
+                    let json = try JSONSerialization.data(withJSONObject: ["characteristics": serialized], options: [])
+                    return Response(status: serialized.count == 1 ? .badRequest : .multiStatus, data: json, mimeType: "application/hap+json")
+                } catch {
+                    logger.error("Could not serialize object", error: error)
+                    return .internalServerError
+                }
+            }
+
 
             return Response(status: .noContent)
 
