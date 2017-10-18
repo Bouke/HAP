@@ -18,9 +18,13 @@ func characteristics(device: Device) -> Application {
             }
             
             let meta = queryItems?.first(where: {$0.name == "meta"})?.value == "1"
+            let perms = queryItems?.first(where: {$0.name == "perms"})?.value == "1"
+            let type = queryItems?.first(where: {$0.name == "type"})?.value == "1"
+            let ev = queryItems?.first(where: {$0.name == "ev"})?.value == "1"
 
             let paths = id.components(separatedBy: ",").map { $0.components(separatedBy: ".").flatMap { Int($0) } }
 
+            var multiStatusResponse = false
             var serialized: [[String: Any]] = []
             for path in paths {
                 guard path.count == 2 else {
@@ -30,7 +34,9 @@ func characteristics(device: Device) -> Application {
                     let characteristic = device.accessories.first(where: {$0.aid == path[0]})?.services.flatMap({$0.characteristics.filter({$0.iid == path[1]})}).first
                     else {
                         // @fixme: hc sets status to StatusServiceCommunicationFailure instead
-                        return .notFound
+                        serialized.append(["aid": path[0],"iid": path[1],"status": HAPStatusCodes.resourceDoesNotExist.rawValue])
+                        multiStatusResponse = true
+                        break
                 }
                 
                 var body = ["aid": path[0],"iid": path[1],"value": characteristic.getValue() ?? NSNull()]
@@ -51,13 +57,30 @@ func characteristics(device: Device) -> Application {
                         body["maxLen"] = maxLen.jsonValueType
                     }
                 }
+                if perms {
+                    body["perms"] = characteristic.permissions.map { $0.rawValue }
+                }
+                if type {
+                    body["type"] = characteristic.type.rawValue
+                }
+                if ev {
+                    body["ev"] = characteristic.permissions.contains(.events)
+                }
                 
                 serialized.append(body)
+            }
+            
+            if multiStatusResponse {
+                for (index,element) in serialized.enumerated() {
+                    if element["status"] == nil {
+                        serialized[index]["status"] = HAPStatusCodes.success.rawValue
+                    }
+                }
             }
 
             do {
                 let json = try JSONSerialization.data(withJSONObject: ["characteristics": serialized], options: [])
-                return Response(data: json, mimeType: "application/hap+json")
+                return Response(status: multiStatusResponse ? .multiStatus : .ok, data: json, mimeType: "application/hap+json")
             } catch {
                 logger.error("Could not serialize object", error: error)
                 return .internalServerError
@@ -110,7 +133,7 @@ func characteristics(device: Device) -> Application {
                         default:
                             try characteristic.setValue(value, fromConnection: connection)
                         }
-                        serialized.append(["aid": aid,"iid": iid,"status": 0])
+                        serialized.append(["aid": aid,"iid": iid,"status": HAPStatusCodes.success.rawValue])
 
                     } catch {
                         logger.warning("Could not set value of type \(type(of: value)): \(error)")
@@ -123,6 +146,11 @@ func characteristics(device: Device) -> Application {
 
                 // toggle events for this characteristic on this connection
                 if let events = item["ev"] as? Bool {
+                    guard characteristic.permissions.contains(.events) else {
+                        serialized.append(["aid": aid,"iid": iid,"status": HAPStatusCodes.notificationNotSupported.rawValue])
+                        multiStatusResponse = true
+                        break
+                    }
                     if events {
                         device.add(characteristic: characteristic, listener: connection)
                         logger.info("Added listener for \(characteristic)")
@@ -130,6 +158,7 @@ func characteristics(device: Device) -> Application {
                         device.remove(characteristic: characteristic, listener: connection)
                         logger.info("Removed listener for \(characteristic)")
                     }
+                    serialized.append(["aid": aid,"iid": iid,"status": HAPStatusCodes.success.rawValue])
                 }
             }
             

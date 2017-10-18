@@ -71,7 +71,7 @@ public enum CharacteristicUnit: String {
 
 
 public enum HAPStatusCodes : Int {
-    case succes = 0
+    case success = 0
     case insufficientPrivileges = -70401
     case unableToCommunicate = -70402
     case busy = -70403
