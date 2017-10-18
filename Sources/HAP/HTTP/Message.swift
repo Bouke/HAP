@@ -32,6 +32,7 @@ class Response {
         case ok = 200, created = 201, accepted = 202, noContent = 204, multiStatus = 207
         case movedPermanently = 301
         case badRequest = 400, unauthorized = 401, forbidden = 403, notFound = 404
+        case methodNotAllowed = 405
         case invalidParameters = 422
         case internalServerError = 500
 
@@ -47,6 +48,7 @@ class Response {
             case .unauthorized: return "401 Unauthorized"
             case .forbidden: return "403 Forbidden"
             case .notFound: return "404 Not Found"
+            case .methodNotAllowed: return "405 Method Not Allowed"
             case .invalidParameters: return "422 Unprocessable Entity"
             case .internalServerError: return "500 Internal Server Error"
             }
@@ -78,6 +80,7 @@ class Response {
 extension Response {
     static var ok: Response { return Response(status: .ok) }
     static var badRequest: Response { return  Response(status: .badRequest) }
+    static var methodNotAllowed: Response { return  Response(status: .methodNotAllowed) }
     static var invalidParameters: Response { return  Response(status: .invalidParameters) }
     static var notFound: Response { return  Response(status: .notFound) }
     static var internalServerError: Response { return  Response(status: .internalServerError) }

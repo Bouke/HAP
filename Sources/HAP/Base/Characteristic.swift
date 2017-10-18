@@ -23,7 +23,10 @@ extension Characteristic {
             "type": type.rawValue,
             "perms": permissions.map { $0.rawValue }
         ]
-        if let value = getValue() { serialized["value"] = value }
+        
+        if permissions.contains(.read) {
+            serialized["value"] = getValue() ?? NSNull()
+        }
         
         if let description = description { serialized["description"] = description }
         if let format = format { serialized["format"] = format.rawValue }
