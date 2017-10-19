@@ -18,20 +18,22 @@ struct Event {
         return "EVENT/1.0 \(status.rawValue) \(status.description)\r\n\(headers)\r\n".data(using: .utf8)! + body
     }
 
-    init?(valueChangedOfCharacteristic characteristic: Characteristic) {
-        guard let aid = characteristic.service?.accessory?.aid else {
-            return nil
+    init?(valueChangedOfCharacteristics characteristics: [Characteristic]) {
+        var payload = [[String: Any]]()
+        for c in characteristics {
+            guard let aid = c.service?.accessory?.aid else {
+                break
+            }
+            payload.append(["aid": aid, "iid": c.iid, "value": c.getValue() ?? NSNull()])
         }
-        let serialized: [String: [[String: Any]]] = ["characteristics": [
-            [
-                "aid": aid,
-                "iid": characteristic.iid,
-                "value": characteristic.getValue() ?? NSNull()
-            ]
-            ]]
+        guard payload.count > 0 else { return nil }
+
+        let serialized = ["characteristics": payload]
+
         guard let body = try? JSONSerialization.data(withJSONObject: serialized, options: []) else {
             abort()
         }
         self.init(status: .ok, body: body, mimeType: "application/hap+json")
     }
+
 }

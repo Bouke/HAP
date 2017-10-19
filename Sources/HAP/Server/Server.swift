@@ -12,10 +12,49 @@ fileprivate let logger = getLogger("hap.http")
 
 
 public class Server: NSObject, NetServiceDelegate {
+
+    class NotificationQueue {
+        var queue = [Characteristic]()
+        weak var listener : Connection?
+
+        func append(characteristic: Characteristic) {
+            DispatchQueue.main.async {
+                self.queue.append(characteristic)
+                if self.queue.count == 1 {
+
+                    /* HAP Specification 5.8 (excerpts)
+                         Network-based notifications must be coalesced
+                         by the accessory using a delay of no less than 1 second.
+                         Excessive or inappropriate notifications may result
+                         in the user being notified of a misbehaving
+                         accessory and/or termination of the pairing relationship.
+                     */
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0 ) {
+                        defer { self.queue.removeAll() }
+                        guard let event = Event(valueChangedOfCharacteristics: self.queue) else {
+                            return logger.error("Could not create value change event")
+                        }
+                        let data = event.serialized()
+                        logger.info("Value changed, notifying \(String(describing: self.listener?.socket?.remoteHostname)), event: \(data)")
+                        self.listener?.writeOutOfBand(data)
+                    }
+                }
+            }
+        }
+    }
+
     public class Connection: NSObject {
         var context = [String: Any]()
         var socket: Socket?
         var cryptographer: Cryptographer? = nil
+        var notificationQueue : NotificationQueue
+
+        override init() {
+            notificationQueue = NotificationQueue()
+            super.init()
+            notificationQueue.listener = self
+        }
+
         func listen(socket: Socket, queue: DispatchQueue, application: @escaping Application) {
             self.socket = socket
             let httpParser = HTTPParser(isRequest: true)
