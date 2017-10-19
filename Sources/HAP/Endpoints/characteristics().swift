@@ -24,7 +24,6 @@ func characteristics(device: Device) -> Application {
 
             let paths = id.components(separatedBy: ",").map { $0.components(separatedBy: ".").flatMap { Int($0) } }
 
-            var multiStatusResponse = false
             var serialized: [[String: Any]] = []
             for path in paths {
                 guard path.count == 2 else {
@@ -33,13 +32,11 @@ func characteristics(device: Device) -> Application {
                 guard
                     let characteristic = device.accessories.first(where: {$0.aid == path[0]})?.services.flatMap({$0.characteristics.filter({$0.iid == path[1]})}).first
                     else {
-                        // @fixme: hc sets status to StatusServiceCommunicationFailure instead
-                        serialized.append(["aid": path[0],"iid": path[1],"status": HAPStatusCodes.resourceDoesNotExist.rawValue])
-                        multiStatusResponse = true
+                        serialized.append(["aid": path[0], "iid": path[1], "status": HAPStatusCodes.resourceDoesNotExist.rawValue])
                         break
                 }
                 
-                var body = ["aid": path[0],"iid": path[1],"value": characteristic.getValue() ?? NSNull()]
+                var body = ["aid": path[0], "iid": path[1], "value": characteristic.getValue() ?? NSNull()]
                 if meta {
                     if let maxValue = characteristic.maxValue {
                         body["maxValue"] = maxValue.jsonValueType
@@ -70,17 +67,32 @@ func characteristics(device: Device) -> Application {
                 serialized.append(body)
             }
             
-            if multiStatusResponse {
+            /* HAP Specification 5.7.3.2
+             If all reads succeed, the accessory must respond with a 200 OK HTTP Status Code and a JSON body.
+             The body must contain a JSON object with the value and instance ID of each characteristic.
+
+             If an error occurs when attempting to read any characteristics, e.g. the physical devices
+             represented by the characteristics to be read were unreachable,
+             the accessory must respond with a 207 Multi-Status HTTP Status Code
+             and each characteristic object must contain a "status" entry.
+             Characteristics that were read successfully must have a "status" of 0 and "value".
+             Characteristics that were read unsuccessfully must contain
+             a non-zero "status" entry and must not contain a "value" entry.
+             */
+            
+            var responseStatus : Response.Status = .ok
+            if serialized.first(where: {$0.keys.contains("status")}) != nil {
                 for (index,element) in serialized.enumerated() {
                     if element["status"] == nil {
                         serialized[index]["status"] = HAPStatusCodes.success.rawValue
                     }
                 }
+                responseStatus = .multiStatus
             }
 
             do {
                 let json = try JSONSerialization.data(withJSONObject: ["characteristics": serialized], options: [])
-                return Response(status: multiStatusResponse ? .multiStatus : .ok, data: json, mimeType: "application/hap+json")
+                return Response(status: responseStatus, data: json, mimeType: "application/hap+json")
             } catch {
                 logger.error("Could not serialize object", error: error)
                 return .internalServerError
@@ -98,7 +110,6 @@ func characteristics(device: Device) -> Application {
             }
             
             var serialized: [[String: Any]] = []
-            var multiStatusResponse = false
 
             for item in items {
                 guard let aid = item["aid"] as? Int,
@@ -113,15 +124,14 @@ func characteristics(device: Device) -> Application {
                     .flatMap({$0.characteristics.filter({$0.iid == iid})})
                     .first else
                 {
-                    return .invalidParameters
+                    return .unprocessableEntity
                 }
 
                 // set new value
                 if let value = item["value"] {
                     guard characteristic.permissions.contains(.write) else {
                         logger.info("\(characteristic) has no write permission")
-                        serialized.append(["aid": aid,"iid": iid,"status": HAPStatusCodes.readOnly.rawValue])
-                        multiStatusResponse = true
+                        serialized.append(["aid": aid, "iid": iid, "status": HAPStatusCodes.readOnly.rawValue])
                         break
                     }
                     
@@ -133,7 +143,7 @@ func characteristics(device: Device) -> Application {
                         default:
                             try characteristic.setValue(value, fromConnection: connection)
                         }
-                        serialized.append(["aid": aid,"iid": iid,"status": HAPStatusCodes.success.rawValue])
+                        serialized.append(["aid": aid, "iid": iid, "status": HAPStatusCodes.success.rawValue])
 
                     } catch {
                         logger.warning("Could not set value of type \(type(of: value)): \(error)")
@@ -147,8 +157,7 @@ func characteristics(device: Device) -> Application {
                 // toggle events for this characteristic on this connection
                 if let events = item["ev"] as? Bool {
                     guard characteristic.permissions.contains(.events) else {
-                        serialized.append(["aid": aid,"iid": iid,"status": HAPStatusCodes.notificationNotSupported.rawValue])
-                        multiStatusResponse = true
+                        serialized.append(["aid": aid, "iid": iid, "status": HAPStatusCodes.notificationNotSupported.rawValue])
                         break
                     }
                     if events {
@@ -158,9 +167,25 @@ func characteristics(device: Device) -> Application {
                         device.remove(characteristic: characteristic, listener: connection)
                         logger.info("Removed listener for \(characteristic)")
                     }
-                    serialized.append(["aid": aid,"iid": iid,"status": HAPStatusCodes.success.rawValue])
+                    serialized.append(["aid": aid, "iid": iid, "status": HAPStatusCodes.success.rawValue])
                 }
             }
+            
+            /* HAP Specification 5.7.2.3
+             If an error occurs when attempting to write any characteristics, e.g. the physical devices
+             represented by the characteristics to be written were unreachable,
+             the accessory must respond with a 207 Multi-Status HTTP Status Code
+             and each response object must contain a "status" entry.
+             Characteristics that were written successfully must have a "status" of 0 and
+             characteristics that failed to be written must have a non-zero "status" entry.
+             
+             For single write the error code is 400 Bad Request
+             */
+            
+            let multiStatusResponse = !serialized
+                .map{ $0["status"] as? HAPStatusCodes.RawValue }
+                .flatMap{$0}
+                .filter{HAPStatusCodes(rawValue: $0) != .success}.isEmpty
             
             if multiStatusResponse {
                 do {
@@ -172,7 +197,10 @@ func characteristics(device: Device) -> Application {
                 }
             }
 
-
+            /* HAP Specification 5.7.2.2
+             If no error occurs, the accessory must send an HTTP response with a 204 No Content status code and an empty body.
+             */
+            
             return Response(status: .noContent)
 
         default:
