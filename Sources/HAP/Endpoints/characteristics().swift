@@ -29,12 +29,21 @@ func characteristics(device: Device) -> Application {
                 guard path.count == 2 else {
                     return .badRequest
                 }
+                
+                
                 guard
                     let characteristic = device.accessories.first(where: {$0.aid == path[0]})?.services.flatMap({$0.characteristics.filter({$0.iid == path[1]})}).first
                     else {
                         serialized.append(["aid": path[0], "iid": path[1], "status": HAPStatusCodes.resourceDoesNotExist.rawValue])
                         break
                 }
+                
+                guard characteristic.permissions.contains(.read) else {
+                    logger.info("\(characteristic) has no read permission")
+                    serialized.append(["aid": path[0], "iid": path[1], "status": HAPStatusCodes.writeOnly.rawValue])
+                    continue
+                }
+
                 
                 var body = ["aid": path[0], "iid": path[1], "value": characteristic.getValue() ?? NSNull()]
                 if meta {
@@ -126,13 +135,18 @@ func characteristics(device: Device) -> Application {
                 {
                     return .unprocessableEntity
                 }
+                
+                // At least one of "value" or "ev" will be present in the characteristic write request object
+                guard item["value"] != nil || item["ev"] != nil else {
+                    return .badRequest
+                }
 
                 // set new value
-                if let value = item["value"] {
+                VALUE: if let value = item["value"] {
                     guard characteristic.permissions.contains(.write) else {
                         logger.info("\(characteristic) has no write permission")
                         serialized.append(["aid": aid, "iid": iid, "status": HAPStatusCodes.readOnly.rawValue])
-                        break
+                        break VALUE  // continue and process other items
                     }
                     
                     logger.debug("Setting \(characteristic) to new value \(value) (type: \(type(of: value)))")
@@ -147,7 +161,8 @@ func characteristics(device: Device) -> Application {
 
                     } catch {
                         logger.warning("Could not set value of type \(type(of: value)): \(error)")
-                        return .badRequest
+                        serialized.append(["aid": aid, "iid": iid, "status": HAPStatusCodes.invalidValue.rawValue])
+                        break VALUE
                     }
 
                     // notify listeners
