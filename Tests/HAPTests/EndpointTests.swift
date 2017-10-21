@@ -486,25 +486,46 @@ class EndpointTests: XCTestCase {
         
         do {
             let req = "\(lamp.aid).\(lamp.lightbulb.brightness.iid),\(lightsensor.aid).\(lightsensor.lightSensor.currentLight.iid),\(thermostat.aid).\(thermostat.thermostat.currentTemperature.iid)"
-        let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=\(req)"))
-        
-        XCTAssertEqual(response.status, .ok)
+            let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=\(req)"))
+            
+            XCTAssertEqual(response.status, .ok)
+            
+            guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body!, options: [])) as? [String: [[String: Any]]] else {
+                return XCTFail("Could not decode")
+            }
+            guard let characteristics = jsonObject["characteristics"] else {
+                return XCTFail("No characteristics")
+            }
+            
+            guard let light = characteristics.first(where: { $0["aid"] as? Int == lightsensor.aid }) else {
+                return XCTFail("Could not get light aid")
+            }
+            
+            guard let therm = characteristics.first(where: { $0["aid"] as? Int == thermostat.aid }) else {
+                return XCTFail("Could not get therm aid")
+            }
+            
+            guard let lampa = characteristics.first(where: { $0["aid"] as? Int == lamp.aid }) else {
+                return XCTFail("Could not get lampa aid")
+            }
+            
+            guard let lightVal = light["value"] as? Double else {
+                return XCTFail("light is not Double")
+            }
+            
+            guard let thermVal = therm["value"] as? Double else {
+                return XCTFail("therm is not Double")
+            }
+            
+            guard let lampaVal = lampa["value"] as? Int else {
+                return XCTFail("therm is not Int")
+            }
 
-        guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body!, options: [])) as? [String: [[String: Any]]] else {
-            return XCTFail("Could not decode")
-        }
-        guard let characteristics = jsonObject["characteristics"] else {
-            return XCTFail("No characteristics")
-        }
-        
-        let light = characteristics.first { $0["aid"] as! Int == lightsensor.aid }!
-        let therm = characteristics.first { $0["aid"] as! Int == thermostat.aid }!
-        let lampa = characteristics.first { $0["aid"] as! Int == lamp.aid }!
 
-        XCTAssertEqual(light["value"] as? Double, lightsensor.lightSensor.currentLight.value)
-        XCTAssertEqual(therm["value"] as? Double, thermostat.thermostat.currentTemperature.value)
-        XCTAssertEqual(lampa["value"] as? Int, lamp.lightbulb.brightness.value)
-
+            XCTAssertEqual(lightVal, lightsensor.lightSensor.currentLight.value)
+            XCTAssertEqual(thermVal, thermostat.thermostat.currentTemperature.value)
+            XCTAssertEqual(lampaVal, lamp.lightbulb.brightness.value)
+            
         }
         
         // trying to read write only access
@@ -535,20 +556,20 @@ class EndpointTests: XCTestCase {
             guard let characteristics = jsonObject["characteristics"] else {
                 return XCTFail("No characteristics")
             }
-
+            
             guard let light = characteristics.first(where: { $0["aid"] as! Int == aid }) else {
                 return XCTFail("light is missing")
             }
             guard let therm = characteristics.first(where: { $0["aid"] as! Int == aid2 }) else {
                 return XCTFail("thermostat is missing")
             }
-
+            
             XCTAssertNil(light["value"])
             XCTAssertEqual(light["status"] as? Int,HAPStatusCodes.writeOnly.rawValue)
             XCTAssertEqual(therm["status"] as? Int,HAPStatusCodes.success.rawValue)
             XCTAssertEqual(therm["value"] as? Double, thermostat.thermostat.currentTemperature.value)
         }
-
+        
         // trying to read write only access and one with read access, reverse order
         
         do {
@@ -577,13 +598,13 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(therm["status"] as? Int,HAPStatusCodes.success.rawValue)
             XCTAssertEqual(therm["value"] as? Double, thermostat.thermostat.currentTemperature.value)
         }
-
+        
         
     }
-
-
-
-
+    
+    
+    
+    
     // from: https://oleb.net/blog/2017/03/keeping-xctest-in-sync/#appendix-code-generation-with-sourcery
     func testLinuxTestSuiteIncludesAllTests() {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
