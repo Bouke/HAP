@@ -509,15 +509,15 @@ class EndpointTests: XCTestCase {
                 return XCTFail("Could not get lampa aid")
             }
             
-            guard let lightVal = light["value"] as? Double else {
+            guard let lightVal = Double(value: light["value"] as Any) else {
                 return XCTFail("light is not Double")
             }
             
-            guard let thermVal = therm["value"] as? Double else {
+            guard let thermVal = Double(value: therm["value"] as Any) else {
                 return XCTFail("therm is not Double")
             }
             
-            guard let lampaVal = lampa["value"] as? Int else {
+            guard let lampaVal = Int(value: lampa["value"] as Any) else {
                 return XCTFail("therm is not Int")
             }
 
@@ -567,7 +567,7 @@ class EndpointTests: XCTestCase {
             XCTAssertNil(light["value"])
             XCTAssertEqual(light["status"] as? Int,HAPStatusCodes.writeOnly.rawValue)
             XCTAssertEqual(therm["status"] as? Int,HAPStatusCodes.success.rawValue)
-            XCTAssertEqual(therm["value"] as? Double, thermostat.thermostat.currentTemperature.value)
+            XCTAssertEqual(Double(value: therm["value"] as Any), thermostat.thermostat.currentTemperature.value)
         }
         
         // trying to read write only access and one with read access, reverse order
@@ -596,7 +596,7 @@ class EndpointTests: XCTestCase {
             XCTAssertNil(light["value"])
             XCTAssertEqual(light["status"] as? Int,HAPStatusCodes.writeOnly.rawValue)
             XCTAssertEqual(therm["status"] as? Int,HAPStatusCodes.success.rawValue)
-            XCTAssertEqual(therm["value"] as? Double, thermostat.thermostat.currentTemperature.value)
+            XCTAssertEqual(Double(value: therm["value"] as Any), thermostat.thermostat.currentTemperature.value)
         }
         
         
