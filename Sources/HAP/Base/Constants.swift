@@ -68,3 +68,19 @@ public enum CharacteristicUnit: String {
     case lux = "lux"
     case seconds = "seconds"
 }
+
+
+public enum HAPStatusCodes : Int {
+    case success = 0
+    case insufficientPrivileges = -70401
+    case unableToCommunicate = -70402
+    case busy = -70403
+    case readOnly = -70404
+    case writeOnly = -70405
+    case notificationNotSupported = -70406
+    case outOfResources = -70407
+    case operationTimedOut = -70408
+    case resourceDoesNotExist = -70409
+    case invalidValue = -70410
+    case insufficientAuthorization = -70411
+}

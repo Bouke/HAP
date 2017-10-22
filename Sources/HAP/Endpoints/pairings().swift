@@ -6,8 +6,10 @@ fileprivate let logger = getLogger("hap.pairings")
 func pairings(device: Device) -> Application {
     return { (connection, request) in
         var body = Data()
+        guard request.method == "POST" else {
+            return .methodNotAllowed
+        }
         guard
-            request.method == "POST",
             let _ = try? request.readAllData(into: &body),
             let data: PairTagTLV8 = try? decode(body),
             data[.sequence]?[0] == PairStep.request.rawValue,
