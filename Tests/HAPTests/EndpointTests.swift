@@ -13,6 +13,7 @@ class EndpointTests: XCTestCase {
             ("testPutBadCharacteristics", testPutBadCharacteristics),
             ("testGetBadCharacteristics", testGetBadCharacteristics),
             ("testNoEventsToSelf", testNoEventsToSelf),
+            ("testSingleEventPerUpdate", testSingleEventPerUpdate),
             ("testDelayMultipleEvents", testDelayMultipleEvents),
             ("testDelayMultipleEventsCoalescence", testDelayMultipleEventsCoalescence),
             ("testDelayMultipleEventsCoalescenceFiltering", testDelayMultipleEventsCoalescenceFiltering),
@@ -637,6 +638,43 @@ class EndpointTests: XCTestCase {
             }
 
             // if no event within 100ms, the test succeeds
+            wait(for: [receiveEvent], timeout: 0.1)
+        }
+    }
+
+    func testSingleEventPerUpdate() {
+        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat"))
+        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
+        let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [thermostat,lamp])
+        let application = characteristics(device: device)
+
+        let connection = MockConnection()
+        withExtendedLifetime(connection) {
+
+            // subscribe to lamp events
+            do {
+                let body = try! JSONSerialization.data(withJSONObject: [
+                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "ev": true]]
+                    ], options: [])
+                let response = application(connection, MockRequest(method: "PUT", path: "/characteristics", body: body))
+                XCTAssertEqual(response.status, .noContent)
+            }
+
+            // setup our expectations
+            let receiveEvent = expectation(description: "should not receive an event")
+            receiveEvent.assertForOverFulfill = true
+            connection.sideChannelDelegate = { _ in receiveEvent.fulfill() }
+
+            // turn lamp on
+            do {
+                let body = try! JSONSerialization.data(withJSONObject: [
+                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 1]]
+                    ], options: [])
+                let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
+                XCTAssertEqual(response.status, .noContent)
+            }
+
+            // if no multiple events within 100ms, the test succeeds
             wait(for: [receiveEvent], timeout: 0.1)
         }
     }
