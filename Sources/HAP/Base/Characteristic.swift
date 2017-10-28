@@ -78,8 +78,6 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
         case .none:
             _value = nil
         }
-        guard let device = service?.accessory?.device else { return }
-        device.notify(characteristicListeners: self, exceptListener: connection)
         _ = onValueChange.map { $0(_value) }
     }
     
