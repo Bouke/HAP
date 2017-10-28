@@ -12,6 +12,7 @@ class EndpointTests: XCTestCase {
             ("testPutDoubleAndEnumCharacteristics", testPutDoubleAndEnumCharacteristics),
             ("testPutBadCharacteristics", testPutBadCharacteristics),
             ("testGetBadCharacteristics", testGetBadCharacteristics),
+            ("testNoEventsToSelf", testNoEventsToSelf),
             ("testDelayMultipleEvents", testDelayMultipleEvents),
             ("testDelayMultipleEventsCoalescence", testDelayMultipleEventsCoalescence),
             ("testDelayMultipleEventsCoalescenceFiltering", testDelayMultipleEventsCoalescenceFiltering),
@@ -600,6 +601,43 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(light["status"] as? Int,HAPStatusCodes.writeOnly.rawValue)
             XCTAssertEqual(therm["status"] as? Int,HAPStatusCodes.success.rawValue)
             XCTAssertEqual(Double(value: therm["value"] as Any), thermostat.thermostat.currentTemperature.value)
+        }
+    }
+
+    func testNoEventsToSelf() {
+        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat"))
+        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
+        let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [thermostat,lamp])
+        let application = characteristics(device: device)
+
+        let connection = MockConnection()
+        withExtendedLifetime(connection) {
+
+            // subscribe to lamp events
+            do {
+                let body = try! JSONSerialization.data(withJSONObject: [
+                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "ev": true]]
+                    ], options: [])
+                let response = application(connection, MockRequest(method: "PUT", path: "/characteristics", body: body))
+                XCTAssertEqual(response.status, .noContent)
+            }
+
+            // setup our expectations
+            let receiveEvent = expectation(description: "should not receive an event")
+            connection.sideChannelDelegate = { _ in receiveEvent.fulfill() }
+            receiveEvent.isInverted = true
+
+            // turn lamp on
+            do {
+                let body = try! JSONSerialization.data(withJSONObject: [
+                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 1]]
+                    ], options: [])
+                let response = application(connection, MockRequest(method: "PUT", path: "/characteristics", body: body))
+                XCTAssertEqual(response.status, .noContent)
+            }
+
+            // if no event within 100ms, the test succeeds
+            wait(for: [receiveEvent], timeout: 0.1)
         }
     }
 
