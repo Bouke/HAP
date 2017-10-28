@@ -637,8 +637,8 @@ class EndpointTests: XCTestCase {
                 XCTAssertEqual(response.status, .noContent)
             }
 
-            // if no event within 100ms, the test succeeds
-            wait(for: [receiveEvent], timeout: 0.1)
+            // if no event within 10ms, the test succeeds
+            wait(for: [receiveEvent], timeout: 0.01)
         }
     }
 
@@ -674,8 +674,8 @@ class EndpointTests: XCTestCase {
                 XCTAssertEqual(response.status, .noContent)
             }
 
-            // if no multiple events within 100ms, the test succeeds
-            wait(for: [receiveEvent], timeout: 0.1)
+            // if no multiple events within 10ms, the test succeeds
+            wait(for: [receiveEvent], timeout: 0.01)
         }
     }
 
@@ -711,7 +711,7 @@ class EndpointTests: XCTestCase {
                 let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
                 XCTAssertEqual(response.status, .noContent)
 
-                wait(for: [expectation], timeout: 0.1)
+                wait(for: [expectation], timeout: 0.01)
             }
 
             // turn lamp off from different connection
@@ -728,11 +728,11 @@ class EndpointTests: XCTestCase {
                 let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
                 XCTAssertEqual(response.status, .noContent)
 
-                wait(for: [expectation], timeout: 2.1)
+                wait(for: [expectation], timeout: 1.01)
             }
 
             let delay = secondEventTimestamp.timeIntervalSince(firstEventTimestamp)
-            XCTAssert(delay > 2, "received event in \(delay) seconds of previous event, events should be sent at a interval of 2 seconds or more")
+            XCTAssert(delay >= 1, "received event in \(delay) seconds of previous event, events should be sent at a interval of 1 seconds or more")
         }
     }
 
@@ -771,7 +771,7 @@ class EndpointTests: XCTestCase {
                 let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
                 XCTAssertEqual(response.status, .noContent)
 
-                wait(for: [expectation], timeout: 0.1)
+                wait(for: [expectation], timeout: 0.01)
             }
 
             var secondEventTimestamp: Date!
@@ -801,7 +801,7 @@ class EndpointTests: XCTestCase {
                     XCTAssertEqual(response.status, .noContent)
                 }
 
-                wait(for: [expectation], timeout: 2.1)
+                wait(for: [expectation], timeout: 1.01)
             }
 
             guard
@@ -815,7 +815,7 @@ class EndpointTests: XCTestCase {
             XCTAssert(eventCharacteristics.count == 2, "consecutive updates within the 2-second interval should have coalesced")
 
             let delay = secondEventTimestamp.timeIntervalSince(firstEventTimestamp)
-            XCTAssert(delay > 2, "received event in \(delay) seconds of previous event, events should be sent at a interval of 2 seconds or more")
+            XCTAssert(delay >= 1, "received event in \(delay) seconds of previous event, events should be sent at a interval of 1 seconds or more")
         }
     }
 
@@ -857,7 +857,7 @@ class EndpointTests: XCTestCase {
                 let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
                 XCTAssertEqual(response.status, .noContent)
 
-                wait(for: [expectation], timeout: 0.1)
+                wait(for: [expectation], timeout: 0.01)
             }
 
             var secondEventTimestamp: Date!
@@ -887,11 +887,11 @@ class EndpointTests: XCTestCase {
                     XCTAssertEqual(response.status, .noContent)
                 }
 
-                wait(for: [expectation], timeout: 2.1)
+                wait(for: [expectation], timeout: 1.01)
             }
 
             let delay = secondEventTimestamp.timeIntervalSince(firstEventTimestamp)
-            XCTAssert(delay > 2, "received event in \(delay) seconds of previous event, events should be sent at a interval of 2 seconds or more")
+            XCTAssert(delay >= 1, "received event in \(delay) seconds of previous event, events should be sent at a interval of 1 seconds or more")
 
             guard
                 let event = Event(deserialize: secondEventData),
