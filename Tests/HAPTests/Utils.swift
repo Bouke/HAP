@@ -98,4 +98,9 @@ final class MockRequest: ServerRequest {
 }
 
 class MockConnection: HAP.Server.Connection {
+    var sideChannelDelegate: ((Data) -> Void)?
+
+    override func writeOutOfBand(_ data: Data) {
+        sideChannelDelegate?(data)
+    }
 }
