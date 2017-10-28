@@ -4,7 +4,19 @@ import Foundation
 import XCTest
 
 class EndpointTests: XCTestCase {
-    static var allTests : [(String, (EndpointTests) -> () throws -> Void)] {
+    static var allTests: [(String, (EndpointTests) -> () throws -> Void)] {
+        #if os(macOS)
+            let asynchronousTests: [(String, (EndpointTests) -> () throws -> Void)] = [
+                ("testNoEventsToSelf", testNoEventsToSelf),
+                ("testSingleEventPerUpdate", testSingleEventPerUpdate),
+                ("testDelayMultipleEvents", testDelayMultipleEvents),
+                ("testDelayMultipleEventsCoalescence", testDelayMultipleEventsCoalescence),
+                ("testDelayMultipleEventsCoalescenceFiltering", testDelayMultipleEventsCoalescenceFiltering),
+            ]
+        #else
+            let asynchronousTests: [(String, (EndpointTests) -> () throws -> Void)] = []
+        #endif
+
         return [
             ("testAccessories", testAccessories),
             ("testGetCharacteristics", testGetCharacteristics),
@@ -12,13 +24,8 @@ class EndpointTests: XCTestCase {
             ("testPutDoubleAndEnumCharacteristics", testPutDoubleAndEnumCharacteristics),
             ("testPutBadCharacteristics", testPutBadCharacteristics),
             ("testGetBadCharacteristics", testGetBadCharacteristics),
-            ("testNoEventsToSelf", testNoEventsToSelf),
-            ("testSingleEventPerUpdate", testSingleEventPerUpdate),
-            ("testDelayMultipleEvents", testDelayMultipleEvents),
-            ("testDelayMultipleEventsCoalescence", testDelayMultipleEventsCoalescence),
-            ("testDelayMultipleEventsCoalescenceFiltering", testDelayMultipleEventsCoalescenceFiltering),
             ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests),
-        ]
+        ] + asynchronousTests
     }
     
     func testAccessories() {
@@ -605,6 +612,7 @@ class EndpointTests: XCTestCase {
         }
     }
 
+  #if os(macOS)
     func testNoEventsToSelf() {
         let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat"))
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
@@ -905,6 +913,7 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(eventCharacteristics[0]["value"] as? On, true, "the lamp should be on")
         }
     }
+  #endif
 
     // from: https://oleb.net/blog/2017/03/keeping-xctest-in-sync/#appendix-code-generation-with-sourcery
     func testLinuxTestSuiteIncludesAllTests() {
