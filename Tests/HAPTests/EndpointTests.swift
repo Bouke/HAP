@@ -705,7 +705,7 @@ class EndpointTests: XCTestCase {
             }
 
             // turn lamp on from different connection
-            var firstEventTimestamp: Date!
+            var firstEventTimestamp: Date?
             do {
                 let expectation = XCTestExpectation(description: "should receive an event")
                 connection.sideChannelDelegate = { _ in
@@ -723,7 +723,7 @@ class EndpointTests: XCTestCase {
             }
 
             // turn lamp off from different connection
-            var secondEventTimestamp: Date!
+            var secondEventTimestamp: Date?
             do {
                 let expectation = XCTestExpectation(description: "should receive an event")
                 connection.sideChannelDelegate = { _ in
@@ -739,8 +739,10 @@ class EndpointTests: XCTestCase {
                 wait(for: [expectation], timeout: 1.01)
             }
 
-            let delay = secondEventTimestamp.timeIntervalSince(firstEventTimestamp)
-            XCTAssert(delay >= 1, "received event in \(delay) seconds of previous event, events should be sent at a interval of 1 seconds or more")
+            if let firstEventTimestamp = firstEventTimestamp, let secondEventTimestamp = secondEventTimestamp {
+                let delay = secondEventTimestamp.timeIntervalSince(firstEventTimestamp)
+                XCTAssert(delay >= 1, "received event in \(delay) seconds of previous event, events should be sent at a interval of 1 seconds or more")
+            }
         }
     }
 
@@ -765,7 +767,7 @@ class EndpointTests: XCTestCase {
             }
 
             // first event: turn lamp on from different connection
-            var firstEventTimestamp: Date!
+            var firstEventTimestamp: Date?
             do {
                 let expectation = XCTestExpectation(description: "should receive an event")
                 connection.sideChannelDelegate = { _ in
@@ -782,8 +784,8 @@ class EndpointTests: XCTestCase {
                 wait(for: [expectation], timeout: 0.01)
             }
 
-            var secondEventTimestamp: Date!
-            var secondEventData: Data!
+            var secondEventTimestamp: Date?
+            var secondEventData: Data?
             do {
                 let expectation = XCTestExpectation(description: "should receive an single event")
                 expectation.assertForOverFulfill = true
@@ -813,7 +815,8 @@ class EndpointTests: XCTestCase {
             }
 
             guard
-                let event = Event(deserialize: secondEventData),
+                secondEventData != nil,
+                let event = Event(deserialize: secondEventData!),
                 let eventJson = try? JSONSerialization.jsonObject(with: event.body, options: []),
                 let eventCharacteristics = (eventJson as? [String: Any])?["characteristics"] as? [[String:Any]]
                 else {
@@ -822,8 +825,10 @@ class EndpointTests: XCTestCase {
             }
             XCTAssert(eventCharacteristics.count == 2, "consecutive updates within the 2-second interval should have coalesced")
 
-            let delay = secondEventTimestamp.timeIntervalSince(firstEventTimestamp)
-            XCTAssert(delay >= 1, "received event in \(delay) seconds of previous event, events should be sent at a interval of 1 seconds or more")
+            if let firstEventTimestamp = firstEventTimestamp, let secondEventTimestamp = secondEventTimestamp {
+                let delay = secondEventTimestamp.timeIntervalSince(firstEventTimestamp)
+                XCTAssert(delay >= 1, "received event in \(delay) seconds of previous event, events should be sent at a interval of 1 seconds or more")
+            }
         }
     }
 
@@ -851,7 +856,7 @@ class EndpointTests: XCTestCase {
             }
 
             // first event: turn lamp on from different connection
-            var firstEventTimestamp: Date!
+            var firstEventTimestamp: Date?
             do {
                 let expectation = XCTestExpectation(description: "should receive an event")
                 connection.sideChannelDelegate = { _ in
@@ -868,8 +873,8 @@ class EndpointTests: XCTestCase {
                 wait(for: [expectation], timeout: 0.01)
             }
 
-            var secondEventTimestamp: Date!
-            var secondEventData: Data!
+            var secondEventTimestamp: Date?
+            var secondEventData: Data?
             do {
                 let expectation = XCTestExpectation(description: "should receive an single event")
                 expectation.assertForOverFulfill = true
@@ -898,11 +903,14 @@ class EndpointTests: XCTestCase {
                 wait(for: [expectation], timeout: 1.01)
             }
 
-            let delay = secondEventTimestamp.timeIntervalSince(firstEventTimestamp)
-            XCTAssert(delay >= 1, "received event in \(delay) seconds of previous event, events should be sent at a interval of 1 seconds or more")
+            if let firstEventTimestamp = firstEventTimestamp, let secondEventTimestamp = secondEventTimestamp {
+                let delay = secondEventTimestamp.timeIntervalSince(firstEventTimestamp)
+                XCTAssert(delay >= 1, "received event in \(delay) seconds of previous event, events should be sent at a interval of 1 seconds or more")
+            }
 
             guard
-                let event = Event(deserialize: secondEventData),
+                secondEventData != nil,
+                let event = Event(deserialize: secondEventData!),
                 let eventJson = try? JSONSerialization.jsonObject(with: event.body, options: []),
                 let eventCharacteristics = (eventJson as? [String: Any])?["characteristics"] as? [[String:Any]]
                 else {
