@@ -4,7 +4,19 @@ import Foundation
 import XCTest
 
 class EndpointTests: XCTestCase {
-    static var allTests : [(String, (EndpointTests) -> () throws -> Void)] {
+    static var allTests: [(String, (EndpointTests) -> () throws -> Void)] {
+        #if os(macOS)
+            let asynchronousTests: [(String, (EndpointTests) -> () throws -> Void)] = [
+                ("testNoEventsToSelf", testNoEventsToSelf),
+                ("testSingleEventPerUpdate", testSingleEventPerUpdate),
+                ("testDelayMultipleEvents", testDelayMultipleEvents),
+                ("testDelayMultipleEventsCoalescence", testDelayMultipleEventsCoalescence),
+                ("testDelayMultipleEventsCoalescenceFiltering", testDelayMultipleEventsCoalescenceFiltering),
+            ]
+        #else
+            let asynchronousTests: [(String, (EndpointTests) -> () throws -> Void)] = []
+        #endif
+
         return [
             ("testAccessories", testAccessories),
             ("testGetCharacteristics", testGetCharacteristics),
@@ -13,7 +25,7 @@ class EndpointTests: XCTestCase {
             ("testPutBadCharacteristics", testPutBadCharacteristics),
             ("testGetBadCharacteristics", testGetBadCharacteristics),
             ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests),
-        ]
+        ] + asynchronousTests
     }
     
     func testAccessories() {
@@ -592,13 +604,319 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(therm["status"] as? Int,HAPStatusCodes.success.rawValue)
             XCTAssertEqual(Double(value: therm["value"] as Any), thermostat.thermostat.currentTemperature.value)
         }
-        
-        
     }
-    
-    
-    
-    
+
+  #if os(macOS)
+    func testNoEventsToSelf() {
+        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat"))
+        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
+        let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [thermostat,lamp])
+        let application = characteristics(device: device)
+
+        let connection = MockConnection()
+        withExtendedLifetime(connection) {
+
+            // subscribe to lamp events
+            do {
+                let body = try! JSONSerialization.data(withJSONObject: [
+                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "ev": true]]
+                    ], options: [])
+                let response = application(connection, MockRequest(method: "PUT", path: "/characteristics", body: body))
+                XCTAssertEqual(response.status, .noContent)
+            }
+
+            // setup our expectations
+            let receiveEvent = expectation(description: "should not receive an event")
+            connection.sideChannelDelegate = { _ in receiveEvent.fulfill() }
+            receiveEvent.isInverted = true
+
+            // turn lamp on
+            do {
+                let body = try! JSONSerialization.data(withJSONObject: [
+                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 1]]
+                    ], options: [])
+                let response = application(connection, MockRequest(method: "PUT", path: "/characteristics", body: body))
+                XCTAssertEqual(response.status, .noContent)
+            }
+
+            // if no event within 10ms, the test succeeds
+            wait(for: [receiveEvent], timeout: 0.01)
+        }
+    }
+
+    func testSingleEventPerUpdate() {
+        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat"))
+        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
+        let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [thermostat,lamp])
+        let application = characteristics(device: device)
+
+        let connection = MockConnection()
+        withExtendedLifetime(connection) {
+
+            // subscribe to lamp events
+            do {
+                let body = try! JSONSerialization.data(withJSONObject: [
+                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "ev": true]]
+                    ], options: [])
+                let response = application(connection, MockRequest(method: "PUT", path: "/characteristics", body: body))
+                XCTAssertEqual(response.status, .noContent)
+            }
+
+            // setup our expectations
+            let receiveEvent = expectation(description: "should not receive an event")
+            receiveEvent.assertForOverFulfill = true
+            connection.sideChannelDelegate = { _ in receiveEvent.fulfill() }
+
+            // turn lamp on
+            do {
+                let body = try! JSONSerialization.data(withJSONObject: [
+                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 1]]
+                    ], options: [])
+                let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
+                XCTAssertEqual(response.status, .noContent)
+            }
+
+            // if no multiple events within 10ms, the test succeeds
+            wait(for: [receiveEvent], timeout: 0.01)
+        }
+    }
+
+    func testDelayMultipleEvents() {
+        let lamp = Accessory.Lightbulb(info: .init(name: "Diner table"))
+        let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [lamp])
+        let application = characteristics(device: device)
+
+        let connection = MockConnection()
+        withExtendedLifetime(connection) {
+
+            // subscribe to lamp events
+            do {
+                let body = try! JSONSerialization.data(withJSONObject: [
+                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "ev": true]]
+                ], options: [])
+                let response = application(connection, MockRequest(method: "PUT", path: "/characteristics", body: body))
+                XCTAssertEqual(response.status, .noContent)
+            }
+
+            // turn lamp on from different connection
+            var firstEventTimestamp: Date?
+            do {
+                let expectation = XCTestExpectation(description: "should receive an event")
+                connection.sideChannelDelegate = { _ in
+                    firstEventTimestamp = Date()
+                    expectation.fulfill()
+                }
+
+                let body = try! JSONSerialization.data(withJSONObject: [
+                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 1]]
+                    ], options: [])
+                let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
+                XCTAssertEqual(response.status, .noContent)
+
+                wait(for: [expectation], timeout: 0.01)
+            }
+
+            // turn lamp off from different connection
+            var secondEventTimestamp: Date?
+            do {
+                let expectation = XCTestExpectation(description: "should receive an event")
+                connection.sideChannelDelegate = { _ in
+                    secondEventTimestamp = Date()
+                    expectation.fulfill()
+                }
+                let body = try! JSONSerialization.data(withJSONObject: [
+                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 0]]
+                    ], options: [])
+                let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
+                XCTAssertEqual(response.status, .noContent)
+
+                wait(for: [expectation], timeout: 1.01)
+            }
+
+            if let firstEventTimestamp = firstEventTimestamp, let secondEventTimestamp = secondEventTimestamp {
+                let delay = secondEventTimestamp.timeIntervalSince(firstEventTimestamp)
+                XCTAssert(delay >= 1, "received event in \(delay) seconds of previous event, events should be sent at a interval of 1 seconds or more")
+            }
+        }
+    }
+
+    func testDelayMultipleEventsCoalescence() {
+        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat"))
+        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
+        let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [thermostat,lamp])
+        let application = characteristics(device: device)
+
+        let connection = MockConnection()
+        withExtendedLifetime(connection) {
+
+            // subscribe to lamp events
+            do {
+                let body = try! JSONSerialization.data(withJSONObject: [
+                    "characteristics": [
+                        ["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "ev": true],
+                        ["aid": thermostat.aid, "iid": thermostat.thermostat.targetTemperature.iid, "ev": true]
+                    ]], options: [])
+                let response = application(connection, MockRequest(method: "PUT", path: "/characteristics", body: body))
+                XCTAssertEqual(response.status, .noContent)
+            }
+
+            // first event: turn lamp on from different connection
+            var firstEventTimestamp: Date?
+            do {
+                let expectation = XCTestExpectation(description: "should receive an event")
+                connection.sideChannelDelegate = { _ in
+                    firstEventTimestamp = Date()
+                    expectation.fulfill()
+                }
+
+                let body = try! JSONSerialization.data(withJSONObject: [
+                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 1]]
+                    ], options: [])
+                let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
+                XCTAssertEqual(response.status, .noContent)
+
+                wait(for: [expectation], timeout: 0.01)
+            }
+
+            var secondEventTimestamp: Date?
+            var secondEventData: Data?
+            do {
+                let expectation = XCTestExpectation(description: "should receive an single event")
+                expectation.assertForOverFulfill = true
+                connection.sideChannelDelegate = { (data) in
+                    secondEventTimestamp = Date()
+                    secondEventData = data
+                    expectation.fulfill()
+                }
+                // second update: turn lamp off
+                do {
+                    let body = try! JSONSerialization.data(withJSONObject: [
+                        "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 0]]
+                        ], options: [])
+                    let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
+                    XCTAssertEqual(response.status, .noContent)
+                }
+                // third update: change target temperature
+                do {
+                    let body = try! JSONSerialization.data(withJSONObject: [
+                        "characteristics": [["aid": thermostat.aid, "iid": thermostat.thermostat.targetTemperature.iid, "value": 17.5]]
+                        ], options: [])
+                    let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
+                    XCTAssertEqual(response.status, .noContent)
+                }
+
+                wait(for: [expectation], timeout: 1.01)
+            }
+
+            guard
+                secondEventData != nil,
+                let event = Event(deserialize: secondEventData!),
+                let eventJson = try? JSONSerialization.jsonObject(with: event.body, options: []),
+                let eventCharacteristics = (eventJson as? [String: Any])?["characteristics"] as? [[String:Any]]
+                else {
+                    XCTFail("Could not decode event")
+                    return
+            }
+            XCTAssert(eventCharacteristics.count == 2, "consecutive updates within the 2-second interval should have coalesced")
+
+            if let firstEventTimestamp = firstEventTimestamp, let secondEventTimestamp = secondEventTimestamp {
+                let delay = secondEventTimestamp.timeIntervalSince(firstEventTimestamp)
+                XCTAssert(delay >= 1, "received event in \(delay) seconds of previous event, events should be sent at a interval of 1 seconds or more")
+            }
+        }
+    }
+
+    func testDelayMultipleEventsCoalescenceFiltering() {
+        // Either we keep track of the state of a characteristic on individual
+        // and only notify the actual changes. Or we only send the last relevant
+        // state of a characteristic. This test assumes the latter, so if we
+        // change to the other, this test needs to check for absence of updates
+        // instead.
+
+        let lamp = Accessory.Lightbulb(info: .init(name: "Kitchen table"))
+        let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [lamp])
+        let application = characteristics(device: device)
+
+        let connection = MockConnection()
+        withExtendedLifetime(connection) {
+
+            // subscribe to lamp events
+            do {
+                let body = try! JSONSerialization.data(withJSONObject: [
+                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "ev": true]]
+                    ], options: [])
+                let response = application(connection, MockRequest(method: "PUT", path: "/characteristics", body: body))
+                XCTAssertEqual(response.status, .noContent)
+            }
+
+            // first event: turn lamp on from different connection
+            var firstEventTimestamp: Date?
+            do {
+                let expectation = XCTestExpectation(description: "should receive an event")
+                connection.sideChannelDelegate = { _ in
+                    firstEventTimestamp = Date()
+                    expectation.fulfill()
+                }
+
+                let body = try! JSONSerialization.data(withJSONObject: [
+                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 1]]
+                    ], options: [])
+                let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
+                XCTAssertEqual(response.status, .noContent)
+
+                wait(for: [expectation], timeout: 0.01)
+            }
+
+            var secondEventTimestamp: Date?
+            var secondEventData: Data?
+            do {
+                let expectation = XCTestExpectation(description: "should receive an single event")
+                expectation.assertForOverFulfill = true
+                connection.sideChannelDelegate = { (data) in
+                    secondEventTimestamp = Date()
+                    secondEventData = data
+                    expectation.fulfill()
+                }
+                // second update: turn lamp off
+                do {
+                    let body = try! JSONSerialization.data(withJSONObject: [
+                        "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 0]]
+                        ], options: [])
+                    let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
+                    XCTAssertEqual(response.status, .noContent)
+                }
+                // second update: turn lamp on again
+                do {
+                    let body = try! JSONSerialization.data(withJSONObject: [
+                        "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 1]]
+                        ], options: [])
+                    let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
+                    XCTAssertEqual(response.status, .noContent)
+                }
+
+                wait(for: [expectation], timeout: 1.01)
+            }
+
+            if let firstEventTimestamp = firstEventTimestamp, let secondEventTimestamp = secondEventTimestamp {
+                let delay = secondEventTimestamp.timeIntervalSince(firstEventTimestamp)
+                XCTAssert(delay >= 1, "received event in \(delay) seconds of previous event, events should be sent at a interval of 1 seconds or more")
+            }
+
+            guard
+                secondEventData != nil,
+                let event = Event(deserialize: secondEventData!),
+                let eventJson = try? JSONSerialization.jsonObject(with: event.body, options: []),
+                let eventCharacteristics = (eventJson as? [String: Any])?["characteristics"] as? [[String:Any]]
+                else {
+                    XCTFail("Could not decode event")
+                    return
+            }
+            XCTAssertEqual(eventCharacteristics.count, 1, "when a characteristic receives multiple updates within the coalescing window, we should only send the last relevant update, not all intermediate updates")
+            XCTAssertEqual(eventCharacteristics[0]["value"] as? On, true, "the lamp should be on")
+        }
+    }
+  #endif
+
     // from: https://oleb.net/blog/2017/03/keeping-xctest-in-sync/#appendix-code-generation-with-sourcery
     func testLinuxTestSuiteIncludesAllTests() {
         #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)

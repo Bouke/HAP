@@ -12,6 +12,39 @@ struct Event {
         headers["Content-Type"] = mimeType
     }
 
+    init?(deserialize data: Data) {
+        let scanner = DataScanner(data: data)
+        let space = " ".data(using: .utf8)!
+        let newline = "\r\n".data(using: .utf8)!
+        let headerSeparator = ": ".data(using: .utf8)!
+        guard
+            let _ = scanner.scan("EVENT/1.0 "),
+            let statusCode = scanner.scanUpTo(" ").flatMap({ Int($0) }),
+            let status = Response.Status(rawValue: statusCode),
+            let _ = scanner.scan(space),
+            let statusText = scanner.scanUpTo("\r\n"),
+            let _ = scanner.scan(newline)
+            else {
+                return nil
+        }
+        self.status = status
+        while true {
+            if let _ = scanner.scan(newline) { 
+                break
+            }
+            guard
+                let key = scanner.scanUpTo(": "),
+                let _ = scanner.scan(headerSeparator),
+                let value = scanner.scanUpTo("\r\n"),
+                let _ = scanner.scan(newline)
+                else {
+                    return nil
+            }
+            headers[key] = value
+        }
+        body = data[scanner.scanLocation..<data.endIndex]
+    }
+
     func serialized() -> Data {
         // @todo should set additional headers here as well?
         let headers = self.headers.map({ "\($0): \($1)\r\n" }).joined(separator: "")
