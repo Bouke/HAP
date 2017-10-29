@@ -14,12 +14,9 @@ func pairVerify(device: Device) -> Application {
             logger.warning("Could not decode message")
             return .badRequest
         }
-        print(body.hex)
-        print(data)
         guard let sequence = data[.sequence]?.first.flatMap({ PairVerifyStep(rawValue: $0) }) else {
             return .badRequest
         }
-        print(sequence)
 
         switch sequence {
         case .startRequest:
