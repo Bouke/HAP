@@ -1,9 +1,12 @@
-import Foundation
-import HKDF
-import CLibSodium
 import func Evergreen.getLogger
+import Foundation
 
-fileprivate let logger = getLogger("hap.pairVerify")
+fileprivate let logger = getLogger("hap.endpoints.pair-verify")
+fileprivate typealias Session = PairVerifyController.Session
+fileprivate let SESSION_KEY = "hap.pair-verify.session"
+fileprivate enum Error: Swift.Error {
+    case noSession
+}
 
 func pairVerify(device: Device) -> Application {
     let controller = PairVerifyController(device: device)
@@ -14,46 +17,30 @@ func pairVerify(device: Device) -> Application {
             logger.warning("Could not decode message")
             return .badRequest
         }
-        print(body.hex)
-        print(data)
         guard let sequence = data[.sequence]?.first.flatMap({ PairVerifyStep(rawValue: $0) }) else {
             return .badRequest
         }
-        print(sequence)
-
-        switch sequence {
-        case .startRequest:
-            logger.info("Pair verify started")
-            let response: PairTagTLV8
-            let session: PairVerifyController.Session
-            do {
-                (response, session) = try controller.startRequest(data)
-            } catch {
-                logger.warning(error)
+        do {
+            switch sequence {
+            case .startRequest:
+                let (response, session) = try controller.startRequest(data)
+                connection.context[SESSION_KEY] = session
+                return Response(status: .ok, data: encode(response), mimeType: "application/pairing+tlv8")
+            case .finishRequest:
+                guard let session = connection.context[SESSION_KEY] as? Session else {
+                    throw Error.noSession
+                }
+                let result = try controller.finishRequest(data, session)
+                let response = UpgradeResponse(cryptographer: Cryptographer(sharedKey: session.sharedSecret))
+                response.headers["Content-Type"] = "application/pairing+tlv8"
+                response.body = encode(result)
+                return response
+            default:
                 return .badRequest
             }
-            connection.context["hap.pairVerify.session"] = session
-            return Response(status: .ok, data: encode(response), mimeType: "application/pairing+tlv8")
-
-        case .finishRequest:
-            guard let session = connection.context["hap.pairVerify.session"] as? PairVerifyController.Session else {
-                logger.warning("No session")
-                return .badRequest
-            }
-            let result: PairTagTLV8
-            do {
-                result = try controller.finishRequest(data, session)
-            } catch {
-                logger.warning(error)
-                return .badRequest
-            }
-            
-            let response = UpgradeResponse(cryptographer: Cryptographer(sharedKey: session.sharedSecret))
-            response.headers["Content-Type"] = "application/pairing+tlv8"
-            response.body = encode(result)
-            return response
-
-        default: return .badRequest
+        } catch {
+            logger.warning(error)
+            return .badRequest
         }
     }
 }

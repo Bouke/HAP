@@ -153,6 +153,10 @@ public class Server: NSObject, NetServiceDelegate {
                 socket.close()
             }
         }
+
+        var isAuthenticated: Bool {
+            return cryptographer != nil
+        }
     }
     
     
