@@ -5,7 +5,7 @@ import Foundation
 import HKDF
 import SRP
 
-fileprivate let logger = getLogger("hap.pair-verify")
+fileprivate let logger = getLogger("hap.controllers.pair-verify")
 
 class PairVerifyController {
     struct Session {
