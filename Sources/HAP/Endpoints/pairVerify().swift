@@ -1,9 +1,12 @@
-import Foundation
-import HKDF
-import CLibSodium
 import func Evergreen.getLogger
+import Foundation
 
-fileprivate let logger = getLogger("hap.pairVerify")
+fileprivate let logger = getLogger("hap.endpoints.pair-verify")
+fileprivate typealias Session = PairVerifyController.Session
+fileprivate let SESSION_KEY = "hap.pair-verify.session"
+fileprivate enum Error: Swift.Error {
+    case noSession
+}
 
 func pairVerify(device: Device) -> Application {
     let controller = PairVerifyController(device: device)
@@ -20,14 +23,12 @@ func pairVerify(device: Device) -> Application {
         do {
             switch sequence {
             case .startRequest:
-                logger.info("Pair verify started")
                 let (response, session) = try controller.startRequest(data)
-                connection.context["hap.pairVerify.session"] = session
+                connection.context[SESSION_KEY] = session
                 return Response(status: .ok, data: encode(response), mimeType: "application/pairing+tlv8")
             case .finishRequest:
-                guard let session = connection.context["hap.pairVerify.session"] as? PairVerifyController.Session else {
-                    logger.warning("No session")
-                    return .badRequest
+                guard let session = connection.context[SESSION_KEY] as? Session else {
+                    throw Error.noSession
                 }
                 let result = try controller.finishRequest(data, session)
                 let response = UpgradeResponse(cryptographer: Cryptographer(sharedKey: session.sharedSecret))

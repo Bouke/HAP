@@ -80,6 +80,7 @@ class Response {
 extension Response {
     static var ok: Response { return Response(status: .ok) }
     static var badRequest: Response { return  Response(status: .badRequest) }
+    static var forbidden: Response { return  Response(status: .forbidden) }
     static var methodNotAllowed: Response { return  Response(status: .methodNotAllowed) }
     static var unprocessableEntity: Response { return  Response(status: .unprocessableEntity) }
     static var notFound: Response { return  Response(status: .notFound) }
