@@ -22,7 +22,11 @@ public class Server: NSObject, NetServiceDelegate {
         
         func addCharacteristic(_ characteristic: Characteristic) {
             concurrentQueue.async(flags: .barrier) {
-                self.queue.append(characteristic)
+                if let index = self.queue.index(where: {$0 === characteristic}) {
+                    self.queue[index] = characteristic
+                } else {
+                    self.queue.append(characteristic)
+                }
             }
         }
         
