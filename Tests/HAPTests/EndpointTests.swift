@@ -37,7 +37,7 @@ class EndpointTests: XCTestCase {
         guard let accessory = jsonObject["accessories"]?.first else {
             return XCTFail("No accessory")
         }
-        XCTAssertEqual(accessory["aid"] as? Int, lamp.aid)
+        XCTAssertEqual(accessory["aid"] as? Int, 1)
         guard let services = accessory["services"] as? [[String: Any]] else {
             return XCTFail("No services")
         }
@@ -46,12 +46,12 @@ class EndpointTests: XCTestCase {
             return XCTFail("No meta")
         }
         XCTAssertEqual(metaService["iid"] as? Int, 1)
-        XCTAssertEqual((metaService["characteristics"] as? [Any])?.count, 6)
+        XCTAssertEqual((metaService["characteristics"] as? [Any])?.count, 5)
         
         guard let lampService = services.first(where: { ($0["type"] as? String) == "43" }) else {
             return XCTFail("No lamp")
         }
-        XCTAssertEqual(lampService["iid"] as? Int, 8)
+        XCTAssertEqual(lampService["iid"] as? Int, 7)
         
         guard let lampCharacteristics = lampService["characteristics"] as? [[String: Any]] else {
             return XCTFail("No lamp characteristics")
@@ -60,11 +60,13 @@ class EndpointTests: XCTestCase {
     }
 
     
+    /// This test assumes that 1.3 and 1.5 are respectively `manufacturer` and
+    /// `name`. This does not need to be the case.
     func testGetCharacteristics() {
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", manufacturer: "Bouke"))
         let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [lamp])
         let application = characteristics(device: device)
-        let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=1.\(lamp.info.manufacturer.iid),1.\(lamp.info.name.iid)"))
+        let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=1.3,1.5"))
         guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body!, options: [])) as? [String: [[String: Any]]] else {
             return XCTFail("Could not decode")
         }
@@ -72,17 +74,19 @@ class EndpointTests: XCTestCase {
             return XCTFail("No characteristics")
         }
         
-        guard let manufacturerCharacteristic = characteristics.first(where: { $0["iid"] as? Int == lamp.info.manufacturer.iid }) else {
+        guard let manufacturerCharacteristic = characteristics.first(where: { $0["iid"] as? Int == 3 }) else {
             return XCTFail("No manufacturer")
         }
         XCTAssertEqual(manufacturerCharacteristic["value"] as? String, "Bouke")
         
-        guard let nameCharacteristic = characteristics.first(where: { $0["iid"] as? Int == lamp.info.name.iid }) else {
+        guard let nameCharacteristic = characteristics.first(where: { $0["iid"] as? Int == 5 }) else {
             return XCTFail("No name")
         }
         XCTAssertEqual(nameCharacteristic["value"] as? String, "Night stand left")
     }
     
+    /// This test assumes that 1.3 and 1.5 are respectively `manufacturer` and
+    /// `name`. This does not need to be the case.
     func testPutBoolAndIntCharacteristics() {
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", manufacturer: "Bouke"))
         let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [lamp])
@@ -96,8 +100,8 @@ class EndpointTests: XCTestCase {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
-                        "aid": lamp.aid,
-                        "iid": lamp.lightbulb.on.iid,
+                        "aid": 1,
+                        "iid": 8,
                         "value": 1
                     ]
                 ]
@@ -113,8 +117,8 @@ class EndpointTests: XCTestCase {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
-                        "aid": lamp.aid,
-                        "iid": lamp.lightbulb.brightness.iid,
+                        "aid": 1,
+                        "iid": 9,
                         "value": Double(50)
                     ]
                 ]
@@ -130,8 +134,8 @@ class EndpointTests: XCTestCase {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
-                        "aid": lamp.aid,
-                        "iid": lamp.lightbulb.brightness.iid,
+                        "aid": 1,
+                        "iid": 9,
                         "value": Double(100)
                     ]
                 ]
@@ -143,6 +147,8 @@ class EndpointTests: XCTestCase {
         }
     }
 
+    /// This test assumes that 1.3 and 1.5 are respectively `manufacturer` and
+    /// `name`. This does not need to be the case.
     func testPutDoubleAndEnumCharacteristics() {
         let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat", manufacturer: "Bouke"))
         let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [thermostat])
@@ -159,13 +165,13 @@ class EndpointTests: XCTestCase {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
-                        "aid": thermostat.aid,
-                        "iid": thermostat.thermostat.targetTemperature.iid,
+                        "aid": 1,
+                        "iid": 11,
                         "value": 19.5
                     ],
                     [
-                        "aid": thermostat.aid,
-                        "iid": thermostat.thermostat.targetHeatingCoolingState.iid,
+                        "aid": 1,
+                        "iid": 9,
                         "value": TargetHeatingCoolingState.auto.rawValue
                     ]
                 ]
@@ -182,8 +188,8 @@ class EndpointTests: XCTestCase {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
-                        "aid": thermostat.aid,
-                        "iid": thermostat.thermostat.targetTemperature.iid,
+                        "aid": 1,
+                        "iid": 11,
                         "value": 20
                     ]
                 ]
@@ -199,8 +205,8 @@ class EndpointTests: XCTestCase {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
-                        "aid": thermostat.aid,
-                        "iid": thermostat.thermostat.targetHeatingCoolingState.iid,
+                        "aid": 1,
+                        "iid": 9,
                         "value": TargetHeatingCoolingState.off.rawValue
                     ]
                 ]
@@ -217,8 +223,8 @@ class EndpointTests: XCTestCase {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
-                        "aid": thermostat.aid,
-                        "iid": thermostat.thermostat.targetHeatingCoolingState.iid,
+                        "aid": 1,
+                        "iid": 9,
                         "value": TargetHeatingCoolingState.off.rawValue,
                         "ev" : true,
                         "authData" : "string",
@@ -247,8 +253,8 @@ class EndpointTests: XCTestCase {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
-                        "aid": lamp.aid,
-                        "iid": lamp.info.manufacturer.iid,
+                        "aid": 1,
+                        "iid": 3,
                         "value": "value"
                     ]
                 ]
@@ -264,8 +270,8 @@ class EndpointTests: XCTestCase {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
-                        "aid": lamp.aid,
-                        "iid": lamp.info.identify.iid,
+                        "aid": 1,
+                        "iid": 9,
                         "value": "value"
                     ]
                 ]
@@ -284,13 +290,13 @@ class EndpointTests: XCTestCase {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
-                        "aid": thermostat.aid,
-                        "iid": thermostat.info.manufacturer.iid,
+                        "aid": 1,
+                        "iid": 3,
                         "value": "value"
                     ],
                     [
-                        "aid": lamp.aid,
-                        "iid": lamp.lightbulb.brightness.iid,
+                        "aid": 2,
+                        "iid": 9,
                         "value": Double(50)
                     ]
                 ]
@@ -312,13 +318,13 @@ class EndpointTests: XCTestCase {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
-                        "aid": thermostat.aid,
-                        "iid": thermostat.info.manufacturer.iid,
+                        "aid": 1,
+                        "iid": 3,
                         "value": "value"
                     ],
                     [
-                        "aid": lamp.aid,
-                        "iid": lamp.lightbulb.on.iid,
+                        "aid": 2,
+                        "iid": 9,
                         "value": "value"
                     ]
                 ]
@@ -340,13 +346,13 @@ class EndpointTests: XCTestCase {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
-                        "aid": lamp.aid,
-                        "iid": lamp.lightbulb.brightness.iid,
+                        "aid": 2,
+                        "iid": 9,
                         "value": Double(50)
                     ],
                     [
-                        "aid": thermostat.aid,
-                        "iid": thermostat.info.firmwareRevision.iid,
+                        "aid": 1,
+                        "iid": 3,
                         "value": "value"
                     ]
                 ]
@@ -369,13 +375,13 @@ class EndpointTests: XCTestCase {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
-                        "aid": lamp.aid,
-                        "iid": lamp.info.serialNumber.iid,
+                        "aid": 1,
+                        "iid": 3,
                         "value": "value"
                     ],
                     [
-                        "aid": thermostat.aid,
-                        "iid": thermostat.info.model.iid,
+                        "aid": 2,
+                        "iid": 4,
                         "value": Double(50)
                     ]
                 ]

@@ -56,7 +56,7 @@ class Cryptographer {
 
     func encrypt(_ data: Data) throws -> Data {
         defer { encryptCount += 1 }
-        logger.debug("Encrypt message: \(self.encryptCount)")
+        logger.debug("Encrypt message #\(self.encryptCount)")
 
         let nonce = encryptCount.bigEndian.bytes
         let length = UInt16(data.count).bigEndian.bytes

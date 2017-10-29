@@ -38,7 +38,6 @@ public enum CharacteristicType: String {
     case securitySystemCurrentState = "66"
     case securitySystemTargetState = "67"
     case lightLevel = "6B"
-    case firmwareRevision = "52"
 }
 
 public enum CharacteristicPermission: String {
