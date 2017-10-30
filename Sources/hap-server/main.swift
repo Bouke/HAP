@@ -52,7 +52,7 @@ device.onIdentify.append({ acc in
 })
 
 let timer = DispatchSource.makeTimerSource()
-timer.schedule(deadline: .now() + .milliseconds(100), repeating: .milliseconds(100))
+timer.schedule(deadline: .now() + .seconds(1), repeating: .seconds(5))
 timer.setEventHandler(handler: {
     livingRoomLightbulb.lightbulb.on.value = !(livingRoomLightbulb.lightbulb.on.value ?? false)
 })
