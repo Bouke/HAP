@@ -2,7 +2,7 @@ import Foundation
 
 protocol Characteristic: class, JSONSerializable {
     weak var service: Service? { get set }
-    var iid: Int { get set }
+    var iid: UInt64 { get set }
     var type: CharacteristicType { get }
     var permissions: [CharacteristicPermission] { get }
     func getValue() -> JSONValueType?
@@ -48,7 +48,7 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
     
     weak var service: Service?
 
-    public internal(set) var iid: Int
+    public internal(set) var iid: UInt64
     public let type: CharacteristicType
 
     internal var _value: T?
@@ -95,7 +95,7 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
     public var minValue: Double?
     public var minStep: Double?
 
-    public init(iid: Int = 0, type: CharacteristicType, value: T? = nil, permissions: [CharacteristicPermission] = [.read, .write, .events], description: String? = nil, format: CharacteristicFormat? = nil, unit: CharacteristicUnit? = nil, maxLength: Int? = nil, maxValue: Double? = nil, minValue: Double? = nil, minStep: Double? = nil) {
+    public init(iid: UInt64 = 0, type: CharacteristicType, value: T? = nil, permissions: [CharacteristicPermission] = [.read, .write, .events], description: String? = nil, format: CharacteristicFormat? = nil, unit: CharacteristicUnit? = nil, maxLength: Int? = nil, maxValue: Double? = nil, minValue: Double? = nil, minStep: Double? = nil) {
         self.iid = iid
         self.type = type
         self._value = value

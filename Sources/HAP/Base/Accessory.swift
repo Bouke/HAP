@@ -21,26 +21,21 @@ public enum AccessoryType: String {
 
 open class Accessory {
     public weak var device: Device?
-    var aid: Int
+    var aid: UInt64
     public let type: AccessoryType
     public let info: Service.Info
     internal let services: [Service]
 
-    public init(aid: Int = 0, info: Service.Info, type: AccessoryType, services: [Service]) {
+    public init(aid: UInt64 = 0, info: Service.Info, type: AccessoryType, services: [Service]) {
         self.aid = aid
         self.type = type
         self.info = info
         self.services = [info] + services
 
-        var iid = 1
         for service in self.services {
-            service.iid = iid
             service.accessory = self
-            iid += 1
             for characteristic in service.characteristics {
-                characteristic.iid = iid
                 characteristic.service = service
-                iid += 1
             }
         }
     }
