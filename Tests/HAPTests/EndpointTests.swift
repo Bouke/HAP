@@ -24,6 +24,7 @@ class EndpointTests: XCTestCase {
             ("testPutDoubleAndEnumCharacteristics", testPutDoubleAndEnumCharacteristics),
             ("testPutBadCharacteristics", testPutBadCharacteristics),
             ("testGetBadCharacteristics", testGetBadCharacteristics),
+            ("testAuthentication", testAuthentication),
             ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests),
         ] + asynchronousTests
     }
@@ -582,6 +583,28 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(light["status"] as? Int,HAPStatusCodes.writeOnly.rawValue)
             XCTAssertEqual(therm["status"] as? Int,HAPStatusCodes.success.rawValue)
             XCTAssertEqual(Double(value: therm["value"] as Any), thermostat.thermostat.currentTemperature.value)
+        }
+    }
+
+    func testAuthentication() {
+        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
+        let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [lamp])
+        let application = root(device: device)
+        do {
+            let response = application(MockConnection(), MockRequest.get(path: "/identify"))
+            XCTAssertEqual(response.status, .forbidden)
+        }
+        do {
+            let response = application(MockConnection(), MockRequest.get(path: "/accessories"))
+            XCTAssertEqual(response.status, .forbidden)
+        }
+        do {
+            let response = application(MockConnection(), MockRequest.get(path: "/characteristics"))
+            XCTAssertEqual(response.status, .forbidden)
+        }
+        do {
+            let response = application(MockConnection(), MockRequest.get(path: "/pairings"))
+            XCTAssertEqual(response.status, .forbidden)
         }
     }
 

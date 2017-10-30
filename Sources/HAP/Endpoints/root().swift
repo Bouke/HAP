@@ -4,10 +4,13 @@ typealias Route = (path: String, application: Application)
 
 func root(device: Device) -> Application {
     return logger(router([
+        // Unauthenticated endpoints
         ("/", { _,_  in Response(status: .ok, text: "Nothing to see here. Pair this Homekit Accessory with an iOS device.") }),
-        ("/identify", identify(device: device)),
         ("/pair-setup", pairSetup(device: device)),
         ("/pair-verify", pairVerify(device: device)),
+
+        // Authenticated endpoints
+        ("/identify", protect(identify(device: device))),
         ("/accessories", protect(accessories(device: device))),
         ("/characteristics", protect(characteristics(device: device))),
         ("/pairings", protect(pairings(device: device)))
