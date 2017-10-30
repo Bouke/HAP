@@ -9,13 +9,67 @@ import func Evergreen.getLogger
 #endif
 
 fileprivate let logger = getLogger("hap.http")
-
+private let minimalTimeBetweenNotifications: DispatchTimeInterval = .seconds(1)
 
 public class Server: NSObject, NetServiceDelegate {
+
+    class NotificationQueue {
+        private var queue = [Int: Characteristic]()
+        fileprivate weak var listener: Connection?
+        private var nextAllowableNotificationTime = DispatchTime.now()
+        
+        internal func append(characteristic: Characteristic) {
+            /* HAP Specification 5.8 (excerpts)
+             Network-based notifications must be coalesced
+             by the accessory using a delay of no less than 1 second.
+             Excessive or inappropriate notifications may result
+             in the user being notified of a misbehaving
+             accessory and/or termination of the pairing relationship.
+             */
+            DispatchQueue.main.async {
+                self.queue[characteristic.iid] = characteristic
+                if DispatchTime.now() >= self.nextAllowableNotificationTime {
+                    self.nextAllowableNotificationTime = DispatchTime.now() + minimalTimeBetweenNotifications
+                    self.sendQueue()
+                } else {
+                    DispatchQueue.main.asyncAfter(deadline: self.nextAllowableNotificationTime) {
+                        self.sendQueue()
+                    }
+                }
+            }
+        }
+
+        private func sendQueue() {
+            guard queue.count > 0 else {
+                return
+            }
+            defer {
+                self.queue.removeAll()
+            }
+            let event: Event
+            do {
+                event = try Event(valueChangedOfCharacteristics: Array(queue.values))
+            } catch {
+                return logger.error("Could not create value change event: \(error)")
+            }
+            let data = event.serialized()
+            logger.info("Value changed, notifying \(String(describing: self.listener?.socket?.remoteHostname)), event: \(data) (\(self.queue.count) updates)")
+            listener?.writeOutOfBand(data)
+        }
+    }
+
     public class Connection: NSObject {
         var context = [String: Any]()
         var socket: Socket?
         var cryptographer: Cryptographer? = nil
+        var notificationQueue: NotificationQueue
+
+        override init() {
+            notificationQueue = NotificationQueue()
+            super.init()
+            notificationQueue.listener = self
+        }
+
         func listen(socket: Socket, queue: DispatchQueue, application: @escaping Application) {
             self.socket = socket
             let httpParser = HTTPParser(isRequest: true)
@@ -67,6 +121,7 @@ public class Server: NSObject, NetServiceDelegate {
                 self.socket = nil
             }
         }
+
         func writeOutOfBand(_ data: Data) {
             // TODO: resolve race conditions with the read/write loop
             guard let socket = socket else {
