@@ -17,7 +17,7 @@ func root(device: Device) -> Application {
 func logger(_ application: @escaping Application) -> Application {
     return { (connection, request) in
         let response = application(connection, request)
-        logger.info("\(request.method) \(request.urlURL.path) \(response.status.rawValue) \(response.body?.count ?? 0)")
+        logger.info("\(connection.socket?.remoteHostname ?? "-") \(request.method) \(request.urlURL.path) \(request.urlURL.query ?? "-") \(response.status.rawValue) \(response.body?.count ?? 0)")
         return response
     }
 }

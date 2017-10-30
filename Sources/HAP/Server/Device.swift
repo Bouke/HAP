@@ -113,7 +113,7 @@ public class Device {
 
     func notify(characteristicListeners characteristic: Characteristic, exceptListener except: Server.Connection? = nil) {
         guard let listeners = characteristicEventListeners[Box(characteristic)]?.filter({$0 != except}), listeners.count > 0 else {
-            return logger.info("Value changed, but nobody listening")
+            return logger.debug("Value changed, but nobody listening")
         }
 
         for listener in listeners {

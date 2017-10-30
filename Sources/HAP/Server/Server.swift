@@ -32,6 +32,7 @@ public class Server: NSObject, NetServiceDelegate {
                     self.nextAllowableNotificationTime = DispatchTime.now() + minimalTimeBetweenNotifications
                     self.sendQueue()
                 } else {
+                    logger.debug("queued event for delivery")
                     DispatchQueue.main.asyncAfter(deadline: self.nextAllowableNotificationTime) {
                         self.sendQueue()
                     }
@@ -53,7 +54,7 @@ public class Server: NSObject, NetServiceDelegate {
                 return logger.error("Could not create value change event: \(error)")
             }
             let data = event.serialized()
-            logger.info("Value changed, notifying \(String(describing: self.listener?.socket?.remoteHostname)), event: \(data) (\(self.queue.count) updates)")
+            logger.info("Value changed, notifying \(self.listener?.socket?.remoteHostname ?? "-"), event: \(data) (\(self.queue.count) updates)")
             listener?.writeOutOfBand(data)
         }
     }
