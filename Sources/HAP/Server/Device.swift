@@ -86,7 +86,7 @@ public class Device {
             accessory.device = self
             accessory.aid = idGenerator.next()!
             for service in accessory.services {
-                service.iid = idGenerator.next()!
+                service.iid = service is Service.Info ? 1 : idGenerator.next()!
                 for characteristic in service.characteristics {
                     characteristic.iid = idGenerator.next()!
                 }
