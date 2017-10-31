@@ -69,14 +69,13 @@ public class Device {
         self.accessories = accessories
         characteristicEventListeners = [:]
 
-        // 2.6.1
-        // Instance IDs are numbers with a range of [1, 18446744073709551615].
-        // These numbers are used to uniquely identify HAP accessory objects
-        // within an HAP accessory server, or uniquely identify services, and
-        // characteristics within an HAP accessory object. The instance ID for
-        // each object must be unique for the lifetime of the server/ client
-        // pairing.
-
+        // 2.6.1.1 Accessory Instance IDs
+        // Accessory instance IDs, "aid", are assigned from the same number
+        // pool that is global across entire HAP Accessory Server. For example,
+        // if the first Accessory object has an instance ID of "1" then no
+        // other Accessory object can have an instance ID of "1" within the
+        // Accessory Server.
+        //
         // TODO: SwiftFoundation in Swift 4.0 cannot encode/decode UInt64,
         // which is the data-type we wanted to use here. We can change it back
         // to UInt64 once the following commit has made it into a release:
@@ -85,12 +84,6 @@ public class Device {
         for accessory in accessories {
             accessory.device = self
             accessory.aid = idGenerator.next()!
-            for service in accessory.services {
-                service.iid = idGenerator.next()!
-                for characteristic in service.characteristics {
-                    characteristic.iid = idGenerator.next()!
-                }
-            }
         }
     }
 

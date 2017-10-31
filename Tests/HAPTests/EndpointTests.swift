@@ -46,13 +46,13 @@ class EndpointTests: XCTestCase {
         guard let metaService = services.first(where: { ($0["type"] as? String) == "3E" }) else {
             return XCTFail("No meta")
         }
-        XCTAssertEqual(metaService["iid"] as? Int, 2)
+        XCTAssertEqual(metaService["iid"] as? Int, 1)
         XCTAssertEqual((metaService["characteristics"] as? [Any])?.count, 6)
 
         guard let lampService = services.first(where: { ($0["type"] as? String) == "43" }) else {
             return XCTFail("No lamp")
         }
-        XCTAssertEqual(lampService["iid"] as? Int, 9)
+        XCTAssertEqual(lampService["iid"] as? Int, 8)
 
         guard let lampCharacteristics = lampService["characteristics"] as? [[String: Any]] else {
             return XCTFail("No lamp characteristics")
@@ -65,7 +65,7 @@ class EndpointTests: XCTestCase {
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", manufacturer: "Bouke"))
         let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [lamp])
         let application = characteristics(device: device)
-        let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=1.\(lamp.info.manufacturer.iid),1.\(lamp.info.name.iid)"))
+        let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=\(lamp.aid).\(lamp.info.manufacturer.iid),\(lamp.aid).\(lamp.info.name.iid)"))
         guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body!, options: [])) as? [String: [[String: Any]]] else {
             return XCTFail("Could not decode")
         }

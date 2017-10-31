@@ -32,10 +32,31 @@ open class Accessory {
         self.info = info
         self.services = [info] + services
 
+        // 2.6.1.2 Service and Characteristic Instance IDs
+        // Service and Characteristic instance IDs, "iid", are assigned from
+        // the same number pool that is unique within each Accessory object.
+        // For example, if the first Service object has an instance ID of "1"
+        // then no other Service or Characteristic objects can have an instance
+        // ID of "1" within the parent Accessory object. The Accessory
+        // Information service must have a service instance ID of 1.
+        //
+        // After a firmware update services and characteristics types that
+        // remain unchanged must retain their previous instance ids, newly
+        // added services and characteristics must not reuse instance ids from
+        // services and characteristics that were removed in the firmware
+        // update.
+        //
+        // TODO: SwiftFoundation in Swift 4.0 cannot encode/decode UInt64,
+        // which is the data-type we wanted to use here. We can change it back
+        // to UInt64 once the following commit has made it into a release:
+        // https://github.com/apple/swift-corelibs-foundation/commit/64b67c91479390776c43a96bd31e4e85f106d5e1
+        var idGenerator = (1...Int.max).makeIterator()
         for service in self.services {
+            service.iid = idGenerator.next()!
             service.accessory = self
             for characteristic in service.characteristics {
                 characteristic.service = service
+                characteristic.iid = idGenerator.next()!
             }
         }
     }
