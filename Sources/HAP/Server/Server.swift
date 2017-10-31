@@ -14,7 +14,7 @@ private let minimalTimeBetweenNotifications: DispatchTimeInterval = .seconds(1)
 public class Server: NSObject, NetServiceDelegate {
 
     class NotificationQueue {
-        private var queue = [UInt64: Characteristic]()
+        private var queue = [Int: Characteristic]()
         fileprivate weak var listener: Connection?
         private var nextAllowableNotificationTime = DispatchTime.now()
         

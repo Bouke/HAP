@@ -15,7 +15,6 @@ extension Dictionary: JSONValueType { }
 extension String: JSONValueType { }
 extension Bool: JSONValueType { }
 extension Int: JSONValueType { }
-extension UInt64: JSONValueType { }
 extension Double: JSONValueType { }
 extension NSNull: JSONValueType { }
 

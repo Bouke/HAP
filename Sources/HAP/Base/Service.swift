@@ -24,11 +24,11 @@ public enum ServiceType: String {
 open class Service {
     weak var accessory: Accessory?
 
-    var iid: UInt64
+    var iid: Int
     public let type: ServiceType
     let characteristics: [Characteristic]
 
-    init(iid: UInt64 = 0, type: ServiceType, characteristics: [Characteristic]) {
+    init(iid: Int = 0, type: ServiceType, characteristics: [Characteristic]) {
         self.iid = iid
         self.type = type
         self.characteristics = characteristics
