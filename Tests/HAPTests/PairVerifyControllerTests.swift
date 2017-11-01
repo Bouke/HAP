@@ -28,7 +28,7 @@ class PairVerifyControllerTests: XCTestCase {
         do {
             // Client -> Server: public key
             let request: PairTagTLV8 = [
-                PairTag.sequence: Data(bytes: [PairVerifyStep.startRequest.rawValue]),
+                PairTag.state: Data(bytes: [PairVerifyStep.startRequest.rawValue]),
                 PairTag.publicKey: clientPublicKey
             ]
             let resultOuter: PairTagTLV8
@@ -60,7 +60,7 @@ class PairVerifyControllerTests: XCTestCase {
                 return XCTFail("Couldn't decrypt response")
             }
             guard let resultInner: PairTagTLV8 = try? decode(plainText),
-                let username = resultInner[.username],
+                let username = resultInner[.identifier],
                 let signature = resultInner[.signature] else
             {
                 return XCTFail("Couldn't decode response")
@@ -83,7 +83,7 @@ class PairVerifyControllerTests: XCTestCase {
                 return XCTFail("Couldn't sign")
             }
             let requestInner: PairTagTLV8 = [
-                .username: username,
+                .identifier: username,
                 .signature: signature
             ]
             guard let cipher = try? ChaCha20Poly1305.encrypt(message: encode(requestInner),

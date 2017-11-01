@@ -1,6 +1,6 @@
 import Foundation
 
-public enum AccessoryType: String {
+public enum AccessoryType: String, Codable {
     case other = "1"
     case bridge = "2"
     case fan = "3"
@@ -31,6 +31,12 @@ open class Accessory {
         self.type = type
         self.info = info
         self.services = [info] + services
+
+        // 5.3.1 Accessory Objects
+        // Array of Service objects. Must not be empty. The maximum number of
+        // services must not exceed 100.
+        precondition((1...100).contains(self.services.count),
+                     "Number of services should be 1...100")
 
         // 2.6.1.2 Service and Characteristic Instance IDs
         // Service and Characteristic instance IDs, "iid", are assigned from

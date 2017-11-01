@@ -30,7 +30,7 @@ class PairSetupControllerTests: XCTestCase {
             let response = try! controller.startRequest([
                 .pairingMethod: Data(bytes: [PairingMethod.default.rawValue])
             ], session)
-            XCTAssertEqual(response[.sequence]?.first, PairSetupStep.startResponse.rawValue)
+            XCTAssertEqual(response[.state]?.first, PairSetupStep.startResponse.rawValue)
             XCTAssertEqual(response[.publicKey], session.server.publicKey)
             XCTAssertEqual(response[.salt], salt)
             clientKeyProof = try! client.processChallenge(salt: response[.salt]!, publicKey: response[.publicKey]!)
@@ -40,7 +40,7 @@ class PairSetupControllerTests: XCTestCase {
             // Client -> Server: [publicKey, keyProof]
             let response = controller.verifyRequest([.publicKey: client.publicKey, .proof: clientKeyProof], session)
             XCTAssertNotNil(response)
-            XCTAssertEqual(response![.sequence]?.first, PairSetupStep.verifyResponse.rawValue)
+            XCTAssertEqual(response![.state]?.first, PairSetupStep.verifyResponse.rawValue)
             
             // Server -> Client: [keyProof]
             let serverKeyProof = response![.proof]!
@@ -58,7 +58,7 @@ class PairSetupControllerTests: XCTestCase {
                 keys.publicKey
             let request: PairTagTLV8 = [
                 .publicKey: keys.publicKey,
-                .username: clientIdentifier,
+                .identifier: clientIdentifier,
                 .signature: try! Ed25519.sign(privateKey: keys.privateKey, message: hashIn)
             ]
             let encryptionKey = deriveKey(algorithm: .sha512,
@@ -83,7 +83,7 @@ class PairSetupControllerTests: XCTestCase {
                                     info: "Pair-Setup-Accessory-Sign-Info".data(using: .utf8),
                                     salt: "Pair-Setup-Accessory-Sign-Salt".data(using: .utf8),
                                     count: 32) +
-                response[.username]! +
+                response[.identifier]! +
                 response[.publicKey]!
             try! Ed25519.verify(publicKey: response[.publicKey]!, message: hashOut, signature: response[.signature]!)
         }

@@ -20,7 +20,7 @@ struct Box<T: Any>: Hashable, Equatable {
     init(_ value: T) {
         self.value = value
     }
-    
+
     var object: AnyObject {
         #if os(macOS)
             return value as AnyObject
@@ -85,6 +85,21 @@ public class Device {
             accessory.device = self
             accessory.aid = idGenerator.next()!
         }
+
+        if let ka = storage["ka"] {
+            let kadata = try! JSONDecoder().decode(Array<KnownAccessory>.self, from: ka)
+            print(kadata)
+        }
+
+        let ka = accessories.map { KnownAccessory(type: $0.type, name: $0.info.name.value!, serialNumber: $0.info.serialNumber.value!) }
+        let kadata = try! JSONEncoder().encode(ka)
+        storage["ka"] = kadata
+    }
+
+    struct KnownAccessory: Codable {
+        let type: AccessoryType
+        let name: String
+        let serialNumber: String
     }
 
     class Pairings {
@@ -137,13 +152,58 @@ public class Device {
         let category: AccessoryType = accessories.count == 1 ? accessories[0].type : .bridge
 
         return [
-            "pv": "1.0", // state
+            // Current configuration number. Required.
+            // Must update when an accessory, service, or characteristic is
+            // added or removed on the accessory server.
+            // Accessories must increment the config number after a firmware
+            // update. This must have a range of 1-4294967295 and wrap to 1
+            // when it overflows. This value must persist across reboots, power
+            // cycles, etc.
+            "c#": "3",
+
+            // Feature flags (e.g. "0x3" for bits 0 and 1). Required if
+            // non-zero. See table:
+            // 0x01         1   Supports HAP Pairing. This flag is required for
+            //                  all HomeKit accessories.
+            // 0x02-0x80    2-8 Reserved.
+            "ff": "0x01",
+
+            // Device ID (Device ID (page 36)) of the accessory. The Device ID
+            // must be formatted as "XX:XX:XX:XX:XX:XX", where "XX" is a
+            // hexadecimal string representing a byte. Required.
+            // This value is also used as the accessory's Pairing Identifier.
             "id": identifier, // identifier
-            "c#": "1", // version
-            "s#": "1", // state
-            "sf": (isPaired ? "0" : "1"), // discoverable
-            "ff": "0", // mfi compliant
+
+            // Model name of the accessory (e.g. "Device1,1"). Required.
             "md": name, // name
+
+            // Protocol version string <major>.<minor> (e.g. "1.0"). Required
+            // if value is not "1.0".
+            // The client should check this before displaying an accessory to
+            // the user. If the major version is greater than the major version
+            // the client software was built to support, it should hide the
+            // accessory from the user. A change in the minor version indicates
+            // the protocol is still compatible. This mechanism allows future
+            // versions of the protocol to hide itself from older clients that
+            // may not know how to handle it.
+            "pv": "1.0",
+
+            // Current state number. Required. This must have a value of "1".
+            "s#": "1",
+
+            // Status flags (e.g. "0x04" for bit 3). Value should be an
+            // unsigned integer. Required if non-zero. See table:
+            // 0x01         1   Accessory has not been paired with any controllers.
+            // 0x02-0x80    2   Accessory has not been configured to join a Wi-Fi network.
+            // 0x04         3   A problem has been detected on the accessory.
+            // 0x08-0x80    4-8 Reserved.
+            "sf": (isPaired ? "0" : "0x01"),
+
+            // Accessory Category Identifier. Required. Indicates the category
+            // that best describes the primary function of the accessory. This
+            // must have a range of 1-65535. This must take values defined in
+            // Table 12-3 (page 254). This must persist across reboots, power
+            // cycles, etc.
             "ci": category.rawValue // category identifier
         ]
     }

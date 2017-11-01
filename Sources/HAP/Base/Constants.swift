@@ -42,10 +42,28 @@ public enum CharacteristicType: String {
 }
 
 public enum CharacteristicPermission: String {
-    case read = "pr"
-    case write = "pw"
+    // This characteristic can only be read by paired controllers.
+    case read = "pr" // paired read
+
+    // This characteristic can only be written by paired controllers.
+    case write = "pw" // paired write
+
+    // This characteristic supports events.
     case events = "ev"
 
+
+    // The following properties are not implemented and included for completeness.
+
+    // This characteristic supports additional authorization data
+    case additionalAuthorization = "aa"
+
+    // This characteristic supports timed write procedure
+    case timedWrite = "tw"
+
+    // This characteristic is hidden from the user
+    case hidden = "hd"
+
+    // Short-hand for "all" permissions.
     static let ReadWrite: [CharacteristicPermission] = [.read, .write, .events]
 }
 

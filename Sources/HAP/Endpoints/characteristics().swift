@@ -172,10 +172,10 @@ func characteristics(device: Device) -> Application {
                     }
                     if events {
                         device.add(characteristic: characteristic, listener: connection)
-                        logger.info("Added listener for \(characteristic)")
+                        logger.debug("Added listener for \(characteristic)")
                     } else {
                         device.remove(characteristic: characteristic, listener: connection)
-                        logger.info("Removed listener for \(characteristic)")
+                        logger.debug("Removed listener for \(characteristic)")
                     }
                     serialized.append(["aid": aid, "iid": iid, "status": HAPStatusCodes.success.rawValue])
                 }

@@ -12,29 +12,34 @@ func pairings(device: Device) -> Application {
         guard
             let _ = try? request.readAllData(into: &body),
             let data: PairTagTLV8 = try? decode(body),
-            data[.sequence]?[0] == PairStep.request.rawValue,
+            data[.state]?[0] == PairStep.request.rawValue,
             let method = data[.pairingMethod].flatMap({PairingMethod(rawValue: $0[0])}),
-            let username = data[.username]
+            let username = data[.identifier]
             else {
                 return .badRequest
         }
         logger.debug("Updating pairings data: \(data), method: \(method)")
 
         switch method {
-        case .add:
+        case .addPairing:
             guard let publicKey = data[.publicKey] else {
                 return .badRequest
             }
             device.pairings[username] = publicKey
             logger.info("Added pairing for \(String(data: username, encoding: .utf8)!)")
-        case .delete:
+        case .removePairing:
             device.pairings[username] = nil
             logger.info("Removed pairing for \(String(data: username, encoding: .utf8)!)")
-        default: return .badRequest
+        case .listPairings:
+            // TODO: implement
+            return .badRequest
+        default:
+            logger.info("Unhandled PairingMethod request: \(method)")
+            return .badRequest
         }
 
         let result: PairTagTLV8 = [
-            .sequence: Data(bytes: [PairStep.response.rawValue])
+            .state: Data(bytes: [PairStep.response.rawValue])
         ]
         return Response(status: .ok, data: encode(result), mimeType: "application/pairing+tlv8")
     }

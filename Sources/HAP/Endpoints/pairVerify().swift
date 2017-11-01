@@ -17,11 +17,11 @@ func pairVerify(device: Device) -> Application {
             logger.warning("Could not decode message")
             return .badRequest
         }
-        guard let sequence = data[.sequence]?.first.flatMap({ PairVerifyStep(rawValue: $0) }) else {
+        guard let state = data[.state]?.first.flatMap({ PairVerifyStep(rawValue: $0) }) else {
             return .badRequest
         }
         do {
-            switch sequence {
+            switch state {
             case .startRequest:
                 let (response, session) = try controller.startRequest(data)
                 connection.context[SESSION_KEY] = session

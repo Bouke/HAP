@@ -27,6 +27,7 @@ class PairSetupController {
         guard let method = data[.pairingMethod]?.first.flatMap({ PairingMethod(rawValue: $0) }) else {
             throw Error.invalidParameters
         }
+        // TODO: according to spec, this should be `method == .pairSetup`
         guard method == .default else {
             throw Error.invalidPairingMethod
         }
@@ -38,7 +39,7 @@ class PairSetupController {
         logger.debug("<-- B \(serverPublicKey.hex)")
         
         let result: PairTagTLV8 = [
-            .sequence: Data(bytes: [PairSetupStep.startResponse.rawValue]),
+            .state: Data(bytes: [PairSetupStep.startResponse.rawValue]),
             .publicKey: serverPublicKey,
             .salt: salt,
             ]
@@ -59,8 +60,8 @@ class PairSetupController {
         {
             logger.warning("Invalid PIN")
             let result: PairTagTLV8 = [
-                .sequence: Data(bytes: [PairSetupStep.verifyResponse.rawValue]),
-                .errorCode: Data(bytes: [PairError.authenticationFailed.rawValue])
+                .state: Data(bytes: [PairSetupStep.verifyResponse.rawValue]),
+                .error: Data(bytes: [PairError.authenticationFailed.rawValue])
             ]
             return result
         }
@@ -68,7 +69,7 @@ class PairSetupController {
         logger.debug("<-- HAMK \(serverKeyProof.hex)")
         
         let result: PairTagTLV8 = [
-            .sequence: Data(bytes: [PairSetupStep.verifyResponse.rawValue]),
+            .state: Data(bytes: [PairSetupStep.verifyResponse.rawValue]),
             .proof: serverKeyProof
         ]
         return result
@@ -96,11 +97,11 @@ class PairSetupController {
             throw Error.couldNotDecodeMessage
         }
         
-        guard let publicKey = data[.publicKey], let username = data[.username], let signatureIn = data[.signature] else {
+        guard let publicKey = data[.publicKey], let username = data[.identifier], let signatureIn = data[.signature] else {
             throw Error.invalidParameters
         }
         
-        logger.debug("--> username \(String(data: username, encoding: .utf8)!)")
+        logger.debug("--> identifier \(String(data: username, encoding: .utf8)!)")
         logger.debug("--> public key \(publicKey.hex)")
         logger.debug("--> signature \(signatureIn.hex)")
         
@@ -130,12 +131,12 @@ class PairSetupController {
         }
         
         let resultInner: PairTagTLV8 = [
-            .username: device.identifier.data(using: .utf8)!,
+            .identifier: device.identifier.data(using: .utf8)!,
             .publicKey: device.publicKey,
             .signature: signatureOut
         ]
         
-        logger.debug("<-- username \(self.device.identifier)")
+        logger.debug("<-- identifier \(self.device.identifier)")
         logger.debug("<-- public key \(self.device.publicKey.hex)")
         logger.debug("<-- signature \(signatureOut.hex)")
         logger.info("Pair setup completed")
@@ -145,7 +146,7 @@ class PairSetupController {
         }
         
         let resultOuter: PairTagTLV8 = [
-            .sequence: Data(bytes: [PairSetupStep.keyExchangeResponse.rawValue]),
+            .state: Data(bytes: [PairSetupStep.keyExchangeResponse.rawValue]),
             .encryptedData: encryptedResultInner
         ]
         return resultOuter
