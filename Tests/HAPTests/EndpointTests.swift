@@ -11,7 +11,7 @@ class EndpointTests: XCTestCase {
                 ("testSingleEventPerUpdate", testSingleEventPerUpdate),
                 ("testDelayMultipleEvents", testDelayMultipleEvents),
                 ("testDelayMultipleEventsCoalescence", testDelayMultipleEventsCoalescence),
-                ("testDelayMultipleEventsCoalescenceFiltering", testDelayMultipleEventsCoalescenceFiltering),
+                ("testDelayMultipleEventsCoalescenceFiltering", testDelayMultipleEventsCoalescenceFiltering)
             ]
         #else
             let asynchronousTests: [(String, (EndpointTests) -> () throws -> Void)] = []
@@ -25,7 +25,7 @@ class EndpointTests: XCTestCase {
             ("testPutBadCharacteristics", testPutBadCharacteristics),
             ("testGetBadCharacteristics", testGetBadCharacteristics),
             ("testAuthentication", testAuthentication),
-            ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests),
+            ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests)
         ] + asynchronousTests
     }
 
@@ -59,7 +59,6 @@ class EndpointTests: XCTestCase {
         }
         XCTAssertEqual(lampCharacteristics.count, 4)
     }
-
 
     func testGetCharacteristics() {
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", manufacturer: "Bouke"))
@@ -212,7 +211,6 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(thermostat.thermostat.targetHeatingCoolingState.value, .off)
         }
 
-
         // wirting all Apple defined properties
         do {
             let jsonObject: [String: [[String: Any]]] = [
@@ -221,9 +219,9 @@ class EndpointTests: XCTestCase {
                         "aid": thermostat.aid,
                         "iid": thermostat.thermostat.targetHeatingCoolingState.iid,
                         "value": TargetHeatingCoolingState.off.rawValue,
-                        "ev" : true,
-                        "authData" : "string",
-                        "remote" : true
+                        "ev": true,
+                        "authData": "string",
+                        "remote": true
                     ]
                 ]
             ]
@@ -237,7 +235,7 @@ class EndpointTests: XCTestCase {
     func testPutBadCharacteristics() {
         let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat"))
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
-        let device = Device(bridgeInfo: .init(name: "Test"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat,lamp])
+        let device = Device(bridgeInfo: .init(name: "Test"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
         let application = characteristics(device: device)
 
         // Writing to read only value should not succeed.
@@ -271,7 +269,7 @@ class EndpointTests: XCTestCase {
             let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .badRequest)
             let json = try! JSONSerialization.jsonObject(with: response.body!)  as! [String: [[String: Any]]]
-            XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int,HAPStatusCodes.invalidValue.rawValue)
+            XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int, HAPStatusCodes.invalidValue.rawValue)
         }
 
         // Writing two values, one should fail as it is read only, the other
@@ -297,8 +295,8 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(lamp.lightbulb.brightness.value, 50)
 
             let json = try! JSONSerialization.jsonObject(with: response.body!)  as! [String: [[String: Any]]]
-            XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int,HAPStatusCodes.readOnly.rawValue)
-            XCTAssertEqual(json["characteristics"]![1]["status"]! as! Int,HAPStatusCodes.success.rawValue)
+            XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int, HAPStatusCodes.readOnly.rawValue)
+            XCTAssertEqual(json["characteristics"]![1]["status"]! as! Int, HAPStatusCodes.success.rawValue)
 
         }
 
@@ -324,8 +322,8 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(response.status, .multiStatus)
 
             let json = try! JSONSerialization.jsonObject(with: response.body!)  as! [String: [[String: Any]]]
-            XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int,HAPStatusCodes.readOnly.rawValue)
-            XCTAssertEqual(json["characteristics"]![1]["status"]! as! Int,HAPStatusCodes.invalidValue.rawValue)
+            XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int, HAPStatusCodes.readOnly.rawValue)
+            XCTAssertEqual(json["characteristics"]![1]["status"]! as! Int, HAPStatusCodes.invalidValue.rawValue)
 
         }
 
@@ -351,8 +349,8 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(lamp.lightbulb.brightness.value, 50)
 
             let json = try! JSONSerialization.jsonObject(with: response.body!)  as! [String: [[String: Any]]]
-            XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int,HAPStatusCodes.success.rawValue)
-            XCTAssertEqual(json["characteristics"]![1]["status"]! as! Int,HAPStatusCodes.readOnly.rawValue)
+            XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int, HAPStatusCodes.success.rawValue)
+            XCTAssertEqual(json["characteristics"]![1]["status"]! as! Int, HAPStatusCodes.readOnly.rawValue)
         }
 
         // Writing two values, both should fail as they are read only.
@@ -377,8 +375,8 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(lamp.lightbulb.brightness.value, 50)
 
             let json = try! JSONSerialization.jsonObject(with: response.body!)  as! [String: [[String: Any]]]
-            XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int,HAPStatusCodes.readOnly.rawValue)
-            XCTAssertEqual(json["characteristics"]![1]["status"]! as! Int,HAPStatusCodes.readOnly.rawValue)
+            XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int, HAPStatusCodes.readOnly.rawValue)
+            XCTAssertEqual(json["characteristics"]![1]["status"]! as! Int, HAPStatusCodes.readOnly.rawValue)
 
         }
 
@@ -389,7 +387,7 @@ class EndpointTests: XCTestCase {
                 "characteristics": [
                     [
                         "aid": lamp.aid,
-                        "iid": lamp.info.serialNumber.iid,
+                        "iid": lamp.info.serialNumber.iid
                     ]
                 ]
             ]
@@ -471,7 +469,7 @@ class EndpointTests: XCTestCase {
         lightsensor.lightSensor.currentLight.value = 234
         thermostat.thermostat.currentTemperature.value = 123
         lamp.lightbulb.brightness.value = 53
-        let device = Device(bridgeInfo: .init(name: "Test"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [lightsensor,thermostat,lamp])
+        let device = Device(bridgeInfo: .init(name: "Test"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [lightsensor, thermostat, lamp])
         let application = characteristics(device: device)
 
         // First a good one
@@ -552,8 +550,8 @@ class EndpointTests: XCTestCase {
             }
 
             XCTAssertNil(light["value"])
-            XCTAssertEqual(light["status"] as? Int,HAPStatusCodes.writeOnly.rawValue)
-            XCTAssertEqual(therm["status"] as? Int,HAPStatusCodes.success.rawValue)
+            XCTAssertEqual(light["status"] as? Int, HAPStatusCodes.writeOnly.rawValue)
+            XCTAssertEqual(therm["status"] as? Int, HAPStatusCodes.success.rawValue)
             XCTAssertEqual(Double(value: therm["value"] as Any), thermostat.thermostat.currentTemperature.value)
         }
 
@@ -580,8 +578,8 @@ class EndpointTests: XCTestCase {
             }
 
             XCTAssertNil(light["value"])
-            XCTAssertEqual(light["status"] as? Int,HAPStatusCodes.writeOnly.rawValue)
-            XCTAssertEqual(therm["status"] as? Int,HAPStatusCodes.success.rawValue)
+            XCTAssertEqual(light["status"] as? Int, HAPStatusCodes.writeOnly.rawValue)
+            XCTAssertEqual(therm["status"] as? Int, HAPStatusCodes.success.rawValue)
             XCTAssertEqual(Double(value: therm["value"] as Any), thermostat.thermostat.currentTemperature.value)
         }
     }
@@ -612,7 +610,7 @@ class EndpointTests: XCTestCase {
     func testNoEventsToSelf() {
         let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat"))
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
-        let device = Device(bridgeInfo: .init(name: "Test"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat,lamp])
+        let device = Device(bridgeInfo: .init(name: "Test"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
         let application = characteristics(device: device)
 
         let connection = MockConnection()
@@ -629,7 +627,7 @@ class EndpointTests: XCTestCase {
 
             // setup our expectations
             let receiveEvent = expectation(description: "should not receive an event")
-            connection.sideChannelDelegate = { _ in receiveEvent.fulfill() }
+            connection.sideChannelCallback = { _ in receiveEvent.fulfill() }
             receiveEvent.isInverted = true
 
             // turn lamp on
@@ -649,7 +647,7 @@ class EndpointTests: XCTestCase {
     func testSingleEventPerUpdate() {
         let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat"))
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
-        let device = Device(bridgeInfo: .init(name: "Test"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat,lamp])
+        let device = Device(bridgeInfo: .init(name: "Test"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
         let application = characteristics(device: device)
 
         let connection = MockConnection()
@@ -667,7 +665,7 @@ class EndpointTests: XCTestCase {
             // setup our expectations
             let receiveEvent = expectation(description: "should not receive an event")
             receiveEvent.assertForOverFulfill = true
-            connection.sideChannelDelegate = { _ in receiveEvent.fulfill() }
+            connection.sideChannelCallback = { _ in receiveEvent.fulfill() }
 
             // turn lamp on
             do {
@@ -704,7 +702,7 @@ class EndpointTests: XCTestCase {
             var firstEventTimestamp: Date?
             do {
                 let expectation = XCTestExpectation(description: "should receive an event")
-                connection.sideChannelDelegate = { _ in
+                connection.sideChannelCallback = { _ in
                     firstEventTimestamp = Date()
                     expectation.fulfill()
                 }
@@ -722,7 +720,7 @@ class EndpointTests: XCTestCase {
             var secondEventTimestamp: Date?
             do {
                 let expectation = XCTestExpectation(description: "should receive an event")
-                connection.sideChannelDelegate = { _ in
+                connection.sideChannelCallback = { _ in
                     secondEventTimestamp = Date()
                     expectation.fulfill()
                 }
@@ -745,7 +743,7 @@ class EndpointTests: XCTestCase {
     func testDelayMultipleEventsCoalescence() {
         let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat"))
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
-        let device = Device(bridgeInfo: .init(name: "Test"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat,lamp])
+        let device = Device(bridgeInfo: .init(name: "Test"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
         let application = characteristics(device: device)
 
         let connection = MockConnection()
@@ -766,7 +764,7 @@ class EndpointTests: XCTestCase {
             var firstEventTimestamp: Date?
             do {
                 let expectation = XCTestExpectation(description: "should receive an event")
-                connection.sideChannelDelegate = { _ in
+                connection.sideChannelCallback = { _ in
                     firstEventTimestamp = Date()
                     expectation.fulfill()
                 }
@@ -785,7 +783,7 @@ class EndpointTests: XCTestCase {
             do {
                 let expectation = XCTestExpectation(description: "should receive an single event")
                 expectation.assertForOverFulfill = true
-                connection.sideChannelDelegate = { (data) in
+                connection.sideChannelCallback = { (data) in
                     secondEventTimestamp = Date()
                     secondEventData = data
                     expectation.fulfill()
@@ -814,7 +812,7 @@ class EndpointTests: XCTestCase {
                 secondEventData != nil,
                 let event = Event(deserialize: secondEventData!),
                 let eventJson = try? JSONSerialization.jsonObject(with: event.body, options: []),
-                let eventCharacteristics = (eventJson as? [String: Any])?["characteristics"] as? [[String:Any]]
+                let eventCharacteristics = (eventJson as? [String: Any])?["characteristics"] as? [[String: Any]]
                 else {
                     XCTFail("Could not decode event")
                     return
@@ -855,7 +853,7 @@ class EndpointTests: XCTestCase {
             var firstEventTimestamp: Date?
             do {
                 let expectation = XCTestExpectation(description: "should receive an event")
-                connection.sideChannelDelegate = { _ in
+                connection.sideChannelCallback = { _ in
                     firstEventTimestamp = Date()
                     expectation.fulfill()
                 }
@@ -874,7 +872,7 @@ class EndpointTests: XCTestCase {
             do {
                 let expectation = XCTestExpectation(description: "should receive an single event")
                 expectation.assertForOverFulfill = true
-                connection.sideChannelDelegate = { (data) in
+                connection.sideChannelCallback = { (data) in
                     secondEventTimestamp = Date()
                     secondEventData = data
                     expectation.fulfill()
@@ -908,7 +906,7 @@ class EndpointTests: XCTestCase {
                 secondEventData != nil,
                 let event = Event(deserialize: secondEventData!),
                 let eventJson = try? JSONSerialization.jsonObject(with: event.body, options: []),
-                let eventCharacteristics = (eventJson as? [String: Any])?["characteristics"] as? [[String:Any]]
+                let eventCharacteristics = (eventJson as? [String: Any])?["characteristics"] as? [[String: Any]]
                 else {
                     XCTFail("Could not decode event")
                     return

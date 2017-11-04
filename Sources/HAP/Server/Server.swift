@@ -17,7 +17,7 @@ public class Server: NSObject, NetServiceDelegate {
         private var queue = [Int: Characteristic]()
         fileprivate weak var listener: Connection?
         private var nextAllowableNotificationTime = DispatchTime.now()
-        
+
         internal func append(characteristic: Characteristic) {
             /* HAP Specification 5.8 (excerpts)
              Network-based notifications must be coalesced
@@ -62,7 +62,7 @@ public class Server: NSObject, NetServiceDelegate {
     public class Connection: NSObject {
         var context = [String: Any]()
         var socket: Socket?
-        var cryptographer: Cryptographer? = nil
+        var cryptographer: Cryptographer?
         var notificationQueue: NotificationQueue
 
         override init() {
@@ -144,8 +144,7 @@ public class Server: NSObject, NetServiceDelegate {
             return cryptographer != nil
         }
     }
-    
-    
+
     let service: NetService
     let socket: Socket
     let queue = DispatchQueue(label: "hap.socket-listener", qos: .utility, attributes: [.concurrent])
@@ -168,11 +167,11 @@ public class Server: NSObject, NetServiceDelegate {
         super.init()
         service.delegate = self
     }
-    
+
     public func start() {
         service.publish()
         logger.info("Listening on port \(self.socket.listeningPort)")
-        
+
         queue.async {
             while self.socket.isListening {
                 do {
@@ -188,33 +187,32 @@ public class Server: NSObject, NetServiceDelegate {
             }
             self.stop()
         }
-        
+
     }
-    
+
     public func stop() {
         service.stop()
         socket.close()
     }
-    
-    
+
     #if os(macOS)
         // MARK: Using Network Services
-        public func netService(_ sender: NetService, didNotPublish errorDict: [String : NSNumber]) {
+        public func netService(_ sender: NetService, didNotPublish errorDict: [String: NSNumber]) {
             logger.error("didNotPublish: \(errorDict)")
         }
     #elseif os(Linux)
         // MARK: Using Network Services
         public func netServiceWillPublish(_ sender: NetService) { }
-        
+
         public func netServiceDidPublish(_ sender: NetService) { }
-        
+
         public func netService(_ sender: NetService,
                                didNotPublish error: Swift.Error) {
             logger.error("didNotPublish: \(error)")
         }
-        
+
         public func netServiceDidStop(_ sender: NetService) { }
-        
+
         // MARK: Accepting Connections
         public func netService(_ sender: NetService,
                                didAcceptConnectionWith socket: Socket) {  }

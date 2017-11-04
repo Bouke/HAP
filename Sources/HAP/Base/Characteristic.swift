@@ -23,11 +23,11 @@ extension Characteristic {
             "type": type.rawValue,
             "perms": permissions.map { $0.rawValue }
         ]
-        
+
         if permissions.contains(.read) {
             serialized["value"] = getValue() ?? NSNull()
         }
-        
+
         if let description = description { serialized["description"] = description }
         if let format = format { serialized["format"] = format.rawValue }
         if let unit = unit { serialized["unit"] = unit.rawValue }
@@ -36,7 +36,7 @@ extension Characteristic {
         if let maxValue = maxValue { serialized["maxValue"] = maxValue }
         if let minValue = minValue { serialized["minValue"] = minValue }
         if let minStep = minStep { serialized["minStep"] = minStep }
-        
+
         return serialized
     }
 }
@@ -45,7 +45,7 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
     enum Error: Swift.Error {
         case valueTypeException
     }
-    
+
     weak var service: Service?
 
     public internal(set) var iid: Int
@@ -67,7 +67,7 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
     func getValue() -> JSONValueType? {
         return value?.jsonValueType
     }
-    
+
     func setValue(_ newValue: Any?, fromConnection connection: Server.Connection?) throws {
         switch newValue {
         case let some?:
@@ -80,9 +80,9 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
         }
         _ = onValueChange.map { $0(_value) }
     }
-    
+
     // Subscribe a listener to value changes from (remote) clients.
-    public var onValueChange: [(T?) -> ()] = []
+    public var onValueChange: [(T?) -> Void] = []
 
     public let permissions: [CharacteristicPermission]
 

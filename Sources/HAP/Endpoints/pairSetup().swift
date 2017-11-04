@@ -33,7 +33,7 @@ func pairSetup(device: Device) -> Application {
         }
         return session
     }
-    
+
     return { (connection, request) in
         var body = Data()
         guard let _ = try? request.readAllData(into: &body), let data: PairTagTLV8 = try? decode(body) else {

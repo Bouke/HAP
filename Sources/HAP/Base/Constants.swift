@@ -51,7 +51,6 @@ public enum CharacteristicPermission: String {
     // This characteristic supports events.
     case events = "ev"
 
-
     // The following properties are not implemented and included for completeness.
 
     // This characteristic supports additional authorization data
@@ -68,28 +67,27 @@ public enum CharacteristicPermission: String {
 }
 
 public enum CharacteristicFormat: String {
-    case string = "string"
-    case bool = "bool"
-    case float = "float"
-    case uint8 = "uint8"
-    case uint16 = "uint16"
-    case uint32 = "uint32"
-    case int32 = "int32"
-    case uint64 = "uint64"
-    case data = "data"
-    case tlv8 = "tlv8"
+    case string
+    case bool
+    case float
+    case uint8
+    case uint16
+    case uint32
+    case int32
+    case uint64
+    case data
+    case tlv8
 }
 
 public enum CharacteristicUnit: String {
-    case percentage = "percentage"
-    case arcdegrees = "arcdegrees"
-    case celcius = "celcius"
-    case lux = "lux"
-    case seconds = "seconds"
+    case percentage
+    case arcdegrees
+    case celcius
+    case lux
+    case seconds
 }
 
-
-public enum HAPStatusCodes : Int {
+public enum HAPStatusCodes: Int {
     case success = 0
     case insufficientPrivileges = -70401
     case unableToCommunicate = -70402

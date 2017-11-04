@@ -29,7 +29,7 @@ class DataScanner {
         return marker
     }
 
-    //MARK:- String helpers
+    // MARK: - String helpers
     func scanUpTo(_ marker: String) -> String? {
         return marker
             .data(using: .utf8)
@@ -44,4 +44,3 @@ class DataScanner {
             .flatMap { String(data: $0, encoding: .utf8) }
     }
 }
-

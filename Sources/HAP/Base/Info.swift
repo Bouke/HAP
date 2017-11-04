@@ -1,6 +1,5 @@
 public typealias Revision = String
 
-
 extension Service {
     public class Info: Service {
         public let identify = GenericCharacteristic<Bool>(type: .identify, permissions: [.write])

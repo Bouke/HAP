@@ -6,4 +6,3 @@ func identify(device: Device) -> Application {
         return Response(status: .noContent)
     }
 }
-

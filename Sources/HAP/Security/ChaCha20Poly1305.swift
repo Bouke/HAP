@@ -5,7 +5,7 @@ class ChaCha20Poly1305 {
     enum Error: Swift.Error {
         case couldNotDecrypt, couldNotEncrypt
     }
-    
+
     private static func upgradeNonce(_ nonce: Data) -> Data {
         switch nonce.count {
         case 12: return nonce
@@ -13,7 +13,7 @@ class ChaCha20Poly1305 {
         default: abort()
         }
     }
-    
+
     static func encrypt(message: Data, additional: Data = Data(), nonce: Data, key: Data) throws -> Data {
         let nonce = upgradeNonce(nonce)
         var cipher = Data(count: message.count + Int(crypto_aead_chacha20poly1305_ABYTES))

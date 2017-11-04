@@ -10,7 +10,6 @@ extension Accessory {
 
 public typealias CurrentLight = Double
 
-
 extension Service {
     open class LightSensor: Service {
         public let currentLight = GenericCharacteristic<CurrentLight>(type: .lightLevel, value: 0, permissions: [.read, .events], maxValue: 100000, minValue: 0.0001)

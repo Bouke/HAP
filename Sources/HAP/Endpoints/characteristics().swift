@@ -29,7 +29,6 @@ func characteristics(device: Device) -> Application {
                     return .badRequest
                 }
 
-
                 guard
                     let characteristic = device.accessories.first(where: {$0.aid == path[0]})?.services.flatMap({$0.characteristics.filter({$0.iid == path[1]})}).first
                     else {
@@ -85,12 +84,10 @@ func characteristics(device: Device) -> Application {
              a non-zero "status" entry and must not contain a "value" entry.
              */
 
-            var responseStatus : Response.Status = .ok
+            var responseStatus: Response.Status = .ok
             if serialized.first(where: {$0.keys.contains("status")}) != nil {
-                for (index,element) in serialized.enumerated() {
-                    if element["status"] == nil {
-                        serialized[index]["status"] = HAPStatusCodes.success.rawValue
-                    }
+                for (index, element) in serialized.enumerated() where element["status"] == nil {
+                    serialized[index]["status"] = HAPStatusCodes.success.rawValue
                 }
                 responseStatus = .multiStatus
             }
@@ -108,8 +105,7 @@ func characteristics(device: Device) -> Application {
             guard let _  = try? request.readAllData(into: &body),
                 let deserialized = try? JSONSerialization.jsonObject(with: body, options: []),
                 let dict = deserialized as? [String: [[String: Any]]],
-                let items = dict["characteristics"] else
-            {
+                let items = dict["characteristics"] else {
                 logger.warning("Could not decode JSON")
                 return .badRequest
             }
@@ -118,8 +114,7 @@ func characteristics(device: Device) -> Application {
 
             for item in items {
                 guard let aid = item["aid"] as? Int,
-                    let iid = item["iid"] as? Int else
-                {
+                    let iid = item["iid"] as? Int else {
                     logger.warning("Missing either aid/iid keys")
                     return .badRequest
                 }
@@ -127,8 +122,7 @@ func characteristics(device: Device) -> Application {
                     .first(where: {$0.aid == aid})?
                     .services
                     .flatMap({$0.characteristics.filter({$0.iid == iid})})
-                    .first else
-                {
+                    .first else {
                     return .unprocessableEntity
                 }
 
@@ -193,9 +187,9 @@ func characteristics(device: Device) -> Application {
              */
 
             let multiStatusResponse = !serialized
-                .map{ $0["status"] as? HAPStatusCodes.RawValue }
-                .flatMap{$0}
-                .filter{HAPStatusCodes(rawValue: $0) != .success}.isEmpty
+                .map { $0["status"] as? HAPStatusCodes.RawValue }
+                .flatMap {$0}
+                .filter {HAPStatusCodes(rawValue: $0) != .success}.isEmpty
 
             if multiStatusResponse {
                 do {

@@ -19,7 +19,7 @@ extension Service {
         public let linkQuality = GenericCharacteristic<LinkQuality>(type: .linkQuality, permissions: [.read, .events])
         public let accessoryIdentifier = GenericCharacteristic<AccessoryIdentifier>(type: .accessoryIdentifier, permissions: [.read, .events])
         public let category = GenericCharacteristic<Category>(type: .category, permissions: [.read, .events])
-        
+
         public init() {
             super.init(type: .bridgingState, characteristics: [reachable, linkQuality, accessoryIdentifier, category])
         }

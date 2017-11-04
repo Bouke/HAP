@@ -50,7 +50,7 @@ class Cryptographer {
         let nonce = decryptCount.bigEndian.bytes
         let encrypted = data[2..<(2 + length + 16)]
         logger.debug("Ciphertext: \(encrypted.hex), Nonce: \(nonce.hex), Length: \(length)")
-        
+
         return try ChaCha20Poly1305.decrypt(cipher: Data(encrypted), additional: Data(data[0..<2]), nonce: nonce, key: decryptKey)
     }
 
@@ -64,7 +64,7 @@ class Cryptographer {
 
         let encrypted = try ChaCha20Poly1305.encrypt(message: data, additional: length, nonce: nonce, key: encryptKey)
         logger.debug("Cipher: \((length + encrypted).hex)")
-        
+
         return length + encrypted
     }
 }

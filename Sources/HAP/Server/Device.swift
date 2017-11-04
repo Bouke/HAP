@@ -49,7 +49,7 @@ public class Device {
     let pairings: Pairings
     public let accessories: [Accessory]
     internal var characteristicEventListeners: [Box<Characteristic>: WeakObjectSet<Server.Connection>]
-    public var onIdentify: [(Accessory?) -> ()] = []
+    public var onIdentify: [(Accessory?) -> Void] = []
 
     /// 2.5.3.2 Bridges
     /// A bridge is a special type of HAP accessory server that bridges HomeKit
@@ -86,8 +86,7 @@ public class Device {
         bridgeInfo: Service.Info,
         setupCode: String,
         storage: Storage,
-        accessories: [Accessory])
-    {
+        accessories: [Accessory]) {
         let bridge = Accessory(info: bridgeInfo, type: .bridge, services: [])
         self.init(name: bridge.info.name.value!,
                   setupCode: setupCode,
@@ -98,8 +97,7 @@ public class Device {
     convenience public init(
         setupCode: String,
         storage: Storage,
-        accessory: Accessory)
-    {
+        accessory: Accessory) {
         self.init(name: accessory.info.name.value!,
                   setupCode: setupCode,
                   storage: storage,
@@ -110,8 +108,7 @@ public class Device {
         name: String,
         setupCode: String,
         storage: Storage,
-        accessories: [Accessory])
-    {
+        accessories: [Accessory]) {
         precondition(setupCode =~ "^\\d{3}-\\d{2}-\\d{3}",
                      "setup code must conform to the format XXX-XX-XXX")
         self.name = name

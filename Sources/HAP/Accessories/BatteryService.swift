@@ -23,7 +23,7 @@ extension Service {
         public let batteryLevel = GenericCharacteristic<BatteryLevel>(type: .batteryLevel, permissions: [.read, .events])
         public let chargingState = GenericCharacteristic<ChargingState>(type: .chargingState, permissions: [.read, .events])
         public let statusLowBattery = GenericCharacteristic<StatusLowBattery>(type: .statusLowBattery, permissions: [.read, .events])
-        
+
         public init() {
             super.init(type: .batteryService, characteristics: [batteryLevel, chargingState, statusLowBattery])
         }

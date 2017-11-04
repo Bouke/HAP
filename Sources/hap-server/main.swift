@@ -4,7 +4,6 @@ import HAP
 
 fileprivate let logger = getLogger("demo")
 
-
 #if os(macOS)
     import Darwin
 #elseif os(Linux)
@@ -49,7 +48,7 @@ let device = Device(
         .Fan(info: .init(name: "Living Room Ceiling Fan")),
         .GarageDoorOpener(info: .init(name: "Garage")),
         .LockMechanism(info: .init(name: "Front Door Lock")),
-        .SecuritySystem(info: .init(name: "Alarm")),
+        .SecuritySystem(info: .init(name: "Alarm"))
     ])
 device.onIdentify.append({ acc in
     logger.info("Got identified: \(String(describing: acc))")

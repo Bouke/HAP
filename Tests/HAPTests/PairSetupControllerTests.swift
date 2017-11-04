@@ -4,13 +4,13 @@ import SRP
 import XCTest
 
 class PairSetupControllerTests: XCTestCase {
-    static var allTests : [(String, (PairSetupControllerTests) -> () throws -> Void)] {
+    static var allTests: [(String, (PairSetupControllerTests) -> () throws -> Void)] {
         return [
             ("test", test),
-            ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests),
+            ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests)
         ]
     }
-    
+
     func test() {
         let clientIdentifier = "hubba hubba".data(using: .utf8)!
         let password = "123-44-321"
@@ -23,7 +23,7 @@ class PairSetupControllerTests: XCTestCase {
         let controller = PairSetupController(device: device)
         let client = SRP.Client(username: "Pair-Setup", password: password, group: .N3072, algorithm: .sha512)
         let keys = Ed25519.generateSignKeypair()
-        
+
         let clientKeyProof: Data
         do {
             // Server -> Client: [salt, publicKey]
@@ -41,12 +41,12 @@ class PairSetupControllerTests: XCTestCase {
             let response = controller.verifyRequest([.publicKey: client.publicKey, .proof: clientKeyProof], session)
             XCTAssertNotNil(response)
             XCTAssertEqual(response![.state]?.first, PairSetupStep.verifyResponse.rawValue)
-            
+
             // Server -> Client: [keyProof]
             let serverKeyProof = response![.proof]!
             try! client.verifySession(keyProof: serverKeyProof)
         }
-        
+
         do {
             // Client -> Server: encrypted[username, publicKey, signature]
             let hashIn = deriveKey(algorithm: .sha512,
@@ -72,7 +72,7 @@ class PairSetupControllerTests: XCTestCase {
                                                               key: encryptionKey)
             ]
             let responseEncrypted = try! controller.keyExchangeRequest(requestEncrypted, session)
-            
+
             // Server -> Client: encrypted[username, publicKey, signature]
             let plaintext = try! ChaCha20Poly1305.decrypt(cipher: responseEncrypted[.encryptedData]!,
                                                           nonce: "PS-Msg06".data(using: .utf8)!,
@@ -87,7 +87,7 @@ class PairSetupControllerTests: XCTestCase {
                 response[.publicKey]!
             try! Ed25519.verify(publicKey: response[.publicKey]!, message: hashOut, signature: response[.signature]!)
         }
-        
+
         XCTAssertEqual(device.pairings[clientIdentifier], keys.publicKey)
     }
 

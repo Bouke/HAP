@@ -19,7 +19,6 @@ class WeakObject<T: AnyObject>: Equatable, Hashable {
     }
 }
 
-
 struct WeakObjectSet<T: AnyObject> where T: Hashable {
     var objects: Set<WeakObject<T>>
 

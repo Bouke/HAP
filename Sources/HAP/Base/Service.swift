@@ -47,7 +47,7 @@ open class Service {
 }
 
 extension Service: JSONSerializable {
-    public func serialized() -> [String : JSONValueType] {
+    public func serialized() -> [String: JSONValueType] {
         return [
             "iid": iid,
             "type": type.rawValue,

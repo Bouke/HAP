@@ -72,7 +72,7 @@ public class FileStorage: Storage {
             }
         }
     }
-    
+
     public func removeAll() throws {
         for file in try FileManager.default.contentsOfDirectory(atPath: path) {
             try FileManager.default.removeItem(atPath: "\(path)/\(file)")

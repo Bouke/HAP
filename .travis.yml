@@ -23,4 +23,6 @@ matrix:
         - sudo make install
         - cd ..
         - sudo ldconfig
-
+    - os: osx
+      osx_image: xcode9
+      script: swiftlint

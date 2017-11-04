@@ -29,7 +29,7 @@ struct Event {
         }
         self.status = status
         while true {
-            if let _ = scanner.scan(newline) { 
+            if let _ = scanner.scan(newline) {
                 break
             }
             guard

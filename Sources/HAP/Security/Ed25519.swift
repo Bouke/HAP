@@ -1,7 +1,6 @@
 import Foundation
 import CLibSodium
 
-
 class Ed25519 {
     enum Error: Swift.Error {
         case invalidSignature
