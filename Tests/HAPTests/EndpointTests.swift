@@ -31,7 +31,7 @@ class EndpointTests: XCTestCase {
 
     func testAccessories() {
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
-        let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [lamp])
+        let device = Device(pin: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = accessories(device: device)
         let response = application(MockConnection(), MockRequest.get(path: "/accessories"))
         let jsonObject = try! JSONSerialization.jsonObject(with: response.body!, options: []) as! [String: [[String: Any]]]
@@ -63,7 +63,7 @@ class EndpointTests: XCTestCase {
 
     func testGetCharacteristics() {
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", manufacturer: "Bouke"))
-        let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [lamp])
+        let device = Device(pin: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = characteristics(device: device)
         let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=\(lamp.aid).\(lamp.info.manufacturer.iid),\(lamp.aid).\(lamp.info.name.iid)"))
         guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body!, options: [])) as? [String: [[String: Any]]] else {
@@ -86,7 +86,7 @@ class EndpointTests: XCTestCase {
 
     func testPutBoolAndIntCharacteristics() {
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", manufacturer: "Bouke"))
-        let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [lamp])
+        let device = Device(pin: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = characteristics(device: device)
 
         lamp.lightbulb.on.value = false
@@ -146,7 +146,7 @@ class EndpointTests: XCTestCase {
 
     func testPutDoubleAndEnumCharacteristics() {
         let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat", manufacturer: "Bouke"))
-        let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [thermostat])
+        let device = Device(pin: "123-44-321", storage: MemoryStorage(), accessory: thermostat)
         let application = characteristics(device: device)
 
         thermostat.thermostat.currentHeatingCoolingState.value = .off
@@ -237,7 +237,7 @@ class EndpointTests: XCTestCase {
     func testPutBadCharacteristics() {
         let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat"))
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
-        let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [thermostat,lamp])
+        let device = Device(bridgeInfo: .init(name: "Test"), pin: "123-44-321", storage: MemoryStorage(), accessories: [thermostat,lamp])
         let application = characteristics(device: device)
 
         // Writing to read only value should not succeed.
@@ -471,7 +471,7 @@ class EndpointTests: XCTestCase {
         lightsensor.lightSensor.currentLight.value = 234
         thermostat.thermostat.currentTemperature.value = 123
         lamp.lightbulb.brightness.value = 53
-        let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [lightsensor,thermostat,lamp])
+        let device = Device(bridgeInfo: .init(name: "Test"), pin: "123-44-321", storage: MemoryStorage(), accessories: [lightsensor,thermostat,lamp])
         let application = characteristics(device: device)
 
         // First a good one
@@ -588,7 +588,7 @@ class EndpointTests: XCTestCase {
 
     func testAuthentication() {
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
-        let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [lamp])
+        let device = Device(pin: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = root(device: device)
         do {
             let response = application(MockConnection(), MockRequest.get(path: "/identify"))
@@ -612,7 +612,7 @@ class EndpointTests: XCTestCase {
     func testNoEventsToSelf() {
         let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat"))
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
-        let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [thermostat,lamp])
+        let device = Device(bridgeInfo: .init(name: "Test"), pin: "123-44-321", storage: MemoryStorage(), accessories: [thermostat,lamp])
         let application = characteristics(device: device)
 
         let connection = MockConnection()
@@ -649,7 +649,7 @@ class EndpointTests: XCTestCase {
     func testSingleEventPerUpdate() {
         let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat"))
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
-        let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [thermostat,lamp])
+        let device = Device(bridgeInfo: .init(name: "Test"), pin: "123-44-321", storage: MemoryStorage(), accessories: [thermostat,lamp])
         let application = characteristics(device: device)
 
         let connection = MockConnection()
@@ -685,7 +685,7 @@ class EndpointTests: XCTestCase {
 
     func testDelayMultipleEvents() {
         let lamp = Accessory.Lightbulb(info: .init(name: "Diner table"))
-        let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [lamp])
+        let device = Device(pin: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = characteristics(device: device)
 
         let connection = MockConnection()
@@ -745,7 +745,7 @@ class EndpointTests: XCTestCase {
     func testDelayMultipleEventsCoalescence() {
         let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat"))
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
-        let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [thermostat,lamp])
+        let device = Device(bridgeInfo: .init(name: "Test"), pin: "123-44-321", storage: MemoryStorage(), accessories: [thermostat,lamp])
         let application = characteristics(device: device)
 
         let connection = MockConnection()
@@ -836,7 +836,7 @@ class EndpointTests: XCTestCase {
         // instead.
 
         let lamp = Accessory.Lightbulb(info: .init(name: "Kitchen table"))
-        let device = Device(name: "Test", pin: "123-44-321", storage: MemoryStorage(), accessories: [lamp])
+        let device = Device(pin: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = characteristics(device: device)
 
         let connection = MockConnection()

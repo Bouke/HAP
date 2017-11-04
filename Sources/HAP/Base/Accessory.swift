@@ -21,13 +21,12 @@ public enum AccessoryType: String, Codable {
 
 open class Accessory {
     public weak var device: Device?
-    var aid: Int
+    internal var aid: Int = 0
     public let type: AccessoryType
     public let info: Service.Info
     internal let services: [Service]
 
-    public init(aid: Int = 0, info: Service.Info, type: AccessoryType, services: [Service]) {
-        self.aid = aid
+    public init(info: Service.Info, type: AccessoryType, services: [Service]) {
         self.type = type
         self.info = info
         self.services = [info] + services

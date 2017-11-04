@@ -13,7 +13,7 @@ class PairVerifyControllerTests: XCTestCase {
     }
     
     func test() {
-        let device = Device(name: "Test", pin: "", storage: MemoryStorage(), accessories: [])
+        let device = Device(bridgeInfo: .init(name: "Test"), pin: "", storage: MemoryStorage(), accessories: [])
         let username = "hubba hubba".data(using: .utf8)!
         let keys = Ed25519.generateSignKeypair() // these are the client's keys
         device.pairings[username] = keys.publicKey

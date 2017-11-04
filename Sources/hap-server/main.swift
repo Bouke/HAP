@@ -32,21 +32,25 @@ bedroomNightStand.lightbulb.on.onValueChange.append({ value in
     logger.info("bedroomNightStand changed value: \(String(describing: value))")
 })
 
-let device = Device(name: "Bridge", pin: "123-44-321", storage: storage, accessories: [
-    livingRoomLightbulb,
-    bedroomNightStand,
-    .Door(info: .init(name: "Front Door")),
-    .Switch(info: .init(name: "Garden Lights")),
-    .Thermostat(info: .init(name: "Living Room Thermostat")),
-    .Thermometer(info: .init(name: "Office Thermometer")),
-    .Outlet(info: .init(name: "Coffee Machine")),
-    .Window(info: .init(name: "Toilet Window")),
-    .WindowCovering(info: .init(name: "Shades")),
-    .Fan(info: .init(name: "Living Room Ceiling Fan")),
-    .GarageDoorOpener(info: .init(name: "Garage")),
-    .LockMechanism(info: .init(name: "Front Door Lock")),
-    .SecuritySystem(info: .init(name: "Alarm")),
-])
+let device = Device(
+    bridgeInfo: .init(name: "Bridge"),
+    pin: "123-44-321",
+    storage: storage,
+    accessories: [
+        livingRoomLightbulb,
+        bedroomNightStand,
+        .Door(info: .init(name: "Front Door")),
+        .Switch(info: .init(name: "Garden Lights")),
+        .Thermostat(info: .init(name: "Living Room Thermostat")),
+        .Thermometer(info: .init(name: "Office Thermometer")),
+        .Outlet(info: .init(name: "Coffee Machine")),
+        .Window(info: .init(name: "Toilet Window")),
+        .WindowCovering(info: .init(name: "Shades")),
+        .Fan(info: .init(name: "Living Room Ceiling Fan")),
+        .GarageDoorOpener(info: .init(name: "Garage")),
+        .LockMechanism(info: .init(name: "Front Door Lock")),
+        .SecuritySystem(info: .init(name: "Alarm")),
+    ])
 device.onIdentify.append({ acc in
     logger.info("Got identified: \(String(describing: acc))")
 })

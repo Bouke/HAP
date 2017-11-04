@@ -50,7 +50,27 @@ public class Device {
     internal var characteristicEventListeners: [Box<Characteristic>: WeakObjectSet<Server.Connection>]
     public var onIdentify: [(Accessory?) -> ()] = []
 
-    public init(name: String, pin: String, storage: Storage, accessories: [Accessory]) {
+    convenience public init(
+        bridgeInfo: Service.Info,
+        pin: String,
+        storage: Storage,
+        accessories: [Accessory])
+    {
+        let bridge = Accessory(info: bridgeInfo, type: .bridge, services: [])
+        self.init(name: bridge.info.name.value!,
+                  pin: pin,
+                  storage: storage,
+                  accessories: [bridge] + accessories)
+    }
+
+    convenience public init(pin: String, storage: Storage, accessory: Accessory) {
+        self.init(name: accessory.info.name.value!,
+                  pin: pin,
+                  storage: storage,
+                  accessories: [accessory])
+    }
+
+    fileprivate init(name: String, pin: String, storage: Storage, accessories: [Accessory]) {
         self.name = name
         self.pin = pin
         self.storage = storage
@@ -85,21 +105,6 @@ public class Device {
             accessory.device = self
             accessory.aid = idGenerator.next()!
         }
-
-        if let ka = storage["ka"] {
-            let kadata = try! JSONDecoder().decode(Array<KnownAccessory>.self, from: ka)
-            print(kadata)
-        }
-
-        let ka = accessories.map { KnownAccessory(type: $0.type, name: $0.info.name.value!, serialNumber: $0.info.serialNumber.value!) }
-        let kadata = try! JSONEncoder().encode(ka)
-        storage["ka"] = kadata
-    }
-
-    struct KnownAccessory: Codable {
-        let type: AccessoryType
-        let name: String
-        let serialNumber: String
     }
 
     class Pairings {
