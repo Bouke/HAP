@@ -16,7 +16,6 @@ Currently ``GenericCharacteristic<T>`` is used, to allow for user-defined value 
 Install libsodium (used for Curve25519 and Ed25519):
 
     brew install libsodium
-    brew link libsodium
 
 And then build the project itself:
 
