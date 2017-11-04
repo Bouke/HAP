@@ -16,7 +16,7 @@ func pairSetup(device: Device) -> Application {
 
     let username = "Pair-Setup"
     let (salt, verificationKey) = createSaltedVerificationKey(username: username,
-                                                              password: device.pin,
+                                                              password: device.setupCode,
                                                               group: group,
                                                               algorithm: algorithm)
     let controller = PairSetupController(device: device)

@@ -34,7 +34,7 @@ bedroomNightStand.lightbulb.on.onValueChange.append({ value in
 
 let device = Device(
     bridgeInfo: .init(name: "Bridge"),
-    pin: "123-44-321",
+    setupCode: "123-44-321",
     storage: storage,
     accessories: [
         livingRoomLightbulb,

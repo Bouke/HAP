@@ -1,5 +1,6 @@
 import Cryptor
 import Foundation
+import Regex
 import func Evergreen.getLogger
 
 fileprivate let logger = getLogger("hap.device")
@@ -43,7 +44,7 @@ public class Device {
     public let identifier: String
     public let publicKey: Data
     let privateKey: Data
-    public let pin: String
+    public let setupCode: String
     let storage: Storage
     let pairings: Pairings
     public let accessories: [Accessory]
@@ -52,27 +53,38 @@ public class Device {
 
     convenience public init(
         bridgeInfo: Service.Info,
-        pin: String,
+        setupCode: String,
         storage: Storage,
         accessories: [Accessory])
     {
         let bridge = Accessory(info: bridgeInfo, type: .bridge, services: [])
         self.init(name: bridge.info.name.value!,
-                  pin: pin,
+                  setupCode: setupCode,
                   storage: storage,
                   accessories: [bridge] + accessories)
     }
 
-    convenience public init(pin: String, storage: Storage, accessory: Accessory) {
+    convenience public init(
+        setupCode: String,
+        storage: Storage,
+        accessory: Accessory)
+    {
         self.init(name: accessory.info.name.value!,
-                  pin: pin,
+                  setupCode: setupCode,
                   storage: storage,
                   accessories: [accessory])
     }
 
-    fileprivate init(name: String, pin: String, storage: Storage, accessories: [Accessory]) {
+    fileprivate init(
+        name: String,
+        setupCode: String,
+        storage: Storage,
+        accessories: [Accessory])
+    {
+        precondition(setupCode =~ "^\\d{3}-\\d{2}-\\d{3}",
+                     "setup code must conform to the format XXX-XX-XXX")
         self.name = name
-        self.pin = pin
+        self.setupCode = setupCode
         self.storage = storage
         if let pk = storage["pk"], let sk = storage["sk"], let identifier = storage["uuid"] {
             self.identifier = String(data: identifier, encoding: .utf8)!

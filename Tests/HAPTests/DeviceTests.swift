@@ -8,7 +8,7 @@ class DeviceTests: XCTestCase {
         // no bridge -- 1 accessory
         do {
             let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
-            let device = Device(pin: "123-44-321", storage: MemoryStorage(), accessory: lamp)
+            let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
             let accessories = device.accessories
             let services = accessories.flatMap({ $0.services })
             let characteristics = services.flatMap({ $0.characteristics })
@@ -22,7 +22,7 @@ class DeviceTests: XCTestCase {
         // bridge with 1 accessory
         do {
             let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
-            let device = Device(pin: "123-44-321", storage: MemoryStorage(), accessory: lamp)
+            let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
             let accessories = device.accessories
             let services = accessories.flatMap({ $0.services })
             let characteristics = services.flatMap({ $0.characteristics })
@@ -36,7 +36,7 @@ class DeviceTests: XCTestCase {
         do {
             let thermostat = Accessory.Thermostat(info: .init(name: "Living room thermostat"))
             let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
-            let device = Device(bridgeInfo: .init(name: "Test"), pin: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
+            let device = Device(bridgeInfo: .init(name: "Test"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
             let accessories = device.accessories
             let services = accessories.flatMap({ $0.services })
             let characteristics = services.flatMap({ $0.characteristics })

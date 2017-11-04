@@ -16,9 +16,10 @@ let package = Package(
         .package(url: "https://github.com/Bouke/Kitura-net.git", from: "1.7.0"),
         .package(url: "https://github.com/IBM-Swift/BlueSocket.git", from: "0.12.0"),
         .package(url: "https://github.com/IBM-Swift/BlueCryptor.git", from: "0.8.16"),
+        .package(url: "https://github.com/crossroadlabs/Regex.git", from: "1.0.0"),
     ],
     targets: [
-        .target(name: "HAP", dependencies: ["SRP", "Cryptor", "Evergreen", "HKDF", "Kitura-net", "Socket"]),
+        .target(name: "HAP", dependencies: ["SRP", "Cryptor", "Evergreen", "HKDF", "Kitura-net", "Regex", "Socket"]),
         .target(name: "hap-server", dependencies: ["HAP", "Evergreen"]),
         .testTarget(name: "HAPTests", dependencies: ["HAP"]),
     ],
