@@ -51,6 +51,37 @@ public class Device {
     internal var characteristicEventListeners: [Box<Characteristic>: WeakObjectSet<Server.Connection>]
     public var onIdentify: [(Accessory?) -> ()] = []
 
+    /// 2.5.3.2 Bridges
+    /// A bridge is a special type of HAP accessory server that bridges HomeKit
+    /// Accessory Protocol and different RF/transport protocols, such as ZigBee
+    /// or Z-Wave. A bridge must expose all the user-addressable functionality
+    /// supported by its connected devices as HAP accessory objects to the HAP
+    /// controller(s). A bridge must ensure that the instance ID assigned to the
+    /// HAP accessory objects exposed on behalf of its connected devices do not
+    /// change for the lifetime of the server/client pairing.
+    ///
+    /// For example, a bridge that bridges three lights would expose four HAP
+    /// accessory objects: one HAP accessory object that represents the bridge
+    /// itself that may include a "firmware update" service, and three
+    /// additional HAP accessory objects that each contain a "lightbulb"
+    /// service.
+    ///
+    /// A bridge must not expose more than 100 HAP accessory objects.
+    ///
+    /// Any accessories, regardless of transport, that enable physical access to
+    /// the home, such as door locks, must not be bridged. Accessories that
+    /// support IP transports, such as Wi-Fi, must not be bridged. Accessories
+    /// that support Bluetooth LE that can be controlled, such as a light bulb,
+    /// must not be bridged. Accessories that support Bluetooth LE that only
+    /// provide data, such as a temperature sensor, and accessories that support
+    /// other transports, such as a ZigBee light bulb or a proprietary RF
+    /// sensor, may be bridged.
+    ///
+    /// - Parameters:
+    ///   - bridgeInfo: information about the bridge
+    ///   - setupCode: the code to pair this device, must be in the format XXX-XX-XXX
+    ///   - storage: persistence interface for storing pairings, secrets
+    ///   - accessories: accessories to be bridged
     convenience public init(
         bridgeInfo: Service.Info,
         setupCode: String,
