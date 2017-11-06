@@ -19,7 +19,7 @@ Install libsodium (used for Curve25519 and Ed25519):
 
 And then build the project itself:
 
-    swift build
+    swift build -c release
 
 ### Linux
 
@@ -40,7 +40,7 @@ Otherwise you have to compile and install libsodium from source;
 
 And then build the project itself:
 
-    swift build
+    swift build -c release
 
 ## Usage
 
