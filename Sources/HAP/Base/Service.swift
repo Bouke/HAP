@@ -24,7 +24,7 @@ public enum ServiceType: String {
 open class Service {
     weak var accessory: Accessory?
 
-    internal var iid: Int = 0
+    internal var iid: InstanceID = 0
     public let type: ServiceType
     let characteristics: [Characteristic]
 

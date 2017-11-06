@@ -1,5 +1,7 @@
 import Foundation
 
+typealias InstanceID = Int
+
 public enum AccessoryType: String, Codable {
     case other = "1"
     case bridge = "2"
@@ -21,7 +23,7 @@ public enum AccessoryType: String, Codable {
 
 open class Accessory {
     public weak var device: Device?
-    internal var aid: Int = 0
+    internal var aid: InstanceID = 0
     public let type: AccessoryType
     public let info: Service.Info
     internal let services: [Service]
@@ -55,7 +57,7 @@ open class Accessory {
         // which is the data-type we wanted to use here. We can change it back
         // to UInt64 once the following commit has made it into a release:
         // https://github.com/apple/swift-corelibs-foundation/commit/64b67c91479390776c43a96bd31e4e85f106d5e1
-        var idGenerator = (1...Int.max).makeIterator()
+        var idGenerator = (1...InstanceID.max).makeIterator()
         for service in self.services {
             service.iid = idGenerator.next()!
             service.accessory = self
