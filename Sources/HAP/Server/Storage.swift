@@ -60,12 +60,12 @@ public class FileStorage: Storage {
             return data
         }
         set {
-            let entityPath = URL(fileURLWithPath: path).appendingPathComponent(key)
+            let entityURL = URL(fileURLWithPath: path).appendingPathComponent(key)
             do {
                 if let newValue = newValue {
-                    try newValue.write(to: entityPath)
-                } else if FileManager.default.fileExists(atPath: entityPath.absoluteString) {
-                    try FileManager.default.removeItem(at: entityPath)
+                    try newValue.write(to: entityURL)
+                } else if FileManager.default.fileExists(atPath: entityURL.path) {
+                    try FileManager.default.removeItem(at: entityURL)
                 }
             } catch {
                 fatalError("Could not write to storage: \(error)")
