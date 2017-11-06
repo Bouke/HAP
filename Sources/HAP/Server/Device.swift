@@ -219,7 +219,11 @@ public class Device {
             // 0x01         1   Supports HAP Pairing. This flag is required for
             //                  all HomeKit accessories.
             // 0x02-0x80    2-8 Reserved.
-            "ff": "0x01",
+            //
+            // NOTE: On non-certified HAP devices (like this package), we can't
+            // set this to 0x01 as clients will send parameters we don't
+            // understand.
+            "ff": "0",
 
             // Device ID (Device ID (page 36)) of the accessory. The Device ID
             // must be formatted as "XX:XX:XX:XX:XX:XX", where "XX" is a
