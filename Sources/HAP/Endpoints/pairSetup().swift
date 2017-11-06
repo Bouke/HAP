@@ -66,6 +66,7 @@ func pairSetup(device: Device) -> Application {
         if let response = response {
             return Response(status: .ok, data: encode(response), mimeType: "application/pairing+tlv8")
         } else {
+            // TODO: return error code -- otherwise setup will hang in iOS (spinner)
             return .badRequest
         }
     }
