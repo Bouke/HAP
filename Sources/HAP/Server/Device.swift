@@ -254,7 +254,7 @@ public class Device {
             // 0x02-0x80    2   Accessory has not been configured to join a Wi-Fi network.
             // 0x04         3   A problem has been detected on the accessory.
             // 0x08-0x80    4-8 Reserved.
-            "sf": (isPaired ? "0" : "0x01"),
+            "sf": (isPaired ? "0" : "1"),
 
             // Accessory Category Identifier. Required. Indicates the category
             // that best describes the primary function of the accessory. This
