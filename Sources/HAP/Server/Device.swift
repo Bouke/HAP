@@ -212,7 +212,7 @@ public class Device {
             // update. This must have a range of 1-4294967295 and wrap to 1
             // when it overflows. This value must persist across reboots, power
             // cycles, etc.
-            "c#": "3",
+            "c#": "1",
 
             // Feature flags (e.g. "0x3" for bits 0 and 1). Required if
             // non-zero. See table:
