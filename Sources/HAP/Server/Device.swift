@@ -51,7 +51,6 @@ public class Device {
     internal var characteristicEventListeners: [Box<Characteristic>: WeakObjectSet<Server.Connection>]
     public var onIdentify: [(Accessory?) -> Void] = []
 
-    /// 2.5.3.2 Bridges
     /// A bridge is a special type of HAP accessory server that bridges HomeKit
     /// Accessory Protocol and different RF/transport protocols, such as ZigBee
     /// or Z-Wave. A bridge must expose all the user-addressable functionality
@@ -94,6 +93,15 @@ public class Device {
                   accessories: [bridge] + accessories)
     }
 
+    /// An HAP accessory object represents a physical accessory on an HAP
+    /// accessory server. For example, a thermostat would expose a single HAP
+    /// accessory object that represents the user-addressable functionality of
+    /// the thermostat.
+    ///
+    /// - Parameters:
+    ///   - setupCode: the code to pair this device, must be in the format XXX-XX-XXX
+    ///   - storage: persistence interface for storing pairings, secrets
+    ///   - accessory: accessory to publish
     convenience public init(
         setupCode: String,
         storage: Storage,
