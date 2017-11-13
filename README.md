@@ -50,9 +50,43 @@ On Mac OS, you can debug using XCode by running the command ``swift package gene
 
 ## Linux
 
-Currently Linux is not supported due to use of NetService, which is not (yet) available in Swift-Foundation. I've been working on implementing NetService, but the implementation isn't complete yet. Patches welcome.
+There is some support on Linux. It uses my own implementation of NetService
+for multicast DNS (mDNS). However this implementation might be working for
+some use-cases, it isn't production grade. Patches welcome. Another solution
+would be to switch to using Avahi instead.
 
-CommonCrypto has been replaced with the portable BlueCryptor; it uses CommonCrypto on Apple platforms and OpenSSL on Linux. 
+CommonCrypto has been replaced with the portable BlueCryptor; it uses CommonCrypto on Apple platforms and OpenSSL on Linux.
+
+## Object-Oriented Design
+
+A high-level overview of the objects involved are shown in the diagram below.
+The terminology of HAP (Device, Accessory, Service, Characteristic) is
+followed for ease of understanding.
+
+                          +------------+
+                          | NetService |
+                          +------------+
+                                 |
+                                 |delegate
+                                 v
+       +--------+ 1       1 +--------+
+       | Device |-----------| Server |
+       +--------+\          +--------+
+            |1    -\notify       |1
+            |*      -\           |*
+      +-----------+   -\  +------------+ 1   0…1 +---------------+
+      | Accessory |     ->| Connection |---------| Cryptographer |
+      +-----------+       +------------+         +---------------+
+            |1
+            |*
+       +---------+
+       | Service |
+       +---------+
+            |1
+            |*
+    +----------------+
+    | Characteristic |
+    +----------------+
 
 ## Credits
 
