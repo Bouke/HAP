@@ -1,6 +1,44 @@
 import Foundation
 
 enum Protocol {
+    struct GetQuery {
+        enum DecodeError: Error {
+            case invalidPath
+        }
+        struct Path {
+            var aid: InstanceID
+            var iid: InstanceID
+            init(_ string: String) throws {
+                let components = string.components(separatedBy: ".")
+                guard
+                    components.count == 2,
+                    let aid = Int(components[0]),
+                    let iid = Int(components[1])
+                    else {
+                        throw DecodeError.invalidPath
+                }
+                self.aid = aid
+                self.iid = iid
+            }
+        }
+
+        var paths: [Path]
+        var meta: Bool
+        var perms: Bool
+        var type: Bool
+        var ev: Bool
+        init(queryItems: [URLQueryItem]) throws {
+            guard let id = queryItems.first(where: {$0.name == "id"})?.value else {
+                throw DecodeError.invalidPath
+            }
+            paths = try id.components(separatedBy: ",").map(Path.init)
+            meta = queryItems.first(where: {$0.name == "meta"})?.value == "1"
+            perms = queryItems.first(where: {$0.name == "perms"})?.value == "1"
+            type = queryItems.first(where: {$0.name == "type"})?.value == "1"
+            ev = queryItems.first(where: {$0.name == "ev"})?.value == "1"
+        }
+    }
+
     enum Value: Codable {
         case int(Int)
         case double(Double)

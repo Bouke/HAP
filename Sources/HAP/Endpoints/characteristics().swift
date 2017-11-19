@@ -8,33 +8,22 @@ func characteristics(device: Device) -> Application {
     return { (connection, request) in
         switch request.method {
         case "GET":
-            let queryItems = request.urlComponents.queryItems
-
             guard
-                let id = queryItems?.first(where: {$0.name == "id"})?.value
-                else {
-                    return .badRequest
+                let queryItems = request.urlComponents.queryItems,
+                let query = try? Protocol.GetQuery(queryItems: queryItems)
+            else {
+                return .badRequest
             }
 
-            let meta = queryItems?.first(where: {$0.name == "meta"})?.value == "1"
-            let perms = queryItems?.first(where: {$0.name == "perms"})?.value == "1"
-            let type = queryItems?.first(where: {$0.name == "type"})?.value == "1"
-            let ev = queryItems?.first(where: {$0.name == "ev"})?.value == "1"
-
-            let paths = id.components(separatedBy: ",").map { $0.components(separatedBy: ".").flatMap { Int($0) } }
-
             var responses = [Protocol.Characteristic]()
-            for path in paths {
-                guard path.count == 2 else {
-                    return .badRequest
-                }
-                guard let characteristic = device.accessories.first(where: {$0.aid == path[0]})?.services.flatMap({$0.characteristics.filter({$0.iid == path[1]})}).first else {
-                    responses.append(Protocol.Characteristic(aid: path[0], iid: path[1], status: .resourceDoesNotExist))
+            for path in query.paths {
+                guard let characteristic = device.accessories.first(where: { $0.aid == path.aid })?.services.flatMap({ $0.characteristics.filter({ $0.iid == path.iid }) }).first else {
+                    responses.append(Protocol.Characteristic(aid: path.aid, iid: path.iid, status: .resourceDoesNotExist))
                     continue
                 }
                 guard characteristic.permissions.contains(.read) else {
                     logger.info("\(characteristic) has no read permission")
-                    responses.append(Protocol.Characteristic(aid: path[0], iid: path[1], status: .writeOnly))
+                    responses.append(Protocol.Characteristic(aid: path.aid, iid: path.iid, status: .writeOnly))
                     continue
                 }
 
@@ -48,21 +37,21 @@ func characteristics(device: Device) -> Application {
                 default: value = nil
                 }
 
-                var response = Protocol.Characteristic(aid: path[0], iid: path[1], value: value)
-                if meta {
+                var response = Protocol.Characteristic(aid: path.aid, iid: path.iid, value: value)
+                if query.meta {
                     response.maxValue = characteristic.maxValue
                     response.minValue = characteristic.minValue
                     response.unit = characteristic.unit
                     response.minStep = characteristic.minStep
                     response.maxLen = characteristic.maxLength
                 }
-                if perms {
+                if query.perms {
                     response.perms = characteristic.permissions
                 }
-                if type {
+                if query.type {
                     response.type = characteristic.type
                 }
-                if ev {
+                if query.ev {
                     response.ev = characteristic.permissions.contains(.events)
                 }
                 responses.append(response)
