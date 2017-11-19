@@ -34,7 +34,7 @@ class EndpointTests: XCTestCase {
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = accessories(device: device)
         let response = application(MockConnection(), MockRequest.get(path: "/accessories"))
-        let jsonObject = try! JSONSerialization.jsonObject(with: response.body!, options: []) as! [String: [[String: Any]]]
+        let jsonObject = try! JSONSerialization.jsonObject(with: response.body ?? Data(), options: []) as! [String: [[String: Any]]]
         guard let accessory = jsonObject["accessories"]?.first else {
             return XCTFail("No accessory")
         }
@@ -64,23 +64,55 @@ class EndpointTests: XCTestCase {
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", manufacturer: "Bouke"))
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = characteristics(device: device)
-        let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=\(lamp.aid).\(lamp.info.manufacturer.iid),\(lamp.aid).\(lamp.info.name.iid)"))
-        guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body!, options: [])) as? [String: [[String: Any]]] else {
-            return XCTFail("Could not decode")
-        }
-        guard let characteristics = jsonObject["characteristics"] else {
-            return XCTFail("No characteristics")
+        do {
+            let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=\(lamp.aid).\(lamp.info.manufacturer.iid),\(lamp.aid).\(lamp.info.name.iid)"))
+            guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body ?? Data(), options: [])) as? [String: [[String: Any]]] else {
+                return XCTFail("Could not decode")
+            }
+            guard let characteristics = jsonObject["characteristics"] else {
+                return XCTFail("No characteristics")
+            }
+
+            guard let manufacturerCharacteristic = characteristics.first(where: { $0["iid"] as? Int == lamp.info.manufacturer.iid }) else {
+                return XCTFail("No manufacturer characteristic")
+            }
+            XCTAssertEqual(manufacturerCharacteristic["value"] as? String, "Bouke")
+
+            guard let nameCharacteristic = characteristics.first(where: { $0["iid"] as? Int == lamp.info.name.iid }) else {
+                return XCTFail("No name characteristic")
+            }
+            XCTAssertEqual(nameCharacteristic["value"] as? String, "Night stand left")
         }
 
-        guard let manufacturerCharacteristic = characteristics.first(where: { $0["iid"] as? Int == lamp.info.manufacturer.iid }) else {
-            return XCTFail("No manufacturer")
-        }
-        XCTAssertEqual(manufacturerCharacteristic["value"] as? String, "Bouke")
+        do {
+            let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=\(lamp.aid).\(lamp.info.name.iid),\(lamp.aid).\(lamp.lightbulb.brightness.iid)&meta=1&perms=1&type=1&ev=1"))
+            guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body ?? Data(), options: [])) as? [String: [[String: Any]]] else {
+                return XCTFail("Could not decode")
+            }
+            guard let characteristics = jsonObject["characteristics"] else {
+                return XCTFail("No characteristics")
+            }
 
-        guard let nameCharacteristic = characteristics.first(where: { $0["iid"] as? Int == lamp.info.name.iid }) else {
-            return XCTFail("No name")
+            guard let nameCharacteristic = characteristics.first(where: { $0["iid"] as? Int == lamp.info.name.iid }) else {
+                return XCTFail("No name characteristic")
+            }
+            XCTAssertEqual(nameCharacteristic["value"] as? String, "Night stand left")
+            XCTAssertEqual(nameCharacteristic["perms"] as? [String] ?? [], ["pr"])
+            XCTAssertEqual(nameCharacteristic["type"] as? String, "23")
+            XCTAssertEqual(nameCharacteristic["ev"] as? Bool, false)
+
+            guard let brightnessCharacteristic = characteristics.first(where: { $0["iid"] as? Int == lamp.lightbulb.brightness.iid }) else {
+                return XCTFail("No identify characteristic")
+            }
+            XCTAssertEqual(brightnessCharacteristic["value"] as? Double, 100)
+            XCTAssertEqual(brightnessCharacteristic["maxValue"] as? Double, 100)
+            XCTAssertEqual(brightnessCharacteristic["minValue"] as? Double, 0)
+            XCTAssertEqual(brightnessCharacteristic["minStep"] as? Double, 1)
+            XCTAssertEqual(brightnessCharacteristic["unit"] as? String, "percentage")
+            XCTAssertEqual(brightnessCharacteristic["perms"] as? [String] ?? [], ["pr", "pw", "ev"])
+            XCTAssertEqual(brightnessCharacteristic["type"] as? String, "8")
+            XCTAssertEqual(brightnessCharacteristic["ev"] as? Bool, true)
         }
-        XCTAssertEqual(nameCharacteristic["value"] as? String, "Night stand left")
     }
 
     func testPutBoolAndIntCharacteristics() {
@@ -268,7 +300,7 @@ class EndpointTests: XCTestCase {
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
             let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .badRequest)
-            let json = try! JSONSerialization.jsonObject(with: response.body!)  as! [String: [[String: Any]]]
+            let json = try! JSONSerialization.jsonObject(with: response.body ?? Data())  as! [String: [[String: Any]]]
             XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int, HAPStatusCodes.invalidValue.rawValue)
         }
 
@@ -294,7 +326,7 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(response.status, .multiStatus)
             XCTAssertEqual(lamp.lightbulb.brightness.value, 50)
 
-            let json = try! JSONSerialization.jsonObject(with: response.body!)  as! [String: [[String: Any]]]
+            let json = try! JSONSerialization.jsonObject(with: response.body ?? Data())  as! [String: [[String: Any]]]
             XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int, HAPStatusCodes.readOnly.rawValue)
             XCTAssertEqual(json["characteristics"]![1]["status"]! as! Int, HAPStatusCodes.success.rawValue)
 
@@ -321,7 +353,7 @@ class EndpointTests: XCTestCase {
             let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .multiStatus)
 
-            let json = try! JSONSerialization.jsonObject(with: response.body!)  as! [String: [[String: Any]]]
+            let json = try! JSONSerialization.jsonObject(with: response.body ?? Data())  as! [String: [[String: Any]]]
             XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int, HAPStatusCodes.readOnly.rawValue)
             XCTAssertEqual(json["characteristics"]![1]["status"]! as! Int, HAPStatusCodes.invalidValue.rawValue)
 
@@ -348,7 +380,7 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(response.status, .multiStatus)
             XCTAssertEqual(lamp.lightbulb.brightness.value, 50)
 
-            let json = try! JSONSerialization.jsonObject(with: response.body!)  as! [String: [[String: Any]]]
+            let json = try! JSONSerialization.jsonObject(with: response.body ?? Data())  as! [String: [[String: Any]]]
             XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int, HAPStatusCodes.success.rawValue)
             XCTAssertEqual(json["characteristics"]![1]["status"]! as! Int, HAPStatusCodes.readOnly.rawValue)
         }
@@ -374,7 +406,7 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(response.status, .multiStatus)
             XCTAssertEqual(lamp.lightbulb.brightness.value, 50)
 
-            let json = try! JSONSerialization.jsonObject(with: response.body!)  as! [String: [[String: Any]]]
+            let json = try! JSONSerialization.jsonObject(with: response.body ?? Data())  as! [String: [[String: Any]]]
             XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int, HAPStatusCodes.readOnly.rawValue)
             XCTAssertEqual(json["characteristics"]![1]["status"]! as! Int, HAPStatusCodes.readOnly.rawValue)
 
@@ -479,7 +511,7 @@ class EndpointTests: XCTestCase {
 
             XCTAssertEqual(response.status, .ok)
 
-            guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body!, options: [])) as? [String: [[String: Any]]] else {
+            guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body ?? Data(), options: [])) as? [String: [[String: Any]]] else {
                 return XCTFail("Could not decode")
             }
             guard let characteristics = jsonObject["characteristics"] else {
@@ -521,7 +553,7 @@ class EndpointTests: XCTestCase {
             let aid = lightsensor.aid
             let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=\(aid).\(iid)"))
             XCTAssertEqual(response.status, .multiStatus)
-            let json = try! JSONSerialization.jsonObject(with: response.body!)  as! [String: [[String: Any]]]
+            let json = try! JSONSerialization.jsonObject(with: response.body ?? Data())  as! [String: [[String: Any]]]
             XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int, HAPStatusCodes.writeOnly.rawValue)
             XCTAssertEqual(json["characteristics"]![0]["aid"]! as! Int, aid)
             XCTAssertEqual(json["characteristics"]![0]["iid"]! as! Int, iid)
@@ -535,7 +567,7 @@ class EndpointTests: XCTestCase {
             let aid2 = thermostat.aid
             let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=\(aid2).\(iid2),\(aid).\(iid)"))
             XCTAssertEqual(response.status, .multiStatus)
-            guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body!, options: [])) as? [String: [[String: Any]]] else {
+            guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body ?? Data(), options: [])) as? [String: [[String: Any]]] else {
                 return XCTFail("Could not decode")
             }
             guard let characteristics = jsonObject["characteristics"] else {
@@ -563,7 +595,7 @@ class EndpointTests: XCTestCase {
             let aid2 = thermostat.aid
             let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=\(aid).\(iid),\(aid2).\(iid2)"))
             XCTAssertEqual(response.status, .multiStatus)
-            guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body!, options: [])) as? [String: [[String: Any]]] else {
+            guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body ?? Data(), options: [])) as? [String: [[String: Any]]] else {
                 return XCTFail("Could not decode")
             }
             guard let characteristics = jsonObject["characteristics"] else {
