@@ -75,10 +75,6 @@ extension Float: CharacteristicValueType {
 extension Data: CharacteristicValueType, JSONValueTypeConvertible {
     public init?(value: Any) {
         fatalError("How does deserialization of Data work?")
-        guard let data = value as? Data else {
-            return nil
-        }
-        self = data
     }
     static public let format = CharacteristicFormat.data
     public var jsonValueType: JSONValueType {
