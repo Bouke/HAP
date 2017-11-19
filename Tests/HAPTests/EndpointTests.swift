@@ -104,10 +104,10 @@ class EndpointTests: XCTestCase {
             guard let brightnessCharacteristic = characteristics.first(where: { $0["iid"] as? Int == lamp.lightbulb.brightness.iid }) else {
                 return XCTFail("No identify characteristic")
             }
-            XCTAssertEqual(brightnessCharacteristic["value"] as? Double, 100)
-            XCTAssertEqual(brightnessCharacteristic["maxValue"] as? Double, 100)
-            XCTAssertEqual(brightnessCharacteristic["minValue"] as? Double, 0)
-            XCTAssertEqual(brightnessCharacteristic["minStep"] as? Double, 1)
+            XCTAssertEqual(brightnessCharacteristic["value"] as? Int, 100)
+            XCTAssertEqual(brightnessCharacteristic["maxValue"] as? Int, 100)
+            XCTAssertEqual(brightnessCharacteristic["minValue"] as? Int, 0)
+            XCTAssertEqual(brightnessCharacteristic["minStep"] as? Int, 1)
             XCTAssertEqual(brightnessCharacteristic["unit"] as? String, "percentage")
             XCTAssertEqual(brightnessCharacteristic["perms"] as? [String] ?? [], ["pr", "pw", "ev"])
             XCTAssertEqual(brightnessCharacteristic["type"] as? String, "8")
