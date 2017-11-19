@@ -1,4 +1,4 @@
-public enum CharacteristicType: String {
+public enum CharacteristicType: String, Codable {
     case on = "25"
     case brightness = "8"
     case saturation = "2F"
@@ -41,7 +41,7 @@ public enum CharacteristicType: String {
     case firmwareRevision = "52"
 }
 
-public enum CharacteristicPermission: String {
+public enum CharacteristicPermission: String, Codable {
     // This characteristic can only be read by paired controllers.
     case read = "pr" // paired read
 
@@ -79,7 +79,7 @@ public enum CharacteristicFormat: String {
     case tlv8
 }
 
-public enum CharacteristicUnit: String {
+public enum CharacteristicUnit: String, Codable {
     case percentage
     case arcdegrees
     case celcius

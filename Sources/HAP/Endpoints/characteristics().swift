@@ -23,52 +23,49 @@ func characteristics(device: Device) -> Application {
 
             let paths = id.components(separatedBy: ",").map { $0.components(separatedBy: ".").flatMap { Int($0) } }
 
-            var serialized: [[String: Any]] = []
+            var responses = [Protocol.Characteristic]()
             for path in paths {
                 guard path.count == 2 else {
                     return .badRequest
                 }
-
-                guard
-                    let characteristic = device.accessories.first(where: {$0.aid == path[0]})?.services.flatMap({$0.characteristics.filter({$0.iid == path[1]})}).first
-                    else {
-                        serialized.append(["aid": path[0], "iid": path[1], "status": HAPStatusCodes.resourceDoesNotExist.rawValue])
-                        break
+                guard let characteristic = device.accessories.first(where: {$0.aid == path[0]})?.services.flatMap({$0.characteristics.filter({$0.iid == path[1]})}).first else {
+                    responses.append(Protocol.Characteristic(aid: path[0], iid: path[1], status: .resourceDoesNotExist))
+                    continue
                 }
                 guard characteristic.permissions.contains(.read) else {
                     logger.info("\(characteristic) has no read permission")
-                    serialized.append(["aid": path[0], "iid": path[1], "status": HAPStatusCodes.writeOnly.rawValue])
+                    responses.append(Protocol.Characteristic(aid: path[0], iid: path[1], status: .writeOnly))
                     continue
                 }
 
-                var body = ["aid": path[0], "iid": path[1], "value": characteristic.getValue() ?? NSNull()]
+                var value: Protocol.Value?
+                switch characteristic.getValue() {
+                case let _value as Double: value = .number(NSNumber(value: _value))
+                case let _value as Float: value = .number(NSNumber(value: _value))
+                case let _value as Int: value = .number(NSNumber(value: _value))
+                case let _value as Bool: value = .number(NSNumber(value: _value))
+                case let _value as String: value = .string(_value)
+                default: value = nil
+                }
+
+                var response = Protocol.Characteristic(aid: path[0], iid: path[1], value: value)
                 if meta {
-                    if let maxValue = characteristic.maxValue {
-                        body["maxValue"] = maxValue.jsonValueType
-                    }
-                    if let minValue = characteristic.minValue {
-                        body["minValue"] = minValue.jsonValueType
-                    }
-                    if let unit = characteristic.unit {
-                        body["unit"] = unit.jsonValueType
-                    }
-                    if let minStep = characteristic.minStep {
-                        body["minStep"] = minStep.jsonValueType
-                    }
-                    if let maxLen = characteristic.maxLength {
-                        body["maxLen"] = maxLen.jsonValueType
-                    }
+                    response.maxValue = characteristic.maxValue
+                    response.minValue = characteristic.minValue
+                    response.unit = characteristic.unit
+                    response.minStep = characteristic.minStep
+                    response.maxLen = characteristic.maxLength
                 }
                 if perms {
-                    body["perms"] = characteristic.permissions.map { $0.rawValue }
+                    response.perms = characteristic.permissions
                 }
                 if type {
-                    body["type"] = characteristic.type.rawValue
+                    response.type = characteristic.type
                 }
                 if ev {
-                    body["ev"] = characteristic.permissions.contains(.events)
+                    response.ev = characteristic.permissions.contains(.events)
                 }
-                serialized.append(body)
+                responses.append(response)
             }
 
             /* HAP Specification 5.7.3.2
@@ -85,15 +82,15 @@ func characteristics(device: Device) -> Application {
              */
 
             var responseStatus: Response.Status = .ok
-            if serialized.first(where: {$0.keys.contains("status")}) != nil {
-                for (index, element) in serialized.enumerated() where element["status"] == nil {
-                    serialized[index]["status"] = HAPStatusCodes.success.rawValue
+            if !responses.filter({ $0.status != nil }).isEmpty {
+                for i in responses.indices where responses[i].status == nil {
+                    responses[i].status = .success
                 }
                 responseStatus = .multiStatus
             }
 
             do {
-                let json = try JSONSerialization.data(withJSONObject: ["characteristics": serialized], options: [])
+                let json = try JSONEncoder().encode(Protocol.CharacteristicContainer(characteristics: responses))
                 return Response(status: responseStatus, data: json, mimeType: "application/hap+json")
             } catch {
                 logger.error("Could not serialize object", error: error)

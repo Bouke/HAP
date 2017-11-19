@@ -34,17 +34,29 @@ enum Protocol {
     struct Characteristic: Codable {
         var aid: InstanceID
         var iid: InstanceID
-        var value: Value? = nil
-        var ev: Bool? = nil
         var status: HAPStatusCodes? = nil
 
-        public init(aid: InstanceID, iid: InstanceID, value: Value? = nil, ev: Bool? = nil, status: HAPStatusCodes? = nil) {
+        var value: Value? = nil
+
+        var perms: [CharacteristicPermission]? = nil
+
+        var unit: CharacteristicUnit? = nil
+        var type: CharacteristicType? = nil
+        var maxLen: Int? = nil
+        var maxValue: Double? = nil
+        var minValue: Double? = nil
+        var minStep: Double? = nil
+
+        var ev: Bool? = nil
+
+        public init(aid: InstanceID, iid: InstanceID, value: Value? = nil, status: HAPStatusCodes? = nil) {
             self.aid = aid
             self.iid = iid
-            self.value = value
-            self.ev = ev
             self.status = status
+            self.value = value
         }
+
+
     }
 
     struct CharacteristicContainer: Codable {
