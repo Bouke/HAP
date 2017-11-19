@@ -2,7 +2,8 @@ import Foundation
 
 enum Protocol {
     enum Value: Codable {
-        case number(NSNumber)
+        case int(Int)
+        case double(Double)
         case string(String)
 
         enum DecodeError: Error {
@@ -11,8 +12,10 @@ enum Protocol {
 
         init(from decoder: Decoder) throws {
             let container = try decoder.singleValueContainer()
-            if let number = try? container.decode(Double.self) {
-                self = .number(NSNumber(value: number))
+            if let int = try? container.decode(Int.self) {
+                self = .int(int)
+            } else if let double = try? container.decode(Double.self) {
+                self = .double(double)
             } else if let string = try? container.decode(String.self) {
                 self = .string(string)
             } else {
@@ -23,8 +26,10 @@ enum Protocol {
         func encode(to encoder: Encoder) throws {
             var container = encoder.singleValueContainer()
             switch self {
-            case let .number(number):
-                try container.encode(number.doubleValue)
+            case let .int(int):
+                try container.encode(int)
+            case let .double(double):
+                try container.encode(double)
             case let .string(string):
                 try container.encode(string)
             }

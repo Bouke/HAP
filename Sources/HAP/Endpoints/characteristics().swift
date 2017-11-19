@@ -40,10 +40,10 @@ func characteristics(device: Device) -> Application {
 
                 var value: Protocol.Value?
                 switch characteristic.getValue() {
-                case let _value as Double: value = .number(NSNumber(value: _value))
-                case let _value as Float: value = .number(NSNumber(value: _value))
-                case let _value as Int: value = .number(NSNumber(value: _value))
-                case let _value as Bool: value = .number(NSNumber(value: _value))
+                case let _value as Double: value = .double(_value)
+                case let _value as Float: value = .double(Double(_value))
+                case let _value as Int: value = .int(_value)
+                case let _value as Bool: value = .int(_value ? 1 : 0)
                 case let _value as String: value = .string(_value)
                 default: value = nil
                 }
@@ -135,8 +135,10 @@ func characteristics(device: Device) -> Application {
                         switch value {
                         case let .string(value):
                             try characteristic.setValue(value, fromConnection: connection)
-                        case let .number(number):
-                            try characteristic.setValue(number, fromConnection: connection)
+                        case let .int(int):
+                            try characteristic.setValue(int, fromConnection: connection)
+                        case let .double(double):
+                            try characteristic.setValue(double, fromConnection: connection)
                         }
                         status.status = .success
                     } catch {
