@@ -1,4 +1,4 @@
-public enum ServiceType: String {
+public enum ServiceType: String, Codable {
     case info = "3E"
     case lightbulb = "43"
     case `switch` = "49"

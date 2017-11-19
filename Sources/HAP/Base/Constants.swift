@@ -66,7 +66,7 @@ public enum CharacteristicPermission: String, Codable {
     static let ReadWrite: [CharacteristicPermission] = [.read, .write, .events]
 }
 
-public enum CharacteristicFormat: String {
+public enum CharacteristicFormat: String, Codable {
     case string
     case bool
     case float
