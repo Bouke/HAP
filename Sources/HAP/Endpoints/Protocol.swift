@@ -12,8 +12,8 @@ enum Protocol {
                 let components = string.components(separatedBy: ".")
                 guard
                     components.count == 2,
-                    let aid = Int(components[0]),
-                    let iid = Int(components[1])
+                    let aid = InstanceID(components[0]),
+                    let iid = InstanceID(components[1])
                     else {
                         throw DecodeError.invalidPath
                 }
