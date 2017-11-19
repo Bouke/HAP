@@ -102,56 +102,50 @@ func characteristics(device: Device) -> Application {
 
         case "PUT":
             var body = Data()
-            guard let _  = try? request.readAllData(into: &body),
-                let deserialized = try? JSONSerialization.jsonObject(with: body, options: []),
-                let dict = deserialized as? [String: [[String: Any]]],
-                let items = dict["characteristics"] else {
-                logger.warning("Could not decode JSON")
-                return .badRequest
-            }
-
-            var serialized: [[String: Any]] = []
-
-            for item in items {
-                guard let aid = item["aid"] as? Int,
-                    let iid = item["iid"] as? Int else {
-                    logger.warning("Missing either aid/iid keys")
+            guard
+                let _  = try? request.readAllData(into: &body),
+                let decoded = try? JSONDecoder().decode(Protocol.CharacteristicContainer.self, from: body) else
+            {
+                    logger.warning("Could not decode JSON")
                     return .badRequest
-                }
+            }
+            var statuses = [Protocol.Characteristic]()
+            for item in decoded.characteristics {
+                var status = Protocol.Characteristic(aid: item.aid, iid: item.iid)
                 guard let characteristic = device.accessories
-                    .first(where: {$0.aid == aid})?
+                    .first(where: {$0.aid == item.aid})?
                     .services
-                    .flatMap({$0.characteristics.filter({$0.iid == iid})})
+                    .flatMap({$0.characteristics.filter({$0.iid == item.iid})})
                     .first else {
                     return .unprocessableEntity
                 }
 
                 // At least one of "value" or "ev" will be present in the characteristic write request object
-                guard item["value"] != nil || item["ev"] != nil else {
+                guard item.value != nil || item.ev != nil else {
                     return .badRequest
                 }
 
                 // set new value
-                VALUE: if let value = item["value"] {
+                VALUE: if let value = item.value {
                     guard characteristic.permissions.contains(.write) else {
                         logger.info("\(characteristic) has no write permission")
-                        serialized.append(["aid": aid, "iid": iid, "status": HAPStatusCodes.readOnly.rawValue])
+                        status.status = .readOnly
                         break VALUE  // continue and process other items
                     }
 
                     logger.debug("Setting \(characteristic) to new value \(value) (type: \(type(of: value)))")
                     do {
                         switch value {
-                        case is NSNull:
-                            try characteristic.setValue(nil, fromConnection: connection)
-                        default:
+                        case let .string(value):
                             try characteristic.setValue(value, fromConnection: connection)
+                        case let .number(number):
+                            try characteristic.setValue(number, fromConnection: connection)
                         }
-                        serialized.append(["aid": aid, "iid": iid, "status": HAPStatusCodes.success.rawValue])
+                        status.status = .success
                     } catch {
                         logger.warning("Could not set value of type \(type(of: value)): \(error)")
-                        serialized.append(["aid": aid, "iid": iid, "status": HAPStatusCodes.invalidValue.rawValue])
-                        break VALUE
+                        status.status = .invalidValue
+                       break VALUE
                     }
 
                     // notify listeners
@@ -159,9 +153,10 @@ func characteristics(device: Device) -> Application {
                 }
 
                 // toggle events for this characteristic on this connection
-                if let events = item["ev"] as? Bool {
+                if let events = item.ev {
                     guard characteristic.permissions.contains(.events) else {
-                        serialized.append(["aid": aid, "iid": iid, "status": HAPStatusCodes.notificationNotSupported.rawValue])
+                        status.status = .notificationNotSupported
+                        statuses.append(status)
                         break
                     }
                     if events {
@@ -171,8 +166,10 @@ func characteristics(device: Device) -> Application {
                         device.remove(characteristic: characteristic, listener: connection)
                         logger.debug("Removed listener for \(characteristic)")
                     }
-                    serialized.append(["aid": aid, "iid": iid, "status": HAPStatusCodes.success.rawValue])
+                    status.status = .success
                 }
+
+                statuses.append(status)
             }
 
             /* HAP Specification 5.7.2.3
@@ -186,15 +183,11 @@ func characteristics(device: Device) -> Application {
              For single write the error code is 400 Bad Request
              */
 
-            let multiStatusResponse = !serialized
-                .map { $0["status"] as? HAPStatusCodes.RawValue }
-                .flatMap {$0}
-                .filter {HAPStatusCodes(rawValue: $0) != .success}.isEmpty
-
-            if multiStatusResponse {
+            let hasErrors = !statuses.filter({ $0.status != .success }).isEmpty
+            guard !hasErrors else {
                 do {
-                    let json = try JSONSerialization.data(withJSONObject: ["characteristics": serialized], options: [])
-                    return Response(status: serialized.count == 1 ? .badRequest : .multiStatus, data: json, mimeType: "application/hap+json")
+                    let json = try JSONEncoder().encode(Protocol.CharacteristicContainer(characteristics: statuses))
+                    return Response(status: statuses.count == 1 ? .badRequest : .multiStatus, data: json, mimeType: "application/hap+json")
                 } catch {
                     logger.error("Could not serialize object", error: error)
                     return .internalServerError

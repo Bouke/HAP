@@ -87,7 +87,7 @@ public enum CharacteristicUnit: String {
     case seconds
 }
 
-public enum HAPStatusCodes: Int {
+public enum HAPStatusCodes: Int, Codable {
     case success = 0
     case insufficientPrivileges = -70401
     case unableToCommunicate = -70402
