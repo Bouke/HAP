@@ -6,9 +6,9 @@ public enum AccessoryType: String, Codable {
     case other = "1"
     case bridge = "2"
     case fan = "3"
-    case garageDoorOpener = "4"
+    case garage = "4"
     case lightbulb = "5"
-    case lockMechanism = "6"
+    case doorLock = "6"
     case outlet = "7"
     case `switch` = "8"
     case thermostat = "9"
@@ -19,6 +19,9 @@ public enum AccessoryType: String, Codable {
     case windowCovering = "14"
     case programmableSwitch = "15"
     case rangeExtender = "16"
+    case ipCamera = "17"
+    case videoDoorBell = "18"
+    case airPurifier = "19"
 }
 
 open class Accessory {

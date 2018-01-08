@@ -2,8 +2,8 @@ extension Accessory {
     open class Lightbulb: Accessory {
         public let lightbulb = Service.Lightbulb()
 
-        public init(info: Service.Info) {
-            super.init(info: info, type: .lightbulb, services: [lightbulb])
+        public init(info: Service.Info, additionalServices: [Service] = []) {
+            super.init(info: info, type: .lightbulb, services: [lightbulb] + additionalServices)
         }
     }
 }

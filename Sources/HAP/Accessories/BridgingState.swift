@@ -2,8 +2,8 @@ extension Accessory {
     open class BridgingState: Accessory {
         public let bridgingState = Service.BridgingState()
 
-        public init(info: Service.Info) {
-            super.init(info: info, type: .door, services: [bridgingState])
+        public init(info: Service.Info, additionalServices: [Service] = []) {
+            super.init(info: info, type: .other, services: [bridgingState] + additionalServices)
         }
     }
 }

@@ -2,8 +2,8 @@ extension Accessory {
     open class GarageDoorOpener: Accessory {
         public let garageDoorOpener = Service.GarageDoorOpener()
 
-        public init(info: Service.Info) {
-            super.init(info: info, type: .garageDoorOpener, services: [garageDoorOpener])
+        public init(info: Service.Info, additionalServices: [Service] = []) {
+            super.init(info: info, type: .garage, services: [garageDoorOpener] + additionalServices)
         }
     }
 }
