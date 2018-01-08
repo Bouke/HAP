@@ -91,6 +91,16 @@ public class Server: NSObject, NetServiceDelegate {
                         break
                     }
 
+                    // Fix to allow Bridges with spaces in name
+                    // HomeKit POSTs contain a hostname with \\032 replacing the space
+                    // which causes Kitura httpParser to baulk on the resulting URL.
+                    // Replacing '\\032' with '-' in the hostname allows Kitura to create a valid URL,
+                    // and the value is not used elsewhere.
+                    //
+                    if let hostname = request.headers["Host"]?[0], (hostname.contains("\\032")) {
+                        request.headers["Host"]![0] = hostname.replacingOccurrences(of:"\\032", with:"-")
+                    }
+
                     guard httpParser.completed else {
                         break
                     }
