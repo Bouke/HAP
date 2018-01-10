@@ -21,34 +21,34 @@ if CommandLine.arguments.contains("--recreate") {
     try storage.removeAll()
 }
 
-let livingRoomLightbulb = Accessory.Lightbulb(info: .init(name: "Living Room"))
+let livingRoomLightbulb = Accessory.Lightbulb(info: Service.Info(name: "Living Room"))
 livingRoomLightbulb.lightbulb.on.onValueChange.append({ value in
     logger.info("livingRoomSwitch changed value: \(String(describing: value))")
 })
 
-let bedroomNightStand = Accessory.Lightbulb(info: .init(name: "Bedroom"))
+let bedroomNightStand = Accessory.Lightbulb(info: Service.Info(name: "Bedroom"))
 bedroomNightStand.lightbulb.on.onValueChange.append({ value in
     logger.info("bedroomNightStand changed value: \(String(describing: value))")
 })
 
 let device = Device(
-    bridgeInfo: .init(name: "Bridge"),
+    bridgeInfo: Service.Info(name: "Bridge"),
     setupCode: "123-44-321",
     storage: storage,
     accessories: [
         livingRoomLightbulb,
         bedroomNightStand,
-        .Door(info: .init(name: "Front Door")),
-        .Switch(info: .init(name: "Garden Lights")),
-        .Thermostat(info: .init(name: "Living Room Thermostat")),
-        .Thermometer(info: .init(name: "Office Thermometer")),
-        .Outlet(info: .init(name: "Coffee Machine")),
-        .Window(info: .init(name: "Toilet Window")),
-        .WindowCovering(info: .init(name: "Shades")),
-        .Fan(info: .init(name: "Living Room Ceiling Fan")),
-        .GarageDoorOpener(info: .init(name: "Garage")),
-        .LockMechanism(info: .init(name: "Front Door Lock")),
-        .SecuritySystem(info: .init(name: "Alarm"))
+        Accessory.Door(info: Service.Info(name: "Front Door")),
+        Accessory.Switch(info: Service.Info(name: "Garden Lights")),
+        Accessory.Thermostat(info: Service.Info(name: "Living Room Thermostat")),
+        Accessory.Thermometer(info: Service.Info(name: "Office Thermometer")),
+        Accessory.Outlet(info: Service.Info(name: "Coffee Machine")),
+        Accessory.Window(info: Service.Info(name: "Toilet Window")),
+        Accessory.WindowCovering(info: Service.Info(name: "Shades")),
+        Accessory.Fan(info: Service.Info(name: "Living Room Ceiling Fan")),
+        Accessory.GarageDoorOpener(info: Service.Info(name: "Garage")),
+        Accessory.LockMechanism(info: Service.Info(name: "Front Door Lock")),
+        Accessory.SecuritySystem(info: Service.Info(name: "Alarm"))
     ])
 device.onIdentify.append({ acc in
     logger.info("Got identified: \(String(describing: acc))")

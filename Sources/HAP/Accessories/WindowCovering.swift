@@ -2,8 +2,8 @@ extension Accessory {
     open class WindowCovering: Accessory {
         public let windowCovering = Service.WindowCovering()
 
-        public init(info: Service.Info) {
-            super.init(info: info, type: .windowCovering, services: [windowCovering])
+        public init(info: Service.Info, additionalServices: [Service] = []) {
+            super.init(info: info, type: .windowCovering, services: [windowCovering] + additionalServices)
         }
     }
 }

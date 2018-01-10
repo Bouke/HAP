@@ -2,8 +2,8 @@ extension Accessory {
     open class Fan: Accessory {
         public let fan = Service.Fan()
 
-        public init(info: Service.Info) {
-            super.init(info: info, type: .fan, services: [fan])
+        public init(info: Service.Info, additionalServices: [Service] = []) {
+            super.init(info: info, type: .fan, services: [fan] + additionalServices)
         }
     }
 }

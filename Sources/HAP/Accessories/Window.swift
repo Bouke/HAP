@@ -2,8 +2,8 @@ extension Accessory {
     open class Window: Accessory {
         public let window = Service.Window()
 
-        public init(info: Service.Info) {
-            super.init(info: info, type: .window, services: [window])
+        public init(info: Service.Info, additionalServices: [Service] = []) {
+            super.init(info: info, type: .window, services: [window] + additionalServices)
         }
     }
 }
