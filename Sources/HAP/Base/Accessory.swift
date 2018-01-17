@@ -1,5 +1,10 @@
 import Foundation
 
+// TODO: SwiftFoundation in Swift 4.0 cannot encode/decode UInt64,
+// which is the data-type we wanted to use here. We can change it back
+// to UInt64 once the following commit has made it into a release:
+// https://github.com/apple/swift-corelibs-foundation/commit/64b67c91479390776c43a96bd31e4e85f106d5e1
+
 typealias InstanceID = Int
 
 public enum AccessoryType: String, Codable {
@@ -30,6 +35,29 @@ open class Accessory {
     public let type: AccessoryType
     public let info: Service.Info
     internal let services: [Service]
+    
+    // An accessory implementation can set this flag to false if a device becomes unreachable for a period
+    // If the accessory has a BridgingState Service, then the reachable property of that Service is set
+    //
+    open var reachable = true {
+        didSet {
+            if self.reachable != oldValue,
+               let bridgingStateService = services.first(where: { $0.type == .bridgingState }) as! Service.BridgingState? {
+                bridgingStateService.reachable.value = self.reachable
+            }
+        }
+    }
+    
+    // An accessory must provide a text identifier, which is guranteed to be unique.
+    // The default implementation uses the devices name and its serial number.
+    // Subclasses should override this property to return the ethernet MAC address of
+    // a physical device if it exists, or another guaranteed unique string
+    //
+    // This is used for persistance of HomeKit aid's
+    
+    open var deviceSpecificUniqueId : String {
+        return "\(info.name.value!)-\(info.serialNumber.value ?? "unknown serial number")"
+    }
 
     public init(info: Service.Info, type: AccessoryType, services: [Service]) {
         self.type = type

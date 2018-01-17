@@ -167,15 +167,36 @@ public class Server: NSObject, NetServiceDelegate {
         try socket.listen(on: port)
 
         service = NetService(domain: "local.", type: "_hap._tcp.", name: device.name, port: socket.listeningPort)
-        #if os(macOS)
-            let record = device.config.dictionary(key: { $0.key }, value: { $0.value.data(using: .utf8)! })
-            service.setTXTRecord(NetService.data(fromTXTRecord: record))
-        #elseif os(Linux)
-            service.setTXTRecord(device.config)
-        #endif
+        
+        Server.publishDiscoveryRecordOf(device, to: service)
 
         super.init()
         service.delegate = self
+        
+        device.onConfigurationChange.append( { (device) in
+            Server.publishDiscoveryRecordOf(device, to: self.service)
+        })
+
+    }
+    
+    deinit {
+        self.stop()
+    }
+    
+    class func publishDiscoveryRecordOf(_ device:Device, to service: NetService) {
+        
+        // Publish the Accessory configuration on the Bonjour service
+        
+        #if os(macOS)
+            
+            let record = device.config.dictionary(key: { $0.key }, value: { $0.value.data(using: .utf8)! })
+            service.setTXTRecord(NetService.data(fromTXTRecord: record))
+            
+        #elseif os(Linux)
+            
+            service.setTXTRecord(device.config)
+            
+        #endif
     }
 
     public func start() {

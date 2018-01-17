@@ -47,9 +47,81 @@ public class Device {
     public let setupCode: String
     let storage: Storage
     let pairings: Pairings
-    public let accessories: [Accessory]
+    public var accessories: [Accessory]
     internal var characteristicEventListeners: [Box<Characteristic>: WeakObjectSet<Server.Connection>]
     public var onIdentify: [(Accessory?) -> Void] = []
+    internal var configuration : Configuration
+    internal var onConfigurationChange: [(Device) -> Void] = []
+
+    // The device maitains a configuration number during its life time, which persists across restarts of the app
+
+    //    Current configuration number.
+    //    Must update when an accessory, service, or characteristic is added or removed on the accessory server.
+    //    Accessories must increment the config number after a firmware update.
+    //    This must have a range of 1-4294967295 and wrap to 1 when it overflows.
+    //    This value must persist across reboots, power cycles, etc.
+    //
+    //    Accessory instance IDs, "aid", are assigned from the same number pool that is global across
+    //    entire HAP Accessory Server. For example, if the first Accessory object has an instance ID of "1"
+    //    then no other Accessory object can have an instance ID of "1" within the Accessory Server.
+    //
+    //    Instance IDs are numbers with a range of [1, 18446744073709551615]. These numbers are used to
+    //    uniquely identify HAP accessory objects within an HAP accessory server, or uniquely identify
+    //    services, and characteristics within an HAP accessory object. The instance ID for each object
+    //    must be unique for the lifetime of the server/ client pairing.
+    
+    struct Configuration : Codable {
+        var number: UInt32 = 0
+        var lastAID: InstanceID = 1
+        var aidForAccessoryUniqueId = [String : InstanceID]()
+        
+        // The next aid - should be checked against existing devices to ensure it is unique
+        var nextAID : InstanceID {
+            mutating get {
+                lastAID = lastAID &+ 1 // Add one and overflow
+                if lastAID < 2 {
+                    lastAID = 2
+                }
+                return lastAID
+            }
+        }
+        
+        func writeTo(_ storage: Storage) {
+            do {
+                let encoder = PropertyListEncoder()
+                let configData = try encoder.encode(self)
+                storage["configuration"] = configData
+            } catch {
+                logger.error("Error encoding configuration data: \(error)")
+            }
+        }
+    }
+    
+    
+    // When a configuration changes
+    // - update the configuration number
+    // - write the configuration to storage
+    // - notify interested parties of the change
+    //
+    func updatedConfiguration() {
+        configuration.number = configuration.number &+ 1
+        if configuration.number < 1 {
+            configuration.number = 1
+        }
+        
+        configuration.writeTo(storage)
+        
+        notifyConfigurationChange()
+
+    }
+    
+    // Notify listeners that the config record has changed
+    
+    func notifyConfigurationChange() {
+        _ = onConfigurationChange.map { $0(self) }
+    }
+
+
 
     /// A bridge is a special type of HAP accessory server that bridges HomeKit
     /// Accessory Protocol and different RF/transport protocols, such as ZigBee
@@ -122,19 +194,31 @@ public class Device {
         self.name = name
         self.setupCode = setupCode
         self.storage = storage
+        self.configuration = Configuration() // default configuration
+
         if let pk = storage["pk"], let sk = storage["sk"], let identifier = storage["uuid"] {
             self.identifier = String(data: identifier, encoding: .utf8)!
             publicKey = pk
             privateKey = sk
+            if let configData = storage["configuration"] {
+                do {
+                    let decoder = PropertyListDecoder()
+                    configuration = try decoder.decode(Configuration.self, from: configData)
+                } catch {
+                    logger.error("Error reading configuration data: \(error)")
+                }
+            }
         } else {
             (publicKey, privateKey) = Ed25519.generateSignKeypair()
             identifier = generateIdentifier()
+            
+            configuration.writeTo(storage)
+            
             storage["pk"] = publicKey
             storage["sk"] = privateKey
             storage["uuid"] = identifier.data(using: .utf8)
         }
         pairings = Pairings(storage: PrefixedKeyStorage(prefix: "pairing.", backing: storage))
-        self.accessories = accessories
         characteristicEventListeners = [:]
 
         // 2.6.1.1 Accessory Instance IDs
@@ -144,15 +228,107 @@ public class Device {
         // other Accessory object can have an instance ID of "1" within the
         // Accessory Server.
         //
-        // TODO: SwiftFoundation in Swift 4.0 cannot encode/decode UInt64,
-        // which is the data-type we wanted to use here. We can change it back
-        // to UInt64 once the following commit has made it into a release:
-        // https://github.com/apple/swift-corelibs-foundation/commit/64b67c91479390776c43a96bd31e4e85f106d5e1
-        var idGenerator = (1...InstanceID.max).makeIterator()
-        for accessory in accessories {
+
+        // Obtain new aid's for any accessories which don't already have one
+
+        self.accessories = [Accessory]()
+
+        // The first accessory must be aid 1
+        accessories[0].aid = 1
+        
+        addAccessories(accessories)
+    }
+    
+    public func addAccessories(_ newAccessories: [Accessory]) {
+ 
+        var configurationUpdated = false
+        
+        accessories.append(contentsOf: newAccessories)
+        
+        for accessory in newAccessories {
             accessory.device = self
-            accessory.aid = idGenerator.next()!
+            if (accessory.aid == 0) {
+                
+                // Check to see if the aid has been stored in the configuration data
+                
+                let dsuid = accessory.deviceSpecificUniqueId
+                if let aid = configuration.aidForAccessoryUniqueId[dsuid] {
+                    accessory.aid = aid
+                }
+            }
         }
+
+        for accessory in newAccessories {
+            // Verify that the aid is indeed unique
+            if accessory.aid != 0,
+               !isUniqueAID(accessory.aid, ignoring: accessory) {
+                logger.info("Accessory \(accessory.info.name.value ?? "unknown") has a duplicate accessory ID \(accessory.aid), replacing with fresh IID")
+                accessory.aid = 0
+            }
+            if (accessory.aid == 0) {
+                // Obtain a new aid, which has not already been used
+                repeat {
+                    accessory.aid = configuration.nextAID
+                } while (!isUniqueAID(accessory.aid, ignoring: accessory))
+                configurationUpdated = true
+
+                // Store the aid in the configuration data
+                
+                let dsuid = accessory.deviceSpecificUniqueId
+                configuration.aidForAccessoryUniqueId[dsuid] = accessory.aid
+            }
+        }
+        
+        // write configuration data to persist updated aid's and notify listeners
+        
+        if configurationUpdated {
+            updatedConfiguration()
+        }
+
+        
+    }
+    
+    public func removeAccessories(_ unwantedAccessories: [Accessory]) {
+        
+        var configurationUpdated = false
+        
+        for accessory in unwantedAccessories {
+            // Ensure the initial accessory is not removed, and that the accessory is in the list
+            if accessory.aid != 1 {
+                if let i = accessories.index(where: { $0 === accessory}) {
+                    accessories.remove(at: i)
+                    
+                    let dsuid = accessory.deviceSpecificUniqueId
+                    configuration.aidForAccessoryUniqueId.removeValue(forKey: dsuid)
+                    
+                    configurationUpdated = true
+                }
+            }
+        }
+        
+        // write configuration data to persist updated aid's
+        
+        if configurationUpdated {
+            updatedConfiguration()
+        }
+
+
+    }
+
+    
+    // Check if a given aid is unique amoungst all acessories, except the one being tested
+    func isUniqueAID(_ aid: InstanceID, ignoring: Accessory) -> Bool {
+        if aid == 0 {
+            return false
+        }
+        for accessory in accessories {
+            if accessory !== ignoring {
+                if accessory.aid == aid {
+                    return false
+                }
+            }
+        }
+        return true
     }
 
     class Pairings {
@@ -174,6 +350,32 @@ public class Device {
     public var isPaired: Bool {
         return !pairings.storage.keys.isEmpty
     }
+    
+    // Add the pairing to the internal DB and notify the change
+    // to update the Bonjour broadcast
+    public func addPairing(_ pairingKey: Data, _ publicKey: Data) {
+        
+        let wasPaired = isPaired
+        pairings[pairingKey] = publicKey
+        
+        if wasPaired {
+            // Update the Bonjour TXT record
+            notifyConfigurationChange()
+        }
+    }
+    
+    // Remove the pairing in the internal DB and notify the change
+    // to update the Bonjour broadcast
+    public func removePairing(_ pairingKey: Data) {
+        pairings[pairingKey] = nil
+        
+        if !isPaired {
+            // Update the Bonjour TXT record
+            notifyConfigurationChange()
+        }
+    }
+
+    // Characteristing listeners
 
     func add(characteristic: Characteristic, listener: Server.Connection) {
         if let _ = characteristicEventListeners[Box(characteristic)] {
@@ -212,7 +414,7 @@ public class Device {
             // update. This must have a range of 1-4294967295 and wrap to 1
             // when it overflows. This value must persist across reboots, power
             // cycles, etc.
-            "c#": "1",
+            "c#": "\(configuration.number)",
 
             // Feature flags (e.g. "0x3" for bits 0 and 1). Required if
             // non-zero. See table:

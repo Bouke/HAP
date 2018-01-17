@@ -17,13 +17,21 @@ func characteristics(device: Device) -> Application {
 
             var responses = [Protocol.Characteristic]()
             for path in query.paths {
-                guard let characteristic = device.accessories.first(where: { $0.aid == path.aid })?.services.flatMap({ $0.characteristics.filter({ $0.iid == path.iid }) }).first else {
+                guard let accessory = device.accessories.first(where: { $0.aid == path.aid }) else {
+                    responses.append(Protocol.Characteristic(aid: path.aid, iid: path.iid, status: .resourceDoesNotExist))
+                    continue
+                }
+                guard let characteristic = accessory.services.flatMap({ $0.characteristics.filter({ $0.iid == path.iid }) }).first else {
                     responses.append(Protocol.Characteristic(aid: path.aid, iid: path.iid, status: .resourceDoesNotExist))
                     continue
                 }
                 guard characteristic.permissions.contains(.read) else {
                     logger.info("\(characteristic) has no read permission")
                     responses.append(Protocol.Characteristic(aid: path.aid, iid: path.iid, status: .writeOnly))
+                    continue
+                }
+                guard accessory.reachable else {
+                    responses.append(Protocol.Characteristic(aid: path.aid, iid: path.iid, status: .unableToCommunicate))
                     continue
                 }
 
@@ -98,8 +106,10 @@ func characteristics(device: Device) -> Application {
             var statuses = [Protocol.Characteristic]()
             for item in decoded.characteristics {
                 var status = Protocol.Characteristic(aid: item.aid, iid: item.iid)
-                guard let characteristic = device.accessories
-                    .first(where: {$0.aid == item.aid})?
+                guard let accessory = device.accessories.first(where: { $0.aid == item.aid }) else {
+                    return .unprocessableEntity
+                }
+                guard let characteristic = accessory
                     .services
                     .flatMap({$0.characteristics.filter({$0.iid == item.iid})})
                     .first else {
@@ -118,6 +128,11 @@ func characteristics(device: Device) -> Application {
                         status.status = .readOnly
                         break VALUE  // continue and process other items
                     }
+                    guard accessory.reachable else {
+                        status.status = .unableToCommunicate
+                        break VALUE  // continue and process other items
+                    }
+
 
                     logger.debug("Setting \(characteristic) to new value \(value) (type: \(type(of: value)))")
                     do {
