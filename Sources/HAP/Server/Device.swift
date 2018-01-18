@@ -70,13 +70,13 @@ public class Device {
     //    services, and characteristics within an HAP accessory object. The instance ID for each object
     //    must be unique for the lifetime of the server/ client pairing.
     
-    struct Configuration : Codable {
-        var number: UInt32 = 0
-        var lastAID: InstanceID = 1
-        var aidForAccessoryUniqueId = [String : InstanceID]()
+    internal struct Configuration : Codable {
+        internal var number: UInt32 = 0
+        private var lastAID: InstanceID = 1
+        internal var aidForAccessoryUniqueId = [String : InstanceID]()
         
         // The next aid - should be checked against existing devices to ensure it is unique
-        var nextAID : InstanceID {
+        internal var nextAID : InstanceID {
             mutating get {
                 lastAID = lastAID &+ 1 // Add one and overflow
                 if lastAID < 2 {
@@ -86,9 +86,11 @@ public class Device {
             }
         }
         
-        func writeTo(_ storage: Storage) {
+        // Write the configuration record to storage
+        
+        internal func writeTo(_ storage: Storage) {
             do {
-                let encoder = PropertyListEncoder()
+                let encoder = JSONEncoder()
                 let configData = try encoder.encode(self)
                 storage["configuration"] = configData
             } catch {
@@ -202,7 +204,7 @@ public class Device {
             privateKey = sk
             if let configData = storage["configuration"] {
                 do {
-                    let decoder = PropertyListDecoder()
+                    let decoder = JSONDecoder()
                     configuration = try decoder.decode(Configuration.self, from: configData)
                 } catch {
                     logger.error("Error reading configuration data: \(error)")

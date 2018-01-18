@@ -42,8 +42,9 @@ open class Accessory {
     open var reachable = true {
         didSet {
             if self.reachable != oldValue,
-               let bridgingStateService = services.first(where: { $0.type == .bridgingState }) as! Service.BridgingState? {
-                bridgingStateService.reachable.value = self.reachable
+               let bridgingStateService = services.first(where: { $0.type == .bridgingState }),
+                let reachableCharacteristic = bridgingStateService.characteristics.first(where: { $0.type == .reachable}){
+                try! reachableCharacteristic.setValue(self.reachable, fromConnection: nil)
             }
         }
     }
