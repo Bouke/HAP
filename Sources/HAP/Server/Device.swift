@@ -70,24 +70,28 @@ public class Device {
     //    services, and characteristics within an HAP accessory object. The instance ID for each object
     //    must be unique for the lifetime of the server/ client pairing.
     
+    internal struct AIDGenerator : Sequence, IteratorProtocol, Codable {
+        internal var lastAID: InstanceID = 1
+        mutating func next() -> InstanceID? {
+            lastAID = lastAID &+ 1 // Add one and overflow if reach max InstanceID
+            if lastAID < 2 {
+                lastAID = 2
+            }
+            return lastAID
+        }
+    }
+    
     internal struct Configuration : Codable {
         internal var number: UInt32 = 0
-        private var lastAID: InstanceID = 1
-        internal var aidForAccessoryUniqueId = [String : InstanceID]()
-        
+        internal var aidForAccessorySerialNumber = [String : InstanceID]()
+        private var aidGenerator = AIDGenerator()
+
         // The next aid - should be checked against existing devices to ensure it is unique
-        internal var nextAID : InstanceID {
-            mutating get {
-                lastAID = lastAID &+ 1 // Add one and overflow
-                if lastAID < 2 {
-                    lastAID = 2
-                }
-                return lastAID
-            }
+        internal mutating func nextAID() -> InstanceID {
+            return aidGenerator.next()!
         }
         
         // Write the configuration record to storage
-        
         internal func writeTo(_ storage: Storage) {
             do {
                 let encoder = JSONEncoder()
@@ -261,7 +265,7 @@ public class Device {
             accessory.device = self
             if (accessory.aid == 0) {
                 let serialNumber = accessory.uniqueSerialNumber
-                if let aid = configuration.aidForAccessoryUniqueId[serialNumber] {
+                if let aid = configuration.aidForAccessorySerialNumber[serialNumber] {
                     accessory.aid = aid
                 }
             }
@@ -277,14 +281,14 @@ public class Device {
             if (accessory.aid == 0) {
                 // Obtain a new aid, which has not already been used
                 repeat {
-                    accessory.aid = configuration.nextAID
+                    accessory.aid = configuration.nextAID()
                 } while (!isUniqueAID(accessory.aid, ignoring: accessory))
                 configurationUpdated = true
 
                 // Store the aid in the configuration data
                 
                 let serialNumber = accessory.uniqueSerialNumber
-                configuration.aidForAccessoryUniqueId[serialNumber] = accessory.aid
+                configuration.aidForAccessorySerialNumber[serialNumber] = accessory.aid
             }
         }
         
@@ -308,7 +312,7 @@ public class Device {
                     accessories.remove(at: i)
                     
                     let serialNumber = accessory.uniqueSerialNumber
-                    configuration.aidForAccessoryUniqueId.removeValue(forKey: serialNumber)
+                    configuration.aidForAccessorySerialNumber.removeValue(forKey: serialNumber)
                     
                     configurationUpdated = true
                 }
