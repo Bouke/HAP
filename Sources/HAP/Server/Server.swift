@@ -173,8 +173,10 @@ public class Server: NSObject, NetServiceDelegate {
         super.init()
         service.delegate = self
         
-        device.onConfigurationChange.append( { (device) in
-            Server.publishDiscoveryRecordOf(device, to: self.service)
+        device.onConfigurationChange.append( { [weak self] (changedDevice) in
+            if let service = self?.service {
+                Server.publishDiscoveryRecordOf(changedDevice, to: service)
+            }
         })
 
     }
@@ -183,7 +185,7 @@ public class Server: NSObject, NetServiceDelegate {
         self.stop()
     }
     
-    class func publishDiscoveryRecordOf(_ device:Device, to service: NetService) {
+    private class func publishDiscoveryRecordOf(_ device:Device, to service: NetService) {
         
         // Publish the Accessory configuration on the Bonjour service
         
