@@ -51,7 +51,7 @@ public class Device {
     internal var characteristicEventListeners: [Box<Characteristic>: WeakObjectSet<Server.Connection>]
     public var onIdentify: [(Accessory?) -> Void] = []
     internal var configuration : Configuration
-    internal var onConfigurationChange: [(Device) -> Void] = []
+    public var onConfigurationChange: [(Device) -> Void] = []
 
     // The device maitains a configuration number during its life time, which persists across restarts of the app
 
