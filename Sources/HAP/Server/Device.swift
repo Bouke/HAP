@@ -303,28 +303,29 @@ public class Device {
     
     public func removeAccessories(_ unwantedAccessories: [Accessory]) {
         
-        var configurationUpdated = false
+        if unwantedAccessories.count == 0 {
+            return
+        }
         
         for accessory in unwantedAccessories {
             // Ensure the initial accessory is not removed, and that the accessory is in the list
-            if accessory.aid != 1 {
-                if let i = accessories.index(where: { $0 === accessory}) {
-                    accessories.remove(at: i)
-                    
-                    let serialNumber = accessory.uniqueSerialNumber
-                    configuration.aidForAccessorySerialNumber.removeValue(forKey: serialNumber)
-                    
-                    configurationUpdated = true
-                }
+            
+            precondition(accessory.aid != 1, "Cannot remove the Bridge Accessory from a Device")
+            
+            guard let index = accessories.index(where: { $0 === accessory}) else {
+                preconditionFailure("Removing a non-existant accessory from the Bridge")
             }
+            
+            accessories.remove(at: index)
+            
+            let serialNumber = accessory.uniqueSerialNumber
+            configuration.aidForAccessorySerialNumber.removeValue(forKey: serialNumber)
+            
         }
         
         // write configuration data to persist updated aid's
         
-        if configurationUpdated {
-            updatedConfiguration()
-        }
-
+        updatedConfiguration()
 
     }
 
