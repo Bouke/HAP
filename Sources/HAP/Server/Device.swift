@@ -247,19 +247,26 @@ public class Device {
         
         accessories.append(contentsOf: newAccessories)
         
+        // Remove any acessories with duplicate serial numbers
+        for i in 0..<accessories.count {
+            let accessory = accessories[i]
+            let serialNumber = accessory.uniqueSerialNumber
+            if !isUniqueSerialNumber(serialNumber, ignoring: accessory) {
+                logger.info("Accessories must have unique serial numbers. Duplicate found '\(serialNumber)'. Second device ignored")
+                accessories.remove(at: i)
+            }
+        }
+        // Check to see if the aid has been stored in the configuration data
         for accessory in newAccessories {
             accessory.device = self
             if (accessory.aid == 0) {
-                
-                // Check to see if the aid has been stored in the configuration data
-                
-                let dsuid = accessory.deviceSpecificUniqueId
-                if let aid = configuration.aidForAccessoryUniqueId[dsuid] {
+                let serialNumber = accessory.uniqueSerialNumber
+                if let aid = configuration.aidForAccessoryUniqueId[serialNumber] {
                     accessory.aid = aid
                 }
             }
         }
-
+        // Generate new aid if one is not already found or provided
         for accessory in newAccessories {
             // Verify that the aid is indeed unique
             if accessory.aid != 0,
@@ -276,8 +283,8 @@ public class Device {
 
                 // Store the aid in the configuration data
                 
-                let dsuid = accessory.deviceSpecificUniqueId
-                configuration.aidForAccessoryUniqueId[dsuid] = accessory.aid
+                let serialNumber = accessory.uniqueSerialNumber
+                configuration.aidForAccessoryUniqueId[serialNumber] = accessory.aid
             }
         }
         
@@ -300,8 +307,8 @@ public class Device {
                 if let i = accessories.index(where: { $0 === accessory}) {
                     accessories.remove(at: i)
                     
-                    let dsuid = accessory.deviceSpecificUniqueId
-                    configuration.aidForAccessoryUniqueId.removeValue(forKey: dsuid)
+                    let serialNumber = accessory.uniqueSerialNumber
+                    configuration.aidForAccessoryUniqueId.removeValue(forKey: serialNumber)
                     
                     configurationUpdated = true
                 }
@@ -315,6 +322,22 @@ public class Device {
         }
 
 
+    }
+
+    
+    // Check if a given serial number is unique amoungst all acessories, except the one being tested
+    func isUniqueSerialNumber(_ serialNumber: String, ignoring: Accessory) -> Bool {
+        if serialNumber == "" {
+            return false
+        }
+        for accessory in accessories {
+            if accessory !== ignoring {
+                if accessory.uniqueSerialNumber == serialNumber {
+                    return false
+                }
+            }
+        }
+        return true
     }
 
     

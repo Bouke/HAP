@@ -50,14 +50,18 @@ open class Accessory {
     }
     
     // An accessory must provide a text identifier, which is guranteed to be unique.
-    // The default implementation uses the devices name and its serial number.
-    // Subclasses should override this property to return the ethernet MAC address of
-    // a physical device if it exists, or another guaranteed unique string
+    // The implementation must could provide the actual serial number of a device,
+    // or a MAC address or some other identifier which is not used on any other accessory
     //
-    // This is used for persistance of HomeKit aid's
+    // Device will check to ensure the serial numbers of all accessories added to
+    // a bridge are are unique
+    //
+    // This is used for persistance of HomeKit AID's
     
-    open var deviceSpecificUniqueId : String {
-        return "\(info.name.value!)-\(info.serialNumber.value ?? "unknown serial number")"
+    open var uniqueSerialNumber : String {
+        let serialNumber = info.serialNumber.value
+        precondition(serialNumber != nil)
+        return serialNumber!
     }
 
     public init(info: Service.Info, type: AccessoryType, services: [Service]) {
