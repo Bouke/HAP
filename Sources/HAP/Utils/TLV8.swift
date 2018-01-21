@@ -3,8 +3,8 @@ import Foundation
 typealias PairTagTLV8 = [PairTag: Data]
 
 enum TLV8Error: Swift.Error {
-    case UnknownKey(UInt8)
-    case DecodeError
+    case unknownKey(UInt8)
+    case decodeError
 }
 
 func decode<Key: Hashable>(_ data: Data) throws -> [Key: Data] where Key: RawRepresentable, Key.RawValue == UInt8 {
@@ -12,14 +12,16 @@ func decode<Key: Hashable>(_ data: Data) throws -> [Key: Data] where Key: RawRep
     var index = data.startIndex
     while index < data.endIndex {
         guard let type = Key(rawValue: data[index]) else {
-            throw TLV8Error.UnknownKey(data[index])
+            throw TLV8Error.unknownKey(data[index])
         }
         index = data.index(after: index)
 
         let length = Int(data[index])
         index = data.index(after: index)
 
-        guard let endIndex = data.index(index, offsetBy: length, limitedBy: data.endIndex) else { throw TLV8Error.DecodeError }
+        guard let endIndex = data.index(index, offsetBy: length, limitedBy: data.endIndex) else {
+            throw TLV8Error.decodeError
+        }
         let value = data[index..<endIndex]
 
         if let append = result[type] {
@@ -55,7 +57,13 @@ func encode<Key>(_ data: [Key: Data]) -> Data where Key: RawRepresentable, Key.R
 }
 
 enum PairSetupStep: UInt8 {
-    case waiting = 0, startRequest, startResponse, verifyRequest, verifyResponse, keyExchangeRequest, keyExchangeResponse
+    case waiting = 0
+    case startRequest
+    case startResponse
+    case verifyRequest
+    case verifyResponse
+    case keyExchangeRequest
+    case keyExchangeResponse
 }
 
 enum PairVerifyStep: UInt8 {

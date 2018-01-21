@@ -1,3 +1,4 @@
+// swiftlint:disable force_try
 @testable import HAP
 import HKDF
 import SRP
@@ -18,8 +19,15 @@ class PairSetupControllerTests: XCTestCase {
                                                                   password: password,
                                                                   group: .N3072,
                                                                   algorithm: .sha512)
-        let session = PairSetupController.Session(server: SRP.Server(username: "Pair-Setup", salt: salt, verificationKey: verificationKey, group: .N3072, algorithm: .sha512))
-        let device = Device(bridgeInfo: .init(name: "Test"), setupCode: password, storage: MemoryStorage(), accessories: [])
+        let session = PairSetupController.Session(server: SRP.Server(username: "Pair-Setup",
+                                                                     salt: salt,
+                                                                     verificationKey: verificationKey,
+                                                                     group: .N3072,
+                                                                     algorithm: .sha512))
+        let device = Device(bridgeInfo: .init(name: "Test"),
+                            setupCode: password,
+                            storage: MemoryStorage(),
+                            accessories: [])
         let controller = PairSetupController(device: device)
         let client = SRP.Client(username: "Pair-Setup", password: password, group: .N3072, algorithm: .sha512)
         let keys = Ed25519.generateSignKeypair()

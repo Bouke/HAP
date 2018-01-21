@@ -39,7 +39,7 @@ class Cryptographer {
 
         logger.debug("Decrypt message #\(self.decryptCount)")
         logger.debug("Data: \(data.hex)")
-        guard data.count > 0 else {
+        guard !data.isEmpty else {
             logger.warning("No ciphertext")
             return data
         }
@@ -51,7 +51,10 @@ class Cryptographer {
         let encrypted = data[2..<(2 + length + 16)]
         logger.debug("Ciphertext: \(encrypted.hex), Nonce: \(nonce.hex), Length: \(length)")
 
-        return try ChaCha20Poly1305.decrypt(cipher: Data(encrypted), additional: Data(data[0..<2]), nonce: nonce, key: decryptKey)
+        return try ChaCha20Poly1305.decrypt(cipher: Data(encrypted),
+                                            additional: Data(data[0..<2]),
+                                            nonce: nonce,
+                                            key: decryptKey)
     }
 
     func encrypt(_ data: Data) throws -> Data {
@@ -62,7 +65,10 @@ class Cryptographer {
         let length = UInt16(data.count).bigEndian.bytes
         logger.debug("Message: \(data.hex), Nonce: \(nonce.hex), Length: \(length.hex)")
 
-        let encrypted = try ChaCha20Poly1305.encrypt(message: data, additional: length, nonce: nonce, key: encryptKey)
+        let encrypted = try ChaCha20Poly1305.encrypt(message: data,
+                                                     additional: length,
+                                                     nonce: nonce,
+                                                     key: encryptKey)
         logger.debug("Cipher: \((length + encrypted).hex)")
 
         return length + encrypted

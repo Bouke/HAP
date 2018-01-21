@@ -18,8 +18,13 @@ public enum LockTargetState: Int, CharacteristicValueType {
 
 extension Service {
     open class LockMechanism: Service {
-        public let lockCurrentState = GenericCharacteristic<LockCurrentState>(type: .lockCurrentState, value: .unsecured, permissions: [.read, .events])
-        public let lockTargetState = GenericCharacteristic<LockTargetState>(type: .lockTargetState, value: .unsecured)
+        public let lockCurrentState = GenericCharacteristic<LockCurrentState>(
+            type: .lockCurrentState,
+            value: .unsecured,
+            permissions: [.read, .events])
+        public let lockTargetState = GenericCharacteristic<LockTargetState>(
+            type: .lockTargetState,
+            value: .unsecured)
 
         public init() {
             super.init(type: .lockMechanism, characteristics: [lockCurrentState, lockTargetState])

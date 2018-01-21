@@ -14,7 +14,9 @@ public enum SmokeDetected: Int, CharacteristicValueType {
 
 extension Service {
     open class SmokeSensor: Service {
-        public let smokeDetected = GenericCharacteristic<SmokeDetected>(type: .currentPosition, permissions: [.read, .events])
+        public let smokeDetected = GenericCharacteristic<SmokeDetected>(
+            type: .currentPosition,
+            permissions: [.read, .events])
 
         public init() {
             super.init(type: .smokeSensor, characteristics: [smokeDetected])

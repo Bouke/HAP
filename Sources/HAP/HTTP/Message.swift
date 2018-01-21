@@ -29,7 +29,11 @@ class Response {
     }
 
     enum Status: Int, CustomStringConvertible {
-        case ok = 200, created = 201, accepted = 202, noContent = 204, multiStatus = 207
+        case ok = 200
+        case created = 201
+        case accepted = 202
+        case noContent = 204
+        case multiStatus = 207
         case movedPermanently = 301
         case badRequest = 400, unauthorized = 401, forbidden = 403, notFound = 404
         case methodNotAllowed = 405

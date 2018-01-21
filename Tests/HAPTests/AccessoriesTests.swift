@@ -1,3 +1,4 @@
+// swiftlint:disable force_try
 @testable import HAP
 import XCTest
 
@@ -20,7 +21,6 @@ class AccessoriesTests: XCTestCase {
 
 func serialize(_ accessory: Accessory, file: StaticString = #file, line: UInt = #line) {
     let jsonObject = accessory.serialized()
-    print(jsonObject)
     XCTAssertTrue(JSONSerialization.isValidJSONObject(jsonObject), "Not a valid JSON object", file: file, line: line)
     _ = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
 }

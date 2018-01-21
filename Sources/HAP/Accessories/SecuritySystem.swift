@@ -18,8 +18,13 @@ public enum SecuritySystemTargetState: Int, CharacteristicValueType {
 
 extension Service {
     open class SecuritySystem: Service {
-        public let securitySystemCurrentState = GenericCharacteristic<SecuritySystemCurrentState>(type: .securitySystemCurrentState, value: .disarmed, permissions: [.read, .events])
-        public let securitySystemTargetState = GenericCharacteristic<SecuritySystemTargetState>(type: .securitySystemTargetState, value: .disarmed)
+        public let securitySystemCurrentState = GenericCharacteristic<SecuritySystemCurrentState>(
+            type: .securitySystemCurrentState,
+            value: .disarmed,
+            permissions: [.read, .events])
+        public let securitySystemTargetState = GenericCharacteristic<SecuritySystemTargetState>(
+            type: .securitySystemTargetState,
+            value: .disarmed)
 
         public init() {
             super.init(type: .securitySystem, characteristics: [securitySystemCurrentState, securitySystemTargetState])
