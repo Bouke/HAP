@@ -25,4 +25,4 @@ matrix:
         - sudo ldconfig
     - os: osx
       osx_image: xcode9
-      script: swiftlint
+      script: swiftlint --strict
