@@ -1,6 +1,6 @@
-import Socket
 import Foundation
 import KituraNet
+import Socket
 import func Evergreen.getLogger
 
 #if os(Linux)

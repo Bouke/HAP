@@ -9,7 +9,12 @@ extension Accessory {
 }
 
 public enum AirQuality: Int, CharacteristicValueType {
-    case unknown = 0, excellent, good, fair, inferior, poor
+    case unknown = 0
+    case excellent = 1
+    case good = 2
+    case fair = 3
+    case inferior = 4
+    case poor = 5
 }
 
 extension Service {

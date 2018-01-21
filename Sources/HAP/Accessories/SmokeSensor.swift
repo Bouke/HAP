@@ -9,7 +9,8 @@ extension Accessory {
 }
 
 public enum SmokeDetected: Int, CharacteristicValueType {
-    case smokeNotDetected = 0, smokeDetected
+    case smokeNotDetected = 0
+    case smokeDetected = 1
 }
 
 extension Service {

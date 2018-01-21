@@ -13,7 +13,8 @@ extension Accessory {
 public typealias ConfigureBridgedAccessoryStatus = Data
 
 public enum DiscoverBridgedAccessories: Int, CharacteristicValueType {
-    case startDiscovery = 0, stopDiscovery
+    case startDiscovery = 0
+    case stopDiscovery = 1
 }
 
 public typealias DiscoveredBridgedAccessories = Int

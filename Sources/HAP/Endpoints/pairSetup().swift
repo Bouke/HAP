@@ -34,7 +34,7 @@ func pairSetup(device: Device) -> Application {
         return session
     }
 
-    return { (connection, request) in
+    return { connection, request in
         var body = Data()
         guard
             (try? request.readAllData(into: &body)) != nil,

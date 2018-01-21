@@ -11,11 +11,13 @@ extension Accessory {
 public typealias BatteryLevel = Int
 
 public enum ChargingState: Int, CharacteristicValueType {
-    case notCharging = 0, charging
+    case notCharging = 0
+    case charging = 1
 }
 
 public enum StatusLowBattery: Int, CharacteristicValueType {
-    case batteryLevelNormal = 0, batteryLevelLow
+    case batteryLevelNormal = 0
+    case batteryLevelLow = 1
 }
 
 extension Service {

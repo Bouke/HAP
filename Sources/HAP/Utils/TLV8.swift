@@ -58,16 +58,20 @@ func encode<Key>(_ data: [Key: Data]) -> Data where Key: RawRepresentable, Key.R
 
 enum PairSetupStep: UInt8 {
     case waiting = 0
-    case startRequest
-    case startResponse
-    case verifyRequest
-    case verifyResponse
-    case keyExchangeRequest
-    case keyExchangeResponse
+    case startRequest = 1
+    case startResponse = 2
+    case verifyRequest = 3
+    case verifyResponse = 4
+    case keyExchangeRequest = 5
+    case keyExchangeResponse = 6
 }
 
 enum PairVerifyStep: UInt8 {
-    case waiting = 0, startRequest, startResponse, finishRequest, finishResponse
+    case waiting = 0
+    case startRequest = 1
+    case startResponse = 2
+    case finishRequest = 3
+    case finishResponse = 4
 }
 
 enum PairTag: UInt8 {

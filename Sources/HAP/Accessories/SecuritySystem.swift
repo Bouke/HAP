@@ -9,11 +9,18 @@ extension Accessory {
 }
 
 public enum SecuritySystemCurrentState: Int, CharacteristicValueType {
-    case stayArm = 0, awayArm, nightArm, disarmed, alarmTriggered
+    case stayArm = 0
+    case awayArm = 1
+    case nightArm = 2
+    case disarmed = 3
+    case alarmTriggered = 4
 }
 
 public enum SecuritySystemTargetState: Int, CharacteristicValueType {
-    case stayArm = 0, awayArm, nightArm, disarmed
+    case stayArm = 0
+    case awayArm = 1
+    case nightArm = 2
+    case disarmed = 3
 }
 
 extension Service {

@@ -29,14 +29,14 @@ enum Protocol {
         var type: Bool
         var ev: Bool
         init(queryItems: [URLQueryItem]) throws {
-            guard let id = queryItems.first(where: {$0.name == "id"})?.value else {
+            guard let id = queryItems.first(where: { $0.name == "id" })?.value else {
                 throw DecodeError.invalidPath
             }
             paths = try id.components(separatedBy: ",").map(Path.init)
-            meta = queryItems.first(where: {$0.name == "meta"})?.value == "1"
-            perms = queryItems.first(where: {$0.name == "perms"})?.value == "1"
-            type = queryItems.first(where: {$0.name == "type"})?.value == "1"
-            ev = queryItems.first(where: {$0.name == "ev"})?.value == "1"
+            meta = queryItems.first(where: { $0.name == "meta" })?.value == "1"
+            perms = queryItems.first(where: { $0.name == "perms" })?.value == "1"
+            type = queryItems.first(where: { $0.name == "type" })?.value == "1"
+            ev = queryItems.first(where: { $0.name == "ev" })?.value == "1"
         }
     }
 

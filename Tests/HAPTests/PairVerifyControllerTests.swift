@@ -1,6 +1,6 @@
 // swiftlint:disable force_try
-import Cryptor
 import CLibSodium
+import Cryptor
 @testable import HAP
 import HKDF
 import XCTest
@@ -63,8 +63,8 @@ class PairVerifyControllerTests: XCTestCase {
                                                 salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8),
                                                 count: 32)
             guard let plainText = try? ChaCha20Poly1305.decrypt(cipher: encryptedData,
-                                                          nonce: "PV-Msg02".data(using: .utf8)!,
-                                                          key: encryptionKey_) else {
+                                                                nonce: "PV-Msg02".data(using: .utf8)!,
+                                                                key: encryptionKey_) else {
                 return XCTFail("Couldn't decrypt response")
             }
             guard let resultInner: PairTagTLV8 = try? decode(plainText),
@@ -116,7 +116,8 @@ class PairVerifyControllerTests: XCTestCase {
             let linuxCount = thisClass.allTests.count
             let darwinCount = Int(thisClass
                 .defaultTestSuite.testCaseCount)
-            XCTAssertEqual(linuxCount, darwinCount,
+            XCTAssertEqual(linuxCount,
+                           darwinCount,
                            "\(darwinCount - linuxCount) tests are missing from allTests")
         #endif
     }

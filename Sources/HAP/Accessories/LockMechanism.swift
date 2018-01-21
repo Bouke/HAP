@@ -9,11 +9,15 @@ extension Accessory {
 }
 
 public enum LockCurrentState: Int, CharacteristicValueType {
-    case unsecured = 0, secured, jammed, unknown
+    case unsecured = 0
+    case secured = 1
+    case jammed = 2
+    case unknown = 3
 }
 
 public enum LockTargetState: Int, CharacteristicValueType {
-    case unsecured = 0, secured
+    case unsecured = 0
+    case secured = 1
 }
 
 extension Service {

@@ -12,7 +12,9 @@ class Response {
     }
 
     var text: String? {
-        guard let body = body else { return nil }
+        guard let body = body else {
+            return nil
+        }
         return String(data: body, encoding: .utf8)
     }
 
@@ -79,9 +81,7 @@ class Response {
         }
         self.init(status: status, data: data, mimeType: "\(mimeType); charset=utf8")
     }
-}
 
-extension Response {
     static var ok: Response { return Response(status: .ok) }
     static var badRequest: Response { return  Response(status: .badRequest) }
     static var forbidden: Response { return  Response(status: .forbidden) }

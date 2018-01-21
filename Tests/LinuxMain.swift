@@ -1,5 +1,5 @@
-import XCTest
 @testable import HAPTests
+import XCTest
 
 XCTMain([
     testCase(EndpointTests.allTests),
