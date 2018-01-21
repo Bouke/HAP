@@ -25,14 +25,37 @@ public enum TemperatureDisplayUnits: Int, CharacteristicValueType {
 
 extension Service {
     open class Thermostat: Service {
-        public let currentHeatingCoolingState = GenericCharacteristic<CurrentHeatingCoolingState>(type: .currentHeatingCoolingState, value: .off, permissions: [.read, .events])
-        public let targetHeatingCoolingState = GenericCharacteristic<TargetHeatingCoolingState>(type: .targetHeatingCoolingState, value: .auto)
-        public let currentTemperature = GenericCharacteristic<CurrentTemperature>(type: .currentTemperature, value: 0, permissions: [.read, .events], maxValue: 100, minValue: -100)
-        public let targetTemperature = GenericCharacteristic<TargetTemperature>(type: .targetTemperature, value: 20, maxValue: 30, minValue: 0, minStep: 0.1)
-        public let temperatureDisplayUnits = GenericCharacteristic<TemperatureDisplayUnits>(type: .temperatureDisplayUnits, value: .celcius, permissions: [.read, .write, .events])
+        public let currentHeatingCoolingState = GenericCharacteristic<CurrentHeatingCoolingState>(
+            type: .currentHeatingCoolingState,
+            value: .off,
+            permissions: [.read, .events])
+        public let targetHeatingCoolingState = GenericCharacteristic<TargetHeatingCoolingState>(
+            type: .targetHeatingCoolingState,
+            value: .auto)
+        public let currentTemperature = GenericCharacteristic<CurrentTemperature>(
+            type: .currentTemperature,
+            value: 0,
+            permissions: [.read, .events],
+            maxValue: 100,
+            minValue: -100)
+        public let targetTemperature = GenericCharacteristic<TargetTemperature>(
+            type: .targetTemperature,
+            value: 20,
+            maxValue: 30,
+            minValue: 0,
+            minStep: 0.1)
+        public let temperatureDisplayUnits = GenericCharacteristic<TemperatureDisplayUnits>(
+            type: .temperatureDisplayUnits,
+            value: .celcius,
+            permissions: [.read, .write, .events])
 
         public init() {
-            super.init(type: .thermostat, characteristics: [currentHeatingCoolingState, targetHeatingCoolingState, currentTemperature, targetTemperature, temperatureDisplayUnits])
+            super.init(type: .thermostat,
+                       characteristics: [currentHeatingCoolingState,
+                                         targetHeatingCoolingState,
+                                         currentTemperature,
+                                         targetTemperature,
+                                         temperatureDisplayUnits])
         }
     }
 }

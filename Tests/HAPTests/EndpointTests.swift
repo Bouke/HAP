@@ -1,3 +1,4 @@
+// swiftlint:disable cyclomatic_complexity force_cast force_try type_body_length file_length line_length
 import Foundation
 @testable import HAP
 @testable import KituraNet

@@ -96,7 +96,16 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
     public var minValue: Double?
     public var minStep: Double?
 
-    public init(type: CharacteristicType, value: T? = nil, permissions: [CharacteristicPermission] = [.read, .write, .events], description: String? = nil, format: CharacteristicFormat? = nil, unit: CharacteristicUnit? = nil, maxLength: Int? = nil, maxValue: Double? = nil, minValue: Double? = nil, minStep: Double? = nil) {
+    public init(type: CharacteristicType,
+                value: T? = nil,
+                permissions: [CharacteristicPermission] = [.read, .write, .events],
+                description: String? = nil,
+                format: CharacteristicFormat? = nil,
+                unit: CharacteristicUnit? = nil,
+                maxLength: Int? = nil,
+                maxValue: Double? = nil,
+                minValue: Double? = nil,
+                minStep: Double? = nil) {
         self.type = type
         self._value = value
         self.permissions = permissions

@@ -10,7 +10,7 @@ func pairings(device: Device) -> Application {
             return .methodNotAllowed
         }
         guard
-            let _ = try? request.readAllData(into: &body),
+            (try? request.readAllData(into: &body)) != nil,
             let data: PairTagTLV8 = try? decode(body),
             data[.state]?[0] == PairStep.request.rawValue,
             let method = data[.pairingMethod].flatMap({PairingMethod(rawValue: $0[0])}),

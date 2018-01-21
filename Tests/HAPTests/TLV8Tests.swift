@@ -1,3 +1,4 @@
+// swiftlint:disable force_try
 @testable import HAP
 import HKDF
 import SRP

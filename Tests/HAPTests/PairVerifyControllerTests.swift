@@ -1,3 +1,4 @@
+// swiftlint:disable force_try
 import Cryptor
 import CLibSodium
 @testable import HAP
@@ -13,14 +14,20 @@ class PairVerifyControllerTests: XCTestCase {
     }
 
     func test() {
-        let device = Device(bridgeInfo: .init(name: "Test"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [])
+        let device = Device(bridgeInfo: .init(name: "Test"),
+                            setupCode: "123-44-321",
+                            storage: MemoryStorage(),
+                            accessories: [])
         let username = "hubba hubba".data(using: .utf8)!
         let keys = Ed25519.generateSignKeypair() // these are the client's keys
         device.pairings[username] = keys.publicKey
 
         let controller = PairVerifyController(device: device)
-        let clientSecretKey = try! Data(bytes: Random.generate(byteCount: 32)) // these are the client's keys for this verify session
-        let clientPublicKey = crypto(crypto_scalarmult_curve25519_base, Data(count: Int(crypto_scalarmult_curve25519_BYTES)), clientSecretKey)!
+        // these are the client's keys for this verify session
+        let clientSecretKey = try! Data(bytes: Random.generate(byteCount: 32))
+        let clientPublicKey = crypto(crypto_scalarmult_curve25519_base,
+                                     Data(count: Int(crypto_scalarmult_curve25519_BYTES)),
+                                     clientSecretKey)!
         let serverPublicKey: Data
         let encryptionKey: Data
         let session: PairVerifyController.Session
@@ -43,7 +50,10 @@ class PairVerifyControllerTests: XCTestCase {
                 let encryptedData = resultOuter[.encryptedData] else {
                 return XCTFail("Response is incomplete")
             }
-            guard let sharedSecret = crypto(crypto_scalarmult, Data(count: Int(crypto_scalarmult_BYTES)), clientSecretKey, serverPublicKey_) else {
+            guard let sharedSecret = crypto(crypto_scalarmult,
+                                            Data(count: Int(crypto_scalarmult_BYTES)),
+                                            clientSecretKey,
+                                            serverPublicKey_) else {
                 return XCTFail("Couldn't generate shared secret")
             }
             XCTAssertEqual(sharedSecret.hex, session.sharedSecret.hex)

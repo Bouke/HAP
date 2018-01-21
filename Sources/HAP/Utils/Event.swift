@@ -1,3 +1,4 @@
+// swiftlint:disable unused_optional_binding
 import Foundation
 
 struct Event {

@@ -1,3 +1,4 @@
+// swiftlint:disable line_length
 import Foundation
 @testable import HAP
 @testable import KituraNet
