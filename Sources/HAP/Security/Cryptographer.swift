@@ -1,6 +1,6 @@
+import Evergreen
 import Foundation
 import HKDF
-import Evergreen
 
 fileprivate let logger = getLogger("hap.encryption")
 

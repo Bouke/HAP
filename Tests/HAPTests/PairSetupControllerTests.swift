@@ -106,7 +106,8 @@ class PairSetupControllerTests: XCTestCase {
             let linuxCount = thisClass.allTests.count
             let darwinCount = Int(thisClass
                 .defaultTestSuite.testCaseCount)
-            XCTAssertEqual(linuxCount, darwinCount,
+            XCTAssertEqual(linuxCount,
+                           darwinCount,
                            "\(darwinCount - linuxCount) tests are missing from allTests")
         #endif
     }

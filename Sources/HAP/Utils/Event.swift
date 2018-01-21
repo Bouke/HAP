@@ -2,6 +2,10 @@
 import Foundation
 
 struct Event {
+    enum Error: Swift.Error {
+        case characteristicWithoutAccessory
+    }
+
     var status: Response.Status
     var body: Data
     var headers: [String: String] = [:]
@@ -48,14 +52,8 @@ struct Event {
 
     func serialized() -> Data {
         // @todo should set additional headers here as well?
-        let headers = self.headers.map({ "\($0): \($1)\r\n" }).joined(separator: "")
+        let headers = self.headers.map({ "\($0): \($1)\r\n" }).joined()
         return "EVENT/1.0 \(status.rawValue) \(status.description)\r\n\(headers)\r\n".data(using: .utf8)! + body
-    }
-}
-
-extension Event {
-    enum Error: Swift.Error {
-        case characteristicWithoutAccessory
     }
 
     init(valueChangedOfCharacteristics characteristics: [Characteristic]) throws {

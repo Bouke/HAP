@@ -11,7 +11,9 @@ extension Accessory {
 public typealias CurrentPosition = Int
 
 public enum PositionState: Int, CharacteristicValueType {
-    case decreasing = 0, increasing, stopped
+    case decreasing = 0
+    case increasing = 1
+    case stopped = 2
 }
 
 public typealias TargetPosition = Int

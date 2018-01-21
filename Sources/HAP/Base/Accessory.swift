@@ -24,7 +24,7 @@ public enum AccessoryType: String, Codable {
     case airPurifier = "19"
 }
 
-open class Accessory {
+open class Accessory: JSONSerializable {
     public weak var device: Device?
     internal var aid: InstanceID = 0
     public let type: AccessoryType
@@ -70,9 +70,7 @@ open class Accessory {
             }
         }
     }
-}
 
-extension Accessory: JSONSerializable {
     public func serialized() -> [String: JSONValueType] {
         return [
             "aid": aid,

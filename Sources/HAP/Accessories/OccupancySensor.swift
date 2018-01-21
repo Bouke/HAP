@@ -9,7 +9,8 @@ extension Accessory {
 }
 
 public enum OccupancyDetected: Int, CharacteristicValueType {
-    case notDetected = 0, detected
+    case notDetected = 0
+    case detected = 1
 }
 
 extension Service {

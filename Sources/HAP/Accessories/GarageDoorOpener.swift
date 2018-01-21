@@ -9,11 +9,16 @@ extension Accessory {
 }
 
 public enum CurrentDoorState: Int, CharacteristicValueType {
-    case open = 0, closed, opening, closing, stopped
+    case open = 0
+    case closed = 1
+    case opening = 2
+    case closing = 3
+    case stopped = 4
 }
 
 public enum TargetDoorState: Int, CharacteristicValueType {
-    case open = 0, closed
+    case open = 0
+    case closed = 1
 }
 
 public typealias ObstructionDetected = Bool

@@ -20,7 +20,7 @@ func root(device: Device) -> Application {
 }
 
 func logger(_ application: @escaping Application) -> Application {
-    return { (connection, request) in
+    return { connection, request in
         let response = application(connection, request)
         // swiftlint:disable:next line_length
         logger.info("\(connection.socket?.remoteHostname ?? "-") \(request.method) \(request.urlURL.path) \(request.urlURL.query ?? "-") \(response.status.rawValue) \(response.body?.count ?? 0)")
@@ -29,7 +29,7 @@ func logger(_ application: @escaping Application) -> Application {
 }
 
 func router(_ routes: [Route]) -> Application {
-    return { (connection, request) in
+    return { connection, request in
         guard let route = routes.first(where: { $0.path == request.urlURL.path }) else {
             return Response(status: .notFound)
         }
@@ -38,7 +38,7 @@ func router(_ routes: [Route]) -> Application {
 }
 
 func protect(_ application: @escaping Application) -> Application {
-    return { (connection, request) in
+    return { connection, request in
         guard connection.isAuthenticated else {
             logger.warning("Unauthorized request to \(request.urlURL.path)")
             return .forbidden

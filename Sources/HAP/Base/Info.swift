@@ -27,7 +27,9 @@ extension Service {
             self.serialNumber.value = serialNumber
             self.firmwareRevision.value = firmwareRevision
             identify.onValueChange.append({ _ in
-                guard let accessory = self.accessory else { return }
+                guard let accessory = self.accessory else {
+                    return
+                }
                 _ = accessory.device?.onIdentify.map { $0(accessory) }
             })
         }

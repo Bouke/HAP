@@ -12,8 +12,10 @@ public typealias MotionDetected = Bool
 
 extension Service {
     open class MotionSensor: Service {
-        public let motionDetected = GenericCharacteristic<MotionDetected>(type: .motionDetected, value: false,
- permissions: [.read, .events])
+        public let motionDetected = GenericCharacteristic<MotionDetected>(
+            type: .motionDetected,
+            value: false,
+            permissions: [.read, .events])
 
         public init() {
             super.init(type: .motionSensor, characteristics: [motionDetected])

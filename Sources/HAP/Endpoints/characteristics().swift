@@ -6,7 +6,7 @@ import func Evergreen.getLogger
 fileprivate let logger = getLogger("hap.endpoints.characteristics")
 
 func characteristics(device: Device) -> Application {
-    return { (connection, request) in
+    return { connection, request in
         switch request.method {
         case "GET":
             guard
@@ -109,9 +109,9 @@ func characteristics(device: Device) -> Application {
             for item in decoded.characteristics {
                 var status = Protocol.Characteristic(aid: item.aid, iid: item.iid)
                 guard let characteristic = device.accessories
-                    .first(where: {$0.aid == item.aid})?
+                    .first(where: { $0.aid == item.aid })?
                     .services
-                    .flatMap({$0.characteristics.filter({$0.iid == item.iid})})
+                    .flatMap({ $0.characteristics.filter({ $0.iid == item.iid }) })
                     .first else {
                         return .unprocessableEntity
                 }

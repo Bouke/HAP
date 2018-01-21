@@ -1,6 +1,6 @@
 // swiftlint:disable identifier_name
-import Foundation
 import CLibSodium
+import Foundation
 
 class Ed25519 {
     enum Error: Swift.Error {
