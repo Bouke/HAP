@@ -7,8 +7,8 @@ fileprivate let logger = getLogger("demo")
 #if os(macOS)
     import Darwin
 #elseif os(Linux)
-    import Glibc
     import Dispatch
+    import Glibc
 #endif
 
 getLogger("hap").logLevel = .debug

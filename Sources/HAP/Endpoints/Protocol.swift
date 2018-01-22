@@ -1,3 +1,4 @@
+// swiftlint:disable nesting
 import Foundation
 
 enum Protocol {
@@ -28,14 +29,14 @@ enum Protocol {
         var type: Bool
         var ev: Bool
         init(queryItems: [URLQueryItem]) throws {
-            guard let id = queryItems.first(where: {$0.name == "id"})?.value else {
+            guard let id = queryItems.first(where: { $0.name == "id" })?.value else {
                 throw DecodeError.invalidPath
             }
             paths = try id.components(separatedBy: ",").map(Path.init)
-            meta = queryItems.first(where: {$0.name == "meta"})?.value == "1"
-            perms = queryItems.first(where: {$0.name == "perms"})?.value == "1"
-            type = queryItems.first(where: {$0.name == "type"})?.value == "1"
-            ev = queryItems.first(where: {$0.name == "ev"})?.value == "1"
+            meta = queryItems.first(where: { $0.name == "meta" })?.value == "1"
+            perms = queryItems.first(where: { $0.name == "perms" })?.value == "1"
+            type = queryItems.first(where: { $0.name == "type" })?.value == "1"
+            ev = queryItems.first(where: { $0.name == "ev" })?.value == "1"
         }
     }
 
@@ -77,20 +78,20 @@ enum Protocol {
     struct Characteristic: Codable {
         var aid: InstanceID
         var iid: InstanceID
-        var status: HAPStatusCodes? = nil
+        var status: HAPStatusCodes?
 
-        var value: Value? = nil
+        var value: Value?
 
-        var perms: [CharacteristicPermission]? = nil
+        var perms: [CharacteristicPermission]?
 
-        var unit: CharacteristicUnit? = nil
-        var type: CharacteristicType? = nil
-        var maxLen: Int? = nil
-        var maxValue: Double? = nil
-        var minValue: Double? = nil
-        var minStep: Double? = nil
+        var unit: CharacteristicUnit?
+        var type: CharacteristicType?
+        var maxLen: Int?
+        var maxValue: Double?
+        var minValue: Double?
+        var minStep: Double?
 
-        var ev: Bool? = nil
+        var ev: Bool?
 
         public init(aid: InstanceID, iid: InstanceID, value: Value? = nil, status: HAPStatusCodes? = nil) {
             self.aid = aid
@@ -98,7 +99,6 @@ enum Protocol {
             self.status = status
             self.value = value
         }
-
 
     }
 

@@ -34,12 +34,13 @@ func pairSetup(device: Device) -> Application {
         return session
     }
 
-    return { (connection, request) in
+    return { connection, request in
         var body = Data()
-        guard let _ = try? request.readAllData(into: &body), let data: PairTagTLV8 = try? decode(body) else {
-            return .badRequest
-        }
-        guard let sequence = data[.state]?.first.flatMap({ PairSetupStep(rawValue: $0) }) else {
+        guard
+            (try? request.readAllData(into: &body)) != nil,
+            let data: PairTagTLV8 = try? decode(body),
+            let sequence = data[.state]?.first.flatMap({ PairSetupStep(rawValue: $0) })
+        else {
             return .badRequest
         }
         let response: PairTagTLV8?

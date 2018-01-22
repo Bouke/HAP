@@ -42,7 +42,7 @@ class PairSetupController {
             .state: Data(bytes: [PairSetupStep.startResponse.rawValue]),
             .publicKey: serverPublicKey,
             .salt: salt
-            ]
+        ]
         return result
     }
 
@@ -56,13 +56,14 @@ class PairSetupController {
         logger.debug("--> M \(clientKeyProof.hex)")
 
         guard let serverKeyProof = try? session.server.verifySession(publicKey: clientPublicKey,
-                                                                     keyProof: clientKeyProof) else {
-            logger.warning("Invalid PIN")
-            let result: PairTagTLV8 = [
-                .state: Data(bytes: [PairSetupStep.verifyResponse.rawValue]),
-                .error: Data(bytes: [PairError.authenticationFailed.rawValue])
-            ]
-            return result
+                                                                     keyProof: clientKeyProof)
+            else {
+                logger.warning("Invalid PIN")
+                let result: PairTagTLV8 = [
+                    .state: Data(bytes: [PairSetupStep.verifyResponse.rawValue]),
+                    .error: Data(bytes: [PairError.authenticationFailed.rawValue])
+                ]
+                return result
         }
 
         logger.debug("<-- HAMK \(serverKeyProof.hex)")
@@ -88,15 +89,18 @@ class PairSetupController {
         guard let plaintext = try? ChaCha20Poly1305.decrypt(cipher: encryptedData,
                                                             nonce: "PS-Msg05".data(using: .utf8)!,
                                                             key: encryptionKey) else {
-            throw Error.couldNotDecryptMessage
+                                                                throw Error.couldNotDecryptMessage
         }
 
         guard let data: PairTagTLV8 = try? decode(plaintext) else {
             throw Error.couldNotDecodeMessage
         }
 
-        guard let publicKey = data[.publicKey], let username = data[.identifier], let signatureIn = data[.signature] else {
-            throw Error.invalidParameters
+        guard let publicKey = data[.publicKey],
+            let username = data[.identifier],
+            let signatureIn = data[.signature]
+            else {
+                throw Error.invalidParameters
         }
 
         logger.debug("--> identifier \(String(data: username, encoding: .utf8)!)")
@@ -109,7 +113,7 @@ class PairSetupController {
                                salt: "Pair-Setup-Controller-Sign-Salt".data(using: .utf8),
                                count: 32) +
             username +
-            publicKey
+        publicKey
 
         try Ed25519.verify(publicKey: publicKey, message: hashIn, signature: signatureIn)
 
@@ -139,8 +143,11 @@ class PairSetupController {
         logger.debug("<-- signature \(signatureOut.hex)")
         logger.info("Pair setup completed")
 
-        guard let encryptedResultInner = try? ChaCha20Poly1305.encrypt(message: encode(resultInner), nonce: "PS-Msg06".data(using: .utf8)!, key: encryptionKey) else {
-            throw Error.couldNotEncrypt
+        guard let encryptedResultInner = try? ChaCha20Poly1305.encrypt(message: encode(resultInner),
+                                                                       nonce: "PS-Msg06".data(using: .utf8)!,
+                                                                       key: encryptionKey)
+            else {
+                throw Error.couldNotEncrypt
         }
 
         let resultOuter: PairTagTLV8 = [

@@ -11,9 +11,11 @@ fileprivate enum Error: Swift.Error {
 func pairVerify(device: Device) -> Application {
     let controller = PairVerifyController(device: device)
 
-    return { (connection, request) in
+    return { connection, request in
         var body = Data()
-        guard let _ = try? request.read(into: &body), let data: PairTagTLV8 = try? decode(body) else {
+        guard (try? request.read(into: &body)) != nil,
+            let data: PairTagTLV8 = try? decode(body)
+        else {
             logger.warning("Could not decode message")
             return .badRequest
         }

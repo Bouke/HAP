@@ -1,3 +1,4 @@
+// swiftlint:disable cyclomatic_complexity
 import Foundation
 import HKDF
 import func Evergreen.getLogger
@@ -5,25 +6,30 @@ import func Evergreen.getLogger
 fileprivate let logger = getLogger("hap.endpoints.characteristics")
 
 func characteristics(device: Device) -> Application {
-    return { (connection, request) in
+    return { connection, request in
         switch request.method {
         case "GET":
             guard
                 let queryItems = request.urlComponents.queryItems,
                 let query = try? Protocol.GetQuery(queryItems: queryItems)
-            else {
-                return .badRequest
+                else {
+                    return .badRequest
             }
 
             var responses = [Protocol.Characteristic]()
             for path in query.paths {
-                guard let accessory = device.accessories.first(where: { $0.aid == path.aid }) else {
-                    responses.append(Protocol.Characteristic(aid: path.aid, iid: path.iid, status: .resourceDoesNotExist))
-                    continue
-                }
-                guard let characteristic = accessory.services.flatMap({ $0.characteristics.filter({ $0.iid == path.iid }) }).first else {
-                    responses.append(Protocol.Characteristic(aid: path.aid, iid: path.iid, status: .resourceDoesNotExist))
-                    continue
+                // TODO: change api to do something like this:
+                //     device.accessories[path.aid].characteristics[path.iid]
+                // or maybe:
+                //     device.characteristics[path]
+                guard let accessory = device.accessories.first(where: { $0.aid == path.aid }),
+                    // swiftlint:disable:next line_length
+                    let characteristic = accessory.services.flatMap({ $0.characteristics.filter({ $0.iid == path.iid }) }).first
+                    else {
+                        responses.append(Protocol.Characteristic(aid: path.aid,
+                                                                 iid: path.iid,
+                                                                 status: .resourceDoesNotExist))
+                        continue
                 }
                 guard characteristic.permissions.contains(.read) else {
                     logger.info("\(characteristic) has no read permission")
@@ -97,23 +103,21 @@ func characteristics(device: Device) -> Application {
         case "PUT":
             var body = Data()
             guard
-                let _  = try? request.readAllData(into: &body),
+                (try? request.readAllData(into: &body)) != nil,
                 let decoded = try? JSONDecoder().decode(Protocol.CharacteristicContainer.self, from: body) else
             {
-                    logger.warning("Could not decode JSON")
-                    return .badRequest
+                logger.warning("Could not decode JSON")
+                return .badRequest
             }
             var statuses = [Protocol.Characteristic]()
             for item in decoded.characteristics {
                 var status = Protocol.Characteristic(aid: item.aid, iid: item.iid)
-                guard let accessory = device.accessories.first(where: { $0.aid == item.aid }) else {
-                    return .unprocessableEntity
-                }
-                guard let characteristic = accessory
+                guard let characteristic = device.accessories
+                    .first(where: { $0.aid == item.aid })?
                     .services
-                    .flatMap({$0.characteristics.filter({$0.iid == item.iid})})
+                    .flatMap({ $0.characteristics.filter({ $0.iid == item.iid }) })
                     .first else {
-                    return .unprocessableEntity
+                        return .unprocessableEntity
                 }
 
                 // At least one of "value" or "ev" will be present in the characteristic write request object
@@ -148,7 +152,7 @@ func characteristics(device: Device) -> Application {
                     } catch {
                         logger.warning("Could not set value of type \(type(of: value)): \(error)")
                         status.status = .invalidValue
-                       break VALUE
+                        break VALUE
                     }
 
                     // notify listeners
@@ -190,16 +194,18 @@ func characteristics(device: Device) -> Application {
             guard !hasErrors else {
                 do {
                     let json = try JSONEncoder().encode(Protocol.CharacteristicContainer(characteristics: statuses))
-                    return Response(status: statuses.count == 1 ? .badRequest : .multiStatus, data: json, mimeType: "application/hap+json")
+                    return Response(status: statuses.count == 1 ? .badRequest : .multiStatus,
+                                    data: json,
+                                    mimeType: "application/hap+json")
                 } catch {
                     logger.error("Could not serialize object", error: error)
                     return .internalServerError
                 }
             }
 
-            /* HAP Specification 5.7.2.2
-             If no error occurs, the accessory must send an HTTP response with a 204 No Content status code and an empty body.
-             */
+            // HAP Specification 5.7.2.2
+            // If no error occurs, the accessory must send an HTTP response with
+            // a 204 No Content status code and an empty body.
             return Response(status: .noContent)
 
         default:
