@@ -211,37 +211,29 @@ public class Device {
     }
 
     public func canAddAccessory(accessory: Accessory) -> Bool {
-        if !isBridge ||
-        accessories.count == 100 { // HAP Spec 2.5.3.2 - Maximum 100 accessories
+        // HAP Spec 2.5.3.2 - Maximum 100 accessories
+        if !isBridge || accessories.count == 100 {
             return false
         }
         let serialNumber = accessory.uniqueSerialNumber
         return isUniqueSerialNumber(serialNumber, ignoring: accessory)
     }
 
-    // Add an array of accessories to a bridge. The result is an array of the acessories sucessfully
-    // added. An accessory will not be added if its serial number is not unique.
-    @discardableResult
-    public func addAccessories(_ newAccessories: [Accessory]) -> [Accessory] {
+    /// Add an accessories to this bridge device.
+    ///
+    /// It is an error to try and add accessories with duplicate serial numbers.
+    /// It is an error to try and add accessories to a non-bridge device.
+    /// It is an error to try and increase the number of accessories above 99.
+    public func addAccessories(_ newAccessories: [Accessory]) {
         precondition(isBridge && (accessories.count + newAccessories.count) <= 100,
                      "A maximum of 99 accessories can be added to a bridge")
-        // Remove any acessories with duplicate serial numbers
-        var verifiedAccessories = [Accessory]()
-        for accessory in newAccessories {
-            let serialNumber = accessory.uniqueSerialNumber
-            if isUniqueSerialNumber(serialNumber, ignoring: accessory) {
-                verifiedAccessories.append(accessory)
-            } else {
-                // swiftlint:disable:next line_length
-                logger.info("Accessories must have unique serial numbers. Duplicate found '\(serialNumber)'. Second device ignored")
-            }
-        }
-        if verifiedAccessories.isEmpty {
-            return []
-        }
-        accessories.append(contentsOf: verifiedAccessories)
+        let existingSerialNumbers = Set(accessories.map { $0.uniqueSerialNumber })
+        let newSerialNumbers = Set(newAccessories.map { $0.uniqueSerialNumber })
+        precondition(existingSerialNumbers.intersection(newSerialNumbers).isEmpty,
+                     "Accessories with duplicate serial numbers provided")
+        accessories.append(contentsOf: newAccessories)
 
-        // Check to see if the aid has been stored in the configuration data
+        // Assign accessory identifiers from possible historical assignment.
         for accessory in newAccessories {
             accessory.device = self
             if accessory.aid == 0 {
@@ -267,17 +259,14 @@ public class Device {
                     accessory.aid = configuration.nextAID()
                 } while (!isUniqueAID(accessory.aid, ignoring: accessory))
 
-                // Store the aid in the configuration data
-
+                // Store the aid in the configuration data.
                 let serialNumber = accessory.uniqueSerialNumber
                 configuration.aidForAccessorySerialNumber[serialNumber] = accessory.aid
             }
         }
 
-        // write configuration data to persist updated aid's and notify listeners
+        // Write configuration data to persist updated aid's and notify listeners
         updatedConfiguration()
-
-        return verifiedAccessories
     }
 
     // When a configuration changes
@@ -374,7 +363,6 @@ public class Device {
     // to update the Bonjour broadcast
     public func removePairing(_ pairingKey: Data) {
         pairings[pairingKey] = nil
-
         if !isPaired {
             // Update the Bonjour TXT record
             notifyConfigurationChange()

@@ -180,7 +180,6 @@ public class Server: NSObject, NetServiceDelegate {
                 Server.publishDiscoveryRecordOf(changedDevice, to: service)
             }
         })
-
     }
 
     deinit {
@@ -216,7 +215,6 @@ public class Server: NSObject, NetServiceDelegate {
             }
             self.stop()
         }
-
     }
 
     public func stop() {
