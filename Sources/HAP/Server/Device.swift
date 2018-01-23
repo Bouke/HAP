@@ -54,23 +54,32 @@ public class Device {
     public var onConfigurationChange: [(Device) -> Void] = []
     public let isBridge : Bool
 
-    // The device maitains a configuration number during its life time, which persists across restarts of the app
-
-    //    Current configuration number.
-    //    Must update when an accessory, service, or characteristic is added or removed on the accessory server.
-    //    Accessories must increment the config number after a firmware update.
-    //    This must have a range of 1-4294967295 and wrap to 1 when it overflows.
-    //    This value must persist across reboots, power cycles, etc.
+    // The device maitains a configuration number during its life time, which
+    // persists across restarts of the app.
     //
-    //    Accessory instance IDs, "aid", are assigned from the same number pool that is global across
-    //    entire HAP Accessory Server. For example, if the first Accessory object has an instance ID of "1"
-    //    then no other Accessory object can have an instance ID of "1" within the Accessory Server.
+    // HAP Specification 5.4: Current configuration number.
     //
-    //    Instance IDs are numbers with a range of [1, 18446744073709551615]. These numbers are used to
-    //    uniquely identify HAP accessory objects within an HAP accessory server, or uniquely identify
-    //    services, and characteristics within an HAP accessory object. The instance ID for each object
-    //    must be unique for the lifetime of the server/ client pairing.
-    
+    // Must update when an accessory, service, or characteristic is added or
+    // removed on the accessory server.
+    // Accessories must increment the config number after a firmware update.
+    // This must have a range of 1-4294967295 and wrap to 1 when it overflows.
+    // This value must persist across reboots, power cycles, etc.
+    //
+    // HAP Specification 2.6.1: Instance IDs
+    //
+    // Instance IDs are numbers with a range of [1, 18446744073709551615]. These
+    // numbers are used to uniquely identify HAP accessory objects within an HAP
+    // accessory server, or uniquely identify ervices, and characteristics
+    // within an HAP accessory object. The instance ID for each object
+    // must be unique for the lifetime of the server/ client pairing.
+    //
+    // HAP Specification 2.6.1.1: Accessory Instance IDs
+    //
+    // Accessory instance IDs, "aid", are assigned from the same number pool
+    // that is global across entire HAP Accessory Server. For example, if the
+    // first Accessory object has an instance ID of "1" then no other Accessory
+    // object can have an instance ID of "1" within the Accessory Server.
+    //
     internal struct AIDGenerator : Sequence, IteratorProtocol, Codable {
         internal var lastAID: InstanceID = 1
         mutating func next() -> InstanceID? {
@@ -104,7 +113,6 @@ public class Device {
         }
     }
     
-    
     // When a configuration changes
     // - update the configuration number
     // - write the configuration to storage
@@ -117,13 +125,11 @@ public class Device {
         }
         
         configuration.writeTo(storage)
-        
         notifyConfigurationChange()
-
     }
     
     // Notify listeners that the config record has changed
-    
+    //
     func notifyConfigurationChange() {
         _ = onConfigurationChange.map { $0(self) }
     }
@@ -260,7 +266,7 @@ public class Device {
     
     // Add an array of accessories to a bridge. The result is an array of the acessories sucessfully
     // added. An accessory will not be added if its serial number is not unique.
-    
+    //
     @discardableResult
     public func addAccessories(_ newAccessories: [Accessory]) ->[Accessory] {
         
@@ -318,7 +324,6 @@ public class Device {
         }
         
         // write configuration data to persist updated aid's and notify listeners
-        
         updatedConfiguration()
 
         return verifiedAccessories
@@ -347,9 +352,7 @@ public class Device {
         }
         
         // write configuration data to persist updated aid's
-        
         updatedConfiguration()
-
     }
 
     
@@ -427,8 +430,6 @@ public class Device {
             notifyConfigurationChange()
         }
     }
-
-    // Characteristing listeners
 
     func add(characteristic: Characteristic, listener: Server.Connection) {
         if let _ = characteristicEventListeners[Box(characteristic)] {

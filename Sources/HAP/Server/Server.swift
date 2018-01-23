@@ -92,10 +92,11 @@ public class Server: NSObject, NetServiceDelegate {
                     }
 
                     // Fix to allow Bridges with spaces in name
-                    // HomeKit POSTs contain a hostname with \\032 replacing the space
-                    // which causes Kitura httpParser to baulk on the resulting URL.
-                    // Replacing '\\032' with '-' in the hostname allows Kitura to create a valid URL,
-                    // and the value is not used elsewhere.
+                    // HomeKit POSTs contain a hostname with \\032 replacing the
+                    // space which causes Kitura httpParser to baulk on the
+                    // resulting URL. Replacing '\\032' with '-' in the hostname
+                    // allows Kitura to create a valid URL, and the value is not
+                    // used elsewhere.
                     //
                     if let hostname = request.headers["Host"]?[0], (hostname.contains("\\032")) {
                         request.headers["Host"]![0] = hostname.replacingOccurrences(of:"\\032", with:"-")
@@ -185,19 +186,13 @@ public class Server: NSObject, NetServiceDelegate {
         self.stop()
     }
     
+    // Publish the Accessory configuration on the Bonjour service
     private class func publishDiscoveryRecordOf(_ device:Device, to service: NetService) {
-        
-        // Publish the Accessory configuration on the Bonjour service
-        
         #if os(macOS)
-            
             let record = device.config.dictionary(key: { $0.key }, value: { $0.value.data(using: .utf8)! })
             service.setTXTRecord(NetService.data(fromTXTRecord: record))
-            
         #elseif os(Linux)
-            
             service.setTXTRecord(device.config)
-            
         #endif
     }
 
