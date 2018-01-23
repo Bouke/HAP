@@ -6,6 +6,25 @@ import Foundation
 // https://github.com/apple/swift-corelibs-foundation/commit/64b67c91479390776c43a96bd31e4e85f106d5e1
 typealias InstanceID = Int
 
+// HAP Specification 2.6.1.1: Accessory Instance IDs
+//
+// Accessory instance IDs, "aid", are assigned from the same number pool
+// that is global across entire HAP Accessory Server. For example, if the
+// first Accessory object has an instance ID of "1" then no other Accessory
+// object can have an instance ID of "1" within the Accessory Server.
+//
+// The generator starts at 2, so you have the ability to special-case 1.
+struct AIDGenerator: Sequence, IteratorProtocol, Codable {
+    internal var lastAID: InstanceID = 1
+    mutating func next() -> InstanceID? {
+        lastAID = lastAID &+ 1 // Add one and overflow if reach max InstanceID
+        if lastAID < 2 {
+            lastAID = 2
+        }
+        return lastAID
+    }
+}
+
 public enum AccessoryType: String, Codable {
     case other = "1"
     case bridge = "2"

@@ -41,7 +41,6 @@ struct Box<T: Any>: Hashable, Equatable {
     }
 }
 
-// swiftlint:disable:next type_body_length
 public class Device {
     public let name: String
     public let identifier: String
@@ -59,44 +58,25 @@ public class Device {
 
     // The device maitains a configuration number during its life time, which
     // persists across restarts of the app.
-    //
-    // HAP Specification 5.4: Current configuration number.
-    //
-    // Must update when an accessory, service, or characteristic is added or
-    // removed on the accessory server.
-    // Accessories must increment the config number after a firmware update.
-    // This must have a range of 1-4294967295 and wrap to 1 when it overflows.
-    // This value must persist across reboots, power cycles, etc.
-    //
-    // HAP Specification 2.6.1: Instance IDs
-    //
-    // Instance IDs are numbers with a range of [1, 18446744073709551615]. These
-    // numbers are used to uniquely identify HAP accessory objects within an HAP
-    // accessory server, or uniquely identify ervices, and characteristics
-    // within an HAP accessory object. The instance ID for each object
-    // must be unique for the lifetime of the server/ client pairing.
-    //
-    // HAP Specification 2.6.1.1: Accessory Instance IDs
-    //
-    // Accessory instance IDs, "aid", are assigned from the same number pool
-    // that is global across entire HAP Accessory Server. For example, if the
-    // first Accessory object has an instance ID of "1" then no other Accessory
-    // object can have an instance ID of "1" within the Accessory Server.
-    //
-    internal struct AIDGenerator: Sequence, IteratorProtocol, Codable {
-        internal var lastAID: InstanceID = 1
-        mutating func next() -> InstanceID? {
-            lastAID = lastAID &+ 1 // Add one and overflow if reach max InstanceID
-            if lastAID < 2 {
-                lastAID = 2
-            }
-            return lastAID
-        }
-    }
-
     internal struct Configuration: Codable {
+        // HAP Specification 5.4: Current configuration number.
+        //
+        // Must update when an accessory, service, or characteristic is added or
+        // removed on the accessory server.
+        // Accessories must increment the config number after a firmware update.
+        // This must have a range of 1-4294967295 and wrap to 1 when it overflows.
+        // This value must persist across reboots, power cycles, etc.
         internal var number: UInt32 = 0
+
+        // HAP Specification 2.6.1: Instance IDs
+        //
+        // Instance IDs are numbers with a range of [1, 18446744073709551615]. These
+        // numbers are used to uniquely identify HAP accessory objects within an HAP
+        // accessory server, or uniquely identify ervices, and characteristics
+        // within an HAP accessory object. The instance ID for each object
+        // must be unique for the lifetime of the server/ client pairing.
         internal var aidForAccessorySerialNumber = [String: InstanceID]()
+
         private var aidGenerator = AIDGenerator()
 
         // The next aid - should be checked against existing devices to ensure it is unique
@@ -114,27 +94,6 @@ public class Device {
                 logger.error("Error encoding configuration data: \(error)")
             }
         }
-    }
-
-    // When a configuration changes
-    // - update the configuration number
-    // - write the configuration to storage
-    // - notify interested parties of the change
-    //
-    func updatedConfiguration() {
-        configuration.number = configuration.number &+ 1
-        if configuration.number < 1 {
-            configuration.number = 1
-        }
-
-        configuration.writeTo(storage)
-        notifyConfigurationChange()
-    }
-
-    // Notify listeners that the config record has changed
-    //
-    func notifyConfigurationChange() {
-        _ = onConfigurationChange.map { $0(self) }
     }
 
     /// A bridge is a special type of HAP accessory server that bridges HomeKit
@@ -319,6 +278,25 @@ public class Device {
         updatedConfiguration()
 
         return verifiedAccessories
+    }
+
+    // When a configuration changes
+    // - update the configuration number
+    // - write the configuration to storage
+    // - notify interested parties of the change
+    func updatedConfiguration() {
+        configuration.number = configuration.number &+ 1
+        if configuration.number < 1 {
+            configuration.number = 1
+        }
+
+        configuration.writeTo(storage)
+        notifyConfigurationChange()
+    }
+
+    // Notify listeners that the config record has changed
+    func notifyConfigurationChange() {
+        _ = onConfigurationChange.map { $0(self) }
     }
 
     public func removeAccessories(_ unwantedAccessories: [Accessory]) {
