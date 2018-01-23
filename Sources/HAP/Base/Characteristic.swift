@@ -42,7 +42,7 @@ extension Characteristic {
     }
 }
 
-public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, JSONSerializable {
+public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, JSONSerializable, Hashable, Equatable {
     enum Error: Swift.Error {
         case valueTypeException
     }
@@ -58,9 +58,13 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
             return _value
         }
         set {
-            guard newValue != _value else { return }
+            guard newValue != _value else {
+                return
+            }
             _value = newValue
-            guard let device = service?.accessory?.device else { return }
+            guard let device = service?.accessory?.device else {
+                return
+            }
             device.notify(characteristicListeners: self)
         }
     }
@@ -96,7 +100,16 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
     public var minValue: Double?
     public var minStep: Double?
 
-    public init(type: CharacteristicType, value: T? = nil, permissions: [CharacteristicPermission] = [.read, .write, .events], description: String? = nil, format: CharacteristicFormat? = nil, unit: CharacteristicUnit? = nil, maxLength: Int? = nil, maxValue: Double? = nil, minValue: Double? = nil, minStep: Double? = nil) {
+    public init(type: CharacteristicType,
+                value: T? = nil,
+                permissions: [CharacteristicPermission] = [.read, .write, .events],
+                description: String? = nil,
+                format: CharacteristicFormat? = nil,
+                unit: CharacteristicUnit? = nil,
+                maxLength: Int? = nil,
+                maxValue: Double? = nil,
+                minValue: Double? = nil,
+                minStep: Double? = nil) {
         self.type = type
         self._value = value
         self.permissions = permissions
@@ -110,15 +123,11 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
         self.minValue = minValue
         self.minStep = minStep
     }
-}
 
-extension GenericCharacteristic: Hashable {
     public var hashValue: Int {
         return iid.hashValue
     }
-}
 
-extension GenericCharacteristic: Equatable {
     public static func == (lhs: GenericCharacteristic, rhs: GenericCharacteristic) -> Bool {
         return lhs === rhs
     }

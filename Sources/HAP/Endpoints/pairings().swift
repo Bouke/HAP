@@ -4,16 +4,16 @@ import func Evergreen.getLogger
 fileprivate let logger = getLogger("hap.endpoints.pairings")
 
 func pairings(device: Device) -> Application {
-    return { (connection, request) in
+    return { connection, request in
         var body = Data()
         guard request.method == "POST" else {
             return .methodNotAllowed
         }
         guard
-            let _ = try? request.readAllData(into: &body),
+            (try? request.readAllData(into: &body)) != nil,
             let data: PairTagTLV8 = try? decode(body),
             data[.state]?[0] == PairStep.request.rawValue,
-            let method = data[.pairingMethod].flatMap({PairingMethod(rawValue: $0[0])}),
+            let method = data[.pairingMethod].flatMap({ PairingMethod(rawValue: $0[0]) }),
             let username = data[.identifier]
             else {
                 return .badRequest

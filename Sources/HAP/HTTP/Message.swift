@@ -12,7 +12,9 @@ class Response {
     }
 
     var text: String? {
-        guard let body = body else { return nil }
+        guard let body = body else {
+            return nil
+        }
         return String(data: body, encoding: .utf8)
     }
 
@@ -29,7 +31,11 @@ class Response {
     }
 
     enum Status: Int, CustomStringConvertible {
-        case ok = 200, created = 201, accepted = 202, noContent = 204, multiStatus = 207
+        case ok = 200
+        case created = 201
+        case accepted = 202
+        case noContent = 204
+        case multiStatus = 207
         case movedPermanently = 301
         case badRequest = 400, unauthorized = 401, forbidden = 403, notFound = 404
         case methodNotAllowed = 405
@@ -75,9 +81,7 @@ class Response {
         }
         self.init(status: status, data: data, mimeType: "\(mimeType); charset=utf8")
     }
-}
 
-extension Response {
     static var ok: Response { return Response(status: .ok) }
     static var badRequest: Response { return  Response(status: .badRequest) }
     static var forbidden: Response { return  Response(status: .forbidden) }

@@ -1,10 +1,11 @@
+// swiftlint:disable line_length
 import Foundation
 
 extension BinaryInteger {
     init(bytes: [UInt8]) {
         precondition(bytes.count == MemoryLayout<Self>.size, "incorrect number of bytes")
         self = bytes.withUnsafeBufferPointer {
-            $0.baseAddress!.withMemoryRebound(to: Self.self, capacity: 1) { //(ptr) -> Result in
+            $0.baseAddress!.withMemoryRebound(to: Self.self, capacity: 1) {
                 return $0.pointee
             }
         }

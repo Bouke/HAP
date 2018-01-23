@@ -1,5 +1,5 @@
-import Cryptor
 import CLibSodium
+import Cryptor
 import func Evergreen.getLogger
 import Foundation
 import HKDF
@@ -16,8 +16,13 @@ class PairVerifyController {
 
         init?(clientPublicKey otherPublicKey: Data) {
             guard let secretKey = (try? Random.generate(byteCount: 32)).flatMap({ Data(bytes: $0) }),
-                let publicKey = crypto(crypto_scalarmult_curve25519_base, Data(count: Int(crypto_scalarmult_curve25519_BYTES)), secretKey),
-                let sharedSecret = crypto(crypto_scalarmult, Data(count: Int(crypto_scalarmult_BYTES)), secretKey, otherPublicKey)
+                let publicKey = crypto(crypto_scalarmult_curve25519_base,
+                                       Data(count: Int(crypto_scalarmult_curve25519_BYTES)),
+                                       secretKey),
+                let sharedSecret = crypto(crypto_scalarmult,
+                                          Data(count: Int(crypto_scalarmult_BYTES)),
+                                          secretKey,
+                                          otherPublicKey)
                 else {
                     return nil
             }
@@ -67,7 +72,9 @@ class PairVerifyController {
                                            salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8),
                                            count: 32)
 
-        guard let encryptedResultInner = try? ChaCha20Poly1305.encrypt(message: encode(resultInner), nonce: "PV-Msg02".data(using: .utf8)!, key: encryptionKey) else {
+        guard let encryptedResultInner = try? ChaCha20Poly1305.encrypt(message: encode(resultInner),
+                                                                       nonce: "PV-Msg02".data(using: .utf8)!,
+                                                                       key: encryptionKey) else {
             throw Error.couldNotEncrypt
         }
 
@@ -91,7 +98,9 @@ class PairVerifyController {
                                            salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8),
                                            count: 32)
 
-        guard let plaintext = try? ChaCha20Poly1305.decrypt(cipher: encryptedData, nonce: "PV-Msg03".data(using: .utf8)!, key: encryptionKey) else {
+        guard let plaintext = try? ChaCha20Poly1305.decrypt(cipher: encryptedData,
+                                                            nonce: "PV-Msg03".data(using: .utf8)!,
+                                                            key: encryptionKey) else {
             throw Error.couldNotDecrypt
         }
 

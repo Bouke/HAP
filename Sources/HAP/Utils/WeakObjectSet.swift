@@ -19,7 +19,7 @@ class WeakObject<T: AnyObject>: Equatable, Hashable {
     }
 }
 
-struct WeakObjectSet<T: AnyObject> where T: Hashable {
+struct WeakObjectSet<T: AnyObject>: Sequence, ExpressibleByArrayLiteral where T: Hashable {
     var objects: Set<WeakObject<T>>
 
     init() {
@@ -49,15 +49,13 @@ struct WeakObjectSet<T: AnyObject> where T: Hashable {
     mutating func remove(_ member: T) -> T? {
         return self.objects.remove(WeakObject(member))?.object
     }
-}
 
-extension WeakObjectSet: Sequence {
+    // Sequence
     func makeIterator() -> IndexingIterator<[T]> {
         return allObjects.makeIterator()
     }
-}
 
-extension WeakObjectSet: ExpressibleByArrayLiteral {
+    // ExpressibleByArrayLiteral
     init(arrayLiteral elements: T...) {
         self.objects = Set(elements.map { WeakObject($0) })
     }

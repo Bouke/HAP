@@ -5,7 +5,7 @@ import HKDF
 fileprivate let logger = getLogger("hap.endpoints.accessories")
 
 func accessories(device: Device) -> Application {
-    return { (connection, request) in
+    return { connection, request in
         guard request.method == "GET" else {
             return .badRequest
         }

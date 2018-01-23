@@ -25,7 +25,7 @@ public enum ServiceType: String, Codable {
     case securitySystem = "7E"
 }
 
-open class Service {
+open class Service: JSONSerializable {
     weak var accessory: Accessory?
 
     internal var iid: InstanceID = 0
@@ -48,9 +48,7 @@ open class Service {
                 .isEmpty,
             "Service's characteristics must have a unique type")
     }
-}
 
-extension Service: JSONSerializable {
     public func serialized() -> [String: JSONValueType] {
         return [
             "iid": iid,

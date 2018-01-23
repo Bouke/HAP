@@ -1,5 +1,6 @@
-import Cryptor
+// swiftlint:disable force_try
 import CLibSodium
+import Cryptor
 @testable import HAP
 import HKDF
 import XCTest
@@ -13,14 +14,20 @@ class PairVerifyControllerTests: XCTestCase {
     }
 
     func test() {
-        let device = Device(bridgeInfo: .init(name: "Test"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [])
+        let device = Device(bridgeInfo: .init(name: "Test"),
+                            setupCode: "123-44-321",
+                            storage: MemoryStorage(),
+                            accessories: [])
         let username = "hubba hubba".data(using: .utf8)!
         let keys = Ed25519.generateSignKeypair() // these are the client's keys
         device.pairings[username] = keys.publicKey
 
         let controller = PairVerifyController(device: device)
-        let clientSecretKey = try! Data(bytes: Random.generate(byteCount: 32)) // these are the client's keys for this verify session
-        let clientPublicKey = crypto(crypto_scalarmult_curve25519_base, Data(count: Int(crypto_scalarmult_curve25519_BYTES)), clientSecretKey)!
+        // these are the client's keys for this verify session
+        let clientSecretKey = try! Data(bytes: Random.generate(byteCount: 32))
+        let clientPublicKey = crypto(crypto_scalarmult_curve25519_base,
+                                     Data(count: Int(crypto_scalarmult_curve25519_BYTES)),
+                                     clientSecretKey)!
         let serverPublicKey: Data
         let encryptionKey: Data
         let session: PairVerifyController.Session
@@ -43,7 +50,10 @@ class PairVerifyControllerTests: XCTestCase {
                 let encryptedData = resultOuter[.encryptedData] else {
                 return XCTFail("Response is incomplete")
             }
-            guard let sharedSecret = crypto(crypto_scalarmult, Data(count: Int(crypto_scalarmult_BYTES)), clientSecretKey, serverPublicKey_) else {
+            guard let sharedSecret = crypto(crypto_scalarmult,
+                                            Data(count: Int(crypto_scalarmult_BYTES)),
+                                            clientSecretKey,
+                                            serverPublicKey_) else {
                 return XCTFail("Couldn't generate shared secret")
             }
             XCTAssertEqual(sharedSecret.hex, session.sharedSecret.hex)
@@ -53,8 +63,8 @@ class PairVerifyControllerTests: XCTestCase {
                                                 salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8),
                                                 count: 32)
             guard let plainText = try? ChaCha20Poly1305.decrypt(cipher: encryptedData,
-                                                          nonce: "PV-Msg02".data(using: .utf8)!,
-                                                          key: encryptionKey_) else {
+                                                                nonce: "PV-Msg02".data(using: .utf8)!,
+                                                                key: encryptionKey_) else {
                 return XCTFail("Couldn't decrypt response")
             }
             guard let resultInner: PairTagTLV8 = try? decode(plainText),
@@ -106,7 +116,8 @@ class PairVerifyControllerTests: XCTestCase {
             let linuxCount = thisClass.allTests.count
             let darwinCount = Int(thisClass
                 .defaultTestSuite.testCaseCount)
-            XCTAssertEqual(linuxCount, darwinCount,
+            XCTAssertEqual(linuxCount,
+                           darwinCount,
                            "\(darwinCount - linuxCount) tests are missing from allTests")
         #endif
     }
