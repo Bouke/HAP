@@ -3,6 +3,7 @@ import KituraNet
 import Socket
 import func Evergreen.getLogger
 
+// swiftlint:disable sorted_imports
 #if os(Linux)
     import Dispatch
     import NetService
@@ -168,26 +169,26 @@ public class Server: NSObject, NetServiceDelegate {
         try socket.listen(on: port)
 
         service = NetService(domain: "local.", type: "_hap._tcp.", name: device.name, port: socket.listeningPort)
-        
+
         Server.publishDiscoveryRecordOf(device, to: service)
 
         super.init()
         service.delegate = self
-        
-        device.onConfigurationChange.append( { [weak self] (changedDevice) in
+
+        device.onConfigurationChange.append({ [weak self] changedDevice in
             if let service = self?.service {
                 Server.publishDiscoveryRecordOf(changedDevice, to: service)
             }
         })
 
     }
-    
+
     deinit {
         self.stop()
     }
-    
+
     // Publish the Accessory configuration on the Bonjour service
-    private class func publishDiscoveryRecordOf(_ device:Device, to service: NetService) {
+    private class func publishDiscoveryRecordOf(_ device: Device, to service: NetService) {
         #if os(macOS)
             let record = device.config.dictionary(key: { $0.key }, value: { $0.value.data(using: .utf8)! })
             service.setTXTRecord(NetService.data(fromTXTRecord: record))

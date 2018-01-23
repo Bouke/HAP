@@ -4,6 +4,7 @@ import HAP
 
 fileprivate let logger = getLogger("demo")
 
+// swiftlint:disable sorted_imports
 #if os(macOS)
     import Darwin
 #elseif os(Linux)
