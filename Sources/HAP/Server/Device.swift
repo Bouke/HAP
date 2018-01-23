@@ -208,7 +208,7 @@ public class Device {
         self.name = name
         self.setupCode = setupCode
         self.storage = storage
-        self.configuration = Configuration() // default configuration
+        self.configuration = Configuration()
         self.isBridge = accessories[0].type == .bridge
 
         if let pk = storage["pk"], let sk = storage["sk"], let identifier = storage["uuid"] {
@@ -220,15 +220,13 @@ public class Device {
                     let decoder = JSONDecoder()
                     configuration = try decoder.decode(Configuration.self, from: configData)
                 } catch {
-                    logger.error("Error reading configuration data: \(error)")
+                    logger.error("Error reading configuration data: \(error), using default configuration instead")
                 }
             }
         } else {
             (publicKey, privateKey) = Ed25519.generateSignKeypair()
             identifier = generateIdentifier()
-
             configuration.writeTo(storage)
-
             storage["pk"] = publicKey
             storage["sk"] = privateKey
             storage["uuid"] = identifier.data(using: .utf8)
@@ -245,7 +243,6 @@ public class Device {
         //
 
         // Obtain new aid's for any accessories which don't already have one
-
         self.accessories = [Accessory]()
 
         // The first accessory must be aid 1
@@ -255,12 +252,10 @@ public class Device {
     }
 
     public func canAddAccessory(accessory: Accessory) -> Bool {
-
         if !isBridge ||
         accessories.count == 100 { // HAP Spec 2.5.3.2 - Maximum 100 accessories
             return false
         }
-
         let serialNumber = accessory.uniqueSerialNumber
         return isUniqueSerialNumber(serialNumber, ignoring: accessory)
     }
@@ -269,13 +264,10 @@ public class Device {
     // added. An accessory will not be added if its serial number is not unique.
     @discardableResult
     public func addAccessories(_ newAccessories: [Accessory]) -> [Accessory] {
-
         precondition(isBridge && (accessories.count + newAccessories.count) <= 100,
                      "A maximum of 99 accessories can be added to a bridge")
-
-        var verifiedAccessories = [Accessory]()
-
         // Remove any acessories with duplicate serial numbers
+        var verifiedAccessories = [Accessory]()
         for accessory in newAccessories {
             let serialNumber = accessory.uniqueSerialNumber
             if isUniqueSerialNumber(serialNumber, ignoring: accessory) {
@@ -285,11 +277,9 @@ public class Device {
                 logger.info("Accessories must have unique serial numbers. Duplicate found '\(serialNumber)'. Second device ignored")
             }
         }
-
-        if !verifiedAccessories.isEmpty {
-            return verifiedAccessories
+        if verifiedAccessories.isEmpty {
+            return []
         }
-
         accessories.append(contentsOf: verifiedAccessories)
 
         // Check to see if the aid has been stored in the configuration data
@@ -332,7 +322,7 @@ public class Device {
     }
 
     public func removeAccessories(_ unwantedAccessories: [Accessory]) {
-        if !unwantedAccessories.isEmpty {
+        if unwantedAccessories.isEmpty {
             return
         }
         for accessory in unwantedAccessories {
