@@ -1,6 +1,6 @@
-import Socket
 import Foundation
 import KituraNet
+import Socket
 import func Evergreen.getLogger
 
 #if os(Linux)
@@ -41,7 +41,7 @@ public class Server: NSObject, NetServiceDelegate {
         }
 
         private func sendQueue() {
-            guard queue.count > 0 else {
+            guard !queue.isEmpty else {
                 return
             }
             defer {
@@ -54,6 +54,7 @@ public class Server: NSObject, NetServiceDelegate {
                 return logger.error("Could not create value change event: \(error)")
             }
             let data = event.serialized()
+            // swiftlint:disable:next line_length
             logger.info("Value changed, notifying \(self.listener?.socket?.remoteHostname ?? "-"), event: \(data) (\(self.queue.count) updates)")
             listener?.writeOutOfBand(data)
         }
@@ -91,15 +92,14 @@ public class Server: NSObject, NetServiceDelegate {
                         break
                     }
 
-                    // Fix to allow Bridges with spaces in name
+                    // Fix to allow Bridges with spaces in name.
                     // HomeKit POSTs contain a hostname with \\032 replacing the
                     // space which causes Kitura httpParser to baulk on the
                     // resulting URL. Replacing '\\032' with '-' in the hostname
                     // allows Kitura to create a valid URL, and the value is not
                     // used elsewhere.
-                    //
                     if let hostname = request.headers["Host"]?[0], (hostname.contains("\\032")) {
-                        request.headers["Host"]![0] = hostname.replacingOccurrences(of:"\\032", with:"-")
+                        request.headers["Host"]![0] = hostname.replacingOccurrences(of: "\\032", with: "-")
                     }
 
                     guard httpParser.completed else {

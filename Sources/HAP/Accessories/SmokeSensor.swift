@@ -9,12 +9,15 @@ extension Accessory {
 }
 
 public enum SmokeDetected: Int, CharacteristicValueType {
-    case smokeNotDetected = 0, smokeDetected
+    case smokeNotDetected = 0
+    case smokeDetected = 1
 }
 
 extension Service {
     open class SmokeSensor: Service {
-        public let smokeDetected = GenericCharacteristic<SmokeDetected>(type: .currentPosition, permissions: [.read, .events])
+        public let smokeDetected = GenericCharacteristic<SmokeDetected>(
+            type: .currentPosition,
+            permissions: [.read, .events])
 
         public init() {
             super.init(type: .smokeSensor, characteristics: [smokeDetected])

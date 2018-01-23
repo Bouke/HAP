@@ -26,6 +26,7 @@ struct Box<T: Any>: Hashable, Equatable {
         #if os(macOS)
             return value as AnyObject
         #elseif os(Linux)
+            // swiftlint:disable:next force_cast
             return value as! AnyObject
         #endif
     }
@@ -431,8 +432,9 @@ public class Device {
         }
     }
 
-    func add(characteristic: Characteristic, listener: Server.Connection) {
-        if let _ = characteristicEventListeners[Box(characteristic)] {
+    func add(characteristic: Characteristic,
+             listener: Server.Connection) {
+        if characteristicEventListeners[Box(characteristic)] != nil {
             characteristicEventListeners[Box(characteristic)]!.addObject(object: listener)
         } else {
             characteristicEventListeners[Box(characteristic)] = [listener]
@@ -440,15 +442,19 @@ public class Device {
     }
 
     @discardableResult
-    func remove(characteristic: Characteristic, listener connection: Server.Connection) -> Server.Connection? {
-        guard let _ = characteristicEventListeners[Box(characteristic)] else {
+    func remove(characteristic: Characteristic,
+                listener connection: Server.Connection) -> Server.Connection? {
+        guard characteristicEventListeners[Box(characteristic)] != nil else {
             return nil
         }
         return characteristicEventListeners[Box(characteristic)]!.remove(connection)
     }
 
-    func notify(characteristicListeners characteristic: Characteristic, exceptListener except: Server.Connection? = nil) {
-        guard let listeners = characteristicEventListeners[Box(characteristic)]?.filter({$0 != except}), listeners.count > 0 else {
+    func notify(characteristicListeners characteristic: Characteristic,
+                exceptListener except: Server.Connection? = nil) {
+        guard let listeners = characteristicEventListeners[Box(characteristic)]?.filter({ $0 != except }),
+            !listeners.isEmpty
+        else {
             return logger.debug("Value changed, but nobody listening")
         }
 
