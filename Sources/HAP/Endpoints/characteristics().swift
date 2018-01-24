@@ -17,13 +17,18 @@ func characteristics(device: Device) -> Application {
 
             var responses = [Protocol.Characteristic]()
             for path in query.paths {
-                guard let accessory = device.accessories.first(where: { $0.aid == path.aid }) else {
-                    responses.append(Protocol.Characteristic(aid: path.aid, iid: path.iid, status: .resourceDoesNotExist))
-                    continue
-                }
-                guard let characteristic = accessory.services.flatMap({ $0.characteristics.filter({ $0.iid == path.iid }) }).first else {
-                    responses.append(Protocol.Characteristic(aid: path.aid, iid: path.iid, status: .resourceDoesNotExist))
-                    continue
+                // TODO: change api to do something like this:
+                //     device.accessories[path.aid].characteristics[path.iid]
+                // or maybe:
+                //     device.characteristics[path]
+                guard let accessory = device.accessories.first(where: { $0.aid == path.aid }),
+                    // swiftlint:disable:next line_length
+                    let characteristic = accessory.services.flatMap({ $0.characteristics.filter({ $0.iid == path.iid }) }).first
+                    else {
+                        responses.append(Protocol.Characteristic(aid: path.aid,
+                                                                 iid: path.iid,
+                                                                 status: .resourceDoesNotExist))
+                        continue
                 }
                 guard characteristic.permissions.contains(.read) else {
                     logger.info("\(characteristic) has no read permission")
@@ -31,7 +36,9 @@ func characteristics(device: Device) -> Application {
                     continue
                 }
                 guard accessory.reachable else {
-                    responses.append(Protocol.Characteristic(aid: path.aid, iid: path.iid, status: .unableToCommunicate))
+                    responses.append(Protocol.Characteristic(aid: path.aid,
+                                                             iid: path.iid,
+                                                             status: .unableToCommunicate))
                     continue
                 }
 
@@ -106,14 +113,12 @@ func characteristics(device: Device) -> Application {
             var statuses = [Protocol.Characteristic]()
             for item in decoded.characteristics {
                 var status = Protocol.Characteristic(aid: item.aid, iid: item.iid)
-                guard let accessory = device.accessories.first(where: { $0.aid == item.aid }) else {
-                    return .unprocessableEntity
-                }
-                guard let characteristic = accessory
-                    .services
-                    .flatMap({$0.characteristics.filter({$0.iid == item.iid})})
-                    .first else {
-                    return .unprocessableEntity
+                guard let accessory = device.accessories.first(where: { $0.aid == item.aid }),
+                    let characteristic = accessory
+                        .services
+                        .flatMap({ $0.characteristics.filter({ $0.iid == item.iid }) })
+                        .first else {
+                            return .unprocessableEntity
                 }
 
                 // At least one of "value" or "ev" will be present in the characteristic write request object
@@ -132,7 +137,6 @@ func characteristics(device: Device) -> Application {
                         status.status = .unableToCommunicate
                         break VALUE  // continue and process other items
                     }
-
 
                     logger.debug("Setting \(characteristic) to new value \(value) (type: \(type(of: value)))")
                     do {

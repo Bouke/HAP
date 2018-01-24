@@ -1,3 +1,4 @@
+// swiftlint:disable file_length
 import Cryptor
 import Foundation
 import Regex
@@ -51,57 +52,38 @@ public class Device {
     public var accessories: [Accessory]
     internal var characteristicEventListeners: [Box<Characteristic>: WeakObjectSet<Server.Connection>]
     public var onIdentify: [(Accessory?) -> Void] = []
-    internal var configuration : Configuration
+    internal var configuration: Configuration
     public var onConfigurationChange: [(Device) -> Void] = []
-    public let isBridge : Bool
+    public let isBridge: Bool
 
     // The device maitains a configuration number during its life time, which
     // persists across restarts of the app.
-    //
-    // HAP Specification 5.4: Current configuration number.
-    //
-    // Must update when an accessory, service, or characteristic is added or
-    // removed on the accessory server.
-    // Accessories must increment the config number after a firmware update.
-    // This must have a range of 1-4294967295 and wrap to 1 when it overflows.
-    // This value must persist across reboots, power cycles, etc.
-    //
-    // HAP Specification 2.6.1: Instance IDs
-    //
-    // Instance IDs are numbers with a range of [1, 18446744073709551615]. These
-    // numbers are used to uniquely identify HAP accessory objects within an HAP
-    // accessory server, or uniquely identify ervices, and characteristics
-    // within an HAP accessory object. The instance ID for each object
-    // must be unique for the lifetime of the server/ client pairing.
-    //
-    // HAP Specification 2.6.1.1: Accessory Instance IDs
-    //
-    // Accessory instance IDs, "aid", are assigned from the same number pool
-    // that is global across entire HAP Accessory Server. For example, if the
-    // first Accessory object has an instance ID of "1" then no other Accessory
-    // object can have an instance ID of "1" within the Accessory Server.
-    //
-    internal struct AIDGenerator : Sequence, IteratorProtocol, Codable {
-        internal var lastAID: InstanceID = 1
-        mutating func next() -> InstanceID? {
-            lastAID = lastAID &+ 1 // Add one and overflow if reach max InstanceID
-            if lastAID < 2 {
-                lastAID = 2
-            }
-            return lastAID
-        }
-    }
-    
-    internal struct Configuration : Codable {
+    internal struct Configuration: Codable {
+        // HAP Specification 5.4: Current configuration number.
+        //
+        // Must update when an accessory, service, or characteristic is added or
+        // removed on the accessory server.
+        // Accessories must increment the config number after a firmware update.
+        // This must have a range of 1-4294967295 and wrap to 1 when it overflows.
+        // This value must persist across reboots, power cycles, etc.
         internal var number: UInt32 = 0
-        internal var aidForAccessorySerialNumber = [String : InstanceID]()
+
+        // HAP Specification 2.6.1: Instance IDs
+        //
+        // Instance IDs are numbers with a range of [1, 18446744073709551615]. These
+        // numbers are used to uniquely identify HAP accessory objects within an HAP
+        // accessory server, or uniquely identify ervices, and characteristics
+        // within an HAP accessory object. The instance ID for each object
+        // must be unique for the lifetime of the server/ client pairing.
+        internal var aidForAccessorySerialNumber = [String: InstanceID]()
+
         private var aidGenerator = AIDGenerator()
 
         // The next aid - should be checked against existing devices to ensure it is unique
         internal mutating func nextAID() -> InstanceID {
             return aidGenerator.next()!
         }
-        
+
         // Write the configuration record to storage
         internal func writeTo(_ storage: Storage) {
             do {
@@ -113,29 +95,6 @@ public class Device {
             }
         }
     }
-    
-    // When a configuration changes
-    // - update the configuration number
-    // - write the configuration to storage
-    // - notify interested parties of the change
-    //
-    func updatedConfiguration() {
-        configuration.number = configuration.number &+ 1
-        if configuration.number < 1 {
-            configuration.number = 1
-        }
-        
-        configuration.writeTo(storage)
-        notifyConfigurationChange()
-    }
-    
-    // Notify listeners that the config record has changed
-    //
-    func notifyConfigurationChange() {
-        _ = onConfigurationChange.map { $0(self) }
-    }
-
-
 
     /// A bridge is a special type of HAP accessory server that bridges HomeKit
     /// Accessory Protocol and different RF/transport protocols, such as ZigBee
@@ -208,7 +167,7 @@ public class Device {
         self.name = name
         self.setupCode = setupCode
         self.storage = storage
-        self.configuration = Configuration() // default configuration
+        self.configuration = Configuration()
         self.isBridge = accessories[0].type == .bridge
 
         if let pk = storage["pk"], let sk = storage["sk"], let identifier = storage["uuid"] {
@@ -220,15 +179,13 @@ public class Device {
                     let decoder = JSONDecoder()
                     configuration = try decoder.decode(Configuration.self, from: configData)
                 } catch {
-                    logger.error("Error reading configuration data: \(error)")
+                    logger.error("Error reading configuration data: \(error), using default configuration instead")
                 }
             }
         } else {
             (publicKey, privateKey) = Ed25519.generateSignKeypair()
             identifier = generateIdentifier()
-            
             configuration.writeTo(storage)
-            
             storage["pk"] = publicKey
             storage["sk"] = privateKey
             storage["uuid"] = identifier.data(using: .utf8)
@@ -245,147 +202,128 @@ public class Device {
         //
 
         // Obtain new aid's for any accessories which don't already have one
-
         self.accessories = [Accessory]()
 
         // The first accessory must be aid 1
         accessories[0].aid = 1
-        
+
         addAccessories(accessories)
     }
-    
+
     public func canAddAccessory(accessory: Accessory) -> Bool {
-        
-        if !isBridge ||
-        accessories.count == 100 { // HAP Spec 2.5.3.2 - Maximum 100 accessories
+        // HAP Spec 2.5.3.2 - Maximum 100 accessories
+        if !isBridge || accessories.count == 100 {
             return false
         }
-        
         let serialNumber = accessory.uniqueSerialNumber
         return isUniqueSerialNumber(serialNumber, ignoring: accessory)
     }
-    
-    // Add an array of accessories to a bridge. The result is an array of the acessories sucessfully
-    // added. An accessory will not be added if its serial number is not unique.
-    //
-    @discardableResult
-    public func addAccessories(_ newAccessories: [Accessory]) ->[Accessory] {
-        
+
+    /// Add an accessories to this bridge device.
+    ///
+    /// It is an error to try and add accessories with duplicate serial numbers.
+    /// It is an error to try and add accessories to a non-bridge device.
+    /// It is an error to try and increase the number of accessories above 99.
+    public func addAccessories(_ newAccessories: [Accessory]) {
         precondition(isBridge && (accessories.count + newAccessories.count) <= 100,
                      "A maximum of 99 accessories can be added to a bridge")
+        let existingSerialNumbers = Set(accessories.map { $0.uniqueSerialNumber })
+        let newSerialNumbers = Set(newAccessories.map { $0.uniqueSerialNumber })
+        precondition(existingSerialNumbers.intersection(newSerialNumbers).isEmpty,
+                     "Accessories with duplicate serial numbers provided")
+        accessories.append(contentsOf: newAccessories)
 
-        var verifiedAccessories = [Accessory]()
-        
-        // Remove any acessories with duplicate serial numbers
-        for accessory in newAccessories {
-            let serialNumber = accessory.uniqueSerialNumber
-            if isUniqueSerialNumber(serialNumber, ignoring: accessory) {
-                verifiedAccessories.append(accessory)
-            } else {
-                logger.info("Accessories must have unique serial numbers. Duplicate found '\(serialNumber)'. Second device ignored")
-            }
-        }
-        
-        if verifiedAccessories.count == 0 {
-            return verifiedAccessories
-        }
-        
-        accessories.append(contentsOf: verifiedAccessories)
-
-        // Check to see if the aid has been stored in the configuration data
+        // Assign accessory identifiers from possible historical assignment.
         for accessory in newAccessories {
             accessory.device = self
-            if (accessory.aid == 0) {
+            if accessory.aid == 0 {
                 let serialNumber = accessory.uniqueSerialNumber
                 if let aid = configuration.aidForAccessorySerialNumber[serialNumber] {
                     accessory.aid = aid
                 }
             }
         }
-        
+
         // Generate new aid if one is not already found or provided
         for accessory in newAccessories {
             // Verify that the aid is indeed unique
             if accessory.aid != 0,
                !isUniqueAID(accessory.aid, ignoring: accessory) {
+                // swiftlint:disable:next line_length
                 logger.info("Accessory \(accessory.info.name.value ?? "unknown") has a duplicate accessory ID \(accessory.aid), replacing with fresh IID")
                 accessory.aid = 0
             }
-            if (accessory.aid == 0) {
+            if accessory.aid == 0 {
                 // Obtain a new aid, which has not already been used
                 repeat {
                     accessory.aid = configuration.nextAID()
                 } while (!isUniqueAID(accessory.aid, ignoring: accessory))
 
-                // Store the aid in the configuration data
-                
+                // Store the aid in the configuration data.
                 let serialNumber = accessory.uniqueSerialNumber
                 configuration.aidForAccessorySerialNumber[serialNumber] = accessory.aid
             }
         }
-        
-        // write configuration data to persist updated aid's and notify listeners
-        updatedConfiguration()
 
-        return verifiedAccessories
+        // Write configuration data to persist updated aid's and notify listeners
+        updatedConfiguration()
     }
-    
+
+    // When a configuration changes
+    // - update the configuration number
+    // - write the configuration to storage
+    // - notify interested parties of the change
+    func updatedConfiguration() {
+        configuration.number = configuration.number &+ 1
+        if configuration.number < 1 {
+            configuration.number = 1
+        }
+
+        configuration.writeTo(storage)
+        notifyConfigurationChange()
+    }
+
+    // Notify listeners that the config record has changed
+    func notifyConfigurationChange() {
+        _ = onConfigurationChange.map { $0(self) }
+    }
+
     public func removeAccessories(_ unwantedAccessories: [Accessory]) {
-        
-        if unwantedAccessories.count == 0 {
+        if unwantedAccessories.isEmpty {
             return
         }
-        
         for accessory in unwantedAccessories {
             // Ensure the initial accessory is not removed, and that the accessory is in the list
-            
             precondition(accessory.aid != 1, "Cannot remove the Bridge Accessory from a Device")
-            
-            guard let index = accessories.index(where: { $0 === accessory}) else {
+            guard let index = accessories.index(where: { $0 === accessory }) else {
                 preconditionFailure("Removing a non-existant accessory from the Bridge")
             }
-            
             accessories.remove(at: index)
-            
             let serialNumber = accessory.uniqueSerialNumber
             configuration.aidForAccessorySerialNumber.removeValue(forKey: serialNumber)
-            
         }
-        
         // write configuration data to persist updated aid's
         updatedConfiguration()
     }
 
-    
     // Check if a given serial number is unique amoungst all acessories, except the one being tested
     func isUniqueSerialNumber(_ serialNumber: String, ignoring: Accessory) -> Bool {
         if serialNumber == "" {
             return false
         }
-        for accessory in accessories {
-            if accessory !== ignoring {
-                if accessory.uniqueSerialNumber == serialNumber {
-                    return false
-                }
-            }
-        }
-        return true
+        return accessories
+            .filter { $0 !== ignoring && $0.uniqueSerialNumber == serialNumber }
+            .isEmpty
     }
 
-    
     // Check if a given aid is unique amoungst all acessories, except the one being tested
     func isUniqueAID(_ aid: InstanceID, ignoring: Accessory) -> Bool {
         if aid == 0 {
             return false
         }
-        for accessory in accessories {
-            if accessory !== ignoring {
-                if accessory.aid == aid {
-                    return false
-                }
-            }
-        }
-        return true
+        return accessories
+            .filter { $0 !== ignoring && $0.aid == aid }
+            .isEmpty
     }
 
     class Pairings {
@@ -407,25 +345,24 @@ public class Device {
     public var isPaired: Bool {
         return !pairings.storage.keys.isEmpty
     }
-    
+
     // Add the pairing to the internal DB and notify the change
     // to update the Bonjour broadcast
     public func addPairing(_ pairingKey: Data, _ publicKey: Data) {
-        
+
         let wasPaired = isPaired
         pairings[pairingKey] = publicKey
-        
+
         if wasPaired {
             // Update the Bonjour TXT record
             notifyConfigurationChange()
         }
     }
-    
+
     // Remove the pairing in the internal DB and notify the change
     // to update the Bonjour broadcast
     public func removePairing(_ pairingKey: Data) {
         pairings[pairingKey] = nil
-        
         if !isPaired {
             // Update the Bonjour TXT record
             notifyConfigurationChange()
