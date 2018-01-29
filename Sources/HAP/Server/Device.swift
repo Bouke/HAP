@@ -219,7 +219,7 @@ public class Device {
         return isUniqueSerialNumber(serialNumber, ignoring: accessory)
     }
 
-    /// Add an accessories to this bridge device.
+    /// Add an array of accessories to this bridge device.
     ///
     /// It is an error to try and add accessories with duplicate serial numbers.
     /// It is an error to try and add accessories to a non-bridge device.
@@ -229,7 +229,7 @@ public class Device {
                      "A maximum of 99 accessories can be added to a bridge")
         let existingSerialNumbers = Set(accessories.map { $0.uniqueSerialNumber })
         let newSerialNumbers = Set(newAccessories.map { $0.uniqueSerialNumber })
-        precondition(existingSerialNumbers.intersection(newSerialNumbers).isEmpty,
+        precondition(existingSerialNumbers.isDisjoint(with: newSerialNumbers),
                      "Accessories with duplicate serial numbers provided")
         accessories.append(contentsOf: newAccessories)
 

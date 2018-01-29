@@ -4,8 +4,9 @@ import func Evergreen.getLogger
 
 fileprivate let logger = getLogger("hap.endpoints.characteristics")
 
+// swiftlint:disable:next cyclomatic_complexity
 func characteristics(device: Device) -> Application {
-    return { (connection, request) in
+    return { connection, request in
         switch request.method {
         case "GET":
             guard
@@ -104,7 +105,7 @@ func characteristics(device: Device) -> Application {
         case "PUT":
             var body = Data()
             guard
-                let _  = try? request.readAllData(into: &body),
+                (try? request.readAllData(into: &body)) != nil,
                 let decoded = try? JSONDecoder().decode(Protocol.CharacteristicContainer.self, from: body) else
             {
                     logger.warning("Could not decode JSON")
@@ -194,7 +195,9 @@ func characteristics(device: Device) -> Application {
             guard !hasErrors else {
                 do {
                     let json = try JSONEncoder().encode(Protocol.CharacteristicContainer(characteristics: statuses))
-                    return Response(status: statuses.count == 1 ? .badRequest : .multiStatus, data: json, mimeType: "application/hap+json")
+                    return Response(status: statuses.count == 1 ? .badRequest : .multiStatus,
+                                    data: json,
+                                    mimeType: "application/hap+json")
                 } catch {
                     logger.error("Could not serialize object", error: error)
                     return .internalServerError
@@ -202,7 +205,8 @@ func characteristics(device: Device) -> Application {
             }
 
             /* HAP Specification 5.7.2.2
-             If no error occurs, the accessory must send an HTTP response with a 204 No Content status code and an empty body.
+             If no error occurs, the accessory must send an HTTP response with
+             a 204 No Content status code and an empty body.
              */
             return Response(status: .noContent)
 

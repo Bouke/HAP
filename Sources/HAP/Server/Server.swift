@@ -3,7 +3,6 @@ import KituraNet
 import Socket
 import func Evergreen.getLogger
 
-// swiftlint:disable sorted_imports
 #if os(Linux)
     import Dispatch
     import NetService
