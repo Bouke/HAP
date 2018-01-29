@@ -225,7 +225,10 @@ public class Device {
     /// It is an error to try and add accessories to a non-bridge device.
     /// It is an error to try and increase the number of accessories above 99.
     public func addAccessories(_ newAccessories: [Accessory]) {
-        precondition(isBridge && (accessories.count + newAccessories.count) <= 100,
+        let totalNumberOfAccessories = accessories.count + newAccessories.count
+        precondition(
+            (isBridge && totalNumberOfAccessories <= 100) ||
+            (!isBridge && totalNumberOfAccessories == 1),
                      "A maximum of 99 accessories can be added to a bridge")
         let existingSerialNumbers = Set(accessories.map { $0.uniqueSerialNumber })
         let newSerialNumbers = Set(newAccessories.map { $0.uniqueSerialNumber })
