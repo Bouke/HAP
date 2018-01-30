@@ -96,7 +96,7 @@ class PairSetupControllerTests: XCTestCase {
             try! Ed25519.verify(publicKey: response[.publicKey]!, message: hashOut, signature: response[.signature]!)
         }
 
-        XCTAssertEqual(device.pairings[clientIdentifier], keys.publicKey)
+        XCTAssertEqual(device.get(pairingWithIdentifier: clientIdentifier)?.publicKey, keys.publicKey)
     }
 
     // from: https://oleb.net/blog/2017/03/keeping-xctest-in-sync/#appendix-code-generation-with-sourcery
