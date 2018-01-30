@@ -45,16 +45,20 @@ public class Device {
     public let name: String
     public let identifier: String
     public let publicKey: Data
-    let privateKey: Data
     public let setupCode: String
-    let storage: Storage
-    private let pairings: Pairings
-    public var accessories: [Accessory]
-    internal var characteristicEventListeners: [Box<Characteristic>: WeakObjectSet<Server.Connection>]
-    public var onIdentify: [(Accessory?) -> Void] = []
-    internal var configuration: Configuration
-    public var onConfigurationChange: [(Device) -> Void] = []
     public let isBridge: Bool
+
+    public private(set) var accessories: [Accessory]
+
+    public var onIdentify: [(Accessory?) -> Void] = []
+    public var onConfigurationChange: [(Device) -> Void] = []
+
+    let pairings: Pairings
+    let privateKey: Data
+    let storage: Storage
+
+    var characteristicEventListeners: [Box<Characteristic>: WeakObjectSet<Server.Connection>]
+    var configuration: Configuration
 
     // The device maitains a configuration number during its life time, which
     // persists across restarts of the app.
@@ -335,7 +339,7 @@ public class Device {
             self.storage = storage
         }
 
-        public subscript(username: Data) -> Data? {
+        internal fileprivate(set) subscript(username: Data) -> Data? {
             get {
                 return storage[username.hex]
             }
@@ -351,31 +355,25 @@ public class Device {
 
     // Add the pairing to the internal DB and notify the change
     // to update the Bonjour broadcast
-    public func addPairing(_ pairingKey: Data, _ publicKey: Data) {
-
-        let wasPaired = isPaired
-        pairings[pairingKey] = publicKey
-
-        if !wasPaired {
-            // Update the Bonjour TXT record
-            notifyConfigurationChange()
+    func addPairing(_ pairingKey: Data, _ publicKey: Data) {
+        if !isPaired {
+            defer {
+                // Update the Bonjour TXT record
+                notifyConfigurationChange()
+            }
         }
+        pairings[pairingKey] = publicKey
     }
 
     // Remove the pairing in the internal DB and notify the change
     // to update the Bonjour broadcast
-    public func removePairing(_ pairingKey: Data) {
+    func removePairing(_ pairingKey: Data) {
         let wasPaired = isPaired
         pairings[pairingKey] = nil
         if wasPaired && !isPaired {
             // Update the Bonjour TXT record
             notifyConfigurationChange()
         }
-    }
-
-    // Return the public key stored for a given paring key
-    public func publicKeyForPairingId(_ pairingKey: Data) -> Data? {
-        return pairings[pairingKey]
     }
 
     // Add an object which would be notified of changes to Characterisics
