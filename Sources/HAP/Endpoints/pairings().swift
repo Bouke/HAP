@@ -25,10 +25,10 @@ func pairings(device: Device) -> Application {
             guard let publicKey = data[.publicKey] else {
                 return .badRequest
             }
-            device.pairings[username] = publicKey
+            device.addPairing(username, publicKey)
             logger.info("Added pairing for \(String(data: username, encoding: .utf8)!)")
         case .removePairing:
-            device.pairings[username] = nil
+            device.removePairing(username)
             logger.info("Removed pairing for \(String(data: username, encoding: .utf8)!)")
         case .listPairings:
             // TODO: implement

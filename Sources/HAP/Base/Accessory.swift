@@ -1,6 +1,29 @@
 import Foundation
 
+// TODO: SwiftFoundation in Swift 4.0 cannot encode/decode UInt64,
+// which is the data-type we wanted to use here. We can change it back
+// to UInt64 once the following commit has made it into a release:
+// https://github.com/apple/swift-corelibs-foundation/commit/64b67c91479390776c43a96bd31e4e85f106d5e1
 typealias InstanceID = Int
+
+// HAP Specification 2.6.1.1: Accessory Instance IDs
+//
+// Accessory instance IDs, "aid", are assigned from the same number pool
+// that is global across entire HAP Accessory Server. For example, if the
+// first Accessory object has an instance ID of "1" then no other Accessory
+// object can have an instance ID of "1" within the Accessory Server.
+//
+// The generator starts at 2, so you have the ability to special-case 1.
+struct AIDGenerator: Sequence, IteratorProtocol, Codable {
+    internal var lastAID: InstanceID = 1
+    mutating func next() -> InstanceID? {
+        lastAID = lastAID &+ 1 // Add one and overflow if reach max InstanceID
+        if lastAID < 2 {
+            lastAID = 2
+        }
+        return lastAID
+    }
+}
 
 public enum AccessoryType: String, Codable {
     case other = "1"
@@ -30,6 +53,35 @@ open class Accessory: JSONSerializable {
     public let type: AccessoryType
     public let info: Service.Info
     internal let services: [Service]
+
+    // An accessory implementation can set this flag to false if a device
+    // becomes unreachable for a period. If the accessory has a
+    // BridgingState Service, then the reachable property of that Service is set.
+    open var reachable = true {
+        didSet {
+            guard self.reachable == oldValue,
+                let characteristic = services
+                    .first(where: { $0.type == .bridgingState })?
+                    .characteristics
+                    .first(where: { $0.type == .reachable }) else {
+                        return
+            }
+            try? characteristic.setValue(self.reachable, fromConnection: nil)
+        }
+    }
+
+    // An accessory must provide a text identifier, which is guranteed to be
+    // unique. The implementation could provide the actual serial number of a
+    // device, or a MAC address or some other identifier which is not used on
+    // any other accessory.
+    //
+    // Device will check to ensure the serial numbers of all accessories added
+    // to a bridge are are unique.
+    //
+    // This is used for persistance of HomeKit AID's.
+    open var serialNumber: String {
+        return info.serialNumber.value!
+    }
 
     public init(info: Service.Info, type: AccessoryType, services: [Service]) {
         self.type = type

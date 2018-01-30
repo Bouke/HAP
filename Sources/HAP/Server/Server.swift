@@ -92,11 +92,12 @@ public class Server: NSObject, NetServiceDelegate {
                         break
                     }
 
-                    // Fix to allow Bridges with spaces in name
-                    // HomeKit POSTs contain a hostname with \\032 replacing the space
-                    // which causes Kitura httpParser to baulk on the resulting URL.
-                    // Replacing '\\032' with '-' in the hostname allows Kitura to create a valid URL,
-                    // and the value is not used elsewhere.
+                    // Fix to allow Bridges with spaces in name.
+                    // HomeKit POSTs contain a hostname with \\032 replacing the
+                    // space which causes Kitura httpParser to baulk on the
+                    // resulting URL. Replacing '\\032' with '-' in the hostname
+                    // allows Kitura to create a valid URL, and the value is not
+                    // used elsewhere.
                     if let hostname = request.headers["Host"]?[0], (hostname.contains("\\032")) {
                         request.headers["Host"]![0] = hostname.replacingOccurrences(of: "\\032", with: "-")
                     }
@@ -167,15 +168,31 @@ public class Server: NSObject, NetServiceDelegate {
         try socket.listen(on: port)
 
         service = NetService(domain: "local.", type: "_hap._tcp.", name: device.name, port: socket.listeningPort)
+
+        Server.publishDiscoveryRecordOf(device, to: service)
+
+        super.init()
+        service.delegate = self
+
+        device.onConfigurationChange.append({ [weak self] changedDevice in
+            if let service = self?.service {
+                Server.publishDiscoveryRecordOf(changedDevice, to: service)
+            }
+        })
+    }
+
+    deinit {
+        self.stop()
+    }
+
+    // Publish the Accessory configuration on the Bonjour service
+    private class func publishDiscoveryRecordOf(_ device: Device, to service: NetService) {
         #if os(macOS)
             let record = device.config.dictionary(key: { $0.key }, value: { $0.value.data(using: .utf8)! })
             service.setTXTRecord(NetService.data(fromTXTRecord: record))
         #elseif os(Linux)
             service.setTXTRecord(device.config)
         #endif
-
-        super.init()
-        service.delegate = self
     }
 
     public func start() {
@@ -197,7 +214,6 @@ public class Server: NSObject, NetServiceDelegate {
             }
             self.stop()
         }
-
     }
 
     public func stop() {

@@ -10,9 +10,9 @@ extension Service {
         public let firmwareRevision = GenericCharacteristic<Revision>(type: .firmwareRevision, permissions: [.read])
 
         public init(name: String,
+                    serialNumber: String,
                     manufacturer: String = "undefined",
                     model: String = "undefined",
-                    serialNumber: String = "undefined",
                     firmwareRevision: Revision = "1.0.0") {
             super.init(type: .info,
                        characteristics: [identify,
