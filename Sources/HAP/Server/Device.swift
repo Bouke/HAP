@@ -385,10 +385,10 @@ public class Device {
             // must be formatted as "XX:XX:XX:XX:XX:XX", where "XX" is a
             // hexadecimal string representing a byte. Required.
             // This value is also used as the accessory's Pairing Identifier.
-            "id": identifier, // identifier
+            "id": identifier,
 
             // Model name of the accessory (e.g. "Device1,1"). Required.
-            "md": name, // name
+            "md": name,
 
             // Protocol version string <major>.<minor> (e.g. "1.0"). Required
             // if value is not "1.0".
@@ -417,7 +417,7 @@ public class Device {
             // must have a range of 1-65535. This must take values defined in
             // Table 12-3 (page 254). This must persist across reboots, power
             // cycles, etc.
-            "ci": category.rawValue // category identifier
+            "ci": category.rawValue
         ]
     }
 }
