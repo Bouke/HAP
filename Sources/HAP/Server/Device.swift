@@ -296,6 +296,12 @@ public class Device {
     func remove(pairingWithIdentifier identifier: PairingIdentifier) {
         let wasPaired = isPaired
         configuration.pairings[identifier] = nil
+        // If the last remaining admin controller pairing is removed, all
+        // pairings on the accessory must be removed.
+        if configuration.pairings.values.first(where: { $0.role == .admin }) == nil {
+            logger.info("Last remaining admin controller pairing is removed, removing all pairings")
+            configuration.pairings = [:]
+        }
         persistConfig()
         if wasPaired && !isPaired {
             // Update the Bonjour TXT record
