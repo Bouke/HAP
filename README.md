@@ -5,10 +5,6 @@ The goal of this package is to provide a complete implementation of the Homekit 
 
 [![Build Status](https://travis-ci.org/Bouke/HAP.svg?branch=master)](https://travis-ci.org/Bouke/HAP)
 
-## Implementation notes
-
-Currently ``GenericCharacteristic<T>`` is used, to allow for user-defined value types. As Swift requires homegenous arrays, a protocol ``AnyCharacteristic`` is introduced. I don't like the resulting implementation as the generics result in a cascade of workarounds (boxing + ``ObjectIdentifier()``).
-
 ## How to build
 
 ### MacOS
@@ -87,6 +83,19 @@ followed for ease of understanding.
     +----------------+
     | Characteristic |
     +----------------+
+
+## Development
+
+### Running tests
+
+Certain tests involve crypto, which can be a bit slow in debug builds. Best to
+run the tests with a release build, like this:
+
+    swift test -c release -Xswiftc -enable-testing
+
+### Implementation notes
+
+Currently ``GenericCharacteristic<T>`` is used, to allow for user-defined value types. As Swift requires homegenous arrays, a protocol ``AnyCharacteristic`` is introduced. I don't like the resulting implementation as the generics result in a cascade of workarounds (boxing + ``ObjectIdentifier()``).
 
 ## Credits
 
