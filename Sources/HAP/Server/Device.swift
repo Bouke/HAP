@@ -1,20 +1,9 @@
 // swiftlint:disable file_length
-import Cryptor
 import Foundation
 import Regex
 import func Evergreen.getLogger
 
 fileprivate let logger = getLogger("hap.device")
-
-func generateIdentifier() -> String {
-    do {
-        return Data(bytes: try Random.generate(byteCount: 6))
-            .map { String($0, radix: 16, uppercase: false) }
-            .joined(separator: ":")
-    } catch {
-        fatalError("Could not generate identifier: \(error)")
-    }
-}
 
 struct Box<T: Any>: Hashable, Equatable {
     let value: T
@@ -43,8 +32,6 @@ struct Box<T: Any>: Hashable, Equatable {
 
 public class Device {
     public let name: String
-    public let identifier: String
-    public let publicKey: Data
     public let setupCode: String
     public let isBridge: Bool
 
@@ -53,52 +40,10 @@ public class Device {
     public var onIdentify: [(Accessory?) -> Void] = []
     public var onConfigurationChange: [(Device) -> Void] = []
 
-    let pairings: Pairings
-    let privateKey: Data
     let storage: Storage
 
-    var characteristicEventListeners: [Box<Characteristic>: WeakObjectSet<Server.Connection>]
-    var configuration: Configuration
-
-    // The device maitains a configuration number during its life time, which
-    // persists across restarts of the app.
-    internal struct Configuration: Codable {
-        // HAP Specification 5.4: Current configuration number.
-        //
-        // Must update when an accessory, service, or characteristic is added or
-        // removed on the accessory server.
-        // Accessories must increment the config number after a firmware update.
-        // This must have a range of 1-4294967295 and wrap to 1 when it overflows.
-        // This value must persist across reboots, power cycles, etc.
-        internal var number: UInt32 = 0
-
-        // HAP Specification 2.6.1: Instance IDs
-        //
-        // Instance IDs are numbers with a range of [1, 18446744073709551615]. These
-        // numbers are used to uniquely identify HAP accessory objects within an HAP
-        // accessory server, or uniquely identify ervices, and characteristics
-        // within an HAP accessory object. The instance ID for each object
-        // must be unique for the lifetime of the server/ client pairing.
-        internal var aidForAccessorySerialNumber = [String: InstanceID]()
-
-        private var aidGenerator = AIDGenerator()
-
-        // The next aid - should be checked against existing devices to ensure it is unique
-        internal mutating func nextAID() -> InstanceID {
-            return aidGenerator.next()!
-        }
-
-        // Write the configuration record to storage
-        internal func writeTo(_ storage: Storage) {
-            do {
-                let encoder = JSONEncoder()
-                let configData = try encoder.encode(self)
-                storage["configuration"] = configData
-            } catch {
-                logger.error("Error encoding configuration data: \(error)")
-            }
-        }
-    }
+    private(set) var characteristicEventListeners: [Box<Characteristic>: WeakObjectSet<Server.Connection>]
+    private(set) var configuration: Configuration
 
     /// A bridge is a special type of HAP accessory server that bridges HomeKit
     /// Accessory Protocol and different RF/transport protocols, such as ZigBee
@@ -166,35 +111,26 @@ public class Device {
         setupCode: String,
         storage: Storage,
         accessories: [Accessory]) {
-        precondition(setupCode =~ "^\\d{3}-\\d{2}-\\d{3}",
+        precondition(setupCode =~ "^\\d{3}-\\d{2}-\\d{3}$",
                      "setup code must conform to the format XXX-XX-XXX")
         self.name = name
         self.setupCode = setupCode
         self.storage = storage
-        self.configuration = Configuration()
-        self.isBridge = accessories[0].type == .bridge
+        isBridge = accessories[0].type == .bridge
 
-        if let pk = storage["pk"], let sk = storage["sk"], let identifier = storage["uuid"] {
-            self.identifier = String(data: identifier, encoding: .utf8)!
-            publicKey = pk
-            privateKey = sk
-            if let configData = storage["configuration"] {
-                do {
-                    let decoder = JSONDecoder()
-                    configuration = try decoder.decode(Configuration.self, from: configData)
-                } catch {
-                    logger.error("Error reading configuration data: \(error), using default configuration instead")
-                }
+        if let configData = storage["configuration"] {
+            do {
+                let decoder = JSONDecoder()
+                configuration = try decoder.decode(Configuration.self, from: configData)
+            } catch {
+                logger.error("Error reading configuration data: \(error), using default configuration instead")
+                configuration = Configuration()
             }
         } else {
-            (publicKey, privateKey) = Ed25519.generateSignKeypair()
-            identifier = generateIdentifier()
-            configuration.writeTo(storage)
-            storage["pk"] = publicKey
-            storage["sk"] = privateKey
-            storage["uuid"] = identifier.data(using: .utf8)
+            configuration = Configuration()
         }
-        pairings = Pairings(storage: PrefixedKeyStorage(prefix: "pairing.", backing: storage))
+
+        configuration.writeTo(storage)
         characteristicEventListeners = [:]
 
         // 2.6.1.1 Accessory Instance IDs
@@ -203,7 +139,6 @@ public class Device {
         // if the first Accessory object has an instance ID of "1" then no
         // other Accessory object can have an instance ID of "1" within the
         // Accessory Server.
-        //
 
         // Obtain new aid's for any accessories which don't already have one
         self.accessories = [Accessory]()
@@ -333,47 +268,37 @@ public class Device {
             .isEmpty
     }
 
-    class Pairings {
-        fileprivate let storage: Storage
-        fileprivate init(storage: Storage) {
-            self.storage = storage
-        }
-
-        internal fileprivate(set) subscript(username: Data) -> Data? {
-            get {
-                return storage[username.hex]
-            }
-            set {
-                storage[username.hex] = newValue
-            }
-        }
-    }
-
     public var isPaired: Bool {
-        return !pairings.storage.keys.isEmpty
+        return !configuration.pairings.isEmpty
     }
 
     // Add the pairing to the internal DB and notify the change
     // to update the Bonjour broadcast
-    func addPairing(_ pairingKey: Data, _ publicKey: Data) {
+    func add(pairing: Pairing) {
         if !isPaired {
             defer {
                 // Update the Bonjour TXT record
                 notifyConfigurationChange()
             }
         }
-        pairings[pairingKey] = publicKey
+        configuration.pairings[pairing.identifier] = pairing
+        configuration.writeTo(storage)
     }
 
     // Remove the pairing in the internal DB and notify the change
     // to update the Bonjour broadcast
-    func removePairing(_ pairingKey: Data) {
+    func remove(pairingWithIdentifier identifier: PairingIdentifier) {
         let wasPaired = isPaired
-        pairings[pairingKey] = nil
+        configuration.pairings[identifier] = nil
+        configuration.writeTo(storage)
         if wasPaired && !isPaired {
             // Update the Bonjour TXT record
             notifyConfigurationChange()
         }
+    }
+
+    func get(pairingWithIdentifier identifier: PairingIdentifier) -> Pairing? {
+        return configuration.pairings[identifier]
     }
 
     // Add an object which would be notified of changes to Characterisics
@@ -406,6 +331,18 @@ public class Device {
         for listener in listeners {
             listener.notificationQueue.append(characteristic: characteristic)
         }
+    }
+
+    var identifier: String {
+        return configuration.identifier
+    }
+
+    var publicKey: PublicKey {
+        return configuration.publicKey
+    }
+
+    var privateKey: PrivateKey {
+        return configuration.privateKey
     }
 
     var config: [String: String] {

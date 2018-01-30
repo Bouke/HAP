@@ -22,16 +22,19 @@ func pairings(device: Device) -> Application {
 
         switch method {
         case .addPairing:
-            guard let publicKey = data[.publicKey] else {
-                return .badRequest
+            guard let publicKey = data[.publicKey],
+                let permissions = data[.permissions]?.first,
+                let role = Pairing.Role(rawValue: permissions) else {
+                    return .badRequest
             }
-            device.addPairing(username, publicKey)
-            logger.info("Added pairing for \(String(data: username, encoding: .utf8)!)")
+            device.add(pairing: Pairing(identifier: username, publicKey: publicKey, role: role))
+            logger.info("Added \(role) pairing for \(String(data: username, encoding: .utf8)!)")
         case .removePairing:
-            device.removePairing(username)
+            device.remove(pairingWithIdentifier: username)
             logger.info("Removed pairing for \(String(data: username, encoding: .utf8)!)")
         case .listPairings:
             // TODO: implement
+            logger.warning("Received List Pairings command, but that's not implemented")
             return .badRequest
         default:
             logger.info("Unhandled PairingMethod request: \(method)")

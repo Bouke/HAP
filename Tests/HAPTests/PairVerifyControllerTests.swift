@@ -20,7 +20,7 @@ class PairVerifyControllerTests: XCTestCase {
                             accessories: [])
         let username = "hubba hubba".data(using: .utf8)!
         let keys = Ed25519.generateSignKeypair() // these are the client's keys
-        device.addPairing(username, keys.publicKey)
+        device.add(pairing: Pairing(identifier: username, publicKey: keys.publicKey, role: .admin))
 
         let controller = PairVerifyController(device: device)
         // these are the client's keys for this verify session

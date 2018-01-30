@@ -112,13 +112,13 @@ class PairSetupController {
                                info: "Pair-Setup-Controller-Sign-Info".data(using: .utf8),
                                salt: "Pair-Setup-Controller-Sign-Salt".data(using: .utf8),
                                count: 32) +
-            username +
-        publicKey
+                     username +
+                     publicKey
 
         try Ed25519.verify(publicKey: publicKey, message: hashIn, signature: signatureIn)
 
-        // At this point, the pairing has completed.
-        device.addPairing(username, publicKey)
+        // At this point, the pairing has completed. The first controller is granted admin role.
+        device.add(pairing: Pairing(identifier: username, publicKey: publicKey, role: .admin))
 
         let hashOut = deriveKey(algorithm: .sha512,
                                 seed: session.server.sessionKey!,
