@@ -79,10 +79,8 @@ open class Accessory: JSONSerializable {
     // to a bridge are are unique.
     //
     // This is used for persistance of HomeKit AID's.
-    open var uniqueSerialNumber: String {
-        let serialNumber = info.serialNumber.value
-        precondition(serialNumber != nil)
-        return serialNumber!
+    open var serialNumber: String {
+        return info.serialNumber.value!
     }
 
     public init(info: Service.Info, type: AccessoryType, services: [Service]) {

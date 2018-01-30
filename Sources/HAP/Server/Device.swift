@@ -48,7 +48,7 @@ public class Device {
     let privateKey: Data
     public let setupCode: String
     let storage: Storage
-    let pairings: Pairings
+    private let pairings: Pairings
     public var accessories: [Accessory]
     internal var characteristicEventListeners: [Box<Characteristic>: WeakObjectSet<Server.Connection>]
     public var onIdentify: [(Accessory?) -> Void] = []
@@ -215,7 +215,7 @@ public class Device {
         if !isBridge || accessories.count == 100 {
             return false
         }
-        let serialNumber = accessory.uniqueSerialNumber
+        let serialNumber = accessory.serialNumber
         return isUniqueSerialNumber(serialNumber, ignoring: accessory)
     }
 
@@ -230,8 +230,8 @@ public class Device {
             (isBridge && totalNumberOfAccessories <= 100) ||
             (!isBridge && totalNumberOfAccessories == 1),
                      "A maximum of 99 accessories can be added to a bridge")
-        let existingSerialNumbers = Set(accessories.map { $0.uniqueSerialNumber })
-        let newSerialNumbers = Set(newAccessories.map { $0.uniqueSerialNumber })
+        let existingSerialNumbers = Set(accessories.map { $0.serialNumber })
+        let newSerialNumbers = Set(newAccessories.map { $0.serialNumber })
         precondition(existingSerialNumbers.isDisjoint(with: newSerialNumbers),
                      "Accessories with duplicate serial numbers provided")
         accessories.append(contentsOf: newAccessories)
@@ -240,7 +240,7 @@ public class Device {
         for accessory in newAccessories {
             accessory.device = self
             if accessory.aid == 0 {
-                let serialNumber = accessory.uniqueSerialNumber
+                let serialNumber = accessory.serialNumber
                 if let aid = configuration.aidForAccessorySerialNumber[serialNumber] {
                     accessory.aid = aid
                 }
@@ -263,7 +263,7 @@ public class Device {
                 } while (!isUniqueAID(accessory.aid, ignoring: accessory))
 
                 // Store the aid in the configuration data.
-                let serialNumber = accessory.uniqueSerialNumber
+                let serialNumber = accessory.serialNumber
                 configuration.aidForAccessorySerialNumber[serialNumber] = accessory.aid
             }
         }
@@ -302,7 +302,7 @@ public class Device {
                 preconditionFailure("Removing a non-existant accessory from the Bridge")
             }
             accessories.remove(at: index)
-            let serialNumber = accessory.uniqueSerialNumber
+            let serialNumber = accessory.serialNumber
             configuration.aidForAccessorySerialNumber.removeValue(forKey: serialNumber)
         }
         // write configuration data to persist updated aid's
@@ -315,7 +315,7 @@ public class Device {
             return false
         }
         return accessories
-            .filter { $0 !== ignoring && $0.uniqueSerialNumber == serialNumber }
+            .filter { $0 !== ignoring && $0.serialNumber == serialNumber }
             .isEmpty
     }
 
@@ -356,7 +356,7 @@ public class Device {
         let wasPaired = isPaired
         pairings[pairingKey] = publicKey
 
-        if wasPaired {
+        if !wasPaired {
             // Update the Bonjour TXT record
             notifyConfigurationChange()
         }
@@ -365,15 +365,20 @@ public class Device {
     // Remove the pairing in the internal DB and notify the change
     // to update the Bonjour broadcast
     public func removePairing(_ pairingKey: Data) {
+        let wasPaired = isPaired
         pairings[pairingKey] = nil
-        if !isPaired {
+        if wasPaired && !isPaired {
             // Update the Bonjour TXT record
             notifyConfigurationChange()
         }
     }
 
-    // Characteristing listeners
+    // Return the public key stored for a given paring key
+    public func publicKeyForPairingId(_ pairingKey: Data) -> Data? {
+        return pairings[pairingKey]
+    }
 
+    // Add an object which would be notified of changes to Characterisics
     func add(characteristic: Characteristic,
              listener: Server.Connection) {
         if characteristicEventListeners[Box(characteristic)] != nil {

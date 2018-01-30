@@ -24,7 +24,7 @@ class PairSetupControllerTests: XCTestCase {
                                                                      verificationKey: verificationKey,
                                                                      group: .N3072,
                                                                      algorithm: .sha512))
-        let device = Device(bridgeInfo: .init(name: "Test"),
+        let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00080"),
                             setupCode: password,
                             storage: MemoryStorage(),
                             accessories: [])
@@ -96,7 +96,7 @@ class PairSetupControllerTests: XCTestCase {
             try! Ed25519.verify(publicKey: response[.publicKey]!, message: hashOut, signature: response[.signature]!)
         }
 
-        XCTAssertEqual(device.pairings[clientIdentifier], keys.publicKey)
+        XCTAssertEqual(device.publicKeyForPairingId(clientIdentifier), keys.publicKey)
     }
 
     // from: https://oleb.net/blog/2017/03/keeping-xctest-in-sync/#appendix-code-generation-with-sourcery
