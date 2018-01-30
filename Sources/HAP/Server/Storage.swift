@@ -6,33 +6,6 @@ public protocol Storage: class {
     var keys: [String] { get }
 }
 
-public class PrefixedKeyStorage: Storage {
-    let prefix: String
-    let backing: Storage
-    init(prefix: String, backing: Storage) {
-        self.prefix = prefix
-        self.backing = backing
-    }
-    public subscript(key: String) -> Data? {
-        get {
-            return backing["\(prefix)\(key)"]
-        }
-        set {
-            backing["\(prefix)\(key)"] = newValue
-        }
-    }
-    public func removeAll() throws {
-        keys.forEach {
-            backing["\(prefix)\($0)"] = nil
-        }
-    }
-    public var keys: [String] {
-        return backing.keys
-            .filter { $0.hasPrefix(prefix) }
-            .map { $0.replacingOccurrences(of: prefix, with: "") }
-    }
-}
-
 public class FileStorage: Storage {
     public enum Error: Swift.Error {
         case couldNotCreateDirectory
