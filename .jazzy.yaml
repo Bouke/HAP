@@ -1,6 +1,6 @@
 xcodebuild_arguments:
   - -scheme
-  - HAP
+  - HAP-Package
 module: HAP
 author: Bouke Haarsma
 author_url: https://twitter.com/BoukeHaarsma
