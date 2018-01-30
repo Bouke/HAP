@@ -23,7 +23,8 @@ internal struct Configuration: Codable {
     let publicKey: PublicKey
     let privateKey: PrivateKey
 
-    public init() {
+    /// Initializes a new configuration
+    init() {
         identifier = generateIdentifier()
         (publicKey, privateKey) = Ed25519.generateSignKeypair()
     }
@@ -54,15 +55,4 @@ internal struct Configuration: Codable {
     }
 
     internal var pairings: [PairingIdentifier: Pairing] = [:]
-
-    // Write the configuration record to storage
-    internal func writeTo(_ storage: Storage) {
-        do {
-            let encoder = JSONEncoder()
-            let configData = try encoder.encode(self)
-            storage["configuration"] = configData
-        } catch {
-            logger.error("Error encoding configuration data: \(error)")
-        }
-    }
 }

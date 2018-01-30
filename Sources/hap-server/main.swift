@@ -15,10 +15,10 @@ getLogger("hap").logLevel = .debug
 getLogger("hap.encryption").logLevel = .info
 getLogger("hap.pair-verify").logLevel = .info
 
-let storage = try FileStorage(path: "db")
+let storage = FileStorage(filename: "configuration.json")
 if CommandLine.arguments.contains("--recreate") {
     logger.info("Dropping all pairings, keys")
-    try storage.removeAll()
+    try storage.write(Data())
 }
 
 let livingRoomLightbulb = Accessory.Lightbulb(info: Service.Info(name: "Living Room", serialNumber: "00002"))
