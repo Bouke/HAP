@@ -118,19 +118,15 @@ public class Device {
         self.storage = storage
         isBridge = accessories[0].type == .bridge
 
-        if let configData = storage["configuration"] {
-            do {
-                let decoder = JSONDecoder()
-                configuration = try decoder.decode(Configuration.self, from: configData)
-            } catch {
-                logger.error("Error reading configuration data: \(error), using default configuration instead")
-                configuration = Configuration()
-            }
-        } else {
+        do {
+            let configData = try storage.read()
+            let decoder = JSONDecoder()
+            configuration = try decoder.decode(Configuration.self, from: configData)
+        } catch {
+            logger.error("Error reading configuration data: \(error), using default configuration instead")
             configuration = Configuration()
         }
 
-        configuration.writeTo(storage)
         characteristicEventListeners = [:]
 
         // 2.6.1.1 Accessory Instance IDs
@@ -147,6 +143,16 @@ public class Device {
         accessories[0].aid = 1
 
         addAccessories(accessories)
+    }
+
+    private func persistConfig() {
+        do {
+            let encoder = JSONEncoder()
+            let configData = try encoder.encode(configuration)
+            try storage.write(configData)
+        } catch {
+            logger.error("Error encoding configuration data: \(error)")
+        }
     }
 
     public func canAddAccessory(accessory: Accessory) -> Bool {
@@ -221,7 +227,7 @@ public class Device {
             configuration.number = 1
         }
 
-        configuration.writeTo(storage)
+        persistConfig()
         notifyConfigurationChange()
     }
 
@@ -282,7 +288,7 @@ public class Device {
             }
         }
         configuration.pairings[pairing.identifier] = pairing
-        configuration.writeTo(storage)
+        persistConfig()
     }
 
     // Remove the pairing in the internal DB and notify the change
@@ -290,7 +296,7 @@ public class Device {
     func remove(pairingWithIdentifier identifier: PairingIdentifier) {
         let wasPaired = isPaired
         configuration.pairings[identifier] = nil
-        configuration.writeTo(storage)
+        persistConfig()
         if wasPaired && !isPaired {
             // Update the Bonjour TXT record
             notifyConfigurationChange()
