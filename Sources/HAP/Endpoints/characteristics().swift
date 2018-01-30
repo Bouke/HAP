@@ -1,10 +1,10 @@
-// swiftlint:disable cyclomatic_complexity
 import Foundation
 import HKDF
 import func Evergreen.getLogger
 
 fileprivate let logger = getLogger("hap.endpoints.characteristics")
 
+// swiftlint:disable:next cyclomatic_complexity
 func characteristics(device: Device) -> Application {
     return { connection, request in
         switch request.method {
@@ -12,8 +12,8 @@ func characteristics(device: Device) -> Application {
             guard
                 let queryItems = request.urlComponents.queryItems,
                 let query = try? Protocol.GetQuery(queryItems: queryItems)
-                else {
-                    return .badRequest
+            else {
+                return .badRequest
             }
 
             var responses = [Protocol.Characteristic]()
@@ -34,6 +34,12 @@ func characteristics(device: Device) -> Application {
                 guard characteristic.permissions.contains(.read) else {
                     logger.info("\(characteristic) has no read permission")
                     responses.append(Protocol.Characteristic(aid: path.aid, iid: path.iid, status: .writeOnly))
+                    continue
+                }
+                guard accessory.reachable else {
+                    responses.append(Protocol.Characteristic(aid: path.aid,
+                                                             iid: path.iid,
+                                                             status: .unableToCommunicate))
                     continue
                 }
 
@@ -102,18 +108,18 @@ func characteristics(device: Device) -> Application {
                 (try? request.readAllData(into: &body)) != nil,
                 let decoded = try? JSONDecoder().decode(Protocol.CharacteristicContainer.self, from: body) else
             {
-                logger.warning("Could not decode JSON")
-                return .badRequest
+                    logger.warning("Could not decode JSON")
+                    return .badRequest
             }
             var statuses = [Protocol.Characteristic]()
             for item in decoded.characteristics {
                 var status = Protocol.Characteristic(aid: item.aid, iid: item.iid)
-                guard let characteristic = device.accessories
-                    .first(where: { $0.aid == item.aid })?
-                    .services
-                    .flatMap({ $0.characteristics.filter({ $0.iid == item.iid }) })
-                    .first else {
-                        return .unprocessableEntity
+                guard let accessory = device.accessories.first(where: { $0.aid == item.aid }),
+                    let characteristic = accessory
+                        .services
+                        .flatMap({ $0.characteristics.filter({ $0.iid == item.iid }) })
+                        .first else {
+                            return .unprocessableEntity
                 }
 
                 // At least one of "value" or "ev" will be present in the characteristic write request object
@@ -126,6 +132,10 @@ func characteristics(device: Device) -> Application {
                     guard characteristic.permissions.contains(.write) else {
                         logger.info("\(characteristic) has no write permission")
                         status.status = .readOnly
+                        break VALUE  // continue and process other items
+                    }
+                    guard accessory.reachable else {
+                        status.status = .unableToCommunicate
                         break VALUE  // continue and process other items
                     }
 
@@ -143,7 +153,7 @@ func characteristics(device: Device) -> Application {
                     } catch {
                         logger.warning("Could not set value of type \(type(of: value)): \(error)")
                         status.status = .invalidValue
-                        break VALUE
+                       break VALUE
                     }
 
                     // notify listeners
@@ -194,9 +204,10 @@ func characteristics(device: Device) -> Application {
                 }
             }
 
-            // HAP Specification 5.7.2.2
-            // If no error occurs, the accessory must send an HTTP response with
-            // a 204 No Content status code and an empty body.
+            /* HAP Specification 5.7.2.2
+             If no error occurs, the accessory must send an HTTP response with
+             a 204 No Content status code and an empty body.
+             */
             return Response(status: .noContent)
 
         default:

@@ -21,34 +21,34 @@ if CommandLine.arguments.contains("--recreate") {
     try storage.removeAll()
 }
 
-let livingRoomLightbulb = Accessory.Lightbulb(info: Service.Info(name: "Living Room"))
+let livingRoomLightbulb = Accessory.Lightbulb(info: Service.Info(name: "Living Room", serialNumber: "00002"))
 livingRoomLightbulb.lightbulb.on.onValueChange.append({ value in
     logger.info("livingRoomSwitch changed value: \(String(describing: value))")
 })
 
-let bedroomNightStand = Accessory.Lightbulb(info: Service.Info(name: "Bedroom"))
+let bedroomNightStand = Accessory.Lightbulb(info: Service.Info(name: "Bedroom", serialNumber: "00003"))
 bedroomNightStand.lightbulb.on.onValueChange.append({ value in
     logger.info("bedroomNightStand changed value: \(String(describing: value))")
 })
 
 let device = Device(
-    bridgeInfo: Service.Info(name: "Bridge"),
+    bridgeInfo: Service.Info(name: "Bridge", serialNumber: "00001"),
     setupCode: "123-44-321",
     storage: storage,
     accessories: [
         livingRoomLightbulb,
         bedroomNightStand,
-        Accessory.Door(info: Service.Info(name: "Front Door")),
-        Accessory.Switch(info: Service.Info(name: "Garden Lights")),
-        Accessory.Thermostat(info: Service.Info(name: "Living Room Thermostat")),
-        Accessory.Thermometer(info: Service.Info(name: "Office Thermometer")),
-        Accessory.Outlet(info: Service.Info(name: "Coffee Machine")),
-        Accessory.Window(info: Service.Info(name: "Toilet Window")),
-        Accessory.WindowCovering(info: Service.Info(name: "Shades")),
-        Accessory.Fan(info: Service.Info(name: "Living Room Ceiling Fan")),
-        Accessory.GarageDoorOpener(info: Service.Info(name: "Garage")),
-        Accessory.LockMechanism(info: Service.Info(name: "Front Door Lock")),
-        Accessory.SecuritySystem(info: Service.Info(name: "Alarm"))
+        Accessory.Door(info: Service.Info(name: "Front Door", serialNumber: "00005")),
+        Accessory.Switch(info: Service.Info(name: "Garden Lights", serialNumber: "00006")),
+        Accessory.Thermostat(info: Service.Info(name: "Living Room Thermostat", serialNumber: "00007")),
+        Accessory.Thermometer(info: Service.Info(name: "Office Thermometer", serialNumber: "00008")),
+        Accessory.Outlet(info: Service.Info(name: "Coffee Machine", serialNumber: "00009")),
+        Accessory.Window(info: Service.Info(name: "Toilet Window", serialNumber: "00010")),
+        Accessory.WindowCovering(info: Service.Info(name: "Shades", serialNumber: "00011")),
+        Accessory.Fan(info: Service.Info(name: "Living Room Ceiling Fan", serialNumber: "00012")),
+        Accessory.GarageDoorOpener(info: Service.Info(name: "Garage", serialNumber: "00013")),
+        Accessory.LockMechanism(info: Service.Info(name: "Front Door Lock", serialNumber: "00014")),
+        Accessory.SecuritySystem(info: Service.Info(name: "Alarm", serialNumber: "00015"))
     ])
 device.onIdentify.append({ acc in
     logger.info("Got identified: \(String(describing: acc))")

@@ -31,7 +31,7 @@ class EndpointTests: XCTestCase {
     }
 
     func testAccessories() {
-        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
+        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00055"))
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = accessories(device: device)
         let response = application(MockConnection(), MockRequest.get(path: "/accessories"))
@@ -62,7 +62,7 @@ class EndpointTests: XCTestCase {
     }
 
     func testGetCharacteristics() {
-        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", manufacturer: "Bouke"))
+        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00056", manufacturer: "Bouke"))
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = characteristics(device: device)
         do {
@@ -117,7 +117,7 @@ class EndpointTests: XCTestCase {
     }
 
     func testPutBoolAndIntCharacteristics() {
-        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", manufacturer: "Bouke"))
+        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00057", manufacturer: "Bouke"))
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = characteristics(device: device)
 
@@ -177,7 +177,7 @@ class EndpointTests: XCTestCase {
     }
 
     func testPutDoubleAndEnumCharacteristics() {
-        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat", manufacturer: "Bouke"))
+        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat", serialNumber: "00058", manufacturer: "Bouke"))
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: thermostat)
         let application = characteristics(device: device)
 
@@ -266,9 +266,9 @@ class EndpointTests: XCTestCase {
     }
 
     func testPutBadCharacteristics() {
-        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat"))
-        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
-        let device = Device(bridgeInfo: .init(name: "Test"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
+        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat", serialNumber: "00059"))
+        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00060"))
+        let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00060B"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
         let application = characteristics(device: device)
 
         // Writing to read only value should not succeed.
@@ -495,14 +495,14 @@ class EndpointTests: XCTestCase {
     }
 
     func testGetBadCharacteristics() {
-        let lightsensor = Accessory.LightSensor(info: .init(name: "LightSensor"))
-        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat"))
-        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
+        let lightsensor = Accessory.LightSensor(info: .init(name: "LightSensor", serialNumber: "00061"))
+        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat", serialNumber: "00062"))
+        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00063"))
 
         lightsensor.lightSensor.currentLight.value = 234
         thermostat.thermostat.currentTemperature.value = 123
         lamp.lightbulb.brightness.value = 53
-        let device = Device(bridgeInfo: .init(name: "Test"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [lightsensor, thermostat, lamp])
+        let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00063B"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [lightsensor, thermostat, lamp])
         let application = characteristics(device: device)
 
         // First a good one
@@ -618,7 +618,7 @@ class EndpointTests: XCTestCase {
     }
 
     func testAuthentication() {
-        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
+        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00064"))
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = root(device: device)
         do {
@@ -641,9 +641,9 @@ class EndpointTests: XCTestCase {
 
     #if os(macOS)
     func testNoEventsToSelf() {
-        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat"))
-        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
-        let device = Device(bridgeInfo: .init(name: "Test"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
+        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat", serialNumber: "00065"))
+        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00066"))
+        let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00066B"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
         let application = characteristics(device: device)
 
         let connection = MockConnection()
@@ -678,9 +678,9 @@ class EndpointTests: XCTestCase {
     }
 
     func testSingleEventPerUpdate() {
-        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat"))
-        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
-        let device = Device(bridgeInfo: .init(name: "Test"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
+        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat", serialNumber: "00067"))
+        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00068"))
+        let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00069"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
         let application = characteristics(device: device)
 
         let connection = MockConnection()
@@ -715,7 +715,7 @@ class EndpointTests: XCTestCase {
     }
 
     func testDelayMultipleEvents() {
-        let lamp = Accessory.Lightbulb(info: .init(name: "Diner table"))
+        let lamp = Accessory.Lightbulb(info: .init(name: "Diner table", serialNumber: "00070"))
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = characteristics(device: device)
 
@@ -774,9 +774,9 @@ class EndpointTests: XCTestCase {
     }
 
     func testDelayMultipleEventsCoalescence() {
-        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat"))
-        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left"))
-        let device = Device(bridgeInfo: .init(name: "Test"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
+        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat", serialNumber: "00071"))
+        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00072"))
+        let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00072B"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
         let application = characteristics(device: device)
 
         let connection = MockConnection()
@@ -867,7 +867,7 @@ class EndpointTests: XCTestCase {
         // change to the other, this test needs to check for absence of updates
         // instead.
 
-        let lamp = Accessory.Lightbulb(info: .init(name: "Kitchen table"))
+        let lamp = Accessory.Lightbulb(info: .init(name: "Kitchen table", serialNumber: "00074"))
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = characteristics(device: device)
 
