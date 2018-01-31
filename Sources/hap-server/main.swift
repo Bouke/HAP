@@ -33,7 +33,6 @@ bedroomNightStand.lightbulb.on.onValueChange.append({ value in
 
 let device = Device(
     bridgeInfo: Service.Info(name: "Bridge", serialNumber: "00001"),
-    setupCode: "123-44-321",
     storage: storage,
     accessories: [
         livingRoomLightbulb,
@@ -49,7 +48,8 @@ let device = Device(
         Accessory.GarageDoorOpener(info: Service.Info(name: "Garage", serialNumber: "00013")),
         Accessory.LockMechanism(info: Service.Info(name: "Front Door Lock", serialNumber: "00014")),
         Accessory.SecuritySystem(info: Service.Info(name: "Alarm", serialNumber: "00015"))
-    ])
+    ],
+    defaultSetupCode: "123-44-321")
 device.onIdentify.append({ acc in
     logger.info("Got identified: \(String(describing: acc))")
 })
