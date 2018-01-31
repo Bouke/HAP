@@ -1,4 +1,5 @@
 // swiftlint:disable file_length
+import Cryptor
 import Foundation
 import Regex
 import func Evergreen.getLogger
@@ -32,9 +33,11 @@ struct Box<T: Any>: Hashable, Equatable {
 
 public class Device {
     public let name: String
-    public let setupCode: String
     public let isBridge: Bool
-
+    public var setupCode: String {
+        return configuration.setupCode
+    }
+    
     public private(set) var accessories: [Accessory]
 
     public var onIdentify: [(Accessory?) -> Void] = []
@@ -77,14 +80,14 @@ public class Device {
     ///   - accessories: accessories to be bridged
     convenience public init(
         bridgeInfo: Service.Info,
-        setupCode: String,
         storage: Storage,
-        accessories: [Accessory]) {
+        accessories: [Accessory],
+        defaultSetupCode: String = "automatic") {
         let bridge = Accessory(info: bridgeInfo, type: .bridge, services: [])
         self.init(name: bridge.info.name.value!,
-                  setupCode: setupCode,
                   storage: storage,
-                  accessories: [bridge] + accessories)
+                  accessories: [bridge] + accessories,
+                  defaultSetupCode: defaultSetupCode)
     }
 
     /// An HAP accessory object represents a physical accessory on an HAP
@@ -93,28 +96,29 @@ public class Device {
     /// the thermostat.
     ///
     /// - Parameters:
-    ///   - setupCode: the code to pair this device, must be in the format XXX-XX-XXX
     ///   - storage: persistence interface for storing pairings, secrets
     ///   - accessory: accessory to publish
+    /// - Optional Parameters:
+    ///   - setupCode: the code to pair this device, must be in the format XXX-XX-XXX
+    ///                if not provided, a code is generated automatically
     convenience public init(
-        setupCode: String,
         storage: Storage,
-        accessory: Accessory) {
+        accessory: Accessory,
+        defaultSetupCode: String = "automatic") {
         self.init(name: accessory.info.name.value!,
-                  setupCode: setupCode,
                   storage: storage,
-                  accessories: [accessory])
+                  accessories: [accessory],
+                  defaultSetupCode: defaultSetupCode)
     }
 
     fileprivate init(
         name: String,
-        setupCode: String,
         storage: Storage,
-        accessories: [Accessory]) {
-        precondition(setupCode =~ "^\\d{3}-\\d{2}-\\d{3}$",
+        accessories: [Accessory],
+        defaultSetupCode: String = "automatic") {
+        precondition(defaultSetupCode == "automatic" || Device.isValid(setupCode: defaultSetupCode),
                      "setup code must conform to the format XXX-XX-XXX")
         self.name = name
-        self.setupCode = setupCode
         self.storage = storage
         isBridge = accessories[0].type == .bridge
 
@@ -124,7 +128,7 @@ public class Device {
             configuration = try decoder.decode(Configuration.self, from: configData)
         } catch {
             logger.error("Error reading configuration data: \(error), using default configuration instead")
-            configuration = Configuration()
+            configuration = Configuration(defaultSetupCode: defaultSetupCode)
         }
 
         characteristicEventListeners = [:]
@@ -344,6 +348,46 @@ public class Device {
             listener.notificationQueue.append(characteristic: characteristic)
         }
     }
+    
+    // HAP Specification lists certain setup codes as invalid
+    public class func isValid(setupCode: String) -> Bool {
+        let invalidCodes = ["000-00-000", "111-11-111", "222-22-222",
+                            "333-33-333", "444-44-444", "555-55-555",
+                            "666-66-666", "777-77-777", "888-88-888",
+                            "999-99-999", "123-45-678", "876-54-321"]
+        return (setupCode =~ "^\\d{3}-\\d{2}-\\d{3}$") && !invalidCodes.contains(setupCode)
+    }
+        
+    // Return a URI which can be displayed as a QR code for quick setup
+    // The URI is an encoded form of the setup code and the accessory type, followed by the setup key
+    //class func setupURI(setupCode: String, accessoryType category: AccessoryType, setupID: String) -> String {
+    public var setupURI: String {
+        let category = accessories[0].type
+        let code = UInt(setupCode.replacingOccurrences(of: "-", with: ""))!
+        let cat = UInt(category.rawValue) ?? UInt(AccessoryType.bridge.rawValue)! // default to a bridge
+        let flags = UInt(2) // 2=IP, 4=BLE, 8=IP_WAC
+        let b36 = code | flags << 27 | cat << 31
+        print("setupCode: \(setupCode), category: \(cat)")
+        print("setupKey: \(configuration.setupKey), pairingID: \(identifier)")
+        print("sh = \(setupHash)")
+       return "X-HM://" +
+            String(b36, radix:36, uppercase:true).padLeft(toLength: 9, withPad: "0") +
+            configuration.setupKey
+    }
+        
+    // The setup hash broadcast in the MDNS TXT record, which HomeKit uses
+    // to match a QR code for automatic setup.
+    // The hash is based on the pairing identifier and the four character setup key
+    // Both those parameters must persit across restarts
+    var setupHash: String {
+        let setupHashMaterial = configuration.setupKey + self.identifier
+        
+        if let sha512 = Digest(using: .sha512).update(string: setupHashMaterial) {
+            return Data(bytes: sha512.final()[0..<4]).base64EncodedString()
+        } else {
+            return ""
+        }
+    }
 
     var identifier: String {
         return configuration.identifier
@@ -417,7 +461,12 @@ public class Device {
             // must have a range of 1-65535. This must take values defined in
             // Table 12-3 (page 254). This must persist across reboots, power
             // cycles, etc.
-            "ci": category.rawValue
+            "ci": category.rawValue,
+            
+            // Hash key used by HomeKit to match a device against its QR code
+            // during auto setup. The setupHash should persist across reboots,
+            // as its constituents must also persist.
+            "sh": self.setupHash
         ]
     }
 }

@@ -7,12 +7,31 @@ fileprivate let logger = getLogger("hap.device")
 func generateIdentifier() -> String {
     do {
         return Data(bytes: try Random.generate(byteCount: 6))
-            .map { String($0, radix: 16, uppercase: false) }
+            .map { String($0, radix: 16, uppercase: true) }
             .joined(separator: ":")
     } catch {
         fatalError("Could not generate identifier: \(error)")
     }
 }
+
+// Generate a valid random setup code, used to pair with the device
+func generateSetupCode() -> String {
+    let n1 = arc4random_uniform(1000)
+    let n2 = arc4random_uniform(100)
+    let n3 = arc4random_uniform(1000)
+    let setupCode = String(format: "%03ld-%02ld-%03ld", n1, n2, n3)
+    
+    if !Device.isValid(setupCode: setupCode) {
+        return generateSetupCode()
+    }
+    return setupCode
+}
+
+// Generate a random four character setup key, used in setupURI and setupHash
+func generateSetupKey() -> String {
+    return String(arc4random_uniform(1679616), radix:36, uppercase: true)
+}
+
 
 typealias PrivateKey = Data
 
@@ -20,12 +39,16 @@ typealias PrivateKey = Data
 // persists across restarts of the app.
 internal struct Configuration: Codable {
     let identifier: String
+    let setupCode: String
+    let setupKey: String
     let publicKey: PublicKey
     let privateKey: PrivateKey
 
     /// Initializes a new configuration
-    init() {
+    init(defaultSetupCode: String = "automatic") {
         identifier = generateIdentifier()
+        setupCode = defaultSetupCode != "automatic" ? defaultSetupCode : generateSetupCode()
+        setupKey = generateSetupKey()
         (publicKey, privateKey) = Ed25519.generateSignKeypair()
     }
 
