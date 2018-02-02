@@ -1,49 +1,63 @@
-public enum CharacteristicType: String, Codable {
-    case on = "25"
-    case brightness = "8"
-    case saturation = "2F"
-    case hue = "13"
-    case currentHumidity = "10"
-    case currentTemperature = "11"
-    case targetTemperature = "35"
-    case currentHeatingCoolingState = "F"
-    case targetHeatingCoolingState =  "33"
-    case temperatureDisplayUnits = "36"
-    case identify = "14"
-    case manufacturer = "20"
-    case model = "21"
-    case name = "23"
-    case serialNumber = "30"
-    case currentPosition = "6D"
-    case positionState = "72"
-    case targetPosition = "7C"
-    case airQuality = "95"
-    case batteryLevel = "68"
-    case motionDetected = "22"
-    case occupancyDetected = "71"
-    case programmableSwitchEvent = "73"
-    case smokeDetected = "76"
-    case contactSensorState = "6A"
-    case chargingState = "8F"
-    case statusLowBattery = "79"
-    case configureBridgedAccessoryStatus = "9D"
-    case discoverBridgedAccessories = "9E"
-    case discoveredBridgedAccessories = "9F"
-    case configureBridgedAccessory = "A0"
-    case reachable = "63"
-    case linkQuality = "9C"
-    case accessoryIdentifier = "57"
-    case category = "A3"
-    case outletInUse = "26"
-    case currentDoorState = "E"
-    case targetDoorState = "32"
-    case obstructionDetected = "24"
-    case lockCurrentState = "1D"
-    case lockTargetState = "1E"
-    case securitySystemCurrentState = "66"
-    case securitySystemTargetState = "67"
-    case lightLevel = "6B"
-    case firmwareRevision = "52"
+public struct CharacteristicType: RawRepresentable, Codable {
+    public typealias RawValue = String
+    public var rawValue: String
+
+    public init(_ rawValue: RawValue) {
+        self.rawValue = rawValue
+    }
+
+    public init?(rawValue: RawValue) {
+        self.rawValue = rawValue
+    }
+}
+
+// swiftlint:disable no_grouping_extension
+public extension CharacteristicType {
+    static let on = CharacteristicType("25")
+    static let brightness = CharacteristicType("8")
+    static let saturation = CharacteristicType("2F")
+    static let hue = CharacteristicType("13")
+    static let currentHumidity = CharacteristicType("10")
+    static let currentTemperature = CharacteristicType("11")
+    static let targetTemperature = CharacteristicType("35")
+    static let currentHeatingCoolingState = CharacteristicType("F")
+    static let targetHeatingCoolingState = CharacteristicType("33")
+    static let temperatureDisplayUnits = CharacteristicType("36")
+    static let identify = CharacteristicType("14")
+    static let manufacturer = CharacteristicType("20")
+    static let model = CharacteristicType("21")
+    static let name = CharacteristicType("23")
+    static let serialNumber = CharacteristicType("30")
+    static let currentPosition = CharacteristicType("6D")
+    static let positionState = CharacteristicType("72")
+    static let targetPosition = CharacteristicType("7C")
+    static let airQuality = CharacteristicType("95")
+    static let batteryLevel = CharacteristicType("68")
+    static let motionDetected = CharacteristicType("22")
+    static let occupancyDetected = CharacteristicType("71")
+    static let programmableSwitchEvent = CharacteristicType("73")
+    static let smokeDetected = CharacteristicType("76")
+    static let contactSensorState = CharacteristicType("6A")
+    static let chargingState = CharacteristicType("8F")
+    static let statusLowBattery = CharacteristicType("79")
+    static let configureBridgedAccessoryStatus = CharacteristicType("9D")
+    static let discoverBridgedAccessories = CharacteristicType("9E")
+    static let discoveredBridgedAccessories = CharacteristicType("9F")
+    static let configureBridgedAccessory = CharacteristicType("A0")
+    static let reachable = CharacteristicType("63")
+    static let linkQuality = CharacteristicType("9C")
+    static let accessoryIdentifier = CharacteristicType("57")
+    static let category = CharacteristicType("A3")
+    static let outletInUse = CharacteristicType("26")
+    static let currentDoorState = CharacteristicType("E")
+    static let targetDoorState = CharacteristicType("32")
+    static let obstructionDetected = CharacteristicType("24")
+    static let lockCurrentState = CharacteristicType("1D")
+    static let lockTargetState = CharacteristicType("1E")
+    static let securitySystemCurrentState = CharacteristicType("66")
+    static let securitySystemTargetState = CharacteristicType("67")
+    static let lightLevel = CharacteristicType("6B")
+    static let firmwareRevision = CharacteristicType("52")
 }
 
 public enum CharacteristicPermission: String, Codable {
