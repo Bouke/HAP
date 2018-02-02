@@ -32,7 +32,7 @@ open class Service: JSONSerializable {
     public let type: ServiceType
     let characteristics: [Characteristic]
 
-    init(type: ServiceType, characteristics: [Characteristic]) {
+    public init(type: ServiceType, characteristics: [Characteristic]) {
         self.type = type
         self.characteristics = characteristics
 
