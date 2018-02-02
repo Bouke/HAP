@@ -29,10 +29,14 @@ func pairVerify(device: Device) -> Application {
                 connection.context[SESSION_KEY] = session
                 return Response(status: .ok, data: encode(response), mimeType: "application/pairing+tlv8")
             case .finishRequest:
+                defer {
+                    connection.context[SESSION_KEY] = nil
+                }
                 guard let session = connection.context[SESSION_KEY] as? Session else {
                     throw Error.noSession
                 }
-                let result = try controller.finishRequest(data, session)
+                let (result, pairing) = try controller.finishRequest(data, session)
+                connection.pairing = pairing
                 let response = UpgradeResponse(cryptographer: Cryptographer(sharedKey: session.sharedSecret))
                 response.headers["Content-Type"] = "application/pairing+tlv8"
                 response.body = encode(result)

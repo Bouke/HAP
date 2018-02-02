@@ -18,6 +18,16 @@ func pairings(device: Device) -> Application {
             else {
                 return .badRequest
         }
+
+        guard connection.pairing?.role == .admin else {
+            logger.warning("Permission denied (non-admin) to update pairing data: \(data), method: \(method)")
+            let result: PairTagTLV8 = [
+                .state: Data(bytes: [PairStep.response.rawValue]),
+                .error: Data(bytes: [PairError.authenticationFailed.rawValue])
+            ]
+            return Response(status: .ok, data: encode(result), mimeType: "application/pairing+tlv8")
+        }
+
         logger.debug("Updating pairings data: \(data), method: \(method)")
 
         switch method {
