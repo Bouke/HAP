@@ -4,8 +4,10 @@ import func Evergreen.getLogger
 
 fileprivate let logger = getLogger("hap.device")
 
+typealias PrivateKey = Data
+
 extension Device {
-    
+
     static internal func generateIdentifier() -> String {
         do {
             return Data(bytes: try Random.generate(byteCount: 6))
@@ -18,24 +20,22 @@ extension Device {
 
     // Generate a random four character setup key, used in setupURI and setupHash
     static internal func generateSetupKey() -> String {
-        return String(arc4random_uniform(1679616), radix:36, uppercase: true)
+        return String(arc4random_uniform(1679616), radix: 36, uppercase: true)
     }
-
-    typealias PrivateKey = Data
 
     // The device maitains a configuration number during its life time, which
     // persists across restarts of the app.
     internal struct Configuration: Codable {
         let identifier: String
-        let setupCode: String
+        var setupCode: String
         let setupKey: String
         let publicKey: PublicKey
         let privateKey: PrivateKey
 
         /// Initializes a new configuration
-        init(setupCode: SetupCode = .automatic) {
+        init() {
             identifier = Device.generateIdentifier()
-            self.setupCode = setupCode.getValidCode()
+            setupCode = SetupCode.generate()
             setupKey = Device.generateSetupKey()
             (publicKey, privateKey) = Ed25519.generateSignKeypair()
         }

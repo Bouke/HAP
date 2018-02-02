@@ -30,15 +30,14 @@ struct Box<T: Any>: Hashable, Equatable {
     }
 }
 
-
 public class Device {
     public let name: String
     public let isBridge: Bool
-    
+
     public var setupCode: String {
-        return configuration.setupCode
+         return configuration.setupCode
     }
-    
+
     public private(set) var accessories: [Accessory]
 
     public var onIdentify: [(Accessory?) -> Void] = []
@@ -81,14 +80,14 @@ public class Device {
     ///   - accessories: accessories to be bridged
     convenience public init(
         bridgeInfo: Service.Info,
+        setupCode: SetupCode = .random,
         storage: Storage,
-        accessories: [Accessory],
-        setupCode: SetupCode = .automatic) {
+        accessories: [Accessory]) {
         let bridge = Accessory(info: bridgeInfo, type: .bridge, services: [])
         self.init(name: bridge.info.name.value!,
+                  setupCode: setupCode,
                   storage: storage,
-                  accessories: [bridge] + accessories,
-                  setupCode: setupCode)
+                  accessories: [bridge] + accessories)
     }
 
     /// An HAP accessory object represents a physical accessory on an HAP
@@ -103,22 +102,22 @@ public class Device {
     ///   - setupCode: the code to pair this device, must be in the format XXX-XX-XXX
     ///                if not provided, a code is generated automatically
     convenience public init(
+        setupCode: SetupCode = .random,
         storage: Storage,
-        accessory: Accessory,
-        setupCode: SetupCode = .automatic) {
+        accessory: Accessory) {
         self.init(name: accessory.info.name.value!,
+                  setupCode: setupCode,
                   storage: storage,
-                  accessories: [accessory],
-                  setupCode: setupCode)
+                  accessories: [accessory])
     }
 
     fileprivate init(
         name: String,
+        setupCode: SetupCode = .random,
         storage: Storage,
-        accessories: [Accessory],
-        setupCode: SetupCode = .automatic) {
-        precondition(setupCode == .automatic || setupCode.isValid,
-                     "setup code must conform to the format XXX-XX-XXX")
+        accessories: [Accessory]) {
+
+        precondition(setupCode.isValid, "setup code must conform to the format XXX-XX-XXX")
         self.name = name
         self.storage = storage
         isBridge = accessories[0].type == .bridge
@@ -129,7 +128,15 @@ public class Device {
             configuration = try decoder.decode(Configuration.self, from: configData)
         } catch {
             logger.error("Error reading configuration data: \(error), using default configuration instead")
-            configuration = Configuration(setupCode: setupCode)
+            configuration = Configuration()
+        }
+
+        // If the caller has provided a setup code, use that
+        switch setupCode {
+        case .predefined(let code):
+            configuration.setupCode = code
+        case .random:
+            break
         }
 
         characteristicEventListeners = [:]
@@ -349,32 +356,28 @@ public class Device {
             listener.notificationQueue.append(characteristic: characteristic)
         }
     }
-    
-    
+
     // Return a URI which can be displayed as a QR code for quick setup
     // The URI is an encoded form of the setup code and the accessory type, followed by the setup key
     //class func setupURI(setupCode: String, accessoryType category: AccessoryType, setupID: String) -> String {
     public var setupURI: String {
         let category = accessories[0].type
-        let code = UInt(setupCode.replacingOccurrences(of: "-", with: ""))!
+        let code = UInt(self.setupCode.replacingOccurrences(of: "-", with: ""))!
         let cat = UInt(category.rawValue) ?? UInt(AccessoryType.bridge.rawValue)! // default to a bridge
         let flags = UInt(2) // 2=IP, 4=BLE, 8=IP_WAC
         let b36 = code | flags << 27 | cat << 31
-        print("setupCode: \(setupCode), category: \(cat)")
-        print("setupKey: \(configuration.setupKey), pairingID: \(identifier)")
-        print("sh = \(setupHash)")
        return "X-HM://" +
-            String(b36, radix:36, uppercase:true).padLeft(toLength: 9, withPad: "0") +
+            String(b36, radix: 36, uppercase: true).padLeft(toLength: 9, withPad: "0") +
             configuration.setupKey
     }
-        
+
     // The setup hash broadcast in the MDNS TXT record, which HomeKit uses
     // to match a QR code for automatic setup.
     // The hash is based on the pairing identifier and the four character setup key
     // Both those parameters must persit across restarts
     var setupHash: String {
-        let setupHashMaterial = configuration.setupKey + self.identifier
-        
+        let setupHashMaterial = configuration.setupKey + configuration.identifier
+
         if let sha512 = Digest(using: .sha512).update(string: setupHashMaterial) {
             return Data(bytes: sha512.final()[0..<4]).base64EncodedString()
         } else {
@@ -455,7 +458,7 @@ public class Device {
             // Table 12-3 (page 254). This must persist across reboots, power
             // cycles, etc.
             "ci": category.rawValue,
-            
+
             // Hash key used by HomeKit to match a device against its QR code
             // during auto setup. The setupHash should persist across reboots,
             // as its constituents must also persist.
