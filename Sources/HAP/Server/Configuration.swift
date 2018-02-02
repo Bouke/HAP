@@ -18,11 +18,6 @@ extension Device {
         }
     }
 
-    // Generate a random four character setup key, used in setupURI and setupHash
-    static internal func generateSetupKey() -> String {
-        return String(arc4random_uniform(1679616), radix: 36, uppercase: true)
-    }
-
     // The device maitains a configuration number during its life time, which
     // persists across restarts of the app.
     internal struct Configuration: Codable {
@@ -36,7 +31,7 @@ extension Device {
         init() {
             identifier = Device.generateIdentifier()
             setupCode = SetupCode.generate()
-            setupKey = Device.generateSetupKey()
+            setupKey = SetupCode.generateSetupKey()
             (publicKey, privateKey) = Ed25519.generateSignKeypair()
         }
 

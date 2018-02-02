@@ -1,5 +1,9 @@
 import Foundation
+#if os(Linux)
+import Glibc
+#endif
 import Regex
+
 
 extension Device {
     public enum SetupCode {
@@ -38,5 +42,24 @@ extension Device {
             return setupCode
         }
 
+        // Generate a random four character setup key, used in setupURI and setupHash
+        static internal func generateSetupKey() -> String {
+            return String(arc4random_uniform(1679616), radix: 36, uppercase: true)
+        }
+
+#if os(Linux)
+        static let _seeded: Bool  = {
+            srandom(UInt32(time(nil)))
+            return true
+        }()
+
+        static func arc4random_uniform(_ max: UInt) -> UInt {
+            precondition(_seeded)
+            return UInt(Glibc.random()) % max
+        }
+#endif
     }
 }
+
+
+
