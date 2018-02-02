@@ -4,7 +4,6 @@ import Glibc
 #endif
 import Regex
 
-
 extension Device {
     public enum SetupCode {
         case random
@@ -48,18 +47,15 @@ extension Device {
         }
 
 #if os(Linux)
-        static let _seeded: Bool  = {
+        static let seededRandom: Bool  = {
             srandom(UInt32(time(nil)))
             return true
         }()
 
         static func arc4random_uniform(_ max: UInt) -> UInt {
-            precondition(_seeded)
+            precondition(seededRandom)
             return UInt(Glibc.random()) % max
         }
 #endif
     }
 }
-
-
-
