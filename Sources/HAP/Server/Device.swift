@@ -133,7 +133,7 @@ public class Device {
 
         // If the caller has provided a setup code, use that
         switch setupCode {
-        case .predefined(let code):
+        case .override(let code):
             configuration.setupCode = code
         case .random:
             break

@@ -33,7 +33,7 @@ bedroomNightStand.lightbulb.on.onValueChange.append({ value in
 
 let device = Device(
     bridgeInfo: Service.Info(name: "Bridge", serialNumber: "00001"),
-    setupCode: .predefined("123-44-321"),
+    setupCode: .override("123-44-321"),
     storage: storage,
     accessories: [
         livingRoomLightbulb,

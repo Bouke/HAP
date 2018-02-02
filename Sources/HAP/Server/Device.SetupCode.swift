@@ -7,12 +7,12 @@ import Regex
 extension Device {
     public enum SetupCode {
         case random
-        case predefined(String)
+        case override(String)
 
         // HAP Specification lists certain setup codes as invalid
         public var isValid: Bool {
             switch self {
-            case .predefined(let setupCode):
+            case .override(let setupCode):
                 return SetupCode.isValid(setupCode)
             case .random:
                 return true
