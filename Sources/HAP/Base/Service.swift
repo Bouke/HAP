@@ -26,16 +26,26 @@ public enum ServiceType: String, Codable {
 }
 
 open class Service: JSONSerializable {
+    public let type: ServiceType
+
     weak var accessory: Accessory?
 
-    internal var iid: InstanceID = 0
-    public let type: ServiceType
+    var iid: InstanceID = 0
     let characteristics: [Characteristic]
+
+    public init(type: ServiceType, characteristics: [AnyCharacteristic]) {
+        self.type = type
+        self.characteristics = characteristics.map { $0.wrapped }
+        self.verify()
+    }
 
     init(type: ServiceType, characteristics: [Characteristic]) {
         self.type = type
         self.characteristics = characteristics
+        self.verify()
+    }
 
+    func verify() {
         // 5.3.2 Service Objects
         // Array of Characteristic objects. Must not be empty. The maximum
         // number of characteristics must not exceed 100, and each
