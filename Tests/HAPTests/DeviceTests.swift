@@ -8,7 +8,7 @@ class DeviceTests: XCTestCase {
         // no bridge -- 1 accessory
         do {
             let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00041"))
-            let device = Device(setupCode: .override("123-44-321"), storage: MemoryStorage(), accessory: lamp)
+            let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
             let accessories = device.accessories
             let services = accessories.flatMap({ $0.services })
             let characteristics = services.flatMap({ $0.characteristics })
@@ -22,7 +22,7 @@ class DeviceTests: XCTestCase {
         // bridge with 1 accessory
         do {
             let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00042"))
-            let device = Device(setupCode: .override("123-44-321"), storage: MemoryStorage(), accessory: lamp)
+            let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
             let accessories = device.accessories
             let services = accessories.flatMap({ $0.services })
             let characteristics = services.flatMap({ $0.characteristics })
@@ -37,7 +37,7 @@ class DeviceTests: XCTestCase {
             let thermostat = Accessory.Thermostat(info: .init(name: "Living room thermostat", serialNumber: "00043"))
             let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00044"))
             let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00045"),
-                                setupCode: .override("123-44-321"),
+                                setupCode: "123-44-321",
                                 storage: MemoryStorage(),
                                 accessories: [thermostat, lamp])
             let accessories = device.accessories

@@ -15,7 +15,7 @@ class PairVerifyControllerTests: XCTestCase {
 
     func test() {
         let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00090"),
-                            setupCode: .override("123-44-321"),
+                            setupCode: "123-44-321",
                             storage: MemoryStorage(),
                             accessories: [])
         let username = "hubba hubba".data(using: .utf8)!

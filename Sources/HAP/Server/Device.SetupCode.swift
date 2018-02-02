@@ -5,9 +5,13 @@ import Glibc
 import Regex
 
 extension Device {
-    public enum SetupCode {
+    public enum SetupCode: ExpressibleByStringLiteral {
         case random
         case override(String)
+
+        public init(stringLiteral value: StringLiteralType) {
+            self = .override(value)
+        }
 
         // HAP Specification lists certain setup codes as invalid
         public var isValid: Bool {
