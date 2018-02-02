@@ -1,7 +1,6 @@
 // swiftlint:disable file_length
 import Cryptor
 import Foundation
-import Regex
 import func Evergreen.getLogger
 
 fileprivate let logger = getLogger("hap.device")
@@ -31,9 +30,11 @@ struct Box<T: Any>: Hashable, Equatable {
     }
 }
 
+
 public class Device {
     public let name: String
     public let isBridge: Bool
+    
     public var setupCode: String {
         return configuration.setupCode
     }
@@ -82,12 +83,12 @@ public class Device {
         bridgeInfo: Service.Info,
         storage: Storage,
         accessories: [Accessory],
-        defaultSetupCode: String = "automatic") {
+        setupCode: SetupCode = .automatic) {
         let bridge = Accessory(info: bridgeInfo, type: .bridge, services: [])
         self.init(name: bridge.info.name.value!,
                   storage: storage,
                   accessories: [bridge] + accessories,
-                  defaultSetupCode: defaultSetupCode)
+                  setupCode: setupCode)
     }
 
     /// An HAP accessory object represents a physical accessory on an HAP
@@ -104,19 +105,19 @@ public class Device {
     convenience public init(
         storage: Storage,
         accessory: Accessory,
-        defaultSetupCode: String = "automatic") {
+        setupCode: SetupCode = .automatic) {
         self.init(name: accessory.info.name.value!,
                   storage: storage,
                   accessories: [accessory],
-                  defaultSetupCode: defaultSetupCode)
+                  setupCode: setupCode)
     }
 
     fileprivate init(
         name: String,
         storage: Storage,
         accessories: [Accessory],
-        defaultSetupCode: String = "automatic") {
-        precondition(defaultSetupCode == "automatic" || Device.isValid(setupCode: defaultSetupCode),
+        setupCode: SetupCode = .automatic) {
+        precondition(setupCode == .automatic || setupCode.isValid,
                      "setup code must conform to the format XXX-XX-XXX")
         self.name = name
         self.storage = storage
@@ -128,7 +129,7 @@ public class Device {
             configuration = try decoder.decode(Configuration.self, from: configData)
         } catch {
             logger.error("Error reading configuration data: \(error), using default configuration instead")
-            configuration = Configuration(defaultSetupCode: defaultSetupCode)
+            configuration = Configuration(setupCode: setupCode)
         }
 
         characteristicEventListeners = [:]
@@ -349,15 +350,7 @@ public class Device {
         }
     }
     
-    // HAP Specification lists certain setup codes as invalid
-    public class func isValid(setupCode: String) -> Bool {
-        let invalidCodes = ["000-00-000", "111-11-111", "222-22-222",
-                            "333-33-333", "444-44-444", "555-55-555",
-                            "666-66-666", "777-77-777", "888-88-888",
-                            "999-99-999", "123-45-678", "876-54-321"]
-        return (setupCode =~ "^\\d{3}-\\d{2}-\\d{3}$") && !invalidCodes.contains(setupCode)
-    }
-        
+    
     // Return a URI which can be displayed as a QR code for quick setup
     // The URI is an encoded form of the setup code and the accessory type, followed by the setup key
     //class func setupURI(setupCode: String, accessoryType category: AccessoryType, setupID: String) -> String {

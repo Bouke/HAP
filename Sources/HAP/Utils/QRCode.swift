@@ -1,10 +1,3 @@
-//
-//  QRCode.swift
-//  HAP
-//
-//  Created by Guy Brooker on 31/01/2018.
-//
-
 import Foundation
 
 #if os(macOS)
