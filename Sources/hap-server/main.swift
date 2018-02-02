@@ -49,7 +49,7 @@ let device = Device(
         Accessory.LockMechanism(info: Service.Info(name: "Front Door Lock", serialNumber: "00014")),
         Accessory.SecuritySystem(info: Service.Info(name: "Alarm", serialNumber: "00015"))
     ],
-    defaultSetupCode: "123-44-321")
+    setupCode: .default("123-44-321"))
 device.onIdentify.append({ acc in
     logger.info("Got identified: \(String(describing: acc))")
 })
