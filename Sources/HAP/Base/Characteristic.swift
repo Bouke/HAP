@@ -20,7 +20,7 @@ extension Characteristic {
     public func serialized() -> [String: JSONValueType] {
         var serialized: [String: JSONValueType] = [
             "iid": iid,
-            "type": type.rawValue,
+            "type": type.rawValue.uuidString,
             "perms": permissions.map { $0.rawValue }
         ]
 
