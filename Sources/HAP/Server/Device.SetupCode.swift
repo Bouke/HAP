@@ -1,3 +1,4 @@
+import Cryptor
 import Foundation
 #if os(Linux)
 import Glibc
@@ -13,7 +14,6 @@ extension Device {
             self = .override(value)
         }
 
-        // HAP Specification lists certain setup codes as invalid
         public var isValid: Bool {
             switch self {
             case .override(let setupCode):
@@ -23,7 +23,7 @@ extension Device {
             }
         }
 
-        // HAP Specification lists certain setup codes as invalid
+        /// HAP Specification lists certain setup codes as invalid.
         static private func isValid(_ setupCode: String) -> Bool {
             let invalidCodes = ["000-00-000", "111-11-111", "222-22-222",
                                 "333-33-333", "444-44-444", "555-55-555",
@@ -32,20 +32,19 @@ extension Device {
             return (setupCode =~ "^\\d{3}-\\d{2}-\\d{3}$") && !invalidCodes.contains(setupCode)
         }
 
-        // Generate a valid random setup code, used to pair with the device
+        /// Generate a valid random setup code, used to pair with the device.
         static func generate() -> String {
-            let n1 = arc4random_uniform(1000)
-            let n2 = arc4random_uniform(100)
-            let n3 = arc4random_uniform(1000)
-            let setupCode = String(format: "%03ld-%02ld-%03ld", n1, n2, n3)
-
-            if !SetupCode.isValid(setupCode) {
-                return generate()
-            }
+            var setupCode = ""
+            repeat {
+                setupCode = String(format: "%03ld-%02ld-%03ld",
+                                   arc4random_uniform(1000),
+                                   arc4random_uniform(100),
+                                   arc4random_uniform(1000))
+            } while !SetupCode.isValid(setupCode)
             return setupCode
         }
 
-        // Generate a random four character setup key, used in setupURI and setupHash
+        /// Generate a random four character setup key, used in setupURI and setupHash
         static internal func generateSetupKey() -> String {
             return String(arc4random_uniform(1679616), radix: 36, uppercase: true)
                     .padLeft(toLength: 4, withPad: "0")

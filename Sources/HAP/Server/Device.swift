@@ -365,9 +365,9 @@ public class Device {
         let cat = UInt(category.rawValue) ?? UInt(AccessoryType.bridge.rawValue)! // default to a bridge
         let flags = UInt(2) // 2=IP, 4=BLE, 8=IP_WAC
         let b36 = code | flags << 27 | cat << 31
-       return "X-HM://" +
+        return "X-HM://" +
             String(b36, radix: 36, uppercase: true).padLeft(toLength: 9, withPad: "0") +
-            configuration.setupKey
+            configuration.setupKey.padLeft(toLength: 4, withPad: "0")
     }
 
     // The setup hash broadcast in the MDNS TXT record, which HomeKit uses
