@@ -19,7 +19,8 @@ let package = Package(
         .package(url: "https://github.com/Coder-256/Regex.git", .branch("swift4")),
     ],
     targets: [
-        .target(name: "HAP", dependencies: ["SRP", "Cryptor", "Evergreen", "HKDF", "Kitura-net", "Regex", "Socket"]),
+        .target(name: "CQRCode"),
+        .target(name: "HAP", dependencies: ["SRP", "Cryptor", "Evergreen", "HKDF", "Kitura-net", "Regex", "Socket", "CQRCode"]),
         .target(name: "hap-server", dependencies: ["HAP", "Evergreen"]),
         .testTarget(name: "HAPTests", dependencies: ["HAP"]),
     ],

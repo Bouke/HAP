@@ -384,6 +384,11 @@ public class Device {
         }
     }
 
+    /// QRCode for easy pairing of controllers with this device.
+    public var setupQRCode: QRCode {
+        return QRCode(from: setupURI)
+    }
+
     var identifier: String {
         return configuration.identifier
     }

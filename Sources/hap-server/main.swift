@@ -73,9 +73,9 @@ let server = try Server(device: device, port: 0)
 server.start()
 
 print()
-print("Scan the following QR code using your iPhone:")
-print("http://chart.apis.google.com/chart?cht=qr&chs=200x200&chld=L|0&chl="
-    + device.setupURI.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)!)
+print("Scan the following QR code using your iPhone to pair this device:")
+print()
+print(device.setupQRCode.asText)
 print()
 
 if CommandLine.arguments.contains("--test") {
