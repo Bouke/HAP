@@ -9,7 +9,7 @@
     func arc4random_uniform(_ upper_bound: UInt32) -> UInt32 {
         var x: UInt32 = 0
         repeat {
-            x = try! UInt32(bytes: Random.generate(byteCount: 4)) % 1000
+            x = try! UInt32(bytes: Random.generate(byteCount: 4))
         } while x >= UInt32.max - UInt32.max % upper_bound
         return x % upper_bound
     }
