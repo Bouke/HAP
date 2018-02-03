@@ -72,6 +72,12 @@ signal(SIGINT) { _ in
 let server = try Server(device: device, port: 0)
 server.start()
 
+print()
+print("Scan the following QR code using your iPhone:")
+print("http://chart.apis.google.com/chart?cht=qr&chs=200x200&chld=L|0&chl="
+    + device.setupURI.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)!)
+print()
+
 if CommandLine.arguments.contains("--test") {
     print("Running runloop for 10 seconds...")
     RunLoop.main.run(until: Date(timeIntervalSinceNow: 10))
