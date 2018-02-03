@@ -34,35 +34,24 @@ extension Device {
 
         /// Generate a valid random setup code, used to pair with the device.
         static func generate() -> String {
-            do {
-                for _ in 0..<100 {
-                    // Note that these setup codes are not evenly distributed.
-                    let n1 = try UInt16(bytes: Random.generate(byteCount: 2)) % 1000
-                    let n2 = try UInt8(bytes: Random.generate(byteCount: 1)) % 100
-                    let n3 = try UInt16(bytes: Random.generate(byteCount: 2)) % 1000
+            for _ in 0..<100 {
+                let setupCode = String(format: "%03ld-%02ld-%03ld",
+                                       arc4random_uniform(1000),
+                                       arc4random_uniform(100),
+                                       arc4random_uniform(1000))
 
-                    let setupCode = String(format: "%03ld-%02ld-%03ld", n1, n2, n3)
-
-                    guard SetupCode.isValid(setupCode) else {
-                        continue
-                    }
-
-                    return setupCode
+                guard SetupCode.isValid(setupCode) else {
+                    continue
                 }
-                fatalError("Could not generate random setup code")
-            } catch {
-                fatalError("Could not generate random setup code: \(error)")
+
+                return setupCode
             }
+            fatalError("Could not generate random setup code")
         }
 
         /// Generate a random four character setup key, used in setupURI and setupHash
         static internal func generateSetupKey() -> String {
-            do {
-                let key = try UInt32(bytes: Random.generate(byteCount: 4)) % 1_679_616
-                return String(key, radix: 36, uppercase: true)
-            } catch {
-                fatalError("Could not generate random setup key: \(error)")
-            }
+            return String(arc4random_uniform(1679616), radix: 36, uppercase: true)
         }
     }
 }
