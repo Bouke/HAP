@@ -34,19 +34,14 @@ extension Device {
 
         /// Generate a valid random setup code, used to pair with the device.
         static func generate() -> String {
-            for _ in 0..<100 {
-                let setupCode = String(format: "%03ld-%02ld-%03ld",
-                                       arc4random_uniform(1000),
-                                       arc4random_uniform(100),
-                                       arc4random_uniform(1000))
-
-                guard SetupCode.isValid(setupCode) else {
-                    continue
-                }
-
-                return setupCode
-            }
-            fatalError("Could not generate random setup code")
+            var setupCode = ""
+            repeat {
+                setupCode = String(format: "%03ld-%02ld-%03ld",
+                                   arc4random_uniform(1000),
+                                   arc4random_uniform(100),
+                                   arc4random_uniform(1000))
+            } while !SetupCode.isValid(setupCode)
+            return setupCode
         }
 
         /// Generate a random four character setup key, used in setupURI and setupHash
