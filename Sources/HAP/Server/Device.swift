@@ -359,7 +359,6 @@ public class Device {
 
     // Return a URI which can be displayed as a QR code for quick setup
     // The URI is an encoded form of the setup code and the accessory type, followed by the setup key
-    //class func setupURI(setupCode: String, accessoryType category: AccessoryType, setupID: String) -> String {
     public var setupURI: String {
         let category = accessories[0].type
         let code = UInt(self.setupCode.replacingOccurrences(of: "-", with: ""))!
