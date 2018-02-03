@@ -108,7 +108,7 @@ class EndpointTests: XCTestCase {
             guard let wattCharacteristic = characteristics.first(where: { $0["iid"] as? Int == energy.service.watt.iid }) else {
                 return XCTFail("No identify characteristic")
             }
-            XCTAssertEqual(wattCharacteristic["value"] as? Double, 42)
+            XCTAssertEqual(wattCharacteristic["value"] as? Int, 42)
             XCTAssertEqual(wattCharacteristic["type"] as? String, "E863F10D-079E-48FF-8F27-9C2605A29F52")
         }
     }
