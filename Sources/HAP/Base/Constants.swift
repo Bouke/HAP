@@ -1,28 +1,65 @@
 import Foundation
 
-public struct CharacteristicType: RawRepresentable, Codable {
-    public typealias RawValue = UUID
-    public var rawValue: RawValue
+public enum CharacteristicType: Codable, Equatable {
 
-    public init?(_ string: String) {
-        if let uuid = UUID(uuidString: string) {
-            self.rawValue = uuid
-        } else {
-            return nil
+    case appleDefined(UInt32)
+    case custom(UUID)
+
+    init(_ hex: UInt32) {
+        self = .appleDefined(hex)
+    }
+
+    public init(_ uuid: UUID) {
+        self = .custom(uuid)
+    }
+
+    var rawValue: String {
+        switch self {
+        case let .appleDefined(value):
+            return String(value, radix: 16)
+        case let .custom(uuid):
+            return uuid.uuidString
         }
     }
 
-    init(_ hex: UInt16) {
-        let string: String = "00000000\(String(hex, radix: 16))".suffix(8) + "-0000-1000-8000-0026BB765291"
-        rawValue = UUID(uuidString: string)!
+    public static func == (lhs: CharacteristicType, rhs: CharacteristicType) -> Bool {
+        switch (lhs, rhs) {
+        case (let .appleDefined(left), let .appleDefined(right)):
+            return left == right
+        case (let .custom(left), let .custom(right)):
+            return left == right
+        default:
+            return false
+        }
     }
 
-    public init(_ rawValue: RawValue) {
-        self.rawValue = rawValue
+    enum DecodeError: Error {
+        case unsupportedValueType
+        case malformedUUIDString
     }
 
-    public init?(rawValue: RawValue) {
-        self.rawValue = rawValue
+    public init(from decoder: Decoder) throws {
+        var container = try decoder.unkeyedContainer()
+        if let int = try? container.decode(UInt32.self) {
+            self = .appleDefined(int)
+        } else if let string = try? container.decode(String.self) {
+            guard let uuid = UUID(uuidString: string) else {
+                throw DecodeError.malformedUUIDString
+            }
+            self = .custom(uuid)
+        } else {
+            throw DecodeError.unsupportedValueType
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.unkeyedContainer()
+        switch self {
+        case let .appleDefined(int):
+            try container.encode(int)
+        case .custom:
+            try container.encode(rawValue)
+        }
     }
 }
 

@@ -53,7 +53,7 @@ open class Service: JSONSerializable {
         precondition((1...100).contains(characteristics.count),
                      "Number of characteristics must be 1...100")
         precondition(
-            Dictionary(grouping: characteristics, by: { $0.type })
+            Dictionary(grouping: characteristics, by: { $0.type.rawValue })
                 .filter({ $0.value.count > 1 })
                 .isEmpty,
             "Service's characteristics must have a unique type")
