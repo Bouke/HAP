@@ -13,7 +13,7 @@ public typealias CurrentLight = Double
 extension Service {
     open class LightSensor: Service {
         public let currentLight = GenericCharacteristic<CurrentLight>(
-            type: .lightLevel,
+            type: .currentAmbientLightLevel,
             value: 0,
             permissions: [.read, .events],
             maxValue: 100000,

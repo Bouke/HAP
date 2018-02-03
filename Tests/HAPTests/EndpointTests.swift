@@ -102,7 +102,7 @@ class EndpointTests: XCTestCase {
             }
             XCTAssertEqual(nameCharacteristic["value"] as? String, "Energy")
             XCTAssertEqual(nameCharacteristic["perms"] as? [String] ?? [], ["pr"])
-            XCTAssertEqual(nameCharacteristic["type"] as? [UInt32] ?? [], [0x23])
+            XCTAssertEqual(nameCharacteristic["type"] as? [String] ?? [], ["23"])
             XCTAssertEqual(nameCharacteristic["ev"] as? Bool, false)
 
             guard let wattCharacteristic = characteristics.first(where: { $0["iid"] as? Int == energy.service.watt.iid }) else {
@@ -151,7 +151,7 @@ class EndpointTests: XCTestCase {
             }
             XCTAssertEqual(nameCharacteristic["value"] as? String, "Night stand left")
             XCTAssertEqual(nameCharacteristic["perms"] as? [String] ?? [], ["pr"])
-            XCTAssertEqual(nameCharacteristic["type"] as? [UInt32] ?? [], [0x23])
+            XCTAssertEqual(nameCharacteristic["type"] as? [String] ?? [], ["23"])
             XCTAssertEqual(nameCharacteristic["ev"] as? Bool, false)
 
             guard let brightnessCharacteristic = characteristics.first(where: { $0["iid"] as? Int == lamp.lightbulb.brightness.iid }) else {
@@ -163,7 +163,7 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(brightnessCharacteristic["minStep"] as? Int, 1)
             XCTAssertEqual(brightnessCharacteristic["unit"] as? String, "percentage")
             XCTAssertEqual(brightnessCharacteristic["perms"] as? [String] ?? [], ["pr", "pw", "ev"])
-            XCTAssertEqual(brightnessCharacteristic["type"] as? [UInt32] ?? [], [0x8])
+            XCTAssertEqual(brightnessCharacteristic["type"] as? [String] ?? [], ["8"])
             XCTAssertEqual(brightnessCharacteristic["ev"] as? Bool, true)
         }
     }
