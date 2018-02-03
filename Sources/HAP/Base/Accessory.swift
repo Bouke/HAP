@@ -4,7 +4,7 @@ import Foundation
 // which is the data-type we wanted to use here. We can change it back
 // to UInt64 once the following commit has made it into a release:
 // https://github.com/apple/swift-corelibs-foundation/commit/64b67c91479390776c43a96bd31e4e85f106d5e1
-public typealias InstanceID = Int
+typealias InstanceID = Int
 
 // HAP Specification 2.6.1.1: Accessory Instance IDs
 //
