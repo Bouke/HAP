@@ -72,6 +72,12 @@ signal(SIGINT) { _ in
 let server = try Server(device: device, port: 0)
 server.start()
 
+print()
+print("Scan the following QR code using your iPhone to pair this device:")
+print()
+print(device.setupQRCode.asText)
+print()
+
 if CommandLine.arguments.contains("--test") {
     print("Running runloop for 10 seconds...")
     RunLoop.main.run(until: Date(timeIntervalSinceNow: 10))
