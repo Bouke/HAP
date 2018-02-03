@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol Characteristic: class, JSONSerializable {
+protocol Characteristic: class, JSONSerializable {
     weak var service: Service? { get set }
     var iid: InstanceID { get set }
     var type: CharacteristicType { get }
@@ -20,7 +20,7 @@ extension Characteristic {
     public func serialized() -> [String: JSONValueType] {
         var serialized: [String: JSONValueType] = [
             "iid": iid,
-            "type": type.rawValue.uuidString,
+            "type": type.rawValue,
             "perms": permissions.map { $0.rawValue }
         ]
 
@@ -47,9 +47,9 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
         case valueTypeException
     }
 
-    public weak var service: Service?
+    weak var service: Service?
 
-    public var iid: InstanceID = 0
+    internal var iid: InstanceID = 0
     public let type: CharacteristicType
 
     internal var _value: T?
@@ -69,11 +69,11 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
         }
     }
 
-    public func getValue() -> JSONValueType? {
+    func getValue() -> JSONValueType? {
         return value?.jsonValueType
     }
 
-    public func setValue(_ newValue: Any?, fromConnection connection: Server.Connection?) throws {
+    func setValue(_ newValue: Any?, fromConnection connection: Server.Connection?) throws {
         switch newValue {
         case let some?:
             guard let newValue = T(value: some) else {

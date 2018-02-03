@@ -32,7 +32,7 @@ open class Service: JSONSerializable {
     public let type: ServiceType
     let characteristics: [Characteristic]
 
-    public init(type: ServiceType, characteristics: [Characteristic]) {
+    init(type: ServiceType, characteristics: [Characteristic]) {
         self.type = type
         self.characteristics = characteristics
 
@@ -43,7 +43,7 @@ open class Service: JSONSerializable {
         precondition((1...100).contains(characteristics.count),
                      "Number of characteristics must be 1...100")
         precondition(
-            Dictionary(grouping: characteristics, by: { $0.type.rawValue })
+            Dictionary(grouping: characteristics, by: { $0.type })
                 .filter({ $0.value.count > 1 })
                 .isEmpty,
             "Service's characteristics must have a unique type")
