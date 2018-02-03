@@ -87,7 +87,7 @@ class PairVerifyController {
         return (resultOuter, session)
     }
 
-    func finishRequest(_ data: PairTagTLV8, _ session: Session) throws -> PairTagTLV8 {
+    func finishRequest(_ data: PairTagTLV8, _ session: Session) throws -> (PairTagTLV8, Pairing) {
         guard let encryptedData = data[.encryptedData] else {
             throw Error.invalidParameters
         }
@@ -115,14 +115,14 @@ class PairVerifyController {
         logger.debug("--> username \(String(data: username, encoding: .utf8)!)")
         logger.debug("--> signature \(signatureIn.hex)")
 
-        guard let publicKey = device.get(pairingWithIdentifier: username)?.publicKey else {
+        guard let pairing = device.get(pairingWithIdentifier: username) else {
             throw Error.noPublicKeyForUser
         }
-        logger.debug("--> public key \(publicKey.hex)")
+        logger.debug("--> public key \(pairing.publicKey.hex)")
 
         let material = session.otherPublicKey + username + session.publicKey
         do {
-            try Ed25519.verify(publicKey: publicKey, message: material, signature: signatureIn)
+            try Ed25519.verify(publicKey: pairing.publicKey, message: material, signature: signatureIn)
         } catch {
             throw Error.invalidSignature
         }
@@ -131,6 +131,6 @@ class PairVerifyController {
         let result: PairTagTLV8 = [
             .state: Data(bytes: [PairVerifyStep.finishResponse.rawValue])
         ]
-        return result
+        return (result, pairing)
     }
 }

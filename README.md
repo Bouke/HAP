@@ -44,6 +44,41 @@ Run ``swift build`` to compile and ``.build/debug/hap-server`` to run. Modify ``
 
 On Mac OS, you can debug using XCode by running the command ``swift package generate-xcodeproj`` and the opening the resulting ``HAP.xcodeproj`` project. Select the ``hap-server`` target to execute.
 
+## Extensibility
+
+The following code snippet how you would model a fictious accessory
+representing a mobile power bank.
+
+```swift
+class PowerBankAccessory: Accessory {
+    let service = PowerBankService()
+    init(info: Service.Info) {
+        super.init(info: info, type: .outlet, services: [service])
+    }
+}
+class PowerBankService: Service {
+    public let on = GenericCharacteristic<Bool>(
+        type: .on,
+        value: false)
+    public let inUse = GenericCharacteristic<Bool>(
+        type: .outletInUse,
+        value: true,
+        permissions: [.read, .events])
+    public let batteryLevel = GenericCharacteristic<Double>(
+        type: .batteryLevel,
+        value: 100,
+        permissions: [.read, .events])
+
+    init() {
+        super.init(type: .outlet, characteristics: [
+            AnyCharacteristic(on),
+            AnyCharacteristic(inUse),
+            AnyCharacteristic(batteryLevel),
+        ])
+    }
+}
+```
+
 ## Linux
 
 There is some support on Linux. It uses my own implementation of NetService

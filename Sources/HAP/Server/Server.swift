@@ -64,6 +64,7 @@ public class Server: NSObject, NetServiceDelegate {
         var context = [String: Any]()
         var socket: Socket?
         var cryptographer: Cryptographer?
+        var pairing: Pairing?
         var notificationQueue: NotificationQueue
 
         override init() {

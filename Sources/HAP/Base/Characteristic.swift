@@ -1,5 +1,13 @@
 import Foundation
 
+public struct AnyCharacteristic {
+    let wrapped: Characteristic
+
+    public init<T>(_ characteristic: GenericCharacteristic<T>) {
+        wrapped = characteristic
+    }
+}
+
 protocol Characteristic: class, JSONSerializable {
     weak var service: Service? { get set }
     var iid: InstanceID { get set }
