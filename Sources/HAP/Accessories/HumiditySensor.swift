@@ -13,7 +13,7 @@ public typealias CurrentRelativeHumidity = Double
 extension Service {
     open class HumiditySensor: Service {
         public let currentRelativeHumidity = GenericCharacteristic<CurrentRelativeHumidity>(
-            type: .currentHumidity,
+            type: .currentRelativeHumidity,
             value: 0,
             permissions: [.read, .events],
             maxValue: 100,

@@ -20,6 +20,7 @@ class EndpointTests: XCTestCase {
 
         return [
             ("testAccessories", testAccessories),
+            ("testCustomCharacteristicType", testCustomCharacteristicType),
             ("testGetCharacteristics", testGetCharacteristics),
             ("testPutBoolAndIntCharacteristics", testPutBoolAndIntCharacteristics),
             ("testPutDoubleAndEnumCharacteristics", testPutDoubleAndEnumCharacteristics),
@@ -59,6 +60,57 @@ class EndpointTests: XCTestCase {
             return XCTFail("No lamp characteristics")
         }
         XCTAssertEqual(lampCharacteristics.count, 4)
+    }
+
+    static let watt = CharacteristicType(UUID(uuidString: "E863F10D-079E-48FF-8F27-9C2605A29F52")!)
+    static let kiloWattHour = CharacteristicType(UUID(uuidString: "E863F10C-079E-48FF-8F27-9C2605A29F52")!)
+
+    class Energy: Accessory {
+        let service = EnergyService()
+
+        init(info: Service.Info) {
+            super.init(info: info, type: .outlet, services: [service])
+        }
+    }
+
+    class EnergyService: Service {
+        let on = GenericCharacteristic<Bool>(type: .on, value: false)
+        let inUse = GenericCharacteristic<Bool>(type: .outletInUse, value: true, permissions: [.read, .events])
+        let watt = GenericCharacteristic<Double>(type: EndpointTests.watt, value: 42, permissions: [.read, .events])
+        let kiloWattHour = GenericCharacteristic<Double>(type: EndpointTests.kiloWattHour, value: 0, permissions: [.read, .events])
+
+        init() {
+            super.init(type: .outlet, characteristics: [AnyCharacteristic(on), AnyCharacteristic(inUse), AnyCharacteristic(watt), AnyCharacteristic(kiloWattHour)])
+        }
+    }
+
+    func testCustomCharacteristicType() {
+        let energy = Energy(info: .init(name: "Energy", serialNumber: "00057"))
+        let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: energy)
+        let application = characteristics(device: device)
+        do {
+            let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=\(energy.aid).\(energy.info.name.iid),\(energy.aid).\(energy.service.watt.iid)&meta=1&perms=1&type=1&ev=1"))
+            guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body ?? Data(), options: [])) as? [String: [[String: Any]]] else {
+                return XCTFail("Could not decode")
+            }
+            guard let characteristics = jsonObject["characteristics"] else {
+                return XCTFail("No characteristics")
+            }
+
+            guard let nameCharacteristic = characteristics.first(where: { $0["iid"] as? Int == energy.info.name.iid }) else {
+                return XCTFail("No name characteristic")
+            }
+            XCTAssertEqual(nameCharacteristic["value"] as? String, "Energy")
+            XCTAssertEqual(nameCharacteristic["perms"] as? [String] ?? [], ["pr"])
+            XCTAssertEqual(nameCharacteristic["type"] as? String, "23")
+            XCTAssertEqual(nameCharacteristic["ev"] as? Bool, false)
+
+            guard let wattCharacteristic = characteristics.first(where: { $0["iid"] as? Int == energy.service.watt.iid }) else {
+                return XCTFail("No identify characteristic")
+            }
+            XCTAssertEqual(wattCharacteristic["value"] as? Int, 42)
+            XCTAssertEqual(wattCharacteristic["type"] as? String, "E863F10D-079E-48FF-8F27-9C2605A29F52")
+        }
     }
 
     func testGetCharacteristics() {
