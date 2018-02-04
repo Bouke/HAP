@@ -80,7 +80,7 @@ class PowerBankService: Service {
         super.init(type: .outlet, characteristics: [
             AnyCharacteristic(on),
             AnyCharacteristic(inUse),
-            AnyCharacteristic(batteryLevel),
+            AnyCharacteristic(batteryLevel)
         ])
     }
 }

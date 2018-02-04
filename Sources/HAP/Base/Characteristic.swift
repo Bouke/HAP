@@ -25,7 +25,7 @@ protocol Characteristic: class, JSONSerializable {
 }
 
 extension Characteristic {
-    public func serialized() -> [String: JSONValueType] {
+    func serialized() -> [String: JSONValueType] {
         var serialized: [String: JSONValueType] = [
             "iid": iid,
             "type": type.rawValue,
