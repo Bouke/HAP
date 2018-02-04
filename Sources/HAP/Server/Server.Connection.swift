@@ -3,6 +3,10 @@ import KituraNet
 import Socket
 import func Evergreen.getLogger
 
+#if os(Linux)
+    import Dispatch
+#endif
+
 fileprivate let logger = getLogger("hap.http")
 private let minimalTimeBetweenNotifications: DispatchTimeInterval = .seconds(1)
 
