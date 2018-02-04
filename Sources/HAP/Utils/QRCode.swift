@@ -46,12 +46,11 @@ public struct QRCode {
             .joined(separator: "\n")
     }
 
-
     public var asBigText: String {
         let bitmap = asBitmap
         return (0..<bitmap.count)
             .map { y in
-                return bitmap[y]
+                bitmap[y]
                     .map { $0 ? "██" : "  " }
                     .joined()
             }
@@ -62,7 +61,7 @@ public struct QRCode {
         let bitmap = asBitmap
         return (0..<bitmap.count)
             .map { y in
-                return bitmap[y]
+                bitmap[y]
                     .map { $0 ? "##" : "  " }
                     .joined()
             }
