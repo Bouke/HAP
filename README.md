@@ -5,6 +5,13 @@ The goal of this package is to provide a complete implementation of the Homekit 
 
 [![Build Status](https://travis-ci.org/Bouke/HAP.svg?branch=master)](https://travis-ci.org/Bouke/HAP)
 
+## Features
+
+* Persistent configuration
+* Pair by scanning QR code (WWDC 2017)
+* Write custom services and characteristics
+* Linux support
+
 ## How to build
 
 ### MacOS
@@ -134,4 +141,7 @@ Currently ``GenericCharacteristic<T>`` is used, to allow for user-defined value 
 
 ## Credits
 
-This library was written by [Bouke Haarsma](https://twitter.com/BoukeHaarsma).
+This library was written by [Bouke Haarsma](https://twitter.com/BoukeHaarsma)
+and [contributors][0].
+
+[0]: https://github.com/Bouke/HAP/graphs/contributors

@@ -1,6 +1,6 @@
 // swiftlint:disable file_length
+import Cryptor
 import Foundation
-import Regex
 import func Evergreen.getLogger
 
 fileprivate let logger = getLogger("hap.device")
@@ -32,8 +32,11 @@ struct Box<T: Any>: Hashable, Equatable {
 
 public class Device {
     public let name: String
-    public let setupCode: String
     public let isBridge: Bool
+
+    public var setupCode: String {
+         return configuration.setupCode
+    }
 
     public private(set) var accessories: [Accessory]
 
@@ -77,7 +80,7 @@ public class Device {
     ///   - accessories: accessories to be bridged
     convenience public init(
         bridgeInfo: Service.Info,
-        setupCode: String,
+        setupCode: SetupCode = .random,
         storage: Storage,
         accessories: [Accessory]) {
         let bridge = Accessory(info: bridgeInfo, type: .bridge, services: [])
@@ -93,11 +96,13 @@ public class Device {
     /// the thermostat.
     ///
     /// - Parameters:
-    ///   - setupCode: the code to pair this device, must be in the format XXX-XX-XXX
     ///   - storage: persistence interface for storing pairings, secrets
     ///   - accessory: accessory to publish
+    /// - Optional Parameters:
+    ///   - setupCode: the code to pair this device, must be in the format XXX-XX-XXX
+    ///                if not provided, a code is generated automatically
     convenience public init(
-        setupCode: String,
+        setupCode: SetupCode = .random,
         storage: Storage,
         accessory: Accessory) {
         self.init(name: accessory.info.name.value!,
@@ -108,13 +113,12 @@ public class Device {
 
     fileprivate init(
         name: String,
-        setupCode: String,
+        setupCode: SetupCode = .random,
         storage: Storage,
         accessories: [Accessory]) {
-        precondition(setupCode =~ "^\\d{3}-\\d{2}-\\d{3}$",
-                     "setup code must conform to the format XXX-XX-XXX")
+
+        precondition(setupCode.isValid, "setup code must conform to the format XXX-XX-XXX")
         self.name = name
-        self.setupCode = setupCode
         self.storage = storage
         isBridge = accessories[0].type == .bridge
 
@@ -125,6 +129,14 @@ public class Device {
         } catch {
             logger.error("Error reading configuration data: \(error), using default configuration instead")
             configuration = Configuration()
+        }
+
+        // If the caller has provided a setup code, use that
+        switch setupCode {
+        case .override(let code):
+            configuration.setupCode = code
+        case .random:
+            break
         }
 
         characteristicEventListeners = [:]
@@ -345,6 +357,38 @@ public class Device {
         }
     }
 
+    // Return a URI which can be displayed as a QR code for quick setup
+    // The URI is an encoded form of the setup code and the accessory type, followed by the setup key
+    public var setupURI: String {
+        let category = accessories[0].type
+        let code = UInt(self.setupCode.replacingOccurrences(of: "-", with: ""))!
+        let cat = UInt(category.rawValue) ?? UInt(AccessoryType.bridge.rawValue)! // default to a bridge
+        let flags = UInt(2) // 2=IP, 4=BLE, 8=IP_WAC
+        let b36 = code | flags << 27 | cat << 31
+        return "X-HM://" +
+            String(b36, radix: 36, uppercase: true).padLeft(toLength: 9, withPad: "0") +
+            configuration.setupKey
+    }
+
+    // The setup hash broadcast in the MDNS TXT record, which HomeKit uses
+    // to match a QR code for automatic setup.
+    // The hash is based on the pairing identifier and the four character setup key
+    // Both those parameters must persit across restarts
+    var setupHash: String {
+        let setupHashMaterial = configuration.setupKey + configuration.identifier
+
+        if let sha512 = Digest(using: .sha512).update(string: setupHashMaterial) {
+            return Data(bytes: sha512.final()[0..<4]).base64EncodedString()
+        } else {
+            return ""
+        }
+    }
+
+    /// QRCode for easy pairing of controllers with this device.
+    public var setupQRCode: QRCode {
+        return QRCode(from: setupURI)
+    }
+
     var identifier: String {
         return configuration.identifier
     }
@@ -417,7 +461,12 @@ public class Device {
             // must have a range of 1-65535. This must take values defined in
             // Table 12-3 (page 254). This must persist across reboots, power
             // cycles, etc.
-            "ci": category.rawValue
+            "ci": category.rawValue,
+
+            // Hash key used by HomeKit to match a device against its QR code
+            // during auto setup. The setupHash should persist across reboots,
+            // as its constituents must also persist.
+            "sh": self.setupHash
         ]
     }
 }

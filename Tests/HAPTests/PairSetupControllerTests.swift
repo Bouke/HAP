@@ -25,7 +25,7 @@ class PairSetupControllerTests: XCTestCase {
                                                                      group: .N3072,
                                                                      algorithm: .sha512))
         let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00080"),
-                            setupCode: password,
+                            setupCode: .override(password),
                             storage: MemoryStorage(),
                             accessories: [])
         let controller = PairSetupController(device: device)
