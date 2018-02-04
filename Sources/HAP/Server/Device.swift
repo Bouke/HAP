@@ -367,7 +367,7 @@ public class Device {
         let b36 = code | flags << 27 | cat << 31
         return "X-HM://" +
             String(b36, radix: 36, uppercase: true).padLeft(toLength: 9, withPad: "0") +
-            configuration.setupKey.padLeft(toLength: 4, withPad: "0")
+            configuration.setupKey
     }
 
     // The setup hash broadcast in the MDNS TXT record, which HomeKit uses

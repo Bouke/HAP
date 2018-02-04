@@ -46,6 +46,29 @@ public struct QRCode {
             .joined(separator: "\n")
     }
 
+
+    public var asBigText: String {
+        let bitmap = asBitmap
+        return (0..<bitmap.count)
+            .map { y in
+                return bitmap[y]
+                    .map { $0 ? "██" : "  " }
+                    .joined()
+            }
+            .joined(separator: "\n")
+    }
+
+    public var asAscii: String {
+        let bitmap = asBitmap
+        return (0..<bitmap.count)
+            .map { y in
+                return bitmap[y]
+                    .map { $0 ? "##" : "  " }
+                    .joined()
+            }
+            .joined(separator: "\n")
+    }
+
 #if os(macOS)
     public var asCIImage: CIImage? {
         let data = string.data(using: String.Encoding.ascii)
