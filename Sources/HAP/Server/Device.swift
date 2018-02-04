@@ -41,9 +41,10 @@ public class Device {
     public private(set) var accessories: [Accessory]
 
     public var onIdentify: [(Accessory?) -> Void] = []
-    public var onConfigurationChange: [(Device) -> Void] = []
 
     let storage: Storage
+
+    weak var server: Server?
 
     private(set) var characteristicEventListeners: [Box<Characteristic>: WeakObjectSet<Server.Connection>]
     private(set) var configuration: Configuration
@@ -245,7 +246,7 @@ public class Device {
 
     // Notify listeners that the config record has changed
     func notifyConfigurationChange() {
-        _ = onConfigurationChange.map { $0(self) }
+        server?.updateDiscoveryRecord()
     }
 
     public func removeAccessories(_ unwantedAccessories: [Accessory]) {

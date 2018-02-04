@@ -67,66 +67,63 @@ extension Server {
             notificationQueue.listener = self
         }
 
-        func listen(socket: Socket, queue: DispatchQueue, application: @escaping Application) {
+        func listen(socket: Socket, application: @escaping Application) {
             self.socket = socket
             let httpParser = HTTPParser(isRequest: true)
             let request = HTTPServerRequest(socket: socket, httpParser: httpParser)
-            queue.async {
-                while true {
-                    var readBuffer = Data()
-                    do {
-                        _ = try socket.read(into: &readBuffer)
-                        if let cryptographer = self.cryptographer {
-                            readBuffer = try cryptographer.decrypt(readBuffer)
-                        }
-                        _ = readBuffer.withUnsafeBytes {
-                            httpParser.execute($0, length: readBuffer.count)
-                        }
-                    } catch {
-                        logger.error("Error while reading from socket", error: error)
-                        break
+            while true {
+                var readBuffer = Data()
+                do {
+                    _ = try socket.read(into: &readBuffer)
+                    if let cryptographer = self.cryptographer {
+                        readBuffer = try cryptographer.decrypt(readBuffer)
                     }
-
-                    // Fix to allow Bridges with spaces in name.
-                    // HomeKit POSTs contain a hostname with \\032 replacing the
-                    // space which causes Kitura httpParser to baulk on the
-                    // resulting URL. Replacing '\\032' with '-' in the hostname
-                    // allows Kitura to create a valid URL, and the value is not
-                    // used elsewhere.
-                    if let hostname = request.headers["Host"]?[0], (hostname.contains("\\032")) {
-                        request.headers["Host"]![0] = hostname.replacingOccurrences(of: "\\032", with: "-")
+                    _ = readBuffer.withUnsafeBytes {
+                        httpParser.execute($0, length: readBuffer.count)
                     }
-
-                    guard httpParser.completed else {
-                        break
-                    }
-
-                    request.parsingCompleted()
-                    var response: Response! = nil
-                    DispatchQueue.main.sync {
-                        response = application(self, request)
-                    }
-
-                    do {
-                        var writeBuffer = response.serialized()
-                        if let cryptographer = self.cryptographer {
-                            writeBuffer = try cryptographer.encrypt(writeBuffer)
-                        }
-                        if let response = response as? UpgradeResponse {
-                            self.cryptographer = response.cryptographer
-                            // todo?: override response
-                        }
-                        try socket.write(from: writeBuffer)
-                        httpParser.reset()
-                    } catch {
-                        logger.error("Error while writing to socket", error: error)
-                        break
-                    }
+                } catch {
+                    logger.error("Error while reading from socket", error: error)
+                    break
                 }
-                logger.debug("Closed connection to \(socket.remoteHostname)")
-                socket.close()
-                self.socket = nil
+
+                // Fix to allow Bridges with spaces in name.
+                // HomeKit POSTs contain a hostname with \\032 replacing the
+                // space which causes Kitura httpParser to baulk on the
+                // resulting URL. Replacing '\\032' with '-' in the hostname
+                // allows Kitura to create a valid URL, and the value is not
+                // used elsewhere.
+                if let hostname = request.headers["Host"]?[0], (hostname.contains("\\032")) {
+                    request.headers["Host"]![0] = hostname.replacingOccurrences(of: "\\032", with: "-")
+                }
+
+                guard httpParser.completed else {
+                    break
+                }
+
+                request.parsingCompleted()
+                var response: Response! = nil
+                DispatchQueue.main.sync {
+                    response = application(self, request)
+                }
+
+                do {
+                    var writeBuffer = response.serialized()
+                    if let cryptographer = self.cryptographer {
+                        writeBuffer = try cryptographer.encrypt(writeBuffer)
+                    }
+                    if let response = response as? UpgradeResponse {
+                        self.cryptographer = response.cryptographer
+                        // todo?: override response
+                    }
+                    try socket.write(from: writeBuffer)
+                    httpParser.reset()
+                } catch {
+                    logger.error("Error while writing to socket", error: error)
+                    break
+                }
             }
+
+            self.socket = nil
         }
 
         func writeOutOfBand(_ data: Data) {

@@ -11,37 +11,37 @@ import func Evergreen.getLogger
 fileprivate let logger = getLogger("hap.http")
 
 public class Server: NSObject, NetServiceDelegate {
-    let service: NetService
-    let socket: Socket
-    let queue = DispatchQueue(label: "hap.socket-listener", qos: .utility, attributes: [.concurrent])
+    let device: Device
     let application: Application
 
+    let service: NetService
+
+    let listenSocket: Socket
+    let socketLockQueue = DispatchQueue(label: "hap.socketLockQueue")
+
+    var continueRunning = true
+    var connectedSockets = [Int32: Socket]()
+
     public init(device: Device, port: Int = 0) throws {
+        precondition(device.server == nil, "Device already assigned to other Server instance")
+        self.device = device
+
         application = root(device: device)
 
-        socket = try Socket.create(family: .inet, type: .stream, proto: .tcp)
-        try socket.listen(on: port)
+        listenSocket = try Socket.create(family: .inet, type: .stream, proto: .tcp)
+        try listenSocket.listen(on: port)
 
-        service = NetService(domain: "local.", type: "_hap._tcp.", name: device.name, port: socket.listeningPort)
-
-        Server.publishDiscoveryRecordOf(device, to: service)
+        service = NetService(domain: "local.", type: "_hap._tcp.", name: device.name, port: listenSocket.listeningPort)
 
         super.init()
+
         service.delegate = self
-
-        device.onConfigurationChange.append({ [weak self] changedDevice in
-            if let service = self?.service {
-                Server.publishDiscoveryRecordOf(changedDevice, to: service)
-            }
-        })
+        device.server = self
+        updateDiscoveryRecord()
     }
 
-    deinit {
-        self.stop()
-    }
-
-    // Publish the Accessory configuration on the Bonjour service
-    private class func publishDiscoveryRecordOf(_ device: Device, to service: NetService) {
+    /// Publish the Accessory configuration on the Bonjour service
+    func updateDiscoveryRecord() {
         #if os(macOS)
             let record = device.config.dictionary(key: { $0.key }, value: { $0.value.data(using: .utf8)! })
             service.setTXTRecord(NetService.data(fromTXTRecord: record))
@@ -51,21 +51,22 @@ public class Server: NSObject, NetServiceDelegate {
     }
 
     public func start() {
-        service.publish()
-        logger.info("Listening on port \(self.socket.listeningPort)")
+        // TODO: make sure can only be started if not started
 
-        queue.async {
-            while self.socket.isListening {
-                do {
-                    let client = try self.socket.acceptClientConnection()
-                    logger.info("Accepted connection from \(client.remoteHostname)")
-                    DispatchQueue.main.async {
-                        _ = Connection().listen(socket: client, queue: self.queue, application: self.application)
-                    }
-                } catch {
-                    logger.error("Could not accept connections for listening socket", error: error)
-                    break
-                }
+        continueRunning = true
+        service.publish()
+        logger.info("Listening on port \(self.listenSocket.listeningPort)")
+
+        let queue = DispatchQueue.global(qos: .userInteractive)
+        queue.async { [unowned self] in
+            do {
+                repeat {
+                    let newSocket = try self.listenSocket.acceptClientConnection()
+                    logger.info("Accepted connection from \(newSocket.remoteHostname)")
+                    self.addNewConnection(socket: newSocket)
+                } while self.continueRunning
+            } catch {
+                logger.error("Could not accept connections for listening socket", error: error)
             }
             self.stop()
         }
@@ -73,7 +74,35 @@ public class Server: NSObject, NetServiceDelegate {
 
     public func stop() {
         service.stop()
-        socket.close()
+        continueRunning = false
+        listenSocket.close()
+
+        socketLockQueue.sync { [unowned self] in
+            for socket in self.connectedSockets {
+                socket.value.close()
+            }
+            self.connectedSockets = [:]
+        }
+    }
+
+    func addNewConnection(socket: Socket) {
+        socketLockQueue.sync { [unowned self, socket] in
+            self.connectedSockets[socket.socketfd] = socket
+        }
+
+        let queue = DispatchQueue.global(qos: .userInteractive)
+
+        // Create the run loop work item and dispatch to the default priority global queue...
+        queue.async { [unowned self, socket] in
+            Connection().listen(socket: socket, application: self.application)
+
+            logger.debug("Closed connection to \(socket.remoteHostname)")
+            socket.close()
+
+            self.socketLockQueue.sync { [unowned self, socket] in
+                self.connectedSockets[socket.socketfd] = nil
+            }
+        }
     }
 
     #if os(macOS)

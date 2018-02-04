@@ -14,8 +14,8 @@ let package = Package(
         .package(url: "https://github.com/Bouke/HKDF.git", from: "3.0.1"),
         .package(url: "https://github.com/knly/Evergreen.git", .branch("swift4")),
         .package(url: "https://github.com/Bouke/Kitura-net.git", from: "1.7.0"),
-        .package(url: "https://github.com/IBM-Swift/BlueSocket.git", from: "0.12.0"),
-        .package(url: "https://github.com/IBM-Swift/BlueCryptor.git", from: "0.8.16"),
+        .package(url: "https://github.com/IBM-Swift/BlueSocket.git", from: "0.12.90"),
+        .package(url: "https://github.com/IBM-Swift/BlueCryptor.git", from: "0.8.27"),
         .package(url: "https://github.com/Coder-256/Regex.git", .branch("swift4")),
     ],
     targets: [

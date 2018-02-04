@@ -107,7 +107,7 @@ followed for ease of understanding.
                                  |
                                  |delegate
                                  v
-       +--------+ 1       1 +--------+
+       +--------+ 1     0…1 +--------+
        | Device |-----------| Server |
        +--------+\          +--------+
             |1    -\notify       |1
