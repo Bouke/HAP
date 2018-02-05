@@ -4,7 +4,7 @@ extension Accessory {
         public enum ColorType {
             case white
             case color
-            case colorTemperature
+            case colorTemperature(min:Int, max:Int)
         }
         public let lightbulb : Service.Lightbulb
 
@@ -46,12 +46,7 @@ extension Service {
             maxValue: 360,
             minValue: 0,
             minStep: 1)
-        public let temperature = GenericCharacteristic<Temperature>(
-            type: .colorTemperature,
-            value: 400,
-            maxValue: 400,
-            minValue: 50,
-            minStep: 1)
+        public let temperature : GenericCharacteristic<Temperature>?
 
         public init(type: Accessory.Lightbulb.ColorType, isDimmable: Bool) {
             var characteristics : [Characteristic] = [on]
@@ -62,10 +57,17 @@ extension Service {
             case .color:
                 characteristics.append(hue)
                 characteristics.append(saturation)
-            case .colorTemperature:
-                characteristics.append(temperature)
+                temperature = nil
+            case .colorTemperature(let min, let max):
+                temperature = GenericCharacteristic<Temperature>(
+                type: .colorTemperature,
+                value: max,
+                maxValue: Double(max),
+                minValue: Double(min),
+                minStep: 1)
+                characteristics.append(temperature!)
             default:
-                break
+                temperature = nil
             }
             super.init(type: .lightbulb, characteristics: characteristics)
         }
