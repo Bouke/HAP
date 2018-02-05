@@ -5,6 +5,16 @@ import func Evergreen.getLogger
 
 fileprivate let logger = getLogger("hap.device")
 
+// MARK: Pairing State
+
+public enum PairingState {
+    case notPaired
+    case pairing
+    case paired
+}
+
+// MARK: Device class
+
 // swiftlint:disable:next type_body_length
 public class Device {
     internal(set) public var name: String {
@@ -25,6 +35,15 @@ public class Device {
     let storage: Storage
 
     weak var server: Server?
+
+    public var onPairingStateChange: [(PairingState, PairingState) -> Void] = []
+
+    public private(set) var state = PairingState.notPaired {
+        didSet {
+            logger.info("State change from: \(oldValue) to \(self.state)")
+            _ = onPairingStateChange.map { $0(oldValue, state) }
+        }
+    }
 
     private(set) var characteristicEventListeners: [Box<Characteristic>: WeakObjectSet<Server.Connection>]
     private(set) var configuration: Configuration
@@ -119,6 +138,9 @@ public class Device {
         case .random:
             break
         }
+
+        // restore state from configuration
+        state = configuration.pairings.isEmpty ? .notPaired : .paired
 
         characteristicEventListeners = [:]
 
@@ -267,27 +289,38 @@ public class Device {
             .isEmpty
     }
 
+    // MARK: - Pairing
+
+    func changePairingState(_ newState: PairingState) {
+        switch (state, newState) {
+        case (.pairing, .notPaired), (.notPaired, .pairing):
+            state = newState
+        case (.pairing, .paired), (.paired, .notPaired):
+            state = newState
+            // Update the Bonjour TXT record
+            notifyConfigurationChange()
+        default:
+            fatalError("Invalid state tranistion: \(state) -> \(newState)")
+        }
+    }
+
     public var isPaired: Bool {
-        return !configuration.pairings.isEmpty
+        return state == .paired
     }
 
     // Add the pairing to the internal DB and notify the change
     // to update the Bonjour broadcast
     func add(pairing: Pairing) {
-        if !isPaired {
-            defer {
-                // Update the Bonjour TXT record
-                notifyConfigurationChange()
-            }
-        }
         configuration.pairings[pairing.identifier] = pairing
         persistConfig()
+        if state == .pairing {
+            changePairingState(.paired)
+        }
     }
 
     // Remove the pairing in the internal DB and notify the change
     // to update the Bonjour broadcast
     func remove(pairingWithIdentifier identifier: PairingIdentifier) {
-        let wasPaired = isPaired
         configuration.pairings[identifier] = nil
         // If the last remaining admin controller pairing is removed, all
         // pairings on the accessory must be removed.
@@ -296,15 +329,16 @@ public class Device {
             configuration.pairings = [:]
         }
         persistConfig()
-        if wasPaired && !isPaired {
-            // Update the Bonjour TXT record
-            notifyConfigurationChange()
+        if state == .paired {
+            changePairingState(.notPaired)
         }
     }
 
     func get(pairingWithIdentifier identifier: PairingIdentifier) -> Pairing? {
         return configuration.pairings[identifier]
     }
+
+    // MARK: - Characteristic listeners
 
     // Add an object which would be notified of changes to Characterisics
     func add(characteristic: Characteristic,
@@ -360,6 +394,8 @@ public class Device {
                                  ofAccessory: accessory,
                                  didChangeValue: newValue)
     }
+
+    // MARK: - QR code pairing
 
     // Return a URI which can be displayed as a QR code for quick setup
     // The URI is an encoded form of the setup code and the accessory type, followed by the setup key
