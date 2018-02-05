@@ -118,6 +118,14 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
                 maxValue: Double? = nil,
                 minValue: Double? = nil,
                 minStep: Double? = nil) {
+        if let v = value, let d = Double(value:v) {
+            if let min = minValue {
+                precondition(d >= min, "Characteristic \(type) value \(v) is lower than minValue \(min)")
+            }
+            if let max = maxValue {
+                precondition(d <= max, "Characteristic \(type) value \(v) is higher than maxValue \(max)")
+            }
+        }
         self.type = type
         self._value = value
         self.permissions = permissions
