@@ -552,7 +552,7 @@ class EndpointTests: XCTestCase {
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00063"))
 
         lightsensor.lightSensor.currentLight.value = 234
-        thermostat.thermostat.currentTemperature.value = 123
+        thermostat.thermostat.currentTemperature.value = 100 //123 BUGFIX
         lamp.lightbulb.brightness.value = 53
         let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00063B"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [lightsensor, thermostat, lamp])
         let application = characteristics(device: device)
