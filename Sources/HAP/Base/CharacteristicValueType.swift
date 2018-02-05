@@ -59,19 +59,6 @@ extension Double: CharacteristicValueType {
     }
 }
 
-extension Float: CharacteristicValueType {
-    public init?(value: Any) {
-        guard let double = value as? Double else {
-            return nil
-        }
-        self = Float(double)
-    }
-    static public let format = CharacteristicFormat.float
-    public var jsonValueType: JSONValueType {
-        return Double(self)
-    }
-}
-
 extension Data: CharacteristicValueType, JSONValueTypeConvertible {
     public init?(value: Any) {
         fatalError("How does deserialization of Data work?")
