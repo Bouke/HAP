@@ -9,6 +9,7 @@ extension Accessory {
         public let lightbulb : Service.Lightbulb
 
         public init(info: Service.Info, additionalServices: [Service] = [], type: ColorType = .color, isDimmable: Bool = true) {
+            
             lightbulb = Service.Lightbulb(type: type, isDimmable: isDimmable)
             super.init(info: info, type: .lightbulb, services: [lightbulb] + additionalServices)
         }
