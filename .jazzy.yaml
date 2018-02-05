@@ -20,7 +20,7 @@ custom_categories:
       - ServiceType
   - name: Characteristic
     children:
-      - Characteristic
+      - AnyCharacteristic
       - GenericCharacteristic
       - CharacteristicFormat
       - CharacteristicPermission
@@ -31,11 +31,13 @@ custom_categories:
     children:
       - AirQuality
       - ChargingState
+      - ContactSensorState
       - CurrentDoorState
       - CurrentHeatingCoolingState
       - DiscoverBridgedAccessories
       - LockCurrentState
       - LockTargetState
+      - OccupancyDetected
       - PositionState
       - SecuritySystemCurrentState
       - SecuritySystemTargetState
@@ -46,12 +48,22 @@ custom_categories:
       - TemperatureDisplayUnits
   - name: Server
     children:
-      - Cryptographer
       - Device
       - Server
+      - QRCode
   - name: Storage
     children:
       - Storage
       - FileStorage
       - MemoryStorage
-      - PrefixedKeyStorage
+  - name: HAP Encoding
+    children:
+      - JSONValueType
+      - JSONValueTypeConvertible
+      - Bool
+      - Data
+      - Double
+      - Float
+      - Int
+      - RawRepresentable
+      - String

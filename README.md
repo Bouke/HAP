@@ -5,6 +5,13 @@ The goal of this package is to provide a complete implementation of the Homekit 
 
 [![Build Status](https://travis-ci.org/Bouke/HAP.svg?branch=master)](https://travis-ci.org/Bouke/HAP)
 
+## Features
+
+* Persistent configuration
+* Pair by scanning QR code (WWDC 2017)
+* Write custom services and characteristics
+* Linux support
+
 ## How to build
 
 ### MacOS
@@ -44,6 +51,41 @@ Run ``swift build`` to compile and ``.build/debug/hap-server`` to run. Modify ``
 
 On Mac OS, you can debug using XCode by running the command ``swift package generate-xcodeproj`` and the opening the resulting ``HAP.xcodeproj`` project. Select the ``hap-server`` target to execute.
 
+## Extensibility
+
+The following code snippet how you would model a fictious accessory
+representing a mobile power bank.
+
+```swift
+class PowerBankAccessory: Accessory {
+    let service = PowerBankService()
+    init(info: Service.Info) {
+        super.init(info: info, type: .outlet, services: [service])
+    }
+}
+class PowerBankService: Service {
+    public let on = GenericCharacteristic<Bool>(
+        type: .on,
+        value: false)
+    public let inUse = GenericCharacteristic<Bool>(
+        type: .outletInUse,
+        value: true,
+        permissions: [.read, .events])
+    public let batteryLevel = GenericCharacteristic<Double>(
+        type: .batteryLevel,
+        value: 100,
+        permissions: [.read, .events])
+
+    init() {
+        super.init(type: .outlet, characteristics: [
+            AnyCharacteristic(on),
+            AnyCharacteristic(inUse),
+            AnyCharacteristic(batteryLevel)
+        ])
+    }
+}
+```
+
 ## Linux
 
 There is some support on Linux. It uses my own implementation of NetService
@@ -65,7 +107,7 @@ followed for ease of understanding.
                                  |
                                  |delegate
                                  v
-       +--------+ 1       1 +--------+
+       +--------+ 1     0…1 +--------+
        | Device |-----------| Server |
        +--------+\          +--------+
             |1    -\notify       |1
@@ -99,4 +141,7 @@ Currently ``GenericCharacteristic<T>`` is used, to allow for user-defined value 
 
 ## Credits
 
-This library was written by [Bouke Haarsma](https://twitter.com/BoukeHaarsma).
+This library was written by [Bouke Haarsma](https://twitter.com/BoukeHaarsma)
+and [contributors][0].
+
+[0]: https://github.com/Bouke/HAP/graphs/contributors

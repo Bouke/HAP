@@ -38,6 +38,8 @@ identifier_name:
     - ev
     - ok
     - on
+    - x
+    - y
     - SESSION_KEY
     - _value
 type_name:

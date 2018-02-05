@@ -9,184 +9,39 @@ import func Evergreen.getLogger
 #endif
 
 fileprivate let logger = getLogger("hap.http")
-private let minimalTimeBetweenNotifications: DispatchTimeInterval = .seconds(1)
 
 public class Server: NSObject, NetServiceDelegate {
-
-    class NotificationQueue {
-        private var queue = [InstanceID: Characteristic]()
-        fileprivate weak var listener: Connection?
-        private var nextAllowableNotificationTime = DispatchTime.now()
-
-        internal func append(characteristic: Characteristic) {
-            /* HAP Specification 5.8 (excerpts)
-             Network-based notifications must be coalesced
-             by the accessory using a delay of no less than 1 second.
-             Excessive or inappropriate notifications may result
-             in the user being notified of a misbehaving
-             accessory and/or termination of the pairing relationship.
-             */
-            DispatchQueue.main.async {
-                self.queue[characteristic.iid] = characteristic
-                if DispatchTime.now() >= self.nextAllowableNotificationTime {
-                    self.nextAllowableNotificationTime = DispatchTime.now() + minimalTimeBetweenNotifications
-                    self.sendQueue()
-                } else {
-                    logger.debug("queued event for delivery")
-                    DispatchQueue.main.asyncAfter(deadline: self.nextAllowableNotificationTime) {
-                        self.sendQueue()
-                    }
-                }
-            }
-        }
-
-        private func sendQueue() {
-            guard !queue.isEmpty else {
-                return
-            }
-            defer {
-                self.queue.removeAll()
-            }
-            let event: Event
-            do {
-                event = try Event(valueChangedOfCharacteristics: Array(queue.values))
-            } catch {
-                return logger.error("Could not create value change event: \(error)")
-            }
-            let data = event.serialized()
-            // swiftlint:disable:next line_length
-            logger.info("Value changed, notifying \(self.listener?.socket?.remoteHostname ?? "-"), event: \(data) (\(self.queue.count) updates)")
-            listener?.writeOutOfBand(data)
-        }
-    }
-
-    public class Connection: NSObject {
-        var context = [String: Any]()
-        var socket: Socket?
-        var cryptographer: Cryptographer?
-        var notificationQueue: NotificationQueue
-
-        override init() {
-            notificationQueue = NotificationQueue()
-            super.init()
-            notificationQueue.listener = self
-        }
-
-        func listen(socket: Socket, queue: DispatchQueue, application: @escaping Application) {
-            self.socket = socket
-            let httpParser = HTTPParser(isRequest: true)
-            let request = HTTPServerRequest(socket: socket, httpParser: httpParser)
-            queue.async {
-                while !socket.remoteConnectionClosed {
-                    var readBuffer = Data()
-                    do {
-                        _ = try socket.read(into: &readBuffer)
-                        if let cryptographer = self.cryptographer {
-                            readBuffer = try cryptographer.decrypt(readBuffer)
-                        }
-                        _ = readBuffer.withUnsafeBytes {
-                            httpParser.execute($0, length: readBuffer.count)
-                        }
-                    } catch {
-                        logger.error("Error while reading from socket", error: error)
-                        break
-                    }
-
-                    // Fix to allow Bridges with spaces in name.
-                    // HomeKit POSTs contain a hostname with \\032 replacing the
-                    // space which causes Kitura httpParser to baulk on the
-                    // resulting URL. Replacing '\\032' with '-' in the hostname
-                    // allows Kitura to create a valid URL, and the value is not
-                    // used elsewhere.
-                    if let hostname = request.headers["Host"]?[0], (hostname.contains("\\032")) {
-                        request.headers["Host"]![0] = hostname.replacingOccurrences(of: "\\032", with: "-")
-                    }
-
-                    guard httpParser.completed else {
-                        break
-                    }
-
-                    request.parsingCompleted()
-                    var response: Response! = nil
-                    DispatchQueue.main.sync {
-                        response = application(self, request)
-                    }
-
-                    do {
-                        var writeBuffer = response.serialized()
-                        if let cryptographer = self.cryptographer {
-                            writeBuffer = try cryptographer.encrypt(writeBuffer)
-                        }
-                        if let response = response as? UpgradeResponse {
-                            self.cryptographer = response.cryptographer
-                            // todo?: override response
-                        }
-                        try socket.write(from: writeBuffer)
-                        httpParser.reset()
-                    } catch {
-                        logger.error("Error while writing to socket", error: error)
-                        break
-                    }
-                }
-                logger.debug("Closed connection to \(socket.remoteHostname)")
-                socket.close()
-                self.socket = nil
-            }
-        }
-
-        func writeOutOfBand(_ data: Data) {
-            // TODO: resolve race conditions with the read/write loop
-            guard let socket = socket else {
-                return
-            }
-            do {
-                var writeBuffer = data
-                if let cryptographer = cryptographer {
-                    writeBuffer = try cryptographer.encrypt(writeBuffer)
-                }
-                try socket.write(from: writeBuffer)
-            } catch {
-                logger.error("Error while writing to socket", error: error)
-                socket.close()
-            }
-        }
-
-        var isAuthenticated: Bool {
-            return cryptographer != nil
-        }
-    }
-
-    let service: NetService
-    let socket: Socket
-    let queue = DispatchQueue(label: "hap.socket-listener", qos: .utility, attributes: [.concurrent])
+    let device: Device
     let application: Application
 
+    let service: NetService
+
+    let listenSocket: Socket
+    let socketLockQueue = DispatchQueue(label: "hap.socketLockQueue")
+
+    var continueRunning = true
+    var connectedSockets = [Int32: Socket]()
+
     public init(device: Device, port: Int = 0) throws {
+        precondition(device.server == nil, "Device already assigned to other Server instance")
+        self.device = device
+
         application = root(device: device)
 
-        socket = try Socket.create(family: .inet, type: .stream, proto: .tcp)
-        try socket.listen(on: port)
+        listenSocket = try Socket.create(family: .inet, type: .stream, proto: .tcp)
+        try listenSocket.listen(on: port)
 
-        service = NetService(domain: "local.", type: "_hap._tcp.", name: device.name, port: socket.listeningPort)
-
-        Server.publishDiscoveryRecordOf(device, to: service)
+        service = NetService(domain: "local.", type: "_hap._tcp.", name: device.name, port: listenSocket.listeningPort)
 
         super.init()
+
         service.delegate = self
-
-        device.onConfigurationChange.append({ [weak self] changedDevice in
-            if let service = self?.service {
-                Server.publishDiscoveryRecordOf(changedDevice, to: service)
-            }
-        })
+        device.server = self
+        updateDiscoveryRecord()
     }
 
-    deinit {
-        self.stop()
-    }
-
-    // Publish the Accessory configuration on the Bonjour service
-    private class func publishDiscoveryRecordOf(_ device: Device, to service: NetService) {
+    /// Publish the Accessory configuration on the Bonjour service
+    func updateDiscoveryRecord() {
         #if os(macOS)
             let record = device.config.dictionary(key: { $0.key }, value: { $0.value.data(using: .utf8)! })
             service.setTXTRecord(NetService.data(fromTXTRecord: record))
@@ -196,21 +51,22 @@ public class Server: NSObject, NetServiceDelegate {
     }
 
     public func start() {
-        service.publish()
-        logger.info("Listening on port \(self.socket.listeningPort)")
+        // TODO: make sure can only be started if not started
 
-        queue.async {
-            while self.socket.isListening {
-                do {
-                    let client = try self.socket.acceptClientConnection()
-                    logger.info("Accepted connection from \(client.remoteHostname)")
-                    DispatchQueue.main.async {
-                        _ = Connection().listen(socket: client, queue: self.queue, application: self.application)
-                    }
-                } catch {
-                    logger.error("Could not accept connections for listening socket", error: error)
-                    break
-                }
+        continueRunning = true
+        service.publish()
+        logger.info("Listening on port \(self.listenSocket.listeningPort)")
+
+        let queue = DispatchQueue.global(qos: .userInteractive)
+        queue.async { [unowned self] in
+            do {
+                repeat {
+                    let newSocket = try self.listenSocket.acceptClientConnection()
+                    logger.info("Accepted connection from \(newSocket.remoteHostname)")
+                    self.addNewConnection(socket: newSocket)
+                } while self.continueRunning
+            } catch {
+                logger.error("Could not accept connections for listening socket", error: error)
             }
             self.stop()
         }
@@ -218,7 +74,35 @@ public class Server: NSObject, NetServiceDelegate {
 
     public func stop() {
         service.stop()
-        socket.close()
+        continueRunning = false
+        listenSocket.close()
+
+        socketLockQueue.sync { [unowned self] in
+            for socket in self.connectedSockets {
+                socket.value.close()
+            }
+            self.connectedSockets = [:]
+        }
+    }
+
+    func addNewConnection(socket: Socket) {
+        socketLockQueue.sync { [unowned self, socket] in
+            self.connectedSockets[socket.socketfd] = socket
+        }
+
+        let queue = DispatchQueue.global(qos: .userInteractive)
+
+        // Create the run loop work item and dispatch to the default priority global queue...
+        queue.async { [unowned self, socket] in
+            Connection().listen(socket: socket, application: self.application)
+
+            logger.debug("Closed connection to \(socket.remoteHostname)")
+            socket.close()
+
+            self.socketLockQueue.sync { [unowned self, socket] in
+                self.connectedSockets[socket.socketfd] = nil
+            }
+        }
     }
 
     #if os(macOS)

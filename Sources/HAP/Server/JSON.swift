@@ -1,10 +1,10 @@
 import Foundation
 
-public protocol JSONSerializable {
+protocol JSONSerializable {
     func serialized() -> [String: JSONValueType]
 }
 
-public protocol JSONDeserializable {
+protocol JSONDeserializable {
     init(_ data: [String: JSONValueType]) throws
 }
 

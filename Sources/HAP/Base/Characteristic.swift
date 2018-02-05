@@ -1,5 +1,13 @@
 import Foundation
 
+public struct AnyCharacteristic {
+    let wrapped: Characteristic
+
+    public init<T>(_ characteristic: GenericCharacteristic<T>) {
+        wrapped = characteristic
+    }
+}
+
 protocol Characteristic: class, JSONSerializable {
     weak var service: Service? { get set }
     var iid: InstanceID { get set }
@@ -17,7 +25,7 @@ protocol Characteristic: class, JSONSerializable {
 }
 
 extension Characteristic {
-    public func serialized() -> [String: JSONValueType] {
+    func serialized() -> [String: JSONValueType] {
         var serialized: [String: JSONValueType] = [
             "iid": iid,
             "type": type.rawValue,
