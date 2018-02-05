@@ -1,15 +1,36 @@
 import Foundation
 
-typealias PairTagTLV8 = [PairTag: Data]
+typealias PairTagTLV8Tuple = (PairTag, Data)
+typealias PairTagTLV8 = [PairTagTLV8Tuple]
+
+extension Array where Element == PairTagTLV8Tuple {
+    subscript(index: PairTag) -> Data? {
+        return self.first(where: { $0.0 == index })?.1
+    }
+
+    static func == (lhs: [PairTagTLV8Tuple], rhs: [PairTagTLV8Tuple]) -> Bool {
+
+        if lhs.count != rhs.count {
+            return false
+        }
+        for i in 0..<lhs.count where lhs[i] != rhs[i] {
+            return false
+        }
+        return true
+    }
+}
 
 enum TLV8Error: Swift.Error {
     case unknownKey(UInt8)
     case decodeError
 }
 
-func decode<Key: Hashable>(_ data: Data) throws -> [Key: Data] where Key: RawRepresentable, Key.RawValue == UInt8 {
-    var result = [Key: Data]()
+func decode<Key>(_ data: Data) throws -> [(Key, Data)] where Key: RawRepresentable, Key.RawValue == UInt8 {
+    var result = [(Key, Data)]()
     var index = data.startIndex
+    var lastLength = 0
+    var lastKey = Key(rawValue: 0)!
+
     while index < data.endIndex {
         guard let type = Key(rawValue: data[index]) else {
             throw TLV8Error.unknownKey(data[index])
@@ -24,24 +45,27 @@ func decode<Key: Hashable>(_ data: Data) throws -> [Key: Data] where Key: RawRep
         }
         let value = data[index..<endIndex]
 
-        if let append = result[type] {
-            result[type] = append + Data(bytes: Array(value))
+        if lastLength == 255 && type == lastKey {
+            let lastFragment = result[result.count - 1].1
+            result[result.count - 1] = (type, lastFragment + Data(bytes: Array(value)))
         } else {
-            result[type] = Data(bytes: Array(value))
+            result.append((type, Data(bytes: Array(value))))
         }
 
         index = endIndex
+        lastKey = type
+        lastLength = length
     }
     return result
 }
 
-func encode<Key>(_ data: [Key: Data]) -> Data where Key: RawRepresentable, Key.RawValue == UInt8 {
+func encode<Key>(_ array: [(Key, Data)]) -> Data where Key: RawRepresentable, Key.RawValue == UInt8 {
     var result = Data()
     func append(type: UInt8, value: Data.SubSequence) {
         result.append(Data(bytes: [type, UInt8(value.count)] + value))
     }
 
-    for (type, value) in data {
+    for (type, value) in array {
         var index = value.startIndex
         repeat {
             if let endIndex = value.index(index, offsetBy: 255, limitedBy: value.endIndex) {
@@ -56,26 +80,48 @@ func encode<Key>(_ data: [Key: Data]) -> Data where Key: RawRepresentable, Key.R
     return result
 }
 
+// Pair Setup State
 enum PairSetupStep: UInt8 {
     case waiting = 0
+
+    // M1: iOS Device -> Accessory -- `SRP Start Request'
     case startRequest = 1
+
+    // M2: Accessory -> iOS Device -- `SRP Start Response'
     case startResponse = 2
+
+    // M3: iOS Device -> Accessory -- `SRP Verify Request'
     case verifyRequest = 3
+
+    // M4: Accessory -> iOS Device -- `SRP Verify Response'
     case verifyResponse = 4
+
+    // M5: iOS Device -> Accessory -- `Exchange Request'
     case keyExchangeRequest = 5
+
+    // M6: Accessory -> iOS Device -- `Exchange Response'
     case keyExchangeResponse = 6
 }
 
+// Pair Verification State
 enum PairVerifyStep: UInt8 {
     case waiting = 0
+
+    // M1: iOS Device -> Accessory -- `Verify Start Request'
     case startRequest = 1
+
+    // M2: Accessory -> iOS Device -- `Verify Start Response'
     case startResponse = 2
+
+    // M3: iOS Device -> Accessory -- `Verify Finish Request'
     case finishRequest = 3
+
+    // M4: Accessory -> iOS Device -- `Verify Finish Response'
     case finishResponse = 4
 }
 
 enum PairTag: UInt8 {
-    // Method to use for pairing. See Table 4-4 (page 60).
+    // TLV Types. See Table 4-6 (page 61).
     case pairingMethod = 0x00
 
     // Identifier for authentication. (UTF-8)
@@ -125,6 +171,7 @@ enum PairTag: UInt8 {
 }
 
 enum PairingMethod: UInt8 {
+    // Method to use for pairing. See Table 4-4 (page 60).
     case `default` = 0 // TODO: according to specs, 0 is 'reserved'
     case pairSetup = 1
     case pairVerify = 2
@@ -138,6 +185,7 @@ enum PairStep: UInt8 {
     case response = 0x02
 }
 
+// Error Codes. See Table 4-5 (page 60).
 enum PairError: UInt8 {
     // Generic error to handle unexpected errors.
     case unknown = 0x01

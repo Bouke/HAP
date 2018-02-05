@@ -35,8 +35,8 @@ class PairVerifyControllerTests: XCTestCase {
         do {
             // Client -> Server: public key
             let request: PairTagTLV8 = [
-                PairTag.state: Data(bytes: [PairVerifyStep.startRequest.rawValue]),
-                PairTag.publicKey: clientPublicKey
+                (.state, Data(bytes: [PairVerifyStep.startRequest.rawValue])),
+                (.publicKey, clientPublicKey)
             ]
             let resultOuter: PairTagTLV8
             do {
@@ -90,8 +90,8 @@ class PairVerifyControllerTests: XCTestCase {
                 return XCTFail("Couldn't sign")
             }
             let requestInner: PairTagTLV8 = [
-                .identifier: username,
-                .signature: signature
+                (.identifier, username),
+                (.signature, signature)
             ]
             guard let cipher = try? ChaCha20Poly1305.encrypt(message: encode(requestInner),
                                                              nonce: "PV-Msg03".data(using: .utf8)!,
@@ -99,7 +99,7 @@ class PairVerifyControllerTests: XCTestCase {
                 return XCTFail("Couldn't encode")
             }
             let resultOuter: PairTagTLV8 = [
-                .encryptedData: cipher
+                (.encryptedData, cipher)
             ]
             do {
                 _ = try controller.finishRequest(resultOuter, session)

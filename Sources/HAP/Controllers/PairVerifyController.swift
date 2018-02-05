@@ -61,8 +61,8 @@ class PairVerifyController {
         let signature = try Ed25519.sign(privateKey: device.privateKey, message: material)
 
         let resultInner: PairTagTLV8 = [
-            .identifier: device.identifier.data(using: .utf8)!,
-            .signature: signature
+            (.identifier, device.identifier.data(using: .utf8)!),
+            (.signature, signature)
         ]
         logger.debug("startRequest result: \(resultInner)")
 
@@ -79,9 +79,9 @@ class PairVerifyController {
         }
 
         let resultOuter: PairTagTLV8 = [
-            .state: Data(bytes: [PairVerifyStep.startResponse.rawValue]),
-            .publicKey: session.publicKey,
-            .encryptedData: encryptedResultInner
+            (.state, Data(bytes: [PairVerifyStep.startResponse.rawValue])),
+            (.publicKey, session.publicKey),
+            (.encryptedData, encryptedResultInner)
         ]
         logger.debug("startRequest encrypted result: \(resultOuter)")
         return (resultOuter, session)
@@ -129,7 +129,7 @@ class PairVerifyController {
 
         logger.info("Pair verify completed")
         let result: PairTagTLV8 = [
-            .state: Data(bytes: [PairVerifyStep.finishResponse.rawValue])
+            (.state, Data(bytes: [PairVerifyStep.finishResponse.rawValue]))
         ]
         return (result, pairing)
     }

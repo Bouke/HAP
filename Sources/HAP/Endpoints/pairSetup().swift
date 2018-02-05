@@ -46,28 +46,40 @@ func pairSetup(device: Device) -> Application {
         let response: PairTagTLV8?
         do {
             switch sequence {
+            // M1: iOS Device -> Accessory -- `SRP Start Request'
             case .startRequest:
                 let session = createSession()
                 response = try controller.startRequest(data, session)
                 connection.context[SESSION_KEY] = session
+            // M3: iOS Device -> Accessory -- `SRP Verify Request'
             case .verifyRequest:
                 let session = try getSession(connection)
-                response = controller.verifyRequest(data, session)
+                response = try controller.verifyRequest(data, session)
+            // M5: iOS Device -> Accessory -- `Exchange Request'
             case .keyExchangeRequest:
                 let session = try getSession(connection)
                 response = try controller.keyExchangeRequest(data, session)
+            // Unknown state - return error and abort
             default:
-                response = nil
+                response = try controller.unknownRequest(data)
             }
         } catch {
             logger.warning(error)
             connection.context[SESSION_KEY] = nil
-            response = nil
+            switch error {
+            case PairSetupController.Error.errorWithResponse(let R):
+                 response = R
+                 if let errorData = response![.error] {
+                    logger.warning(
+                        "Pair Setup error:\(String(describing: errorData.first.flatMap({ PairError(rawValue: $0) })) )")
+                }
+            default:
+                response = nil
+            }
         }
         if let response = response {
             return Response(status: .ok, data: encode(response), mimeType: "application/pairing+tlv8")
         } else {
-            // TODO: return error code -- otherwise setup will hang in iOS (spinner)
             return .badRequest
         }
     }

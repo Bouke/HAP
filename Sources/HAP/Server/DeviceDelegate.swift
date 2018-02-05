@@ -47,6 +47,10 @@ public protocol DeviceDelegate: class {
     /// - Parameter accessory: accessory to be identified
     func didRequestIdentificationOf(_ accessory: Accessory)
 
+    /// Tells the delegate that the Device PairingState has changed.
+    ///
+    func didChangePairingState(from: PairingState, to: PairingState)
+
     /// Tells the delegate that the value of a characteristic has changed.
     ///
     /// - Parameters:
@@ -76,6 +80,8 @@ public extension DeviceDelegate {
     func didRequestIdentification() { }
 
     func didRequestIdentificationOf(_ accessory: Accessory) { }
+
+    func didChangePairingState(from: PairingState, to: PairingState) { }
 
     func characteristic<T>(
         _ characteristic: GenericCharacteristic<T>,
