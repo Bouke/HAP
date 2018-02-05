@@ -59,6 +59,7 @@ extension Service {
                 characteristics.append(saturation)
                 temperature = nil
             case .colorTemperature(let min, let max):
+                precondition(min >= 50 && max <= 400, "Maximum range for color temperature is 50...400, \(min)...\(max) is out of bounds")
                 temperature = GenericCharacteristic<Temperature>(
                 type: .colorTemperature,
                 value: max,
