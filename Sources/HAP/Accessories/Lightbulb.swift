@@ -1,3 +1,4 @@
+// swiftlint:disable nesting
 extension Accessory {
     open class Lightbulb: Accessory {
 
@@ -6,10 +7,13 @@ extension Accessory {
             case color
             case colorTemperature(min:Int, max:Int)
         }
-        public let lightbulb : Service.Lightbulb
+        public let lightbulb: Service.Lightbulb
 
-        public init(info: Service.Info, additionalServices: [Service] = [], type: ColorType = .color, isDimmable: Bool = true) {
-            
+        public init(info: Service.Info,
+                    additionalServices: [Service] = [],
+                    type: ColorType = .color,
+                    isDimmable: Bool = true) {
+
             lightbulb = Service.Lightbulb(type: type, isDimmable: isDimmable)
             super.init(info: info, type: .lightbulb, services: [lightbulb] + additionalServices)
         }
@@ -46,10 +50,10 @@ extension Service {
             maxValue: 360,
             minValue: 0,
             minStep: 1)
-        public let temperature : GenericCharacteristic<Temperature>?
+        public let temperature: GenericCharacteristic<Temperature>?
 
         public init(type: Accessory.Lightbulb.ColorType, isDimmable: Bool) {
-            var characteristics : [Characteristic] = [on]
+            var characteristics: [Characteristic] = [on]
             if isDimmable {
                 characteristics.append(brightness)
             }
@@ -59,7 +63,8 @@ extension Service {
                 characteristics.append(saturation)
                 temperature = nil
             case .colorTemperature(let min, let max):
-                precondition(min >= 50 && max <= 400, "Maximum range for color temperature is 50...400, \(min)...\(max) is out of bounds")
+                precondition(min >= 50 && max <= 400,
+                             "Maximum range for color temperature is 50...400, \(min)...\(max) is out of bounds")
                 temperature = GenericCharacteristic<Temperature>(
                 type: .colorTemperature,
                 value: max,

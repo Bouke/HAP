@@ -69,7 +69,7 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
             guard newValue != _value else {
                 return
             }
-            if let v = newValue, let d = Double(value:v) {
+            if let v = newValue, let d = Double(value: v) {
                 if let min = minValue {
                     precondition(d >= min, "Characteristic \(type) value \(v) is lower than minValue \(min)")
                 }
@@ -126,8 +126,8 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
                 maxValue: Double? = nil,
                 minValue: Double? = nil,
                 minStep: Double? = nil) {
-        
-        if let v = value, let d = Double(value:v) {
+
+        if let v = value, let d = Double(value: v) {
             if let min = minValue {
                 precondition(d >= min, "Characteristic \(type) value \(v) is lower than minValue \(min)")
             }
