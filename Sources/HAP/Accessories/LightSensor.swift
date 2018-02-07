@@ -14,7 +14,7 @@ extension Service {
     open class LightSensor: Service {
         public let currentLight = GenericCharacteristic<CurrentLight>(
             type: .currentAmbientLightLevel,
-            value: 0,
+            value: 0.0001,
             permissions: [.read, .events],
             maxValue: 100000,
             minValue: 0.0001)

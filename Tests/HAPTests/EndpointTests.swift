@@ -32,7 +32,7 @@ class EndpointTests: XCTestCase {
     }
 
     func testAccessories() {
-        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00055"))
+        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00055"), type: .color, isDimmable: true)
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = accessories(device: device)
         let response = application(MockConnection(), MockRequest.get(path: "/accessories"))
@@ -114,7 +114,7 @@ class EndpointTests: XCTestCase {
     }
 
     func testGetCharacteristics() {
-        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00056", manufacturer: "Bouke"))
+        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00056", manufacturer: "Bouke"), isDimmable: true)
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = characteristics(device: device)
         do {
@@ -138,7 +138,7 @@ class EndpointTests: XCTestCase {
         }
 
         do {
-            let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=\(lamp.aid).\(lamp.info.name.iid),\(lamp.aid).\(lamp.lightbulb.brightness.iid)&meta=1&perms=1&type=1&ev=1"))
+            let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=\(lamp.aid).\(lamp.info.name.iid),\(lamp.aid).\(lamp.lightbulb.brightness!.iid)&meta=1&perms=1&type=1&ev=1"))
             guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body ?? Data(), options: [])) as? [String: [[String: Any]]] else {
                 return XCTFail("Could not decode")
             }
@@ -154,7 +154,7 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(nameCharacteristic["type"] as? String, "23")
             XCTAssertEqual(nameCharacteristic["ev"] as? Bool, false)
 
-            guard let brightnessCharacteristic = characteristics.first(where: { $0["iid"] as? Int == lamp.lightbulb.brightness.iid }) else {
+            guard let brightnessCharacteristic = characteristics.first(where: { $0["iid"] as? Int == lamp.lightbulb.brightness!.iid }) else {
                 return XCTFail("No identify characteristic")
             }
             XCTAssertEqual(brightnessCharacteristic["value"] as? Int, 100)
@@ -169,12 +169,12 @@ class EndpointTests: XCTestCase {
     }
 
     func testPutBoolAndIntCharacteristics() {
-        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00057", manufacturer: "Bouke"))
+        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00057", manufacturer: "Bouke"), isDimmable: true)
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = characteristics(device: device)
 
         lamp.lightbulb.on.value = false
-        lamp.lightbulb.brightness.value = 0
+        lamp.lightbulb.brightness?.value = 0
 
         // turn lamp on
         do {
@@ -199,7 +199,7 @@ class EndpointTests: XCTestCase {
                 "characteristics": [
                     [
                         "aid": lamp.aid,
-                        "iid": lamp.lightbulb.brightness.iid,
+                        "iid": lamp.lightbulb.brightness!.iid,
                         "value": Double(50)
                     ]
                 ]
@@ -207,7 +207,7 @@ class EndpointTests: XCTestCase {
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
             let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .noContent)
-            XCTAssertEqual(lamp.lightbulb.brightness.value, 50)
+            XCTAssertEqual(lamp.lightbulb.brightness!.value, 50)
         }
 
         // 100% brightness
@@ -216,7 +216,7 @@ class EndpointTests: XCTestCase {
                 "characteristics": [
                     [
                         "aid": lamp.aid,
-                        "iid": lamp.lightbulb.brightness.iid,
+                        "iid": lamp.lightbulb.brightness!.iid,
                         "value": Double(100)
                     ]
                 ]
@@ -224,7 +224,7 @@ class EndpointTests: XCTestCase {
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
             let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .noContent)
-            XCTAssertEqual(lamp.lightbulb.brightness.value, 100)
+            XCTAssertEqual(lamp.lightbulb.brightness!.value, 100)
         }
     }
 
@@ -319,7 +319,7 @@ class EndpointTests: XCTestCase {
 
     func testPutBadCharacteristics() {
         let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat", serialNumber: "00059"))
-        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00060"))
+        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00060"), isDimmable: true)
         let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00060B"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
         let application = characteristics(device: device)
 
@@ -369,7 +369,7 @@ class EndpointTests: XCTestCase {
                     ],
                     [
                         "aid": lamp.aid,
-                        "iid": lamp.lightbulb.brightness.iid,
+                        "iid": lamp.lightbulb.brightness!.iid,
                         "value": Double(50)
                     ]
                 ]
@@ -377,7 +377,7 @@ class EndpointTests: XCTestCase {
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
             let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .multiStatus)
-            XCTAssertEqual(lamp.lightbulb.brightness.value, 50)
+            XCTAssertEqual(lamp.lightbulb.brightness!.value, 50)
 
             let json = try! JSONSerialization.jsonObject(with: response.body ?? Data())  as! [String: [[String: Any]]]
             XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int, HAPStatusCodes.readOnly.rawValue)
@@ -418,7 +418,7 @@ class EndpointTests: XCTestCase {
                 "characteristics": [
                     [
                         "aid": lamp.aid,
-                        "iid": lamp.lightbulb.brightness.iid,
+                        "iid": lamp.lightbulb.brightness!.iid,
                         "value": Double(50)
                     ],
                     [
@@ -431,7 +431,7 @@ class EndpointTests: XCTestCase {
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
             let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .multiStatus)
-            XCTAssertEqual(lamp.lightbulb.brightness.value, 50)
+            XCTAssertEqual(lamp.lightbulb.brightness!.value, 50)
 
             let json = try! JSONSerialization.jsonObject(with: response.body ?? Data())  as! [String: [[String: Any]]]
             XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int, HAPStatusCodes.success.rawValue)
@@ -457,7 +457,7 @@ class EndpointTests: XCTestCase {
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
             let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .multiStatus)
-            XCTAssertEqual(lamp.lightbulb.brightness.value, 50)
+            XCTAssertEqual(lamp.lightbulb.brightness!.value, 50)
 
             let json = try! JSONSerialization.jsonObject(with: response.body ?? Data())  as! [String: [[String: Any]]]
             XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int, HAPStatusCodes.readOnly.rawValue)
@@ -549,17 +549,17 @@ class EndpointTests: XCTestCase {
     func testGetBadCharacteristics() {
         let lightsensor = Accessory.LightSensor(info: .init(name: "LightSensor", serialNumber: "00061"))
         let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat", serialNumber: "00062"))
-        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00063"))
+        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00063"), isDimmable: true)
 
         lightsensor.lightSensor.currentLight.value = 234
-        thermostat.thermostat.currentTemperature.value = 123
-        lamp.lightbulb.brightness.value = 53
+        thermostat.thermostat.currentTemperature.value = 100
+        lamp.lightbulb.brightness!.value = 53
         let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00063B"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [lightsensor, thermostat, lamp])
         let application = characteristics(device: device)
 
         // First a good one
         do {
-            let req = "\(lamp.aid).\(lamp.lightbulb.brightness.iid),\(lightsensor.aid).\(lightsensor.lightSensor.currentLight.iid),\(thermostat.aid).\(thermostat.thermostat.currentTemperature.iid)"
+            let req = "\(lamp.aid).\(lamp.lightbulb.brightness!.iid),\(lightsensor.aid).\(lightsensor.lightSensor.currentLight.iid),\(thermostat.aid).\(thermostat.thermostat.currentTemperature.iid)"
             let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=\(req)"))
 
             XCTAssertEqual(response.status, .ok)
@@ -597,7 +597,7 @@ class EndpointTests: XCTestCase {
 
             XCTAssertEqual(lightVal, lightsensor.lightSensor.currentLight.value)
             XCTAssertEqual(thermVal, thermostat.thermostat.currentTemperature.value)
-            XCTAssertEqual(lampaVal, lamp.lightbulb.brightness.value)
+            XCTAssertEqual(lampaVal, lamp.lightbulb.brightness!.value)
         }
 
         // trying to read write only access

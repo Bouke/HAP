@@ -7,7 +7,9 @@ class DeviceTests: XCTestCase {
     func testInstanceIdentifiers() {
         // no bridge -- 1 accessory
         do {
-            let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00041"))
+            let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00041"),
+                                           type: .color,
+                                           isDimmable: true)
             let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
             let accessories = device.accessories
             let services = accessories.flatMap({ $0.services })
@@ -21,7 +23,9 @@ class DeviceTests: XCTestCase {
 
         // bridge with 1 accessory
         do {
-            let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00042"))
+            let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00042"),
+                                           type: .color,
+                                           isDimmable: true)
             let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
             let accessories = device.accessories
             let services = accessories.flatMap({ $0.services })
@@ -35,7 +39,9 @@ class DeviceTests: XCTestCase {
 
         do {
             let thermostat = Accessory.Thermostat(info: .init(name: "Living room thermostat", serialNumber: "00043"))
-            let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00044"))
+            let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00044"),
+                                           type: .color,
+                                           isDimmable: true)
             let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00045"),
                                 setupCode: "123-44-321",
                                 storage: MemoryStorage(),
