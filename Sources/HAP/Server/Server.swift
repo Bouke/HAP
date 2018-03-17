@@ -96,9 +96,6 @@ public class Server: NSObject, NetServiceDelegate {
         queue.async { [unowned self, socket] in
             Connection().listen(socket: socket, application: self.application)
 
-            logger.debug("Closed connection to \(socket.remoteHostname)")
-            socket.close()
-
             self.socketLockQueue.sync { [unowned self, socket] in
                 self.connectedSockets[socket.socketfd] = nil
             }

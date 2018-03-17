@@ -64,6 +64,7 @@ extension Server {
         var cryptographer: Cryptographer?
         var pairing: Pairing?
         var notificationQueue: NotificationQueue
+        let writeQueue = DispatchQueue(label: "hap.server.connection")
 
         override init() {
             notificationQueue = NotificationQueue()
@@ -111,22 +112,27 @@ extension Server {
                 }
 
                 do {
-                    var writeBuffer = response.serialized()
-                    if let cryptographer = self.cryptographer {
-                        writeBuffer = try cryptographer.encrypt(writeBuffer)
+                    try writeQueue.sync {
+                        var writeBuffer = response.serialized()
+                        if let cryptographer = self.cryptographer {
+                            writeBuffer = try cryptographer.encrypt(writeBuffer)
+                        }
+                        if let response = response as? UpgradeResponse {
+                            self.cryptographer = response.cryptographer
+                            // todo?: override response
+                        }
+                        try socket.write(from: writeBuffer)
+                        httpParser.reset()
                     }
-                    if let response = response as? UpgradeResponse {
-                        self.cryptographer = response.cryptographer
-                        // todo?: override response
-                    }
-                    try socket.write(from: writeBuffer)
-                    httpParser.reset()
                 } catch {
                     logger.error("Error while writing to socket", error: error)
                     break
                 }
             }
-
+            logger.debug("Closed connection to \(socket.remoteHostname)")
+            writeQueue.sync {
+                socket.close()
+            }
             self.socket = nil
         }
 
@@ -135,15 +141,17 @@ extension Server {
             guard let socket = socket else {
                 return
             }
-            do {
-                var writeBuffer = data
-                if let cryptographer = cryptographer {
-                    writeBuffer = try cryptographer.encrypt(writeBuffer)
+            writeQueue.async { [unowned self] in
+                do {
+                    var writeBuffer = data
+                    if let cryptographer = self.cryptographer {
+                        writeBuffer = try cryptographer.encrypt(writeBuffer)
+                    }
+                    try socket.write(from: writeBuffer)
+                } catch {
+                    logger.error("Error while writing to socket", error: error)
+                    socket.close()
                 }
-                try socket.write(from: writeBuffer)
-            } catch {
-                logger.error("Error while writing to socket", error: error)
-                socket.close()
             }
         }
 
