@@ -15,9 +15,9 @@ matrix:
         - tar xzf swift-4.0-RELEASE-ubuntu14.04.tar.gz
         - export PATH=`pwd`/swift-4.0-RELEASE-ubuntu14.04/usr/bin:"${PATH}"
         - sudo apt-get install -y libssl-dev
-        - wget https://download.libsodium.org/libsodium/releases/libsodium-1.0.12.tar.gz
-        - tar xzf libsodium-1.0.12.tar.gz
-        - cd libsodium-1.0.12
+        - wget https://download.libsodium.org/libsodium/releases/libsodium-1.0.16.tar.gz
+        - tar xzf libsodium-1.0.16.tar.gz
+        - cd libsodium-1.0.16
         - ./configure
         - make && make check
         - sudo make install
