@@ -26,12 +26,16 @@ extension Service {
             self.model.value = model
             self.serialNumber.value = serialNumber
             self.firmwareRevision.value = firmwareRevision
-            identify.onValueChange.append({ _ in
-                guard let accessory = self.accessory else {
-                    return
+        }
+
+        override func characteristic<T>(_ characteristic: GenericCharacteristic<T>,
+                                        didChangeValue newValue: T?) {
+            if characteristic === identify {
+                if let accessory = accessory {
+                    accessory.device?.delegate?.didRequestIdentificationOf(accessory)
                 }
-                _ = accessory.device?.onIdentify.map { $0(accessory) }
-            })
+            }
+            super.characteristic(characteristic, didChangeValue: newValue)
         }
     }
 }

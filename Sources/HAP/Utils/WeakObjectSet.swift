@@ -39,15 +39,27 @@ struct WeakObjectSet<T: AnyObject>: Sequence, ExpressibleByArrayLiteral where T:
     }
 
     mutating func addObject(object: T) {
+        cleanup()
         self.objects.formUnion([WeakObject(object)])
     }
 
     mutating func addObjects(objects: [T]) {
+        cleanup()
         self.objects.formUnion(objects.map { WeakObject($0) })
     }
 
     mutating func remove(_ member: T) -> T? {
+        cleanup()
         return self.objects.remove(WeakObject(member))?.object
+    }
+
+    mutating func cleanup() {
+        objects = objects.filter { $0.object != nil }
+    }
+
+    /// Complexity: O(n)
+    var isEmpty: Bool {
+        return allObjects.isEmpty
     }
 
     // Sequence

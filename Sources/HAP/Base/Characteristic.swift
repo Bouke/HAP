@@ -6,6 +6,10 @@ public struct AnyCharacteristic {
     public init<T>(_ characteristic: GenericCharacteristic<T>) {
         wrapped = characteristic
     }
+
+    init(_ characteristic: Characteristic) {
+        wrapped = characteristic
+    }
 }
 
 protocol Characteristic: class, JSONSerializable {
@@ -81,7 +85,7 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
             guard let device = service?.accessory?.device else {
                 return
             }
-            device.notify(characteristicListeners: self)
+            device.notifyListeners(of: self)
         }
     }
 
@@ -99,11 +103,8 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
         case .none:
             _value = nil
         }
-        _ = onValueChange.map { $0(_value) }
+        service?.characteristic(self, didChangeValue: _value)
     }
-
-    // Subscribe a listener to value changes from (remote) clients.
-    public var onValueChange: [(T?) -> Void] = []
 
     public let permissions: [CharacteristicPermission]
 
@@ -155,5 +156,9 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
 
     public static func == (lhs: GenericCharacteristic, rhs: GenericCharacteristic) -> Bool {
         return lhs === rhs
+    }
+
+    internal var device: Device? {
+        return service?.accessory?.device
     }
 }

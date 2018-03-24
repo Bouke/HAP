@@ -11,9 +11,7 @@ fileprivate let logger = getLogger("demo")
     import Glibc
 #endif
 
-getLogger("hap").logLevel = .debug
-getLogger("hap.encryption").logLevel = .info
-getLogger("hap.pair-verify").logLevel = .info
+getLogger("hap").logLevel = .warning
 
 let storage = FileStorage(filename: "configuration.json")
 if CommandLine.arguments.contains("--recreate") {
@@ -22,14 +20,7 @@ if CommandLine.arguments.contains("--recreate") {
 }
 
 let livingRoomLightbulb = Accessory.Lightbulb(info: Service.Info(name: "Living Room", serialNumber: "00002"))
-livingRoomLightbulb.lightbulb.on.onValueChange.append({ value in
-    logger.info("livingRoomSwitch changed value: \(String(describing: value))")
-})
-
 let bedroomNightStand = Accessory.Lightbulb(info: Service.Info(name: "Bedroom", serialNumber: "00003"))
-bedroomNightStand.lightbulb.on.onValueChange.append({ value in
-    logger.info("bedroomNightStand changed value: \(String(describing: value))")
-})
 
 let device = Device(
     bridgeInfo: Service.Info(name: "Bridge", serialNumber: "00001"),
@@ -50,10 +41,46 @@ let device = Device(
         Accessory.LockMechanism(info: Service.Info(name: "Front Door Lock", serialNumber: "00014")),
         Accessory.SecuritySystem(info: Service.Info(name: "Alarm", serialNumber: "00015"))
     ])
-device.onIdentify.append({ acc in
-    logger.info("Got identified: \(String(describing: acc))")
-})
 
+class MyDeviceDelegate: DeviceDelegate {
+    func didRequestIdentificationOf(_ accessory: Accessory) {
+        logger.info("Requested identification "
+            + "of accessory \(String(describing: accessory.info.name.value ?? ""))")
+    }
+
+    func characteristic<T>(_ characteristic: GenericCharacteristic<T>,
+                           ofService service: Service,
+                           ofAccessory accessory: Accessory,
+                           didChangeValue newValue: T?) {
+        logger.info("Characteristic \(characteristic) "
+            + "in service \(service.type) "
+            + "of accessory \(accessory.info.name.value ?? "") "
+            + "did change: \(String(describing: newValue))")
+    }
+
+    func characteristicListenerDidSubscribe(_ accessory: Accessory,
+                                            service: Service,
+                                            characteristic: AnyCharacteristic) {
+        logger.info("Characteristic \(characteristic) "
+            + "in service \(service.type) "
+            + "of accessory \(accessory.info.name.value ?? "") "
+            + "got a subscriber")
+    }
+
+    func characteristicListenerDidUnsubscribe(_ accessory: Accessory,
+                                              service: Service,
+                                              characteristic: AnyCharacteristic) {
+        logger.info("Characteristic \(characteristic) "
+            + "in service \(service.type) "
+            + "of accessory \(accessory.info.name.value ?? "") "
+            + "lost a subscriber")
+    }
+}
+
+var delegate = MyDeviceDelegate()
+device.delegate = delegate
+
+// Switch the lights every 5 seconds.
 let timer = DispatchSource.makeTimerSource()
 timer.schedule(deadline: .now() + .seconds(1), repeating: .seconds(5))
 timer.setEventHandler(handler: {
@@ -61,6 +88,7 @@ timer.setEventHandler(handler: {
 })
 timer.resume()
 
+// Stop server on interrupt.
 var keepRunning = true
 signal(SIGINT) { _ in
     logger.info("Caught interrupt, stopping...")
@@ -78,12 +106,14 @@ print()
 print(device.setupQRCode.asText)
 print()
 
-if CommandLine.arguments.contains("--test") {
-    print("Running runloop for 10 seconds...")
-    RunLoop.main.run(until: Date(timeIntervalSinceNow: 10))
-} else {
-    while keepRunning {
-        RunLoop.current.run(until: Date().addingTimeInterval(2))
+withExtendedLifetime([delegate]) {
+    if CommandLine.arguments.contains("--test") {
+        print("Running runloop for 10 seconds...")
+        RunLoop.main.run(until: Date(timeIntervalSinceNow: 10))
+    } else {
+        while keepRunning {
+            RunLoop.current.run(until: Date().addingTimeInterval(2))
+        }
     }
 }
 

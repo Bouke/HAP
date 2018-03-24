@@ -5,31 +5,7 @@ import func Evergreen.getLogger
 
 fileprivate let logger = getLogger("hap.device")
 
-struct Box<T: Any>: Hashable, Equatable {
-    let value: T
-
-    init(_ value: T) {
-        self.value = value
-    }
-
-    var object: AnyObject {
-        #if os(macOS)
-            return value as AnyObject
-        #elseif os(Linux)
-            // swiftlint:disable:next force_cast
-            return value as! AnyObject
-        #endif
-    }
-
-    var hashValue: Int {
-        return ObjectIdentifier(object).hashValue
-    }
-
-    static func == (lhs: Box<T>, rhs: Box<T>) -> Bool {
-        return ObjectIdentifier(lhs.object) == ObjectIdentifier(rhs.object)
-    }
-}
-
+// swiftlint:disable:next type_body_length
 public class Device {
     public let name: String
     public let isBridge: Bool
@@ -40,7 +16,7 @@ public class Device {
 
     public private(set) var accessories: [Accessory]
 
-    public var onIdentify: [(Accessory?) -> Void] = []
+    public weak var delegate: DeviceDelegate?
 
     let storage: Storage
 
@@ -334,6 +310,11 @@ public class Device {
         } else {
             characteristicEventListeners[Box(characteristic)] = [listener]
         }
+        if let service = characteristic.service, let accessory = service.accessory {
+            delegate?.characteristicListenerDidSubscribe(accessory,
+                                                         service: service,
+                                                         characteristic: AnyCharacteristic(characteristic))
+        }
     }
 
     @discardableResult
@@ -342,11 +323,18 @@ public class Device {
         guard characteristicEventListeners[Box(characteristic)] != nil else {
             return nil
         }
-        return characteristicEventListeners[Box(characteristic)]!.remove(connection)
+        let subscriber = characteristicEventListeners[Box(characteristic)]!.remove(connection)
+        if subscriber != nil, let service = characteristic.service, let accessory = service.accessory {
+            delegate?.characteristicListenerDidUnsubscribe(accessory,
+                                                           service: service,
+                                                           characteristic: AnyCharacteristic(characteristic))
+        }
+        return subscriber
     }
 
-    func notify(characteristicListeners characteristic: Characteristic,
-                exceptListener except: Server.Connection? = nil) {
+    func notifyListeners(of characteristic: Characteristic,
+                         exceptListener except: Server.Connection? = nil) {
+        // Notify internal listeners (server connections) of changes to a characteristic
         guard let listeners = characteristicEventListeners[Box(characteristic)]?.filter({ $0 != except }),
             !listeners.isEmpty
         else {
@@ -356,6 +344,17 @@ public class Device {
         for listener in listeners {
             listener.notificationQueue.append(characteristic: characteristic)
         }
+    }
+
+    /// Characteristic's value was changed by controller. Used to notify the delegate.
+    func characteristic<T>(_ characteristic: GenericCharacteristic<T>,
+                           ofService service: Service,
+                           ofAccessory accessory: Accessory,
+                           didChangeValue newValue: T?) {
+        delegate?.characteristic(characteristic,
+                                 ofService: service,
+                                 ofAccessory: accessory,
+                                 didChangeValue: newValue)
     }
 
     // Return a URI which can be displayed as a QR code for quick setup

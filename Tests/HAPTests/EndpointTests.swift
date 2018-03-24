@@ -80,7 +80,11 @@ class EndpointTests: XCTestCase {
         let kiloWattHour = GenericCharacteristic<Double>(type: EndpointTests.kiloWattHour, value: 0, permissions: [.read, .events])
 
         init() {
-            super.init(type: .outlet, characteristics: [AnyCharacteristic(on), AnyCharacteristic(inUse), AnyCharacteristic(watt), AnyCharacteristic(kiloWattHour)])
+            super.init(type: .outlet, characteristics: [
+                AnyCharacteristic(on as Characteristic),
+                AnyCharacteristic(inUse as Characteristic),
+                AnyCharacteristic(watt as Characteristic),
+                AnyCharacteristic(kiloWattHour as Characteristic)])
         }
     }
 

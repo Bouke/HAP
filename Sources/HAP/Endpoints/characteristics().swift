@@ -157,7 +157,7 @@ func characteristics(device: Device) -> Application {
                     }
 
                     // notify listeners
-                    device.notify(characteristicListeners: characteristic, exceptListener: connection)
+                    device.notifyListeners(of: characteristic, exceptListener: connection)
                 }
 
                 // toggle events for this characteristic on this connection
