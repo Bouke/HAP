@@ -27,8 +27,8 @@ enum TLV8Error: Swift.Error {
 func decode<Key>(_ data: Data) throws -> [(Key, Data)] where Key: RawRepresentable, Key.RawValue == UInt8 {
     var result = [(Key, Data)]()
     var index = data.startIndex
-    var lastLength = 0
-    var lastKey = Key(rawValue: 0)!
+    var currentType: Key?
+    var currentValue: Data?
 
     while index < data.endIndex {
         guard let type = Key(rawValue: data[index]) else {
@@ -44,16 +44,20 @@ func decode<Key>(_ data: Data) throws -> [(Key, Data)] where Key: RawRepresentab
         }
         let value = data[index..<endIndex]
 
-        if lastLength == 255 && type == lastKey {
-            let lastFragment = result[result.count - 1].1
-            result[result.count - 1] = (type, lastFragment + Data(bytes: Array(value)))
+        if currentType == nil || type != currentType! {
+            if let currentType = currentType, let currentValue = currentValue {
+                result.append((currentType, currentValue))
+            }
+            currentType = type
+            currentValue = Data(bytes: Array(value))
         } else {
-            result.append((type, Data(bytes: Array(value))))
+            currentValue! += Data(bytes: Array(value))
         }
 
         index = endIndex
-        lastKey = type
-        lastLength = length
+    }
+    if let currentType = currentType, let currentValue = currentValue {
+        result.append((currentType, currentValue))
     }
     return result
 }
