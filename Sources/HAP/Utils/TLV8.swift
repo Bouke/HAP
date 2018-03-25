@@ -13,6 +13,12 @@ extension Array where Element == PairTagTLV8Tuple {
     }
 }
 
+// Requires Swift 4.1 -- conditional conformance.
+//extension Array: ExpressibleByDictionaryLiteral where Element == PairTagTLV8Tuple {
+//}
+//extension Array: Equatable where Element == PairTagTLV8Tuple {
+//}
+
 enum TLV8Error: Swift.Error {
     case unknownKey(UInt8)
     case decodeError

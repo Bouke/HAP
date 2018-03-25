@@ -47,17 +47,15 @@ class PairSetupControllerTests: XCTestCase {
 
         do {
             // Client -> Server: [publicKey, keyProof]
-            let response = try controller.verifyRequest([(.publicKey, client.publicKey),
-                                                         (.proof, clientKeyProof)],
-                                                        session)
+            let response = try! controller.verifyRequest([(.publicKey, client.publicKey),
+                                                          (.proof, clientKeyProof)],
+                                                         session)
             XCTAssertNotNil(response)
             XCTAssertEqual(response![.state]?.first, PairSetupStep.verifyResponse.rawValue)
 
             // Server -> Client: [keyProof]
             let serverKeyProof = response![.proof]!
             try! client.verifySession(keyProof: serverKeyProof)
-        } catch {
-            return XCTFail("Unable to verify keys")
         }
 
         do {
