@@ -13,6 +13,10 @@ public enum PairingState {
     case paired
 }
 
+public enum PairingStateError: Error {
+    case invalidTransition(from: PairingState, to: PairingState)
+}
+
 // MARK: Device class
 
 // swiftlint:disable:next type_body_length
@@ -289,7 +293,7 @@ public class Device {
 
     // MARK: - Pairing
 
-    func changePairingState(_ newState: PairingState) {
+    func changePairingState(_ newState: PairingState) throws {
         switch (state, newState) {
         case (.pairing, .notPaired), (.notPaired, .pairing):
             state = newState
@@ -298,7 +302,7 @@ public class Device {
             // Update the Bonjour TXT record
             notifyConfigurationChange()
         default:
-            fatalError("Invalid state tranistion: \(state) -> \(newState)")
+            throw PairingStateError.invalidTransition(from: state, to: newState)
         }
     }
 
@@ -312,7 +316,8 @@ public class Device {
         configuration.pairings[pairing.identifier] = pairing
         persistConfig()
         if state == .pairing {
-            changePairingState(.paired)
+            // swiftlint:disable:next force_try
+            try! changePairingState(.paired)
         }
     }
 
@@ -328,7 +333,8 @@ public class Device {
         }
         persistConfig()
         if state == .paired {
-            changePairingState(.notPaired)
+            // swiftlint:disable:next force_try
+            try! changePairingState(.notPaired)
         }
     }
 

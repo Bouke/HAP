@@ -8,17 +8,37 @@ extension Array where Element == PairTagTLV8Tuple {
         return self.first(where: { $0.0 == index })?.1
     }
 
-    static func == (lhs: [PairTagTLV8Tuple], rhs: [PairTagTLV8Tuple]) -> Bool {
+    var pairStep: PairStep? {
+        return self
+            .first(where: { $0.0 == PairTag.state })?.1
+            .first
+            .flatMap({ PairStep(rawValue: $0) })
+    }
 
-        if lhs.count != rhs.count {
-            return false
-        }
-        for i in 0..<lhs.count where lhs[i] != rhs[i] {
-            return false
-        }
-        return true
+    var pairSetupStep: PairSetupStep? {
+        return self
+            .first(where: { $0.0 == PairTag.state })?.1
+            .first
+            .flatMap({ PairSetupStep(rawValue: $0) })
+    }
+
+    var error: PairError? {
+        return self
+            .first(where: { $0.0 == PairTag.error })?.1
+            .first
+            .flatMap({ PairError(rawValue: $0) })
+    }
+
+    static func == (lhs: [PairTagTLV8Tuple], rhs: [PairTagTLV8Tuple]) -> Bool {
+        return lhs.elementsEqual(rhs, by: ==)
     }
 }
+
+// Requires Swift 4.1 -- conditional conformance.
+//extension Array: ExpressibleByDictionaryLiteral where Element == PairTagTLV8Tuple {
+//}
+//extension Array: Equatable where Element == PairTagTLV8Tuple {
+//}
 
 enum TLV8Error: Swift.Error {
     case unknownKey(UInt8)
@@ -28,8 +48,8 @@ enum TLV8Error: Swift.Error {
 func decode<Key>(_ data: Data) throws -> [(Key, Data)] where Key: RawRepresentable, Key.RawValue == UInt8 {
     var result = [(Key, Data)]()
     var index = data.startIndex
-    var lastLength = 0
-    var lastKey = Key(rawValue: 0)!
+    var currentType: Key?
+    var currentValue: Data?
 
     while index < data.endIndex {
         guard let type = Key(rawValue: data[index]) else {
@@ -45,16 +65,20 @@ func decode<Key>(_ data: Data) throws -> [(Key, Data)] where Key: RawRepresentab
         }
         let value = data[index..<endIndex]
 
-        if lastLength == 255 && type == lastKey {
-            let lastFragment = result[result.count - 1].1
-            result[result.count - 1] = (type, lastFragment + Data(bytes: Array(value)))
+        if currentType == nil || type != currentType! {
+            if let currentType = currentType, let currentValue = currentValue {
+                result.append((currentType, currentValue))
+            }
+            currentType = type
+            currentValue = Data(bytes: Array(value))
         } else {
-            result.append((type, Data(bytes: Array(value))))
+            currentValue! += Data(bytes: Array(value))
         }
 
         index = endIndex
-        lastKey = type
-        lastLength = length
+    }
+    if let currentType = currentType, let currentValue = currentValue {
+        result.append((currentType, currentValue))
     }
     return result
 }

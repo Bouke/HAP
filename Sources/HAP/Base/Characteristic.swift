@@ -82,10 +82,9 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
                 }
             }
             _value = newValue
-            guard let device = service?.accessory?.device else {
-                return
+            if let device = service?.accessory?.device {
+                device.notifyListeners(of: self)
             }
-            device.notifyListeners(of: self)
         }
     }
 

@@ -3,6 +3,13 @@
 import XCTest
 
 class AccessoriesTests: XCTestCase {
+    static var allTests: [(String, (AccessoriesTests) -> () throws -> Void)] {
+        return [
+            ("testSerialize", testSerialize),
+            ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests)
+        ]
+    }
+
     func testSerialize() {
         serialize(Accessory.Door(info: .init(name: "Door", serialNumber: "00021")))
         serialize(Accessory.Fan(info: .init(name: "Fan", serialNumber: "00022")))
@@ -16,6 +23,19 @@ class AccessoriesTests: XCTestCase {
         serialize(Accessory.Thermostat(info: .init(name: "Thermostat", serialNumber: "00030")))
         serialize(Accessory.Window(info: .init(name: "Window", serialNumber: "00031")))
         serialize(Accessory.WindowCovering(info: .init(name: "WindowCovering", serialNumber: "00032")))
+    }
+
+    // from: https://oleb.net/blog/2017/03/keeping-xctest-in-sync/#appendix-code-generation-with-sourcery
+    func testLinuxTestSuiteIncludesAllTests() {
+        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
+            let thisClass = type(of: self)
+            let linuxCount = thisClass.allTests.count
+            let darwinCount = Int(thisClass
+                .defaultTestSuite.testCaseCount)
+            XCTAssertEqual(linuxCount,
+                           darwinCount,
+                           "\(darwinCount - linuxCount) tests are missing from allTests")
+        #endif
     }
 }
 

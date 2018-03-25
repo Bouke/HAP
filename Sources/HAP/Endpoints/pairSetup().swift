@@ -10,6 +10,7 @@ fileprivate enum Error: Swift.Error {
     case noSession
 }
 
+// swiftlint:disable:next cyclomatic_complexity
 func pairSetup(device: Device) -> Application {
     let group = Group.N3072
     let algorithm = Digest.Algorithm.sha512
@@ -61,18 +62,38 @@ func pairSetup(device: Device) -> Application {
                 response = try controller.keyExchangeRequest(data, session)
             // Unknown state - return error and abort
             default:
-                response = try controller.unknownRequest(data)
+                throw PairSetupController.Error.invalidParameters
             }
         } catch {
             logger.warning(error)
             connection.context[SESSION_KEY] = nil
+            try? device.changePairingState(.notPaired)
             switch error {
-            case PairSetupController.Error.errorWithResponse(let R):
-                 response = R
-                 if let errorData = response![.error] {
-                    logger.warning(
-                        "Pair Setup error:\(String(describing: errorData.first.flatMap({ PairError(rawValue: $0) })) )")
-                }
+            case PairSetupController.Error.invalidParameters:
+                response = [
+                    (.state, Data(bytes: [PairSetupStep.waiting.rawValue])),
+                    (.error, Data(bytes: [PairError.unknown.rawValue]))
+                ]
+            case PairSetupController.Error.alreadyPaired:
+                response = [
+                    (.state, Data(bytes: [PairSetupStep.startResponse.rawValue])),
+                    (.error, Data(bytes: [PairError.unavailable.rawValue]))
+                ]
+            case PairSetupController.Error.alreadyPairing:
+                response = [
+                    (.state, Data(bytes: [PairSetupStep.startResponse.rawValue])),
+                    (.error, Data(bytes: [PairError.busy.rawValue]))
+                ]
+            case PairSetupController.Error.invalidSetupState:
+                response = [
+                    (.state, Data(bytes: [PairSetupStep.verifyResponse.rawValue])),
+                    (.error, Data(bytes: [PairError.unknown.rawValue]))
+                ]
+            case PairSetupController.Error.authenticationFailed:
+                response = [
+                    (.state, Data(bytes: [PairSetupStep.verifyResponse.rawValue])),
+                    (.error, Data(bytes: [PairError.authenticationFailed.rawValue]))
+                ]
             default:
                 response = nil
             }
