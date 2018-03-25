@@ -16,5 +16,5 @@ internal struct Pairing: Codable {
     // iOS Device's Curve25519 public key
     let publicKey: PublicKey
 
-    let role: Role
+    var role: Role
 }

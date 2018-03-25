@@ -8,6 +8,27 @@ extension Array where Element == PairTagTLV8Tuple {
         return self.first(where: { $0.0 == index })?.1
     }
 
+    var pairStep: PairStep? {
+        return self
+            .first(where: { $0.0 == PairTag.state })?.1
+            .first
+            .flatMap({ PairStep(rawValue: $0) })
+    }
+
+    var pairSetupStep: PairSetupStep? {
+        return self
+            .first(where: { $0.0 == PairTag.state })?.1
+            .first
+            .flatMap({ PairSetupStep(rawValue: $0) })
+    }
+
+    var error: PairError? {
+        return self
+            .first(where: { $0.0 == PairTag.error })?.1
+            .first
+            .flatMap({ PairError(rawValue: $0) })
+    }
+
     static func == (lhs: [PairTagTLV8Tuple], rhs: [PairTagTLV8Tuple]) -> Bool {
         return lhs.elementsEqual(rhs, by: ==)
     }
