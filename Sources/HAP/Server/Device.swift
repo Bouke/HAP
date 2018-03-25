@@ -36,12 +36,10 @@ public class Device {
 
     weak var server: Server?
 
-    public var onPairingStateChange: [(PairingState, PairingState) -> Void] = []
-
     public private(set) var state = PairingState.notPaired {
         didSet {
             logger.info("State change from: \(oldValue) to \(self.state)")
-            _ = onPairingStateChange.map { $0(oldValue, state) }
+            delegate?.didChangePairingState(from: oldValue, to: state)
         }
     }
 
