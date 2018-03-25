@@ -55,7 +55,8 @@ class PairSetupController {
         }
 
         // Notify listeners of the pairing event and record the paring state
-        device.changePairingState(.pairing)
+        // swiftlint:disable:next force_try
+        try! device.changePairingState(.pairing)
 
         let (salt, serverPublicKey) = session.server.getChallenge()
 
@@ -74,7 +75,6 @@ class PairSetupController {
     func verifyRequest(_ data: PairTagTLV8, _ session: Session) throws -> PairTagTLV8? {
         guard let clientPublicKey = data[.publicKey], let clientKeyProof = data[.proof] else {
             logger.warning("Invalid parameters")
-            device.changePairingState(.notPaired)
             throw Error.invalidSetupState
         }
 
@@ -85,7 +85,6 @@ class PairSetupController {
                                                                      keyProof: clientKeyProof)
             else {
                 logger.warning("Invalid PIN")
-                device.changePairingState(.notPaired)
                 throw Error.authenticationFailed
         }
 
@@ -112,12 +111,10 @@ class PairSetupController {
         guard let plaintext = try? ChaCha20Poly1305.decrypt(cipher: encryptedData,
                                                             nonce: "PS-Msg05".data(using: .utf8)!,
                                                             key: encryptionKey) else {
-            device.changePairingState(.notPaired)
             throw Error.couldNotDecryptMessage
         }
 
         guard let data: PairTagTLV8 = try? decode(plaintext) else {
-            device.changePairingState(.notPaired)
             throw Error.couldNotDecodeMessage
         }
 
@@ -125,7 +122,6 @@ class PairSetupController {
             let username = data[.identifier],
             let signatureIn = data[.signature]
             else {
-                device.changePairingState(.notPaired)
                 throw Error.invalidParameters
         }
 
@@ -141,12 +137,7 @@ class PairSetupController {
                      username +
                      publicKey
 
-        do {
-            try Ed25519.verify(publicKey: publicKey, message: hashIn, signature: signatureIn)
-        } catch {
-            device.changePairingState(.notPaired)
-            throw error
-        }
+        try Ed25519.verify(publicKey: publicKey, message: hashIn, signature: signatureIn)
 
         let hashOut = deriveKey(algorithm: .sha512,
                                 seed: session.server.sessionKey!,
@@ -157,7 +148,6 @@ class PairSetupController {
             device.publicKey
 
         guard let signatureOut = try? Ed25519.sign(privateKey: device.privateKey, message: hashOut) else {
-            device.changePairingState(.notPaired)
             throw Error.couldNotSign
         }
 
@@ -176,7 +166,6 @@ class PairSetupController {
                                                                        nonce: "PS-Msg06".data(using: .utf8)!,
                                                                        key: encryptionKey)
             else {
-                device.changePairingState(.notPaired)
                 throw Error.couldNotEncrypt
         }
 
@@ -188,10 +177,5 @@ class PairSetupController {
             (.encryptedData, encryptedResultInner)
         ]
         return resultOuter
-    }
-
-    func unknownRequest(_ data: PairTagTLV8) throws -> PairTagTLV8 {
-        device.changePairingState(.notPaired)
-        throw Error.invalidParameters
     }
 }

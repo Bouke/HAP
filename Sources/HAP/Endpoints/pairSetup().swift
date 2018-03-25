@@ -62,11 +62,12 @@ func pairSetup(device: Device) -> Application {
                 response = try controller.keyExchangeRequest(data, session)
             // Unknown state - return error and abort
             default:
-                response = try controller.unknownRequest(data)
+                throw PairSetupController.Error.invalidParameters
             }
         } catch {
             logger.warning(error)
             connection.context[SESSION_KEY] = nil
+            try? device.changePairingState(.notPaired)
             switch error {
             case PairSetupController.Error.invalidParameters:
                 response = [
