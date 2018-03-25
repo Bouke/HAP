@@ -44,22 +44,17 @@ func pairings(device: Device) -> Application {
             logger.info("Removed pairing for \(String(data: username, encoding: .utf8)!)")
         case .listPairings:
             logger.debug("Listing parings")
-            var pairings = device.configuration.pairings.makeIterator()
-            let firstPairing = pairings.next()!.value
-            var results: PairTagTLV8 = [
-                (.state, Data(bytes: [PairStep.response.rawValue])),
-                (.identifier, firstPairing.identifier),
-                (.publicKey, firstPairing.publicKey),
-                (.permissions, Data(bytes: [firstPairing.role.rawValue]))
-            ]
-            logger.debug("Pairing 1 ID: \(firstPairing.identifier) \(firstPairing.role)")
-            while let p = pairings.next()?.value {
-                results.append((.separator, Data()))
-                results.append((.identifier, p.identifier))
-                results.append((.publicKey, p.publicKey))
-                results.append((.permissions, Data(bytes: [p.role.rawValue])))
-                logger.debug("Pairing n ID: \(p.identifier) \(p.role)")
-            }
+            let pairings = device.configuration.pairings.values
+                .map { pairing -> PairTagTLV8 in
+                    [
+                        (.identifier, pairing.identifier),
+                        (.publicKey, pairing.publicKey),
+                        (.permissions, Data(bytes: [pairing.role.rawValue]))
+                    ]
+                }
+                .joined(separator: [(.state, Data(bytes: [PairStep.response.rawValue]))])
+                .flatMap { $0 }
+            let results: PairTagTLV8 = [(.state, Data(bytes: [PairStep.response.rawValue]))] + pairings
             return Response(status: .ok, data: encode(results), mimeType: "application/pairing+tlv8")
         default:
             logger.info("Unhandled PairingMethod request: \(method)")
