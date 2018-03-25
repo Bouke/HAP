@@ -824,7 +824,7 @@ class EndpointTests: XCTestCase {
 
             if let firstEventTimestamp = firstEventTimestamp, let secondEventTimestamp = secondEventTimestamp {
                 let delay = secondEventTimestamp.timeIntervalSince(firstEventTimestamp)
-                XCTAssert(delay >= 1, "received event in \(delay) seconds of previous event, events should be sent at a interval of 1 seconds or more")
+                XCTAssert(delay >= 0.99, "received event in \(delay) seconds of previous event, events should be sent at a interval of 1 seconds or more")
             }
         }
     }
