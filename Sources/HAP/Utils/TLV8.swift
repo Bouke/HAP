@@ -9,14 +9,7 @@ extension Array where Element == PairTagTLV8Tuple {
     }
 
     static func == (lhs: [PairTagTLV8Tuple], rhs: [PairTagTLV8Tuple]) -> Bool {
-
-        if lhs.count != rhs.count {
-            return false
-        }
-        for i in 0..<lhs.count where lhs[i] != rhs[i] {
-            return false
-        }
-        return true
+        return lhs.elementsEqual(rhs, by: ==)
     }
 }
 
