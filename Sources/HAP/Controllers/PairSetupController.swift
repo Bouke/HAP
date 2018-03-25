@@ -16,7 +16,10 @@ class PairSetupController {
         case couldNotDecodeMessage
         case couldNotSign
         case couldNotEncrypt
-        case errorWithResponse(PairTagTLV8)
+        case alreadyPaired
+        case alreadyPairing
+        case invalidSetupState
+        case authenticationFailed
     }
 
     let device: Device
@@ -36,10 +39,7 @@ class PairSetupController {
         // If the accessory is already paired it must respond with
         // Error_Unavailable
         if device.state == .paired {
-            throw Error.errorWithResponse([
-                (.state, Data(bytes: [PairSetupStep.startResponse.rawValue])),
-                (.error, Data(bytes: [PairError.unavailable.rawValue]))
-            ])
+            throw Error.alreadyPaired
         }
 
         // If the accessory has received more than 100 unsuccessful
@@ -51,10 +51,7 @@ class PairSetupController {
         // a different controller it must respond with
         // Error_Busy
         if device.state == .pairing {
-            throw Error.errorWithResponse([
-                (.state, Data(bytes: [PairSetupStep.startResponse.rawValue])),
-                (.error, Data(bytes: [PairError.busy.rawValue]))
-            ])
+            throw Error.alreadyPairing
         }
 
         // Notify listeners of the pairing event and record the paring state
@@ -78,10 +75,7 @@ class PairSetupController {
         guard let clientPublicKey = data[.publicKey], let clientKeyProof = data[.proof] else {
             logger.warning("Invalid parameters")
             device.changePairingState(.notPaired)
-            throw Error.errorWithResponse([
-                (.state, Data(bytes: [PairSetupStep.verifyResponse.rawValue])),
-                (.error, Data(bytes: [PairError.unknown.rawValue]))
-            ])
+            throw Error.invalidSetupState
         }
 
         logger.debug("--> A \(clientPublicKey.hex)")
@@ -92,10 +86,7 @@ class PairSetupController {
             else {
                 logger.warning("Invalid PIN")
                 device.changePairingState(.notPaired)
-                throw Error.errorWithResponse([
-                    (.state, Data(bytes: [PairSetupStep.verifyResponse.rawValue])),
-                    (.error, Data(bytes: [PairError.authenticationFailed.rawValue]))
-                ])
+                throw Error.authenticationFailed
         }
 
         logger.debug("<-- HAMK \(serverKeyProof.hex)")
@@ -201,9 +192,6 @@ class PairSetupController {
 
     func unknownRequest(_ data: PairTagTLV8) throws -> PairTagTLV8 {
         device.changePairingState(.notPaired)
-        throw Error.errorWithResponse([
-            (.state, Data(bytes: [PairSetupStep.waiting.rawValue])),
-            (.error, Data(bytes: [PairError.unknown.rawValue]))
-        ])
+        throw Error.invalidParameters
     }
 }
