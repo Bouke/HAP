@@ -7,7 +7,11 @@ fileprivate let logger = getLogger("hap.device")
 
 // swiftlint:disable:next type_body_length
 public class Device {
-    public let name: String
+    internal(set) public var name: String {
+        didSet {
+            notifyConfigurationChange()
+        }
+    }
     public let isBridge: Bool
 
     public var setupCode: String {
@@ -220,7 +224,7 @@ public class Device {
         notifyConfigurationChange()
     }
 
-    // Notify listeners that the config record has changed
+    // Notify the server that the config record has changed
     func notifyConfigurationChange() {
         server?.updateDiscoveryRecord()
     }
