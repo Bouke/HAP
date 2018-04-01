@@ -32,20 +32,11 @@ public class Device {
          return configuration.setupCode
     }
 
-    public private(set) var accessories: [Accessory]
-
     public weak var delegate: DeviceDelegate?
 
     let storage: Storage
 
     weak var server: Server?
-
-    public private(set) var state = PairingState.notPaired {
-        didSet {
-            logger.info("State change from: \(oldValue) to \(self.state)")
-            delegate?.didChangePairingState(from: oldValue, to: state)
-        }
-    }
 
     private(set) var characteristicEventListeners: [Box<Characteristic>: WeakObjectSet<Server.Connection>]
     private(set) var configuration: Configuration
@@ -142,7 +133,7 @@ public class Device {
         }
 
         // restore state from configuration
-        state = configuration.pairings.isEmpty ? .notPaired : .paired
+        pairingState = configuration.pairings.isEmpty ? .notPaired : .paired
 
         characteristicEventListeners = [:]
 
@@ -172,6 +163,14 @@ public class Device {
         }
     }
 
+    // MARK: - Accessories
+
+    public private(set) var accessories: [Accessory]
+
+    /// Verifies whether this device can add the given accessory.
+    ///
+    /// - Parameter accessory:
+    /// - Returns:
     public func canAddAccessory(accessory: Accessory) -> Bool {
         // HAP Spec 2.5.3.2 - Maximum 100 accessories
         if !isBridge || accessories.count == 100 {
@@ -234,10 +233,10 @@ public class Device {
         updatedConfiguration()
     }
 
-    // When a configuration changes
-    // - update the configuration number
-    // - write the configuration to storage
-    // - notify interested parties of the change
+    /// When a configuration changes
+    /// - update the configuration number
+    /// - write the configuration to storage
+    /// - notify interested parties of the change
     func updatedConfiguration() {
         configuration.number = configuration.number &+ 1
         if configuration.number < 1 {
@@ -248,7 +247,7 @@ public class Device {
         notifyConfigurationChange()
     }
 
-    // Notify the server that the config record has changed
+    /// Notify the server that the config record has changed
     func notifyConfigurationChange() {
         server?.updateDiscoveryRecord()
     }
@@ -294,20 +293,28 @@ public class Device {
     // MARK: - Pairing
 
     func changePairingState(_ newState: PairingState) throws {
-        switch (state, newState) {
+        switch (pairingState, newState) {
         case (.pairing, .notPaired), (.notPaired, .pairing):
-            state = newState
+            pairingState = newState
         case (.pairing, .paired), (.paired, .notPaired):
-            state = newState
+            pairingState = newState
             // Update the Bonjour TXT record
             notifyConfigurationChange()
         default:
-            throw PairingStateError.invalidTransition(from: state, to: newState)
+            throw PairingStateError.invalidTransition(from: pairingState, to: newState)
+        }
+    }
+
+    /// The device's pairing state.
+    public private(set) var pairingState = PairingState.notPaired {
+        didSet {
+            logger.info("State change from: \(oldValue) to \(self.pairingState)")
+            delegate?.didChangePairingState(from: oldValue, to: pairingState)
         }
     }
 
     public var isPaired: Bool {
-        return state == .paired
+        return pairingState == .paired
     }
 
     // Add the pairing to the internal DB and notify the change
@@ -315,7 +322,7 @@ public class Device {
     func add(pairing: Pairing) {
         configuration.pairings[pairing.identifier] = pairing
         persistConfig()
-        if state == .pairing {
+        if pairingState == .pairing {
             // swiftlint:disable:next force_try
             try! changePairingState(.paired)
         }
@@ -332,7 +339,7 @@ public class Device {
             configuration.pairings = [:]
         }
         persistConfig()
-        if state == .paired {
+        if pairingState == .paired {
             // swiftlint:disable:next force_try
             try! changePairingState(.notPaired)
         }
@@ -374,9 +381,9 @@ public class Device {
         return subscriber
     }
 
+    /// Notifies listeners (controllers) of changes to a characteristic's value.
     func notifyListeners(of characteristic: Characteristic,
                          exceptListener except: Server.Connection? = nil) {
-        // Notify internal listeners (server connections) of changes to a characteristic
         guard let listeners = characteristicEventListeners[Box(characteristic)]?.filter({ $0 != except }),
             !listeners.isEmpty
         else {

@@ -38,7 +38,7 @@ class PairSetupController {
 
         // If the accessory is already paired it must respond with
         // Error_Unavailable
-        if device.state == .paired {
+        if device.pairingState == .paired {
             throw Error.alreadyPaired
         }
 
@@ -50,7 +50,7 @@ class PairSetupController {
         // If the accessory is currently performing a Pair Setup operation with
         // a different controller it must respond with
         // Error_Busy
-        if device.state == .pairing {
+        if device.pairingState == .pairing {
             throw Error.alreadyPairing
         }
 
