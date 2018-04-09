@@ -24,6 +24,7 @@ func logger(_ application: @escaping Application) -> Application {
         let response = application(connection, request)
         // swiftlint:disable:next line_length
         logger.info("\(connection.socket?.remoteHostname ?? "-") \(request.method) \(request.urlURL.path) \(request.urlURL.query ?? "-") \(response.status.rawValue) \(response.body?.count ?? 0)")
+        logger.debug("- Response Messagea: \(String(data: response.serialized(), encoding: .utf8) ?? "-")")
         return response
     }
 }
