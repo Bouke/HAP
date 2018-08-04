@@ -88,8 +88,8 @@ func characteristics(device: Device) -> Application {
 
             var responseStatus: Response.Status = .ok
             if !responses.filter({ $0.status != nil }).isEmpty {
-                for i in responses.indices where responses[i].status == nil {
-                    responses[i].status = .success
+                for index in responses.indices where responses[index].status == nil {
+                    responses[index].status = .success
                 }
                 responseStatus = .multiStatus
             }

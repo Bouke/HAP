@@ -73,12 +73,17 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
             guard newValue != _value else {
                 return
             }
-            if let v = newValue, let d = Double(value: v) {
+            // swiftlint:disable:next identifier_name
+            if let _newValue = newValue, let doubleValue = Double(value: _newValue) {
                 if let min = minValue {
-                    precondition(d >= min, "Characteristic \(type) value \(v) is lower than minValue \(min)")
+                    precondition(
+                        doubleValue >= min,
+                        "Characteristic \(type) value \(_newValue) is lower than minValue \(min)")
                 }
                 if let max = maxValue {
-                    precondition(d <= max, "Characteristic \(type) value \(v) is higher than maxValue \(max)")
+                    precondition(
+                        doubleValue <= max,
+                        "Characteristic \(type) value \(_newValue) is higher than maxValue \(max)")
                 }
             }
             _value = newValue
@@ -127,12 +132,12 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
                 minValue: Double? = nil,
                 minStep: Double? = nil) {
 
-        if let v = value, let d = Double(value: v) {
+        if let value = value, let doubleValue = Double(value: value) {
             if let min = minValue {
-                precondition(d >= min, "Characteristic \(type) value \(v) is lower than minValue \(min)")
+                precondition(doubleValue >= min, "Characteristic \(type) value \(value) is lower than minValue \(min)")
             }
             if let max = maxValue {
-                precondition(d <= max, "Characteristic \(type) value \(v) is higher than maxValue \(max)")
+                precondition(doubleValue <= max, "Characteristic \(type) value \(value) is higher than maxValue \(max)")
             }
         }
         self.type = type

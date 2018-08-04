@@ -46,6 +46,7 @@ class PairVerifyControllerTests: XCTestCase {
             }
 
             // Server -> Client: encrypted(username, signature), public key
+            // swiftlint:disable:next identifier_name
             guard let serverPublicKey_ = resultOuter[.publicKey],
                 let encryptedData = resultOuter[.encryptedData] else {
                 return XCTFail("Response is incomplete")
@@ -57,6 +58,7 @@ class PairVerifyControllerTests: XCTestCase {
                 return XCTFail("Couldn't generate shared secret")
             }
             XCTAssertEqual(sharedSecret.hex, session.sharedSecret.hex)
+            // swiftlint:disable:next identifier_name
             let encryptionKey_ = HKDF.deriveKey(algorithm: .sha512,
                                                 seed: sharedSecret,
                                                 info: "Pair-Verify-Encrypt-Info".data(using: .utf8),

@@ -58,11 +58,11 @@ struct Event {
 
     init(valueChangedOfCharacteristics characteristics: [Characteristic]) throws {
         var payload = [[String: Any]]()
-        for c in characteristics {
-            guard let aid = c.service?.accessory?.aid else {
+        for char in characteristics {
+            guard let aid = char.service?.accessory?.aid else {
                 throw Error.characteristicWithoutAccessory
             }
-            payload.append(["aid": aid, "iid": c.iid, "value": c.getValue() ?? NSNull()])
+            payload.append(["aid": aid, "iid": char.iid, "value": char.getValue() ?? NSNull()])
         }
         let serialized = ["characteristics": payload]
         guard let body = try? JSONSerialization.data(withJSONObject: serialized, options: []) else {
