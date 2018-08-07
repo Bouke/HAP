@@ -13,7 +13,7 @@ public struct AnyCharacteristic {
 }
 
 protocol Characteristic: class, JSONSerializable {
-    weak var service: Service? { get set }
+    var service: Service? { get set }
     var iid: InstanceID { get set }
     var type: CharacteristicType { get }
     var permissions: [CharacteristicPermission] { get }

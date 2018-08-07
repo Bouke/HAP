@@ -31,7 +31,7 @@ struct WeakObjectSet<T: AnyObject>: Sequence, ExpressibleByArrayLiteral where T:
     }
 
     var allObjects: [T] {
-        return objects.flatMap { $0.object }
+        return objects.compactMap { $0.object }
     }
 
     func contains(object: T) -> Bool {

@@ -16,7 +16,7 @@ class PairingsController {
                 ]
             }
             .joined(separator: [(.state, Data(bytes: [PairStep.response.rawValue]))])
-            .flatMap { $0 }
+            //.flatMap { $0 }
         return [(.state, Data(bytes: [PairStep.response.rawValue]))] + pairings
     }
 }

@@ -1,4 +1,4 @@
-// swiftlint:disable line_length
+// swiftlint:disable implicit_return
 import Foundation
 
 extension BinaryInteger {
@@ -22,7 +22,7 @@ extension UnsignedInteger {
         // TODO: optimize this
         // TODO: is this a good solution regarding LE/BE?
         return withUnsafePointer(to: &copy) {
-            let reversed: ReversedRandomAccessCollection<Data> = Data(bytes: $0, count: MemoryLayout<Self>.size).reversed()
+            let reversed: ReversedCollection<Data> = Data(bytes: $0, count: MemoryLayout<Self>.size).reversed()
             return Data(reversed)
         }
     }
