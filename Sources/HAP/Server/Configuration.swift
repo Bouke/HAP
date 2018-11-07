@@ -42,7 +42,7 @@ extension Device {
         // Accessories must increment the config number after a firmware update.
         // This must have a range of 1-4294967295 and wrap to 1 when it overflows.
         // This value must persist across reboots, power cycles, etc.
-        internal var number: UInt32 = 0
+        internal var number: UInt32 = 1
 
         // HAP Specification 2.6.1: Instance IDs
         //

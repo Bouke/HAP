@@ -150,7 +150,7 @@ public class Device {
         // The first accessory must be aid 1
         accessories[0].aid = 1
 
-        addAccessories(accessories)
+        addToAccessoryList(accessories)
     }
 
     private func persistConfig() {
@@ -185,7 +185,7 @@ public class Device {
     /// It is an error to try and add accessories with duplicate serial numbers.
     /// It is an error to try and add accessories to a non-bridge device.
     /// It is an error to try and increase the number of accessories above 99.
-    public func addAccessories(_ newAccessories: [Accessory]) {
+    private func addToAccessoryList(_ newAccessories: [Accessory]) {
         let totalNumberOfAccessories = accessories.count + newAccessories.count
         precondition(
             (isBridge && totalNumberOfAccessories <= 100) ||
@@ -228,6 +228,18 @@ public class Device {
                 configuration.aidForAccessorySerialNumber[serialNumber] = accessory.aid
             }
         }
+    }
+
+    /// Add an array of accessories to this bridge device, and notify changes
+    ///
+    /// It is an error to try and add accessories with duplicate serial numbers.
+    /// It is an error to try and add accessories to a non-bridge device.
+    /// It is an error to try and increase the number of accessories above 99.
+    public func addAccessories(_ newAccessories: [Accessory]) {
+
+        addToAccessoryList(newAccessories)
+
+        delegate?.didChangeAccessoryList()
 
         // Write configuration data to persist updated aid's and notify listeners
         updatedConfiguration()
@@ -266,6 +278,8 @@ public class Device {
             let serialNumber = accessory.serialNumber
             configuration.aidForAccessorySerialNumber.removeValue(forKey: serialNumber)
         }
+        delegate?.didChangeAccessoryList()
+
         // write configuration data to persist updated aid's
         updatedConfiguration()
     }
@@ -317,6 +331,22 @@ public class Device {
         return pairingState == .paired
     }
 
+    // Remove all the pairings made with this Device
+    // Can be used in the event of a stale configuration file
+    public func unpairFromAllControllers() {
+        logger.debug("Before unpair")
+        logger.debug(self.configuration)
+        logger.debug(self.config)
+        server?.stop()
+        let allPairingIdentifiers = configuration.pairings.keys
+        for identifier in allPairingIdentifiers {
+            remove(pairingWithIdentifier: identifier)
+        }
+        logger.debug("After unpair")
+        logger.debug(self.configuration)
+        logger.debug(self.config)
+    }
+
     // Add the pairing to the internal DB and notify the change
     // to update the Bonjour broadcast
     func add(pairing: Pairing) {
@@ -339,7 +369,7 @@ public class Device {
             configuration.pairings = [:]
         }
         persistConfig()
-        if pairingState == .paired {
+        if pairingState == .paired && configuration.pairings.isEmpty {
             // swiftlint:disable:next force_try
             try! changePairingState(.notPaired)
         }

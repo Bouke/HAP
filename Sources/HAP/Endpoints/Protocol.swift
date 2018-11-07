@@ -44,6 +44,7 @@ enum Protocol {
         case int(Int)
         case double(Double)
         case string(String)
+        case bool(Bool)
 
         enum DecodeError: Error {
             case unsupportedValueType
@@ -57,6 +58,8 @@ enum Protocol {
                 self = .double(double)
             } else if let string = try? container.decode(String.self) {
                 self = .string(string)
+            } else if let bool = try? container.decode(Bool.self) {
+                self = .bool(bool)
             } else {
                 throw DecodeError.unsupportedValueType
             }
@@ -71,6 +74,8 @@ enum Protocol {
                 try container.encode(double)
             case let .string(string):
                 try container.encode(string)
+            case let .bool(bool):
+                try container.encode(bool)
             }
         }
     }
