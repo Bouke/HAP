@@ -27,6 +27,8 @@ struct AIDGenerator: Sequence, IteratorProtocol, Codable {
 
 open class Accessory: JSONSerializable {
     public weak var device: Device?
+    public weak var delegate: AccessoryDelegate?
+
     internal var aid: InstanceID = 0
     public let type: AccessoryType
     public let info: Service.Info
@@ -103,11 +105,12 @@ open class Accessory: JSONSerializable {
 
     /// Characteristic's value was changed by controller. Used for bubbling up
     /// to the device, which will notify the delegate.
-    open func characteristic<T>(_ characteristic: GenericCharacteristic<T>,
+    internal func characteristic<T>(_ characteristic: GenericCharacteristic<T>,
                                 ofService service: Service,
                                 didChangeValue newValue: T?) {
         device?.characteristic(characteristic, ofService: service, ofAccessory: self, didChangeValue: newValue)
-    }
+        delegate?.characteristic(characteristic, ofService: service, didChangeValue: newValue)
+   }
 
     public func serialized() -> [String: JSONValueType] {
         [
@@ -115,4 +118,25 @@ open class Accessory: JSONSerializable {
             "services": services.map { $0.serialized() }
         ]
     }
+}
+
+/// A HAP `Characteristic` calls the methods of this delegate to report
+/// set/gets from a HAP controller.
+///
+/// Implement this protocol in an accessory-specific object (such as a subclass
+/// of a given accessory) in order to make the accessory react accordingly.
+/// For example, you might want to update the value of certain characteristics
+/// if the HAP controller is showing interest or makes a change.
+///
+public protocol AccessoryDelegate: class {
+    /// Characteristic's value was changed by controller. Used for notifying
+    func characteristic<T>(
+        _ characteristic: GenericCharacteristic<T>,
+        ofService: Service,
+        didChangeValue: T?)
+    /// Characteristic's value was observed by controller. Used for lazy updating
+    func characteristic<T>(
+        _ characteristic: GenericCharacteristic<T>,
+        ofService: Service,
+        didGetValue: T?)
 }

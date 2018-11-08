@@ -18,7 +18,8 @@ protocol Characteristic: class, JSONSerializable {
     var iid: InstanceID { get set }
     var type: CharacteristicType { get }
     var permissions: [CharacteristicPermission] { get }
-    func getValue() -> JSONValueType?
+    func jsonValue() -> JSONValueType?
+    func getValue(fromChannel: Channel?) -> JSONValueType?
     func setValue(_: Any?, fromChannel: Channel?) throws
     var description: String? { get }
     var format: CharacteristicFormat? { get }
@@ -41,7 +42,7 @@ extension Characteristic {
 
         if permissions.contains(.read) {
             // TODO: fixit
-            serialized["value"] = getValue() ?? 0 //NSNull()
+            serialized["value"] = jsonValue() ?? 0 //NSNull()
         }
 
         if let description = description { serialized["description"] = description }
@@ -89,13 +90,33 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
             if let device = service?.accessory?.device {
                 device.fireCharacteristicChangeEvent(self)
             }
+            if let service = self.service,
+               let accessory = service.accessory,
+               let device = accessory.device {
+                device.characteristic(self,
+                                      ofService: service,
+                                      ofAccessory: accessory,
+                                      didChangeValue: _value)
+            }
         }
     }
 
-    func getValue() -> JSONValueType? {
+    func jsonValue() -> JSONValueType? {
         value?.jsonValueType
     }
 
+    // Get Value for HAP controller
+    func getValue(fromChannel channel: Channel?) -> JSONValueType? {
+        let currentValue = _value
+        DispatchQueue.main.async { [weak self] in
+            if let this = self, let service = this.service {
+                service.accessory?.delegate?.characteristic(this, ofService: service, didGetValue: currentValue)
+            }
+        }
+        return jsonValue()
+    }
+
+    // Set Value by HAP controller
     func setValue(_ newValue: Any?, fromChannel channel: Channel?) throws {
         switch newValue {
         case let some?:

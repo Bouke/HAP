@@ -62,7 +62,7 @@ struct Event {
             guard let aid = char.service?.accessory?.aid else {
                 throw Error.characteristicWithoutAccessory
             }
-            payload.append(["aid": aid, "iid": char.iid, "value": char.getValue() ?? NSNull()])
+            payload.append(["aid": aid, "iid": char.iid, "value": char.jsonValue() ?? NSNull()])
         }
         let serialized = ["characteristics": payload]
         guard let body = try? JSONSerialization.data(withJSONObject: serialized, options: []) else {
