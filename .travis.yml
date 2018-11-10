@@ -29,9 +29,13 @@ matrix:
       install:
         - brew update
         - brew upgrade swiftlint || true
+      script: swiftlint --strict
+    - name: SonarCloud scanner
+      os: osx
+      osx_image: xcode10
       addons:
         sonarcloud:
           organization: bouke-github
-      script:
-        - swiftlint --strict
-        - sonar-scanner
+      script: sonar-scanner
+  allow_failures:
+    - name: SonarCloud scanner
