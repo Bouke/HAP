@@ -317,6 +317,22 @@ public class Device {
         return pairingState == .paired
     }
 
+    // Remove all the pairings made with this Device
+    // Can be used in the event of a stale configuration file
+    public func unpairFromAllControllers() {
+        logger.debug("Before unpair")
+        logger.debug(self.configuration)
+        logger.debug(self.config)
+        server?.stop()
+        let allPairingIdentifiers = configuration.pairings.keys
+        for identifier in allPairingIdentifiers {
+            remove(pairingWithIdentifier: identifier)
+        }
+        logger.debug("After unpair")
+        logger.debug(self.configuration)
+        logger.debug(self.config)
+    }
+
     // Add the pairing to the internal DB and notify the change
     // to update the Bonjour broadcast
     func add(pairing: Pairing) {
@@ -339,7 +355,7 @@ public class Device {
             configuration.pairings = [:]
         }
         persistConfig()
-        if pairingState == .paired {
+        if pairingState == .paired && configuration.pairings.isEmpty {
             // swiftlint:disable:next force_try
             try! changePairingState(.notPaired)
         }
