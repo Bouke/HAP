@@ -153,7 +153,10 @@ public class Device {
         // The first accessory must be aid 1
         accessories[0].aid = 1
 
-        addAccessories(accessories)
+        addToAccessoryList(accessories)
+
+        // Write configuration data to persist updated aid's and notify listeners
+        updatedConfiguration()
     }
 
     private func persistConfig() {
@@ -188,7 +191,7 @@ public class Device {
     /// It is an error to try and add accessories with duplicate serial numbers.
     /// It is an error to try and add accessories to a non-bridge device.
     /// It is an error to try and increase the number of accessories above 99.
-    public func addAccessories(_ newAccessories: [Accessory]) {
+    private func addToAccessoryList(_ newAccessories: [Accessory]) {
         let totalNumberOfAccessories = accessories.count + newAccessories.count
         precondition(
             (isBridge && totalNumberOfAccessories <= 100) ||
@@ -231,12 +234,24 @@ public class Device {
                 configuration.aidForAccessorySerialNumber[serialNumber] = accessory.aid
             }
         }
+    }
+
+    /// Add an array of accessories to this bridge device, and notify changes
+    ///
+    /// It is an error to try and add accessories with duplicate serial numbers.
+    /// It is an error to try and add accessories to a non-bridge device.
+    /// It is an error to try and increase the number of accessories above 99.
+    public func addAccessories(_ newAccessories: [Accessory]) {
+
+        addToAccessoryList(newAccessories)
+
+        delegate?.didChangeAccessoryList()
 
         // Write configuration data to persist updated aid's and notify listeners
         updatedConfiguration()
     }
 
-    /// When a configuration changes
+    /// If a configuration has changed
     /// - update the configuration number
     /// - write the configuration to storage
     /// - notify interested parties of the change
@@ -245,13 +260,14 @@ public class Device {
         if newStableHash != configuration.stableHash {
             configuration.number = configuration.number &+ 1
             configuration.stableHash = newStableHash
-        }
-        if configuration.number < 1 {
-            configuration.number = 1
-        }
 
-        persistConfig()
-        notifyConfigurationChange()
+            if configuration.number < 1 {
+                configuration.number = 1
+            }
+
+            persistConfig()
+            notifyConfigurationChange()
+        }
     }
 
     /// Generate uniqueness hash for device configuration, used to determine
@@ -292,6 +308,8 @@ public class Device {
                 configuration.aidForAccessorySerialNumber.removeValue(forKey: serialNumber)
             }
         }
+        delegate?.didChangeAccessoryList()
+
         // write configuration data to persist updated aid's
         updatedConfiguration()
     }
