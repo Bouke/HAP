@@ -107,8 +107,8 @@ func characteristics(device: Device) -> Application {
             let byteCount = try? request.readAllData(into: &body)
             logger.debug("PUT data: \(String(bytes: body, encoding: .utf8))")
             guard byteCount != nil,
-                let decoded = try? JSONDecoder().decode(Protocol.CharacteristicContainer.self, from: body) else
-            {
+                let decoded = try? JSONDecoder().decode(Protocol.CharacteristicContainer.self, from: body)
+            else {
                     logger.warning("Could not decode JSON")
                     return .badRequest
             }

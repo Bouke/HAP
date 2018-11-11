@@ -20,6 +20,8 @@ extension Socket {
     // thread by closing the sockets file descriptor using system calls.
     //
     // Assumes socket is being listened to and is connected
+    //
+    // swiftlint:disable:next identifier_name
     static func forceClose(socketfd fd: Int32) {
         #if os(Linux)
         _ = Glibc.shutdown(fd, Int32(SHUT_RDWR))
