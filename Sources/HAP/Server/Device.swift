@@ -238,13 +238,33 @@ public class Device {
     /// - write the configuration to storage
     /// - notify interested parties of the change
     func updatedConfiguration() {
-        configuration.number = configuration.number &+ 1
+        var newStableHash = generateStableHash()
+        if newStableHash != configuration.stableHash {
+            configuration.number = configuration.number &+ 1
+            configuration.stableHash = newStableHash
+        }
         if configuration.number < 1 {
             configuration.number = 1
         }
 
         persistConfig()
         notifyConfigurationChange()
+    }
+
+    /// Generate uniqueness hash for device configuration, used to determine
+    /// if the configuration number should be updated.
+    func generateStableHash() -> Int {
+        var hash = 0
+        for accessory in accessories {
+            hash ^= 17 &* accessory.aid
+            for service in accessory.services {
+                hash ^= 19 &* service.iid
+                for characteristic in service.characteristics {
+                    hash ^= 23 &* characteristic.iid
+                }
+            }
+        }
+        return hash
     }
 
     /// Notify the server that the config record has changed

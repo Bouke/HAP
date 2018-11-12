@@ -53,6 +53,11 @@ extension Device {
         // must be unique for the lifetime of the server/ client pairing.
         internal var aidForAccessorySerialNumber = [String: InstanceID]()
 
+        // Hash of the attached accessories, services and characteristics. Used
+        // to assert if the current configuration number should be updated after
+        // initializing / modifying list of accessories.
+        internal var stableHash: Int = 0
+
         private var aidGenerator = AIDGenerator()
 
         // The next aid - should be checked against existing devices to ensure it is unique
