@@ -319,18 +319,13 @@ public class Device {
 
     // Remove all the pairings made with this Device
     // Can be used in the event of a stale configuration file
-    public func unpairFromAllControllers() {
-        logger.debug("Before unpair")
-        logger.debug(self.configuration)
-        logger.debug(self.config)
+    public func removeAllPairings() {
+        logger.debug("Removing all pairings")
         server?.stop()
         let allPairingIdentifiers = configuration.pairings.keys
         for identifier in allPairingIdentifiers {
             remove(pairingWithIdentifier: identifier)
         }
-        logger.debug("After unpair")
-        logger.debug(self.configuration)
-        logger.debug(self.config)
     }
 
     // Add the pairing to the internal DB and notify the change
