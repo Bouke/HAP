@@ -115,9 +115,12 @@ public class Server: NSObject, NetServiceDelegate {
         }
         continueRunning = false
 
-        //listenSocket.close()
+        // Ideally we would call `.close()` on all open sockets. However
+        // BlueSocket doesn't like us doing that from another thread than
+        // the one that's currently listening. As a workaround, we'll 
+        // force close the file descriptor instead.
+
         Socket.forceClose(socketfd: listenSocket.socketfd)
-        //tearDownConnections()
     }
 
     func addNewConnection(socket: Socket) {
