@@ -1,10 +1,3 @@
-//
-//  Socket+forceClose.swift
-//  HAP
-//
-//  Created by Guy Brooker on 10/10/2018.
-//
-
 import Foundation
 import Socket
 
