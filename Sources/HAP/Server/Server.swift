@@ -19,7 +19,25 @@ public class Server: NSObject, NetServiceDelegate {
     let listenSocket: Socket
     let socketLockQueue = DispatchQueue(label: "hap.socketLockQueue")
 
-    var continueRunning = true
+    let continueRunningLock = DispatchSemaphore(value: 1)
+
+    // swiftlint:disable:next identifier_name
+    var _continueRunning = false
+    var continueRunning: Bool {
+        get {
+            continueRunningLock.wait()
+            defer {
+                continueRunningLock.signal()
+            }
+            return _continueRunning
+        }
+        set {
+            continueRunningLock.wait()
+            _continueRunning = newValue
+            continueRunningLock.signal()
+        }
+
+    }
     var connectedSockets = [Int32: Socket]()
 
     public init(device: Device, port: Int = 0) throws {
@@ -51,6 +69,9 @@ public class Server: NSObject, NetServiceDelegate {
     }
 
     public func start() {
+        if #available(OSX 10.12, *) {
+            dispatchPrecondition(condition: .onQueue(.main))
+        }
         // TODO: make sure can only be started if not started
 
         continueRunning = true
@@ -62,27 +83,44 @@ public class Server: NSObject, NetServiceDelegate {
             do {
                 repeat {
                     let newSocket = try self.listenSocket.acceptClientConnection()
-                    logger.info("Accepted connection from \(newSocket.remoteHostname)")
+                    DispatchQueue.main.async {
+                        logger.info("Accepted connection from \(newSocket.remoteHostname)")
+                    }
                     self.addNewConnection(socket: newSocket)
                 } while self.continueRunning
             } catch {
                 logger.error("Could not accept connections for listening socket", error: error)
             }
-            self.stop()
+            self.tearDownConnections()
+            self.listenSocket.close()
         }
     }
 
-    public func stop() {
+    func tearDownConnections() {
         service.stop()
         continueRunning = false
-        listenSocket.close()
 
         socketLockQueue.sync { [unowned self] in
             for socket in self.connectedSockets {
-                socket.value.close()
+                Socket.forceClose(socketfd: socket.key)
             }
             self.connectedSockets = [:]
         }
+
+    }
+
+    public func stop() {
+        if #available(OSX 10.12, *) {
+            dispatchPrecondition(condition: .onQueue(.main))
+        }
+        continueRunning = false
+
+        // Ideally we would call `.close()` on all open sockets. However
+        // BlueSocket doesn't like us doing that from another thread than
+        // the one that's currently listening. As a workaround, we'll 
+        // force close the file descriptor instead.
+
+        Socket.forceClose(socketfd: listenSocket.socketfd)
     }
 
     func addNewConnection(socket: Socket) {
