@@ -2,9 +2,9 @@ import Foundation
 import Socket
 
 #if os(macOS) || os(iOS) || os(tvOS)
-import Darwin
+    import Darwin
 #elseif os(Linux)
-import Glibc
+    import Glibc
 #endif
 
 extension Socket {
@@ -17,11 +17,11 @@ extension Socket {
     // swiftlint:disable:next identifier_name
     static func forceClose(socketfd fd: Int32) {
         #if os(Linux)
-        _ = Glibc.shutdown(fd, Int32(SHUT_RDWR))
-        _ = Glibc.close(fd)
+            _ = Glibc.shutdown(fd, Int32(SHUT_RDWR))
+            _ = Glibc.close(fd)
         #else
-        _ = Darwin.shutdown(fd, Int32(SHUT_RDWR))
-        _ = Darwin.close(fd)
+            _ = Darwin.shutdown(fd, Int32(SHUT_RDWR))
+            _ = Darwin.close(fd)
         #endif
     }
 }
