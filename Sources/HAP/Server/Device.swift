@@ -321,7 +321,6 @@ public class Device {
     // Can be used in the event of a stale configuration file
     public func removeAllPairings() {
         logger.debug("Removing all pairings")
-        server?.stop()
         let allPairingIdentifiers = configuration.pairings.keys
         for identifier in allPairingIdentifiers {
             remove(pairingWithIdentifier: identifier)
