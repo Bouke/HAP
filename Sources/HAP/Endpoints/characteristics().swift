@@ -104,10 +104,11 @@ func characteristics(device: Device) -> Application {
 
         case "PUT":
             var body = Data()
-            guard
-                (try? request.readAllData(into: &body)) != nil,
-                let decoded = try? JSONDecoder().decode(Protocol.CharacteristicContainer.self, from: body) else
-            {
+            let bytesRead = try? request.readAllData(into: &body)
+            logger.debug("PUT data: \(String(bytes: body, encoding: .utf8))")
+            guard bytesRead != nil,
+                let decoded = try? JSONDecoder().decode(Protocol.CharacteristicContainer.self, from: body)
+            else {
                     logger.warning("Could not decode JSON")
                     return .badRequest
             }
@@ -148,6 +149,8 @@ func characteristics(device: Device) -> Application {
                             try characteristic.setValue(int, fromConnection: connection)
                         case let .double(double):
                             try characteristic.setValue(double, fromConnection: connection)
+                        case let .bool(bool):
+                            try characteristic.setValue(bool, fromConnection: connection)
                         }
                         status.status = .success
                     } catch {
