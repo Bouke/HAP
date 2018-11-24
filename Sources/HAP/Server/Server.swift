@@ -17,7 +17,7 @@ public class Server: NSObject, NetServiceDelegate {
     let service: NetService
 
     let listenSocket: Socket
-    let socketLockQueue = DispatchQueue(label: "hap.socketLockQueue")
+    let connectionsLockQueue = DispatchQueue(label: "hap.connectionsLockQueue")
 
     let continueRunningLock = DispatchSemaphore(value: 1)
 
@@ -38,7 +38,7 @@ public class Server: NSObject, NetServiceDelegate {
         }
 
     }
-    var connectedSockets = [Int32: Socket]()
+    var connections = [Int32: Connection]()
 
     public init(device: Device, port: Int = 0) throws {
         precondition(device.server == nil, "Device already assigned to other Server instance")
@@ -84,7 +84,7 @@ public class Server: NSObject, NetServiceDelegate {
                 repeat {
                     let newSocket = try self.listenSocket.acceptClientConnection()
                     DispatchQueue.main.async {
-                        logger.info("Accepted connection from \(newSocket.remoteHostname)")
+                        logger.info("Accepted connection from \(newSocket.remoteHostname):\(newSocket.remotePort)")
                     }
                     self.addNewConnection(socket: newSocket)
                 } while self.continueRunning
@@ -100,11 +100,11 @@ public class Server: NSObject, NetServiceDelegate {
         service.stop()
         continueRunning = false
 
-        socketLockQueue.sync { [unowned self] in
-            for socket in self.connectedSockets {
-                Socket.forceClose(socketfd: socket.key)
+        connectionsLockQueue.sync { [unowned self] in
+            for (_, connection) in self.connections {
+                connection.tearDown()
             }
-            self.connectedSockets = [:]
+            self.connections = [:]
         }
 
     }
@@ -124,18 +124,32 @@ public class Server: NSObject, NetServiceDelegate {
     }
 
     func addNewConnection(socket: Socket) {
-        socketLockQueue.sync { [unowned self, socket] in
-            self.connectedSockets[socket.socketfd] = socket
-        }
 
         let queue = DispatchQueue.global(qos: .userInteractive)
 
         // Create the run loop work item and dispatch to the default priority global queue...
         queue.async { [unowned self, socket] in
-            Connection().listen(socket: socket, application: self.application)
+            let socketfd = socket.socketfd
+            let connection = Connection(server: self)
 
-            self.socketLockQueue.sync { [unowned self, socket] in
-                self.connectedSockets[socket.socketfd] = nil
+            self.connectionsLockQueue.sync { [unowned self, socket, connection] in
+                self.connections[socket.socketfd] = connection
+            }
+
+            connection.listen(socket: socket, application: self.application)
+
+            self.connectionsLockQueue.sync { [unowned self, socketfd] in
+                self.connections[socketfd] = nil
+            }
+        }
+    }
+
+    func removeConnectionsFor(pairing: Pairing) {
+        connectionsLockQueue.sync { [unowned self] in
+            for (socketfd, connection) in self.connections
+            where connection.pairing?.identifier == pairing.identifier {
+                    connection.tearDown()
+                    self.connections[socketfd] = nil
             }
         }
     }
