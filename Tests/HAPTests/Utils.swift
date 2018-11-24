@@ -100,9 +100,8 @@ final class MockRequest: ServerRequest {
 
 class MockConnection: HAP.Server.Connection {
     var sideChannelCallback: ((Data) -> Void)?
-    init(_ device: Device) {
-        let server = HAP.Server(forTestingWithDevice: device)
-        super.init(server: server)
+    init() {
+        super.init(withoutServerForXCTest: true)
     }
     override func writeOutOfBand(_ data: Data) {
         sideChannelCallback?(data)

@@ -14,13 +14,16 @@ public class Server: NSObject, NetServiceDelegate {
     let device: Device
     let application: Application
 
-    private let service: NetService?
-    private let listenSocket: Socket?
-    private let connectionsLockQueue = DispatchQueue(label: "hap.connectionsLockQueue")
-    private let continueRunningLock = DispatchSemaphore(value: 1)
+    let service: NetService
 
-    private var _continueRunning = false
-    private var continueRunning: Bool {
+    let listenSocket: Socket
+    let connectionsLockQueue = DispatchQueue(label: "hap.connectionsLockQueue")
+
+    let continueRunningLock = DispatchSemaphore(value: 1)
+
+    // swiftlint:disable:next identifier_name
+    var _continueRunning = false
+    var continueRunning: Bool {
         get {
             continueRunningLock.wait()
             defer {
@@ -35,7 +38,7 @@ public class Server: NSObject, NetServiceDelegate {
         }
 
     }
-    private var connections = [Int32: Connection]()
+    var connections = [Int32: Connection]()
 
     public init(device: Device, port: Int = 0) throws {
         precondition(device.server == nil, "Device already assigned to other Server instance")
@@ -44,35 +47,24 @@ public class Server: NSObject, NetServiceDelegate {
         application = root(device: device)
 
         listenSocket = try Socket.create(family: .inet, type: .stream, proto: .tcp)
-        try listenSocket!.listen(on: port)
+        try listenSocket.listen(on: port)
 
-        service = NetService(domain: "local.", type: "_hap._tcp.", name: device.name, port: listenSocket!.listeningPort)
+        service = NetService(domain: "local.", type: "_hap._tcp.", name: device.name, port: listenSocket.listeningPort)
 
         super.init()
 
-        service?.delegate = self
+        service.delegate = self
         device.server = self
         updateDiscoveryRecord()
-    }
-
-    /// An initialiser for testing purposes - no network connections are setup
-    internal init(forTestingWithDevice device: Device) {
-        precondition(device.server == nil, "Device already assigned to other Server instance")
-        self.device = device
-        application = root(device: device)
-        service = nil
-        listenSocket = nil
-        super.init()
-        device.server = self
     }
 
     /// Publish the Accessory configuration on the Bonjour service
     func updateDiscoveryRecord() {
         #if os(macOS)
             let record = device.config.dictionary(key: { $0.key }, value: { $0.value.data(using: .utf8)! })
-            service?.setTXTRecord(NetService.data(fromTXTRecord: record))
+            service.setTXTRecord(NetService.data(fromTXTRecord: record))
         #elseif os(Linux)
-            service?.setTXTRecord(device.config)
+            service.setTXTRecord(device.config)
         #endif
     }
 
@@ -83,33 +75,29 @@ public class Server: NSObject, NetServiceDelegate {
         // TODO: make sure can only be started if not started
 
         continueRunning = true
-        service?.publish(options: NetService.Options(rawValue: 0))
-        if let listenSocket = self.listenSocket {
-            logger.info("Listening on port \(listenSocket.listeningPort)")
+        service.publish(options: NetService.Options(rawValue: 0))
+        logger.info("Listening on port \(self.listenSocket.listeningPort)")
 
-            let queue = DispatchQueue.global(qos: .userInteractive)
-            queue.async { [unowned self] in
-                do {
-                    repeat {
-                        let newSocket = try listenSocket.acceptClientConnection()
-                        DispatchQueue.main.async {
-                            logger.info("Accepted connection from \(newSocket.remoteHostname):\(newSocket.remotePort)")
-                        }
-                        self.addNewConnection(socket: newSocket)
-                    } while self.continueRunning
-                } catch {
-                    logger.error("Could not accept connections for listening socket", error: error)
-                }
-                self.tearDownConnections()
-                listenSocket.close()
+        let queue = DispatchQueue.global(qos: .userInteractive)
+        queue.async { [unowned self] in
+            do {
+                repeat {
+                    let newSocket = try self.listenSocket.acceptClientConnection()
+                    DispatchQueue.main.async {
+                        logger.info("Accepted connection from \(newSocket.remoteHostname):\(newSocket.remotePort)")
+                    }
+                    self.addNewConnection(socket: newSocket)
+                } while self.continueRunning
+            } catch {
+                logger.error("Could not accept connections for listening socket", error: error)
             }
-        } else {
-            assertionFailure("Server has no socket")
+            self.tearDownConnections()
+            self.listenSocket.close()
         }
     }
 
     func tearDownConnections() {
-        service?.stop()
+        service.stop()
         continueRunning = false
 
         connectionsLockQueue.sync { [unowned self] in
@@ -132,9 +120,7 @@ public class Server: NSObject, NetServiceDelegate {
         // the one that's currently listening. As a workaround, we'll 
         // force close the file descriptor instead.
 
-        if let listenSocket = self.listenSocket {
-            Socket.forceClose(socketfd: listenSocket.socketfd)
-        }
+        Socket.forceClose(socketfd: listenSocket.socketfd)
     }
 
     func addNewConnection(socket: Socket) {

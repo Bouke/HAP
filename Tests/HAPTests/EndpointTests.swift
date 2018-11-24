@@ -35,7 +35,7 @@ class EndpointTests: XCTestCase {
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00055"), type: .color, isDimmable: true)
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = accessories(device: device)
-        let response = application(MockConnection(device), MockRequest.get(path: "/accessories"))
+        let response = application(MockConnection(), MockRequest.get(path: "/accessories"))
         let jsonObject = try! JSONSerialization.jsonObject(with: response.body ?? Data(), options: []) as! [String: [[String: Any]]]
         guard let accessory = jsonObject["accessories"]?.first else {
             return XCTFail("No accessory")
@@ -93,7 +93,7 @@ class EndpointTests: XCTestCase {
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: energy)
         let application = characteristics(device: device)
         do {
-            let response = application(MockConnection(device), MockRequest.get(path: "/characteristics?id=\(energy.aid).\(energy.info.name.iid),\(energy.aid).\(energy.service.watt.iid)&meta=1&perms=1&type=1&ev=1"))
+            let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=\(energy.aid).\(energy.info.name.iid),\(energy.aid).\(energy.service.watt.iid)&meta=1&perms=1&type=1&ev=1"))
             guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body ?? Data(), options: [])) as? [String: [[String: Any]]] else {
                 return XCTFail("Could not decode")
             }
@@ -122,7 +122,7 @@ class EndpointTests: XCTestCase {
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = characteristics(device: device)
         do {
-            let response = application(MockConnection(device), MockRequest.get(path: "/characteristics?id=\(lamp.aid).\(lamp.info.manufacturer.iid),\(lamp.aid).\(lamp.info.name.iid)"))
+            let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=\(lamp.aid).\(lamp.info.manufacturer.iid),\(lamp.aid).\(lamp.info.name.iid)"))
             guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body ?? Data(), options: [])) as? [String: [[String: Any]]] else {
                 return XCTFail("Could not decode")
             }
@@ -142,7 +142,7 @@ class EndpointTests: XCTestCase {
         }
 
         do {
-            let response = application(MockConnection(device), MockRequest.get(path: "/characteristics?id=\(lamp.aid).\(lamp.info.name.iid),\(lamp.aid).\(lamp.lightbulb.brightness!.iid)&meta=1&perms=1&type=1&ev=1"))
+            let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=\(lamp.aid).\(lamp.info.name.iid),\(lamp.aid).\(lamp.lightbulb.brightness!.iid)&meta=1&perms=1&type=1&ev=1"))
             guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body ?? Data(), options: [])) as? [String: [[String: Any]]] else {
                 return XCTFail("Could not decode")
             }
@@ -192,7 +192,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .noContent)
             XCTAssertEqual(lamp.lightbulb.on.value, true)
         }
@@ -209,7 +209,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .noContent)
             XCTAssertEqual(lamp.lightbulb.brightness!.value, 50)
         }
@@ -226,7 +226,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .noContent)
             XCTAssertEqual(lamp.lightbulb.brightness!.value, 100)
         }
@@ -260,7 +260,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .noContent)
             XCTAssertEqual(thermostat.thermostat.targetTemperature.value, 19.5)
             XCTAssertEqual(thermostat.thermostat.targetHeatingCoolingState.value, .auto)
@@ -278,7 +278,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .noContent)
             XCTAssertEqual(thermostat.thermostat.targetTemperature.value, 20)
         }
@@ -295,7 +295,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .noContent)
             XCTAssertEqual(thermostat.thermostat.targetHeatingCoolingState.value, .off)
         }
@@ -315,7 +315,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .noContent)
             XCTAssertEqual(thermostat.thermostat.targetHeatingCoolingState.value, .off)
         }
@@ -339,7 +339,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .badRequest)
         }
 
@@ -355,7 +355,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .badRequest)
             let json = try! JSONSerialization.jsonObject(with: response.body ?? Data())  as! [String: [[String: Any]]]
             XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int, HAPStatusCodes.invalidValue.rawValue)
@@ -379,7 +379,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .multiStatus)
             XCTAssertEqual(lamp.lightbulb.brightness!.value, 50)
 
@@ -407,7 +407,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .multiStatus)
 
             let json = try! JSONSerialization.jsonObject(with: response.body ?? Data())  as! [String: [[String: Any]]]
@@ -433,7 +433,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .multiStatus)
             XCTAssertEqual(lamp.lightbulb.brightness!.value, 50)
 
@@ -459,7 +459,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .multiStatus)
             XCTAssertEqual(lamp.lightbulb.brightness!.value, 50)
 
@@ -481,7 +481,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .badRequest)
         }
 
@@ -496,7 +496,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .badRequest)
         }
 
@@ -511,7 +511,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .badRequest)
         }
 
@@ -528,7 +528,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .unprocessableEntity)
         }
 
@@ -545,7 +545,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+            let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
             XCTAssertEqual(response.status, .unprocessableEntity)
         }
     }
@@ -564,7 +564,7 @@ class EndpointTests: XCTestCase {
         // First a good one
         do {
             let req = "\(lamp.aid).\(lamp.lightbulb.brightness!.iid),\(lightsensor.aid).\(lightsensor.lightSensor.currentLight.iid),\(thermostat.aid).\(thermostat.thermostat.currentTemperature.iid)"
-            let response = application(MockConnection(device), MockRequest.get(path: "/characteristics?id=\(req)"))
+            let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=\(req)"))
 
             XCTAssertEqual(response.status, .ok)
 
@@ -608,7 +608,7 @@ class EndpointTests: XCTestCase {
         do {
             let iid = lightsensor.info.identify.iid
             let aid = lightsensor.aid
-            let response = application(MockConnection(device), MockRequest.get(path: "/characteristics?id=\(aid).\(iid)"))
+            let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=\(aid).\(iid)"))
             XCTAssertEqual(response.status, .multiStatus)
             let json = try! JSONSerialization.jsonObject(with: response.body ?? Data())  as! [String: [[String: Any]]]
             XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int, HAPStatusCodes.writeOnly.rawValue)
@@ -622,7 +622,7 @@ class EndpointTests: XCTestCase {
             let aid = lightsensor.aid
             let iid2 = thermostat.thermostat.currentTemperature.iid
             let aid2 = thermostat.aid
-            let response = application(MockConnection(device), MockRequest.get(path: "/characteristics?id=\(aid2).\(iid2),\(aid).\(iid)"))
+            let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=\(aid2).\(iid2),\(aid).\(iid)"))
             XCTAssertEqual(response.status, .multiStatus)
             guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body ?? Data(), options: [])) as? [String: [[String: Any]]] else {
                 return XCTFail("Could not decode")
@@ -650,7 +650,7 @@ class EndpointTests: XCTestCase {
             let aid = lightsensor.aid
             let iid2 = thermostat.thermostat.currentTemperature.iid
             let aid2 = thermostat.aid
-            let response = application(MockConnection(device), MockRequest.get(path: "/characteristics?id=\(aid).\(iid),\(aid2).\(iid2)"))
+            let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=\(aid).\(iid),\(aid2).\(iid2)"))
             XCTAssertEqual(response.status, .multiStatus)
             guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body ?? Data(), options: [])) as? [String: [[String: Any]]] else {
                 return XCTFail("Could not decode")
@@ -678,19 +678,19 @@ class EndpointTests: XCTestCase {
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = root(device: device)
         do {
-            let response = application(MockConnection(device), MockRequest.get(path: "/identify"))
+            let response = application(MockConnection(), MockRequest.get(path: "/identify"))
             XCTAssertEqual(response.status, .forbidden)
         }
         do {
-            let response = application(MockConnection(device), MockRequest.get(path: "/accessories"))
+            let response = application(MockConnection(), MockRequest.get(path: "/accessories"))
             XCTAssertEqual(response.status, .forbidden)
         }
         do {
-            let response = application(MockConnection(device), MockRequest.get(path: "/characteristics"))
+            let response = application(MockConnection(), MockRequest.get(path: "/characteristics"))
             XCTAssertEqual(response.status, .forbidden)
         }
         do {
-            let response = application(MockConnection(device), MockRequest.get(path: "/pairings"))
+            let response = application(MockConnection(), MockRequest.get(path: "/pairings"))
             XCTAssertEqual(response.status, .forbidden)
         }
     }
@@ -702,7 +702,7 @@ class EndpointTests: XCTestCase {
         let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00066B"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
         let application = characteristics(device: device)
 
-        let connection = MockConnection(device)
+        let connection = MockConnection()
         withExtendedLifetime(connection) {
 
             // subscribe to lamp events
@@ -739,7 +739,7 @@ class EndpointTests: XCTestCase {
         let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00069"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
         let application = characteristics(device: device)
 
-        let connection = MockConnection(device)
+        let connection = MockConnection()
         withExtendedLifetime(connection) {
 
             // subscribe to lamp events
@@ -761,7 +761,7 @@ class EndpointTests: XCTestCase {
                 let body = try! JSONSerialization.data(withJSONObject: [
                     "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 1]]
                 ], options: [])
-                let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+                let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
                 XCTAssertEqual(response.status, .noContent)
             }
 
@@ -775,7 +775,7 @@ class EndpointTests: XCTestCase {
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = characteristics(device: device)
 
-        let connection = MockConnection(device)
+        let connection = MockConnection()
         withExtendedLifetime(connection) {
 
             // subscribe to lamp events
@@ -799,7 +799,7 @@ class EndpointTests: XCTestCase {
                 let body = try! JSONSerialization.data(withJSONObject: [
                     "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 1]]
                 ], options: [])
-                let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+                let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
                 XCTAssertEqual(response.status, .noContent)
 
                 wait(for: [expectation], timeout: 0.01)
@@ -816,7 +816,7 @@ class EndpointTests: XCTestCase {
                 let body = try! JSONSerialization.data(withJSONObject: [
                     "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 0]]
                 ], options: [])
-                let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+                let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
                 XCTAssertEqual(response.status, .noContent)
 
                 wait(for: [expectation], timeout: 1.01)
@@ -835,7 +835,7 @@ class EndpointTests: XCTestCase {
         let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00072B"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
         let application = characteristics(device: device)
 
-        let connection = MockConnection(device)
+        let connection = MockConnection()
         withExtendedLifetime(connection) {
 
             // subscribe to lamp events
@@ -862,7 +862,7 @@ class EndpointTests: XCTestCase {
                 let body = try! JSONSerialization.data(withJSONObject: [
                     "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 1]]
                 ], options: [])
-                let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+                let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
                 XCTAssertEqual(response.status, .noContent)
 
                 wait(for: [expectation], timeout: 0.01)
@@ -883,7 +883,7 @@ class EndpointTests: XCTestCase {
                     let body = try! JSONSerialization.data(withJSONObject: [
                         "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 0]]
                     ], options: [])
-                    let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+                    let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
                     XCTAssertEqual(response.status, .noContent)
                 }
                 // third update: change target temperature
@@ -891,7 +891,7 @@ class EndpointTests: XCTestCase {
                     let body = try! JSONSerialization.data(withJSONObject: [
                         "characteristics": [["aid": thermostat.aid, "iid": thermostat.thermostat.targetTemperature.iid, "value": 17.5]]
                     ], options: [])
-                    let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+                    let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
                     XCTAssertEqual(response.status, .noContent)
                 }
 
@@ -927,7 +927,7 @@ class EndpointTests: XCTestCase {
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = characteristics(device: device)
 
-        let connection = MockConnection(device)
+        let connection = MockConnection()
         withExtendedLifetime(connection) {
 
             // subscribe to lamp events
@@ -951,7 +951,7 @@ class EndpointTests: XCTestCase {
                 let body = try! JSONSerialization.data(withJSONObject: [
                     "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 1]]
                 ], options: [])
-                let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+                let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
                 XCTAssertEqual(response.status, .noContent)
 
                 wait(for: [expectation], timeout: 0.01)
@@ -972,7 +972,7 @@ class EndpointTests: XCTestCase {
                     let body = try! JSONSerialization.data(withJSONObject: [
                         "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 0]]
                     ], options: [])
-                    let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+                    let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
                     XCTAssertEqual(response.status, .noContent)
                 }
                 // second update: turn lamp on again
@@ -980,7 +980,7 @@ class EndpointTests: XCTestCase {
                     let body = try! JSONSerialization.data(withJSONObject: [
                         "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 1]]
                     ], options: [])
-                    let response = application(MockConnection(device), MockRequest(method: "PUT", path: "/characteristics", body: body))
+                    let response = application(MockConnection(), MockRequest(method: "PUT", path: "/characteristics", body: body))
                     XCTAssertEqual(response.status, .noContent)
                 }
 
