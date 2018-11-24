@@ -18,7 +18,7 @@ class PairingsEndpointTests: XCTestCase {
     var application: Application!
     override func setUp() {
         device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00072B"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [])
-        connection = MockConnection()
+        connection = MockConnection(device)
         connection.pairing = Pairing(identifier: Data(), publicKey: Data(), role: .regularUser)
         device.add(pairing: connection.pairing!)
         application = pairings(device: device)
