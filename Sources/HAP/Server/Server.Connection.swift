@@ -17,6 +17,8 @@ extension Server {
         private var nextAllowableNotificationTime = DispatchTime.now()
 
         internal func append(characteristic: Characteristic) {
+            // Called on MAIN queue (from Device or from characteristics() )
+
             /* HAP Specification 5.8 (excerpts)
              Network-based notifications must be coalesced
              by the accessory using a delay of no less than 1 second.
@@ -38,7 +40,37 @@ extension Server {
             }
         }
 
+        /// If there are no queued or very recent notifications then send
+        /// an empty event to test whether the Connection is still alive.
+        /// The socket will be closed if the message cannot be written
+        /// to the socket, or if the test causes a simultaneous blocking read
+        /// in the listen function to detect a dead connection.
+        fileprivate func tickle() {
+            // Called on global queue
+            DispatchQueue.main.async {
+                if let listener = self.listener,
+                    listener.socket != nil,
+                    self.queue.isEmpty,
+                    DispatchTime.now() >= self.nextAllowableNotificationTime {
+
+                    // swiftlint:disable:next line_length
+                    logger.info("Tickling \(self.listener?.socket?.remoteHostname ?? "-"):\(self.listener?.socket?.remotePort.description ?? "-"))")
+
+                    self.nextAllowableNotificationTime = DispatchTime.now() + minimalTimeBetweenNotifications
+                    let event: Event
+                    do {
+                        event = try Event(valueChangedOfCharacteristics: [])
+                    } catch {
+                        return logger.error("Could not create value change event: \(error)")
+                    }
+                    let data = event.serialized()
+                    listener.writeOutOfBand(data)
+                }
+            }
+        }
+
         private func sendQueue() {
+            // Called on MAIN queue
             guard !queue.isEmpty else {
                 return
             }
@@ -65,21 +97,45 @@ extension Server {
         var pairing: Pairing?
         var notificationQueue: NotificationQueue
         let writeQueue = DispatchQueue(label: "hap.server.connection")
+        weak var server: Server?
+        private let created = Date()
 
-        override init() {
+        init(server: Server) {
+            // Called on global Queue
             notificationQueue = NotificationQueue()
             super.init()
             notificationQueue.listener = self
+            self.server = server
+        }
+
+        func repeatingTickle() {
+            // Called on global queue
+            if socket != nil {
+                let secondsBetweenTickles = 10 * 60
+                writeQueue.asyncAfter(deadline: .now() + .seconds(secondsBetweenTickles)) { [weak self] in
+                    self?.notificationQueue.tickle()
+                    self?.repeatingTickle()
+                }
+            }
         }
 
         func listen(socket: Socket, application: @escaping Application) {
+            // Called on global queue
             self.socket = socket
+
+            // Regularly check if the connection is still alive
+            repeatingTickle()
+
             let httpParser = HTTPParser(isRequest: true)
             let request = HTTPServerRequest(socket: socket, httpParser: httpParser)
             while true {
                 var readBuffer = Data()
                 do {
-                    _ = try socket.read(into: &readBuffer)
+                    let byteCount = try socket.read(into: &readBuffer)
+                    guard byteCount > 0 else {
+                        // 0 bytes read signals the socket has closed
+                        break
+                    }
                     if let cryptographer = self.cryptographer {
                         readBuffer = try cryptographer.decrypt(readBuffer)
                     }
@@ -129,15 +185,12 @@ extension Server {
                     break
                 }
             }
-            logger.debug("Closed connection to \(socket.remoteHostname)")
-            writeQueue.sync {
-                socket.close()
-            }
-            self.socket = nil
+            logger.debug("Closed connection to \(socket.remoteHostname):\(socket.remotePort)")
+            self.tearDown()
         }
 
         func writeOutOfBand(_ data: Data) {
-            // TODO: resolve race conditions with the read/write loop
+            // Called on MAIN queue
             guard let socket = socket else {
                 return
             }
@@ -150,7 +203,33 @@ extension Server {
                     try socket.write(from: writeBuffer)
                 } catch {
                     logger.error("Error while writing to socket", error: error)
-                    socket.close()
+                    self.tearDown()
+                }
+            }
+        }
+
+        func tearDown() {
+            // Called on MAIN queue (pairings()) or writeQueue (writeOutOfBand) or globalQueue (listen)
+            DispatchQueue.main.async {
+
+                func format(duration: TimeInterval) -> String {
+                    let formatter = DateComponentsFormatter()
+                    formatter.allowedUnits = [.day, .hour, .minute, .second]
+                    formatter.unitsStyle = .abbreviated
+                    formatter.maximumUnitCount = 1
+
+                    return formatter.string(from: duration)!
+                }
+
+                if let socket = self.socket {
+                    // swiftlint:disable:next line_length
+                    logger.debug("Tearing down connection to \(socket.remoteHostname):\(socket.remotePort) after \(format(duration: Date().timeIntervalSince(self.created)))")
+                    self.writeQueue.async {
+                        // Close after any write operation is complete
+                        Socket.forceClose(socketfd: socket.socketfd)
+                    }
+                    self.server?.device.remove(listener: self)
+                    self.socket = nil
                 }
             }
         }

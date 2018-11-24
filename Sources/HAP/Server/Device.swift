@@ -361,17 +361,28 @@ public class Device {
     // Remove the pairing in the internal DB and notify the change
     // to update the Bonjour broadcast
     func remove(pairingWithIdentifier identifier: PairingIdentifier) {
-        configuration.pairings[identifier] = nil
-        // If the last remaining admin controller pairing is removed, all
-        // pairings on the accessory must be removed.
-        if configuration.pairings.values.first(where: { $0.role == .admin }) == nil {
-            logger.info("Last remaining admin controller pairing is removed, removing all pairings")
-            configuration.pairings = [:]
-        }
-        persistConfig()
-        if pairingState == .paired && configuration.pairings.isEmpty {
-            // swiftlint:disable:next force_try
-            try! changePairingState(.notPaired)
+        if let pairing = configuration.pairings[identifier] {
+
+            server?.removeConnectionsFor(pairing: pairing)
+            configuration.pairings[identifier] = nil
+
+            // If the last remaining admin controller pairing is removed, all
+            // pairings on the accessory must be removed.
+            if configuration.pairings.values.first(where:{ $0.role == .admin }) == nil {
+                logger.info("Last remaining admin controller pairing is removed, removing all pairings")
+                let allPairingIdentifiers = configuration.pairings.keys
+                for identifier in allPairingIdentifiers {
+                    server?.removeConnectionsFor(pairing: pairing)
+                    configuration.pairings[identifier] = nil
+                }
+            }
+
+            persistConfig()
+            if pairingState == .paired && configuration.pairings.isEmpty {
+                // swiftlint:disable:next force_try
+                try! changePairingState(.notPaired)
+            }
+
         }
     }
 
@@ -422,6 +433,14 @@ public class Device {
 
         for listener in listeners {
             listener.notificationQueue.append(characteristic: characteristic)
+        }
+    }
+
+    /// Remove a listener for any associated characteristics
+    func remove(listener connection: Server.Connection) {
+        for (boxedCharacteristic, _) in characteristicEventListeners {
+            let characteristic = boxedCharacteristic.value
+            remove(characteristic: characteristic, listener: connection)
         }
     }
 
