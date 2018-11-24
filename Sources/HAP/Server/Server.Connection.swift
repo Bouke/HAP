@@ -108,6 +108,14 @@ extension Server {
             self.server = server
         }
 
+        init(withoutServerForXCTest: Bool) {
+            // Called on MAIN Queue
+            notificationQueue = NotificationQueue()
+            super.init()
+            notificationQueue.listener = self
+            self.server = nil
+        }
+
         func repeatingTickle() {
             // Called on global queue
             if socket != nil {
