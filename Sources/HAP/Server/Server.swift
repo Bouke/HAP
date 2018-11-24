@@ -146,11 +146,10 @@ public class Server: NSObject, NetServiceDelegate {
 
     func removeConnectionsFor(pairing: Pairing) {
         connectionsLockQueue.sync { [unowned self] in
-            for (socketfd, connection) in self.connections {
-                if connection.pairing?.identifier == pairing.identifier {
+            for (socketfd, connection) in self.connections
+            where connection.pairing?.identifier == pairing.identifier {
                     connection.tearDown()
                     self.connections[socketfd] = nil
-                }
             }
         }
     }
