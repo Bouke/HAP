@@ -11,7 +11,7 @@ fileprivate let logger = getLogger("demo")
     import Glibc
 #endif
 
-getLogger("hap").logLevel = .warning
+getLogger("hap").logLevel = .debug
 
 let storage = FileStorage(filename: "configuration.json")
 if CommandLine.arguments.contains("--recreate") {
@@ -97,27 +97,26 @@ signal(SIGINT) { _ in
     }
 }
 
-//let server = try Server(device: device, port: 0)
-//server.start()
-//
-//print()
-//print("Scan the following QR code using your iPhone to pair this device:")
-//print()
-//print(device.setupQRCode.asText)
-//print()
-//
-//withExtendedLifetime([delegate]) {
-//    if CommandLine.arguments.contains("--test") {
-//        print("Running runloop for 10 seconds...")
-//        RunLoop.main.run(until: Date(timeIntervalSinceNow: 10))
-//    } else {
-//        while keepRunning {
-//            RunLoop.current.run(until: Date().addingTimeInterval(2))
-//        }
-//    }
-//}
-//
-//server.stop()
-//logger.info("Stopped")
+let server = try Server(device: device, port: 8000)
 
-runServer(device: device, port: 8000)
+print()
+print("Scan the following QR code using your iPhone to pair this device:")
+print()
+print(device.setupQRCode.asText)
+print()
+
+server.wait()
+
+withExtendedLifetime([delegate]) {
+    if CommandLine.arguments.contains("--test") {
+        print("Running runloop for 10 seconds...")
+        RunLoop.main.run(until: Date(timeIntervalSinceNow: 10))
+    } else {
+        while keepRunning {
+            RunLoop.current.run(until: Date().addingTimeInterval(2))
+        }
+    }
+}
+
+//server.stop()
+logger.info("Stopped")

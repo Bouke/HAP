@@ -1,5 +1,6 @@
 import func Evergreen.getLogger
 import Foundation
+import HTTP
 
 fileprivate let logger = getLogger("hap.endpoints.pair-verify")
 fileprivate typealias Session = PairVerifyController.Session
@@ -8,12 +9,15 @@ fileprivate enum Error: Swift.Error {
     case noSession
 }
 
-func pairVerify(device: Device) -> Application {
+func pairVerify(device: Device) -> Responder {
     let controller = PairVerifyController(device: device)
 
-    return { connection, request in
-        var body = Data()
-        guard (try? request.read(into: &body)) != nil,
+    // TODO: this memory is not freed, not thread-safe either
+    var sessions: [ObjectIdentifier: PairVerifyController.Session] = [:]
+
+    return { context, request in
+        guard
+            let body = request.body.data,
             let data: PairTagTLV8 = try? decode(body)
         else {
             logger.warning("Could not decode message")
@@ -24,23 +28,32 @@ func pairVerify(device: Device) -> Application {
         }
         do {
             switch state {
+
             case .startRequest:
                 let (response, session) = try controller.startRequest(data)
-                connection.context[SESSION_KEY] = session
-                return Response(status: .ok, data: encode(response), mimeType: "application/pairing+tlv8")
+                sessions[ObjectIdentifier(context.channel)] = session
+                return HTTPResponse(tags: response)
+
             case .finishRequest:
                 defer {
-                    connection.context[SESSION_KEY] = nil
+                    sessions[ObjectIdentifier(context.channel)] = nil
                 }
-                guard let session = connection.context[SESSION_KEY] as? Session else {
+                guard let session = sessions[ObjectIdentifier(context.channel)] else {
                     throw Error.noSession
                 }
+
                 let (result, pairing) = try controller.finishRequest(data, session)
-                connection.pairing = pairing
-                let response = UpgradeResponse(cryptographer: Cryptographer(sharedKey: session.sharedSecret))
-                response.headers["Content-Type"] = "application/pairing+tlv8"
-                response.body = encode(result)
-                return response
+                // TODO: what's this used for?
+                //connection.pairing = pairing
+
+                logger.error("ALL OK, BUT CANNOT UPGRADE!")
+                return HTTPResponse(status: .badRequest)
+
+//                let response = UpgradeResponse(cryptographer: Cryptographer(sharedKey: session.sharedSecret))
+//                response.headers["Content-Type"] = "application/pairing+tlv8"
+//                response.body = encode(result)
+//                return response
+
             default:
                 return .badRequest
             }

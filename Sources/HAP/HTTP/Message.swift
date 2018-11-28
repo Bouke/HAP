@@ -1,4 +1,5 @@
 import Foundation
+import HTTP
 
 class Response {
     var status = Status.ok
@@ -89,4 +90,19 @@ class Response {
     static var unprocessableEntity: Response { return  Response(status: .unprocessableEntity) }
     static var notFound: Response { return  Response(status: .notFound) }
     static var internalServerError: Response { return  Response(status: .internalServerError) }
+}
+
+
+extension HTTPResponse {
+    init(tags: PairTagTLV8) {
+        self.init(status: .ok,
+                  headers: HTTPHeaders([("Content-Type", "application/pairing+tlv8")]),
+                  body: encode(tags))
+    }
+
+    static var badRequest: HTTPResponse {
+        get {
+            return HTTPResponse(status: .badRequest)
+        }
+    }
 }

@@ -14,7 +14,6 @@ class ControllerHandler : ChannelInboundHandler {
         let channel = ctx.channel
         channelsSyncQueue.async {
             self.channels[ObjectIdentifier(channel)] = channel
-            print(self.channels)
         }
     }
 
@@ -22,7 +21,6 @@ class ControllerHandler : ChannelInboundHandler {
         let channel = ctx.channel
         channelsSyncQueue.async {
             self.channels.removeValue(forKey: ObjectIdentifier(channel))
-            print(self.channels)
         }
     }
 }

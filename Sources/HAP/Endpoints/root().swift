@@ -1,3 +1,4 @@
+import Foundation
 import HTTP
 
 import func Evergreen.getLogger
@@ -9,8 +10,8 @@ func root(device: Device) -> Responder {
     return logger(router([
         // Unauthenticated endpoints
         ("/", { _, _  in HTTPResponse(body: "Nothing to see here. Pair this Homekit Accessory with an iOS device.") }),
-//        ("/pair-setup", pairSetup(device: device)),
-//        ("/pair-verify", pairVerify(device: device)),
+        ("/pair-setup", pairSetup(device: device)),
+        ("/pair-verify", pairVerify(device: device)),
 
         // Authenticated endpoints
 //        ("/identify", protect(identify(device: device))),
@@ -21,11 +22,11 @@ func root(device: Device) -> Responder {
 }
 
 func logger(_ application: @escaping Responder) -> Responder {
-    return { connection, request in
-        let response = application(connection, request)
+    return { context, request in
+        let response = application(context, request)
         // swiftlint:disable:next line_length
-//        logger.info("\(connection.socket?.remoteHostname ?? "-") \(request.method) \(request.urlURL.path) \(request.urlURL.query ?? "-") \(response.status.rawValue) \(response.body?.count ?? 0)")
-//        logger.debug("- Response Messagea: \(String(data: response.serialized(), encoding: .utf8) ?? "-")")
+        logger.info("\(context.channel.remoteAddress) \(request.method) \(request.uri) \(response.status) \(response.body.count ?? 0)")
+        logger.debug("- Response Messagea: \(String(data: response.body.data ?? Data(), encoding: .utf8) ?? "-")")
         return response
     }
 }

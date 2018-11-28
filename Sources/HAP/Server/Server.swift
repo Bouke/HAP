@@ -2,6 +2,9 @@ import Foundation
 import KituraNet
 import Socket
 import func Evergreen.getLogger
+import HTTP
+import NIO
+import NIOHTTP1
 
 #if os(Linux)
     import Dispatch
@@ -12,146 +15,74 @@ fileprivate let logger = getLogger("hap.http")
 
 public class Server: NSObject, NetServiceDelegate {
     let device: Device
-    let application: Application
 
     let service: NetService
 
-    let listenSocket: Socket
-    let connectionsLockQueue = DispatchQueue(label: "hap.connectionsLockQueue")
-
-    let continueRunningLock = DispatchSemaphore(value: 1)
-
-    // swiftlint:disable:next identifier_name
-    var _continueRunning = false
-    var continueRunning: Bool {
-        get {
-            continueRunningLock.wait()
-            defer {
-                continueRunningLock.signal()
-            }
-            return _continueRunning
-        }
-        set {
-            continueRunningLock.wait()
-            _continueRunning = newValue
-            continueRunningLock.signal()
-        }
-
-    }
-    var connections = [Int32: Connection]()
+    let channel: Channel
+    let channel6: Channel
 
     public init(device: Device, port: Int = 0) throws {
-        abort()
         precondition(device.server == nil, "Device already assigned to other Server instance")
         self.device = device
 
-//        application = root(device: device)
+        device.controllerHandler = ControllerHandler()
 
-        listenSocket = try Socket.create(family: .inet, type: .stream, proto: .tcp)
-        try listenSocket.listen(on: port)
+        var applicationHandler = ApplicationHandler(responder: root(device: device))
 
-        service = NetService(domain: "local.", type: "_hap._tcp.", name: device.name, port: listenSocket.listeningPort)
+        let group = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
+        let bootstrap = ServerBootstrap(group: group)
+            // Specify backlog and enable SO_REUSEADDR for the server itself
+            .serverChannelOption(ChannelOptions.backlog, value: 256)
+            .serverChannelOption(ChannelOptions.socket(SocketOptionLevel(SOL_SOCKET), SO_REUSEADDR), value: 1)
+
+            // Set the handlers that are applied to the accepted child `Channel`s.
+            .childChannelInitializer { channel in
+                channel.pipeline.configureHTTPServerPipeline(withErrorHandling: true).then {
+                    // It's important we use the same handler for all accepted channels. The ControllerHandler is thread-safe!
+                    channel.pipeline.add(handler: device.controllerHandler!).then {
+                        channel.pipeline.add(handler: RequestHandler()).then {
+                            channel.pipeline.add(handler: applicationHandler)
+                        }
+                    }
+                }
+            }
+
+            // Enable TCP_NODELAY and SO_REUSEADDR for the accepted Channels
+            .childChannelOption(ChannelOptions.socket(IPPROTO_TCP, TCP_NODELAY), value: 1)
+            .childChannelOption(ChannelOptions.socket(SocketOptionLevel(SOL_SOCKET), SO_REUSEADDR), value: 1)
+            .childChannelOption(ChannelOptions.maxMessagesPerRead, value: 16)
+            .childChannelOption(ChannelOptions.recvAllocator, value: AdaptiveRecvByteBufferAllocator())
+        defer {
+            try! group.syncShutdownGracefully()
+        }
+
+        channel = try! bootstrap.bind(to: SocketAddress(ipAddress: "0.0.0.0", port: UInt16(port))).wait()
+        channel6 = try! bootstrap.bind(to: SocketAddress(ipAddress: "::", port: UInt16(port))).wait()
+        /* the server will now be accepting connections */
+
+        print("bound, listening on \(channel.localAddress?.port)")
+        print("bound, listening on \(channel6.localAddress?.port)")
+
+        service = NetService(domain: "local.", type: "_hap._tcp.", name: device.name, port: Int32(channel.localAddress!.port!))
 
         super.init()
 
         service.delegate = self
         device.server = self
         updateDiscoveryRecord()
+
+        service.publish(options: NetService.Options(rawValue: 0))
+        try! channel.closeFuture.wait()
+        try! channel6.closeFuture.wait()
+    }
+
+    public func wait() {
     }
 
     /// Publish the Accessory configuration on the Bonjour service
     func updateDiscoveryRecord() {
         let record = device.config.dictionary(key: { $0.key }, value: { $0.value.data(using: .utf8)! })
         service.setTXTRecord(NetService.data(fromTXTRecord: record))
-    }
-
-    public func start() {
-        if #available(OSX 10.12, *) {
-            dispatchPrecondition(condition: .onQueue(.main))
-        }
-        // TODO: make sure can only be started if not started
-
-        continueRunning = true
-        service.publish(options: NetService.Options(rawValue: 0))
-        logger.info("Listening on port \(self.listenSocket.listeningPort)")
-
-        let queue = DispatchQueue.global(qos: .userInteractive)
-        queue.async { [unowned self] in
-            do {
-                repeat {
-                    let newSocket = try self.listenSocket.acceptClientConnection()
-                    DispatchQueue.main.async {
-                        logger.info("Accepted connection from \(newSocket.remoteHostname):\(newSocket.remotePort)")
-                    }
-                    self.addNewConnection(socket: newSocket)
-                } while self.continueRunning
-            } catch {
-                logger.error("Could not accept connections for listening socket", error: error)
-            }
-            self.tearDownConnections()
-            self.listenSocket.close()
-        }
-    }
-
-    func tearDownConnections() {
-        service.stop()
-        continueRunning = false
-
-        connectionsLockQueue.sync { [unowned self] in
-            for (_, connection) in self.connections {
-                connection.tearDown()
-            }
-            self.connections = [:]
-        }
-
-    }
-
-    public func stop() {
-        if #available(OSX 10.12, *) {
-            dispatchPrecondition(condition: .onQueue(.main))
-        }
-        continueRunning = false
-
-        // Ideally we would call `.close()` on all open sockets. However
-        // BlueSocket doesn't like us doing that from another thread than
-        // the one that's currently listening. As a workaround, we'll
-        // force close the file descriptor instead.
-
-        Socket.forceClose(socketfd: listenSocket.socketfd)
-    }
-
-    func addNewConnection(socket: Socket) {
-
-        let queue = DispatchQueue.global(qos: .userInteractive)
-
-        // Create the run loop work item and dispatch to the default priority global queue...
-        queue.async { [weak self, socket] in
-            let socketfd = socket.socketfd
-
-            if let this = self {
-                let connection = Connection(server: this)
-
-                this.connectionsLockQueue.sync { [weak self, socket, connection] in
-                    self?.connections[socket.socketfd] = connection
-                }
-
-                connection.listen(socket: socket, application: this.application)
-            }
-
-            self?.connectionsLockQueue.sync { [weak self, socketfd] in
-                self?.connections[socketfd] = nil
-            }
-        }
-    }
-
-    func removeConnectionsFor(pairing: Pairing) {
-        connectionsLockQueue.sync { [unowned self] in
-            for (socketfd, connection) in self.connections
-            where connection.pairing?.identifier == pairing.identifier {
-                    connection.tearDown()
-                    self.connections[socketfd] = nil
-            }
-        }
     }
 
     public func netServiceDidPublish(_ sender: NetService) {
@@ -188,3 +119,6 @@ public class Server: NSObject, NetServiceDelegate {
                                didAcceptConnectionWith socket: Socket) {  }
     #endif
 }
+
+
+
