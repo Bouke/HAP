@@ -18,6 +18,9 @@ public class Server: NSObject, NetServiceDelegate {
 
     let service: NetService
 
+    let group: EventLoopGroup
+    let bootstrap: ServerBootstrap
+
     let channel: Channel
     let channel6: Channel
 
@@ -27,10 +30,10 @@ public class Server: NSObject, NetServiceDelegate {
 
         device.controllerHandler = ControllerHandler()
 
-        var applicationHandler = ApplicationHandler(responder: root(device: device))
+        let applicationHandler = ApplicationHandler(responder: root(device: device))
 
-        let group = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
-        let bootstrap = ServerBootstrap(group: group)
+        group = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
+        bootstrap = ServerBootstrap(group: group)
             // Specify backlog and enable SO_REUSEADDR for the server itself
             .serverChannelOption(ChannelOptions.backlog, value: 256)
             .serverChannelOption(ChannelOptions.socket(SocketOptionLevel(SOL_SOCKET), SO_REUSEADDR), value: 1)
@@ -40,8 +43,12 @@ public class Server: NSObject, NetServiceDelegate {
                 channel.pipeline.configureHTTPServerPipeline(withErrorHandling: true).then {
                     // It's important we use the same handler for all accepted channels. The ControllerHandler is thread-safe!
                     channel.pipeline.add(handler: device.controllerHandler!).then {
-                        channel.pipeline.add(handler: RequestHandler()).then {
-                            channel.pipeline.add(handler: applicationHandler)
+                        channel.pipeline.add(handler: CryptographerHandler()).then {
+                            channel.pipeline.add(handler: RequestHandler()).then {
+                                channel.pipeline.add(handler: UpgradeEventHandler()).then {
+                                    channel.pipeline.add(handler: applicationHandler)
+                                }
+                            }
                         }
                     }
                 }
@@ -52,9 +59,6 @@ public class Server: NSObject, NetServiceDelegate {
             .childChannelOption(ChannelOptions.socket(SocketOptionLevel(SOL_SOCKET), SO_REUSEADDR), value: 1)
             .childChannelOption(ChannelOptions.maxMessagesPerRead, value: 16)
             .childChannelOption(ChannelOptions.recvAllocator, value: AdaptiveRecvByteBufferAllocator())
-        defer {
-            try! group.syncShutdownGracefully()
-        }
 
         channel = try! bootstrap.bind(to: SocketAddress(ipAddress: "0.0.0.0", port: UInt16(port))).wait()
         channel6 = try! bootstrap.bind(to: SocketAddress(ipAddress: "::", port: UInt16(port))).wait()
@@ -72,11 +76,15 @@ public class Server: NSObject, NetServiceDelegate {
         updateDiscoveryRecord()
 
         service.publish(options: NetService.Options(rawValue: 0))
-        try! channel.closeFuture.wait()
-        try! channel6.closeFuture.wait()
     }
 
     public func wait() {
+        try! channel.closeFuture.wait()
+        try! channel6.closeFuture.wait()
+
+        defer {
+            try! group.syncShutdownGracefully()
+        }
     }
 
     /// Publish the Accessory configuration on the Bonjour service
