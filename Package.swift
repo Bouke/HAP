@@ -15,16 +15,18 @@ let package = Package(
         .package(url: "https://github.com/knly/Evergreen.git", .branch("swift4")),
         .package(url: "https://github.com/Bouke/Kitura-net.git", from: "1.7.0"),
         .package(url: "https://github.com/IBM-Swift/BlueSocket.git", from: "0.12.90"),
-        .package(url: "https://github.com/IBM-Swift/BlueCryptor.git", from: "0.8.27"),
+        .package(url: "https://github.com/IBM-Swift/BlueCryptor.git", from: "1.0.20"),
         .package(url: "https://github.com/crossroadlabs/Regex.git", from: "1.1.0"),
+        .package(url: "https://github.com/apple/swift-nio.git", from: "1.11.0"),
     ],
     targets: [
         .target(name: "CQRCode"),
-        .target(name: "HAP", dependencies: ["SRP", "Cryptor", "Evergreen", "HKDF", "Kitura-net", "Regex", "Socket", "CQRCode"]),
+        .target(name: "COperatingSystem"),
+        .target(name: "HTTP", dependencies: ["NIO", "NIOHTTP1", "NIOFoundationCompat", "COperatingSystem"]),
+        .target(name: "HAP", dependencies: ["SRP", "Cryptor", "Evergreen", "HKDF", "Kitura-net", "Regex", "Socket", "CQRCode", "HTTP"]),
         .target(name: "hap-server", dependencies: ["HAP", "Evergreen"]),
         .testTarget(name: "HAPTests", dependencies: ["HAP"]),
-    ],
-    swiftLanguageVersions: [4]
+    ]
 )
 
 #if os(Linux)

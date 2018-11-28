@@ -41,10 +41,11 @@ public class Server: NSObject, NetServiceDelegate {
     var connections = [Int32: Connection]()
 
     public init(device: Device, port: Int = 0) throws {
+        abort()
         precondition(device.server == nil, "Device already assigned to other Server instance")
         self.device = device
 
-        application = root(device: device)
+//        application = root(device: device)
 
         listenSocket = try Socket.create(family: .inet, type: .stream, proto: .tcp)
         try listenSocket.listen(on: port)
