@@ -28,18 +28,18 @@ let device = Device(
     storage: storage,
     accessories: [
         livingRoomLightbulb,
-        bedroomNightStand,
-        Accessory.Door(info: Service.Info(name: "Front Door", serialNumber: "00005")),
-        Accessory.Switch(info: Service.Info(name: "Garden Lights", serialNumber: "00006")),
-        Accessory.Thermostat(info: Service.Info(name: "Living Room Thermostat", serialNumber: "00007")),
-        Accessory.Thermometer(info: Service.Info(name: "Office Thermometer", serialNumber: "00008")),
-        Accessory.Outlet(info: Service.Info(name: "Coffee Machine", serialNumber: "00009")),
-        Accessory.Window(info: Service.Info(name: "Toilet Window", serialNumber: "00010")),
-        Accessory.WindowCovering(info: Service.Info(name: "Shades", serialNumber: "00011")),
-        Accessory.Fan(info: Service.Info(name: "Living Room Ceiling Fan", serialNumber: "00012")),
-        Accessory.GarageDoorOpener(info: Service.Info(name: "Garage", serialNumber: "00013")),
-        Accessory.LockMechanism(info: Service.Info(name: "Front Door Lock", serialNumber: "00014")),
-        Accessory.SecuritySystem(info: Service.Info(name: "Alarm", serialNumber: "00015"))
+//        bedroomNightStand,
+//        Accessory.Door(info: Service.Info(name: "Front Door", serialNumber: "00005")),
+//        Accessory.Switch(info: Service.Info(name: "Garden Lights", serialNumber: "00006")),
+//        Accessory.Thermostat(info: Service.Info(name: "Living Room Thermostat", serialNumber: "00007")),
+//        Accessory.Thermometer(info: Service.Info(name: "Office Thermometer", serialNumber: "00008")),
+//        Accessory.Outlet(info: Service.Info(name: "Coffee Machine", serialNumber: "00009")),
+//        Accessory.Window(info: Service.Info(name: "Toilet Window", serialNumber: "00010")),
+//        Accessory.WindowCovering(info: Service.Info(name: "Shades", serialNumber: "00011")),
+//        Accessory.Fan(info: Service.Info(name: "Living Room Ceiling Fan", serialNumber: "00012")),
+//        Accessory.GarageDoorOpener(info: Service.Info(name: "Garage", serialNumber: "00013")),
+//        Accessory.LockMechanism(info: Service.Info(name: "Front Door Lock", serialNumber: "00014")),
+//        Accessory.SecuritySystem(info: Service.Info(name: "Alarm", serialNumber: "00015"))
     ])
 
 class MyDeviceDelegate: DeviceDelegate {
