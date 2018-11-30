@@ -8,5 +8,6 @@ XCTMain([
     testCase(PairingsEndpointTests.allTests),
     testCase(PairSetupControllerTests.allTests),
     testCase(PairVerifyControllerTests.allTests),
-    testCase(TLV8Tests.allTests)
+    testCase(TLV8Tests.allTests),
+    testCase(StorageTests.allTests),
 ])
