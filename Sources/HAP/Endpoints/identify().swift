@@ -1,8 +1,9 @@
 import Foundation
+import HTTP
 
-func identify(device: Device) -> Application {
-    return { connection, request in
+func identify(device: Device) -> Responder {
+    return { context, request in
         device.delegate?.didRequestIdentification()
-        return Response(status: .noContent)
+        return HTTPResponse(status: .noContent)
     }
 }

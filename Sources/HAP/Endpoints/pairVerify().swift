@@ -46,19 +46,12 @@ func pairVerify(device: Device) -> Responder {
                 // TODO: what's this used for?
                 //connection.pairing = pairing
 
-                let response = HTTPResponse(
+                return HTTPResponse(
                     headers: HTTPHeaders([
                         ("x-shared-key", session.sharedSecret.base64EncodedString()),
                         ("Content-Type", "application/pairing+tlv8"),
                     ]),
                     body: encode(result))
-
-                return response
-
-//                let response = UpgradeResponse(cryptographer: Cryptographer(sharedKey: session.sharedSecret))
-//                response.headers["Content-Type"] = "application/pairing+tlv8"
-//                response.body = encode(result)
-//                return response
 
             default:
                 return .badRequest
