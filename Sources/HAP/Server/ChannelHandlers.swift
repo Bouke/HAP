@@ -49,7 +49,7 @@ class CryptographerHandler : ChannelDuplexHandler {
             let encrypted = try! cryptographer.encrypt(data)
             var out = ctx.channel.allocator.buffer(capacity: encrypted.count)
             out.write(bytes: encrypted)
-            ctx.fireChannelRead(wrapOutboundOut(out))
+            ctx.write(wrapOutboundOut(out), promise: promise)
         } else {
             ctx.write(data, promise: promise)
         }
