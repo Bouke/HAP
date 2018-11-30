@@ -20,9 +20,8 @@ public class Server: NSObject, NetServiceDelegate {
     let bootstrap: ServerBootstrap
 
     let channel: Channel
-    let channel6: Channel
 
-    public init(device: Device, port: Int = 0) throws {
+    public init(device: Device, listenPort requestedPort: Int = 0) throws {
         precondition(device.server == nil, "Device already assigned to other Server instance")
         self.device = device
 
@@ -58,14 +57,10 @@ public class Server: NSObject, NetServiceDelegate {
             .childChannelOption(ChannelOptions.maxMessagesPerRead, value: 16)
             .childChannelOption(ChannelOptions.recvAllocator, value: AdaptiveRecvByteBufferAllocator())
 
-        logger.debug("binding IPv4 port...")
-        channel = try! bootstrap.bind(to: SocketAddress(ipAddress: "0.0.0.0", port: UInt16(port))).wait()
+        logger.debug("binding listening port...")
+        channel = try! bootstrap.bind(to: SocketAddress(ipAddress: "::", port: UInt16(requestedPort))).wait()
         let actualPort = channel.localAddress!.port!
         logger.debug("bound, listening on \(actualPort)")
-
-        logger.debug("binding IPv6 port...")
-        channel6 = try! bootstrap.bind(to: SocketAddress(ipAddress: "::", port: UInt16(actualPort))).wait()
-        logger.debug("bound, listening on \(channel6.localAddress!.port!)")
 
         /* the server will now be accepting connections */
 
@@ -82,7 +77,7 @@ public class Server: NSObject, NetServiceDelegate {
 
     public func wait() {
         try! channel.closeFuture.wait()
-        try! channel6.closeFuture.wait()
+//        try! channel6.closeFuture.wait()
 
         defer {
             try! group.syncShutdownGracefully()

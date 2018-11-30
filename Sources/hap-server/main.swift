@@ -97,7 +97,7 @@ signal(SIGINT) { _ in
     }
 }
 
-let server = try Server(device: device, port: 8000)
+let server = try Server(device: device, listenPort: 8000)
 
 print()
 print("Scan the following QR code using your iPhone to pair this device:")
