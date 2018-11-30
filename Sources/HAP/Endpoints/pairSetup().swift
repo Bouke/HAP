@@ -29,12 +29,6 @@ func pairSetup(device: Device) -> Responder {
                                           group: group,
                                           algorithm: algorithm))
     }
-    func getSession(_ connection: Server.Connection) throws -> Session {
-        guard let session = connection.context[SESSION_KEY] as? Session else {
-            throw Error.noSession
-        }
-        return session
-    }
 
     // TODO: this memory is not freed, not thread-safe either
     var sessions: [ObjectIdentifier: Session] = [:]

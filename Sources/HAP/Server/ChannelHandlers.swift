@@ -29,6 +29,7 @@ class CryptographerHandler : ChannelDuplexHandler {
     }
 
     func channelRead(ctx: ChannelHandlerContext, data: NIOAny) {
+        print("IN: \(unwrapInboundIn(data).readableBytes) bytes")
         if let cryptographer = cryptographer {
             var buffer = unwrapInboundIn(data)
             let data = buffer.readData(length: buffer.readableBytes)!
@@ -42,6 +43,7 @@ class CryptographerHandler : ChannelDuplexHandler {
     }
 
     func write(ctx: ChannelHandlerContext, data: NIOAny, promise: EventLoopPromise<Void>?) {
+        print("OUT: \(unwrapOutboundIn(data).readableBytes) bytes")
         if let cryptographer = cryptographer {
             print("written with cryptographer")
             var buffer = unwrapOutboundIn(data)

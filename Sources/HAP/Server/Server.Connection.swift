@@ -1,6 +1,6 @@
 import Foundation
-import KituraNet
-import Socket
+//import KituraNet
+//import Socket
 import func Evergreen.getLogger
 
 #if os(Linux)
@@ -47,52 +47,52 @@ extension Server {
         /// in the listen function to detect a dead connection.
         fileprivate func tickle() {
             // Called on global queue
-            DispatchQueue.main.async {
-                if let listener = self.listener,
-                    listener.socket != nil,
-                    self.queue.isEmpty,
-                    DispatchTime.now() >= self.nextAllowableNotificationTime {
-
-                    // swiftlint:disable:next line_length
-                    logger.info("Tickling \(self.listener?.socket?.remoteHostname ?? "-"):\(self.listener?.socket?.remotePort.description ?? "-"))")
-
-                    self.nextAllowableNotificationTime = DispatchTime.now() + minimalTimeBetweenNotifications
-                    let event: Event
-                    do {
-                        event = try Event(valueChangedOfCharacteristics: [])
-                    } catch {
-                        return logger.error("Could not create value change event: \(error)")
-                    }
-                    let data = event.serialized()
-                    listener.writeOutOfBand(data)
-                }
-            }
+//            DispatchQueue.main.async {
+//                if let listener = self.listener,
+//                    listener.socket != nil,
+//                    self.queue.isEmpty,
+//                    DispatchTime.now() >= self.nextAllowableNotificationTime {
+//
+//                    // swiftlint:disable:next line_length
+//                    logger.info("Tickling \(self.listener?.socket?.remoteHostname ?? "-"):\(self.listener?.socket?.remotePort.description ?? "-"))")
+//
+//                    self.nextAllowableNotificationTime = DispatchTime.now() + minimalTimeBetweenNotifications
+//                    let event: Event
+//                    do {
+//                        event = try Event(valueChangedOfCharacteristics: [])
+//                    } catch {
+//                        return logger.error("Could not create value change event: \(error)")
+//                    }
+//                    let data = event.serialized()
+//                    listener.writeOutOfBand(data)
+//                }
+//            }
         }
 
         private func sendQueue() {
             // Called on MAIN queue
-            guard !queue.isEmpty else {
-                return
-            }
-            defer {
-                self.queue.removeAll()
-            }
-            let event: Event
-            do {
-                event = try Event(valueChangedOfCharacteristics: Array(queue.values))
-            } catch {
-                return logger.error("Could not create value change event: \(error)")
-            }
-            let data = event.serialized()
-            // swiftlint:disable:next line_length
-            logger.info("Value changed, notifying \(self.listener?.socket?.remoteHostname ?? "-"), event: \(data) (\(self.queue.count) updates)")
-            listener?.writeOutOfBand(data)
+//            guard !queue.isEmpty else {
+//                return
+//            }
+//            defer {
+//                self.queue.removeAll()
+//            }
+//            let event: Event
+//            do {
+//                event = try Event(valueChangedOfCharacteristics: Array(queue.values))
+//            } catch {
+//                return logger.error("Could not create value change event: \(error)")
+//            }
+//            let data = event.serialized()
+//            // swiftlint:disable:next line_length
+//            logger.info("Value changed, notifying \(self.listener?.socket?.remoteHostname ?? "-"), event: \(data) (\(self.queue.count) updates)")
+//            listener?.writeOutOfBand(data)
         }
     }
 
     public class Connection: NSObject {
         var context = [String: Any]()
-        var socket: Socket?
+//        var socket: Socket?
         var cryptographer: Cryptographer?
         var pairing: Pairing?
         var notificationQueue: NotificationQueue
@@ -118,137 +118,128 @@ extension Server {
 
         func repeatingTickle() {
             // Called on global queue
-            if socket != nil {
-                let secondsBetweenTickles = 10 * 60
-                writeQueue.asyncAfter(deadline: .now() + .seconds(secondsBetweenTickles)) { [weak self] in
-                    self?.notificationQueue.tickle()
-                    self?.repeatingTickle()
-                }
-            }
+//            if socket != nil {
+//                let secondsBetweenTickles = 10 * 60
+//                writeQueue.asyncAfter(deadline: .now() + .seconds(secondsBetweenTickles)) { [weak self] in
+//                    self?.notificationQueue.tickle()
+//                    self?.repeatingTickle()
+//                }
+//            }
         }
 
-        func listen(socket: Socket, application: @escaping Application) {
-            // Called on global queue
-            self.socket = socket
-
-            // Regularly check if the connection is still alive
-            repeatingTickle()
-            var emptyResponseCount = 0
-
-            let httpParser = HTTPParser(isRequest: true)
-            let request = HTTPServerRequest(socket: socket, httpParser: httpParser)
-            while true {
-                var readBuffer = Data()
-                do {
-                    let byteCount = try socket.read(into: &readBuffer)
-                    guard byteCount > 0 else {
-                        // 0 bytes read signals the socket has closed
-                        logger.debug("Read zero bytes")
-                        emptyResponseCount += 1
-                        if emptyResponseCount < 8 {
-                            continue
-                        } else {
-                            break
-                        }
-                    }
-                    emptyResponseCount = 0
-                    if let cryptographer = self.cryptographer {
-                        readBuffer = try cryptographer.decrypt(readBuffer)
-                    }
-                    _ = readBuffer.withUnsafeBytes {
-                        httpParser.execute($0, length: readBuffer.count)
-                    }
-                } catch {
-                    logger.error("Error while reading from socket", error: error)
-                    break
-                }
-
-                // Fix to allow Bridges with spaces in name.
-                // HomeKit POSTs contain a hostname with \\032 replacing the
-                // space which causes Kitura httpParser to baulk on the
-                // resulting URL. Replacing '\\032' with '-' in the hostname
-                // allows Kitura to create a valid URL, and the value is not
-                // used elsewhere.
-                if let hostname = request.headers["Host"]?[0], (hostname.contains("\\032")) {
-                    request.headers["Host"]![0] = hostname.replacingOccurrences(of: "\\032", with: "-")
-                }
-
-                guard httpParser.completed else {
-                    logger.debug("Parsing incomplete")
-                    continue
-                }
-
-                request.parsingCompleted()
-                var response: Response! = nil
-                DispatchQueue.main.sync {
-                    response = application(self, request)
-                }
-
-                do {
-                    try writeQueue.sync {
-                        var writeBuffer = response.serialized()
-                        if let cryptographer = self.cryptographer {
-                            writeBuffer = try cryptographer.encrypt(writeBuffer)
-                        }
-                        if let response = response as? UpgradeResponse {
-                            self.cryptographer = response.cryptographer
-                            // todo?: override response
-                        }
-                        try socket.write(from: writeBuffer)
-                        httpParser.reset()
-                    }
-                } catch {
-                    logger.error("Error while writing to socket", error: error)
-                    break
-                }
-            }
-            logger.debug("Closed connection to \(socket.remoteHostname):\(socket.remotePort)")
-            self.tearDown()
-        }
+//        func listen(socket: Socket, application: @escaping Application) {
+//            // Called on global queue
+//            self.socket = socket
+//
+//            // Regularly check if the connection is still alive
+//            repeatingTickle()
+//
+//            let httpParser = HTTPParser(isRequest: true)
+//            let request = HTTPServerRequest(socket: socket, httpParser: httpParser)
+//            while true {
+//                var readBuffer = Data()
+//                do {
+//                    let byteCount = try socket.read(into: &readBuffer)
+//                    guard byteCount > 0 else {
+//                        // 0 bytes read signals the socket has closed
+//                        break
+//                    }
+//                    if let cryptographer = self.cryptographer {
+//                        readBuffer = try cryptographer.decrypt(readBuffer)
+//                    }
+//                    _ = readBuffer.withUnsafeBytes {
+//                        httpParser.execute($0, length: readBuffer.count)
+//                    }
+//                } catch {
+//                    logger.error("Error while reading from socket", error: error)
+//                    break
+//                }
+//
+//                // Fix to allow Bridges with spaces in name.
+//                // HomeKit POSTs contain a hostname with \\032 replacing the
+//                // space which causes Kitura httpParser to baulk on the
+//                // resulting URL. Replacing '\\032' with '-' in the hostname
+//                // allows Kitura to create a valid URL, and the value is not
+//                // used elsewhere.
+//                if let hostname = request.headers["Host"]?[0], (hostname.contains("\\032")) {
+//                    request.headers["Host"]![0] = hostname.replacingOccurrences(of: "\\032", with: "-")
+//                }
+//
+//                guard httpParser.completed else {
+//                    break
+//                }
+//
+//                request.parsingCompleted()
+//                var response: Response! = nil
+//                DispatchQueue.main.sync {
+//                    response = application(self, request)
+//                }
+//
+//                do {
+//                    try writeQueue.sync {
+//                        var writeBuffer = response.serialized()
+//                        if let cryptographer = self.cryptographer {
+//                            writeBuffer = try cryptographer.encrypt(writeBuffer)
+//                        }
+//                        if let response = response as? UpgradeResponse {
+//                            self.cryptographer = response.cryptographer
+//                            // todo?: override response
+//                        }
+//                        try socket.write(from: writeBuffer)
+//                        httpParser.reset()
+//                    }
+//                } catch {
+//                    logger.error("Error while writing to socket", error: error)
+//                    break
+//                }
+//            }
+//            logger.debug("Closed connection to \(socket.remoteHostname):\(socket.remotePort)")
+//            self.tearDown()
+//        }
 
         func writeOutOfBand(_ data: Data) {
             // Called on MAIN queue
-            guard let socket = socket else {
-                return
-            }
-            writeQueue.async { [unowned self] in
-                do {
-                    var writeBuffer = data
-                    if let cryptographer = self.cryptographer {
-                        writeBuffer = try cryptographer.encrypt(writeBuffer)
-                    }
-                    try socket.write(from: writeBuffer)
-                } catch {
-                    logger.error("Error while writing to socket", error: error)
-                    self.tearDown()
-                }
-            }
+//            guard let socket = socket else {
+//                return
+//            }
+//            writeQueue.async { [unowned self] in
+//                do {
+//                    var writeBuffer = data
+//                    if let cryptographer = self.cryptographer {
+//                        writeBuffer = try cryptographer.encrypt(writeBuffer)
+//                    }
+//                    try socket.write(from: writeBuffer)
+//                } catch {
+//                    logger.error("Error while writing to socket", error: error)
+//                    self.tearDown()
+//                }
+//            }
         }
 
         func tearDown() {
             // Called on MAIN queue (pairings()) or writeQueue (writeOutOfBand) or globalQueue (listen)
-            DispatchQueue.main.async {
-
-                func format(duration: TimeInterval) -> String {
-                    let formatter = DateComponentsFormatter()
-                    formatter.allowedUnits = [.day, .hour, .minute, .second]
-                    formatter.unitsStyle = .abbreviated
-                    formatter.maximumUnitCount = 1
-
-                    return formatter.string(from: duration)!
-                }
-
-                if let socket = self.socket {
-                    // swiftlint:disable:next line_length
-                    logger.debug("Tearing down connection to \(socket.remoteHostname):\(socket.remotePort) after \(format(duration: Date().timeIntervalSince(self.created)))")
-                    self.writeQueue.async {
-                        // Close after any write operation is complete
-                        Socket.forceClose(socketfd: socket.socketfd)
-                    }
-                    self.server?.device.remove(listener: self)
-                    self.socket = nil
-                }
-            }
+//            DispatchQueue.main.async {
+//
+//                func format(duration: TimeInterval) -> String {
+//                    let formatter = DateComponentsFormatter()
+//                    formatter.allowedUnits = [.day, .hour, .minute, .second]
+//                    formatter.unitsStyle = .abbreviated
+//                    formatter.maximumUnitCount = 1
+//
+//                    return formatter.string(from: duration)!
+//                }
+//
+//                if let socket = self.socket {
+//                    // swiftlint:disable:next line_length
+//                    logger.debug("Tearing down connection to \(socket.remoteHostname):\(socket.remotePort) after \(format(duration: Date().timeIntervalSince(self.created)))")
+//                    self.writeQueue.async {
+//                        // Close after any write operation is complete
+//                        Socket.forceClose(socketfd: socket.socketfd)
+//                    }
+//                    self.server?.device.remove(listener: self)
+//                    self.socket = nil
+//                }
+//            }
         }
 
         var isAuthenticated: Bool {

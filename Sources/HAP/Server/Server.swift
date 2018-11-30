@@ -1,6 +1,4 @@
 import Foundation
-import KituraNet
-import Socket
 import func Evergreen.getLogger
 import HTTP
 import NIO
@@ -64,8 +62,8 @@ public class Server: NSObject, NetServiceDelegate {
         channel6 = try! bootstrap.bind(to: SocketAddress(ipAddress: "::", port: UInt16(port))).wait()
         /* the server will now be accepting connections */
 
-        print("bound, listening on \(channel.localAddress?.port)")
-        print("bound, listening on \(channel6.localAddress?.port)")
+        print("bound, listening on \(channel.localAddress!.port!)")
+        print("bound, listening on \(channel6.localAddress!.port!)")
 
         service = NetService(domain: "local.", type: "_hap._tcp.", name: device.name, port: Int32(channel.localAddress!.port!))
 

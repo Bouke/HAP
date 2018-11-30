@@ -18,7 +18,7 @@ protocol Characteristic: class, JSONSerializable {
     var type: CharacteristicType { get }
     var permissions: [CharacteristicPermission] { get }
     func getValue() -> JSONValueType?
-    func setValue(_: Any?, fromConnection: Server.Connection?) throws
+//    func setValue(_: Any?, fromConnection: Server.Connection?) throws
     var description: String? { get }
     var format: CharacteristicFormat? { get }
     var unit: CharacteristicUnit? { get }
@@ -97,18 +97,18 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
         return value?.jsonValueType
     }
 
-    func setValue(_ newValue: Any?, fromConnection connection: Server.Connection?) throws {
-        switch newValue {
-        case let some?:
-            guard let newValue = T(value: some) else {
-                throw Error.valueTypeException
-            }
-            _value = newValue
-        case .none:
-            _value = nil
-        }
-        service?.characteristic(self, didChangeValue: _value)
-    }
+//    func setValue(_ newValue: Any?, fromConnection connection: Server.Connection?) throws {
+//        switch newValue {
+//        case let some?:
+//            guard let newValue = T(value: some) else {
+//                throw Error.valueTypeException
+//            }
+//            _value = newValue
+//        case .none:
+//            _value = nil
+//        }
+//        service?.characteristic(self, didChangeValue: _value)
+//    }
 
     public let permissions: [CharacteristicPermission]
 
