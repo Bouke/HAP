@@ -111,20 +111,9 @@ public class Server: NSObject, NetServiceDelegate {
         }
     #elseif os(Linux)
         // MARK: Using Network Services
-        public func netServiceWillPublish(_ sender: NetService) { }
-
         public func netService(_ sender: NetService,
                                didNotPublish error: Swift.Error) {
             logger.error("didNotPublish: \(error)")
         }
-
-        public func netServiceDidStop(_ sender: NetService) { }
-
-        // MARK: Accepting Connections
-        public func netService(_ sender: NetService,
-                               didAcceptConnectionWith socket: Socket) {  }
     #endif
 }
-
-
-
