@@ -58,12 +58,16 @@ public class Server: NSObject, NetServiceDelegate {
             .childChannelOption(ChannelOptions.maxMessagesPerRead, value: 16)
             .childChannelOption(ChannelOptions.recvAllocator, value: AdaptiveRecvByteBufferAllocator())
 
+        print("binding IPv4 port...")
         channel = try! bootstrap.bind(to: SocketAddress(ipAddress: "0.0.0.0", port: UInt16(port))).wait()
-        channel6 = try! bootstrap.bind(to: SocketAddress(ipAddress: "::", port: UInt16(port))).wait()
-        /* the server will now be accepting connections */
+        let actualPort = channel.localAddress!.port!
+        print("bound, listening on \(actualPort)")
 
-        print("bound, listening on \(channel.localAddress!.port!)")
+        print("binding IPv4 port...")
+        channel6 = try! bootstrap.bind(to: SocketAddress(ipAddress: "::", port: UInt16(actualPort))).wait()
         print("bound, listening on \(channel6.localAddress!.port!)")
+
+        /* the server will now be accepting connections */
 
         service = NetService(domain: "local.", type: "_hap._tcp.", name: device.name, port: Int32(channel.localAddress!.port!))
 
