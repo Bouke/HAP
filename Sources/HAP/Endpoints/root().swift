@@ -16,8 +16,8 @@ func root(device: Device) -> Responder {
         // Authenticated endpoints
         ("/identify", protect(identify(device: device))),
         ("/accessories", protect(accessories(device: device))),
-//        ("/characteristics", protect(characteristics(device: device))),
-//        ("/pairings", protect(pairings(device: device)))
+        ("/characteristics", protect(characteristics(device: device))),
+        ("/pairings", protect(pairings(device: device)))
     ]))
 }
 

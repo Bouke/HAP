@@ -1,18 +1,18 @@
 import Foundation
 import func Evergreen.getLogger
+import HTTP
 
 fileprivate let logger = getLogger("hap.endpoints.pairings")
 
-func pairings(device: Device) -> Application {
+func pairings(device: Device) -> Responder {
     let controller = PairingsController(device: device)
 
-    return { connection, request in
-        var body = Data()
-        guard request.method == "POST" else {
-            return .methodNotAllowed
+    return { context, request in
+        guard request.method == .POST else {
+            return HTTPResponse(status: .methodNotAllowed)
         }
         guard
-            (try? request.readAllData(into: &body)) != nil,
+            let body = request.body.data,
             let data: PairTagTLV8 = try? decode(body),
             data[.state]?[0] == PairStep.request.rawValue,
             let method = data[.pairingMethod].flatMap({ PairingMethod(rawValue: $0[0]) })
@@ -20,14 +20,16 @@ func pairings(device: Device) -> Application {
                 return .badRequest
         }
 
-        guard connection.pairing?.role == .admin else {
-            logger.warning("Permission denied (non-admin) to update pairing data: \(data), method: \(method)")
-            let result: PairTagTLV8 = [
-                (.state, Data(bytes: [PairStep.response.rawValue])),
-                (.error, Data(bytes: [PairError.authenticationFailed.rawValue]))
-            ]
-            return Response(status: .ok, data: encode(result), mimeType: "application/pairing+tlv8")
-        }
+        // TODO: authorization
+//        guard connection.pairing?.role == .admin else {
+//            logger.warning("Permission denied (non-admin) to update pairing data: \(data), method: \(method)")
+//            let result: PairTagTLV8 = [
+//                (.state, Data(bytes: [PairStep.response.rawValue])),
+//                (.error, Data(bytes: [PairError.authenticationFailed.rawValue]))
+//            ]
+//
+//            return HTTPResponse(tags: result)
+//        }
 
         logger.debug("Updating pairings data: \(data), method: \(method)")
 
@@ -50,7 +52,7 @@ func pairings(device: Device) -> Application {
         case .listPairings:
             logger.debug("Listing parings")
             let result = controller.listPairings()
-            return Response(status: .ok, data: encode(result), mimeType: "application/pairing+tlv8")
+            return HTTPResponse(tags: result)
         default:
             logger.info("Unhandled PairingMethod request: \(method)")
             return .badRequest
@@ -59,6 +61,6 @@ func pairings(device: Device) -> Application {
         let result: PairTagTLV8 = [
             (.state, Data(bytes: [PairStep.response.rawValue]))
         ]
-        return Response(status: .ok, data: encode(result), mimeType: "application/pairing+tlv8")
+        return HTTPResponse(tags: result)
     }
 }
