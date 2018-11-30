@@ -1,3 +1,5 @@
+import Foundation
+
 /// An HTTP request from a client to a server.
 ///
 ///     let httpReq = HTTPRequest(method: .GET, url: "/hello")
@@ -18,11 +20,11 @@ public struct HTTPRequest: HTTPMessage {
         set { head.method = newValue }
     }
 
-    /// The unparsed URL string. This is usually set through the `url` property.
+    /// The unparsed URL string.
     ///
     ///     httpReq.urlString = "/welcome"
     ///
-    public var uri: String {
+    public var urlString: String {
         get { return head.uri }
         set { head.uri = newValue }
     }
@@ -54,10 +56,17 @@ public struct HTTPRequest: HTTPMessage {
     /// If set, reference to the NIO `Channel` this request came from.
     public var channel: Channel?
 
+    /// The parsed url.
+    public var url: URL {
+        didSet {
+            head.uri = url.relativeString
+        }
+    }
+
     /// See `CustomStringConvertible`
     public var description: String {
         var desc: [String] = []
-        desc.append("\(method) \(uri) HTTP/\(version.major).\(version.minor)")
+        desc.append("\(method) \(urlString) HTTP/\(version.major).\(version.minor)")
         desc.append(headers.debugDescription)
         desc.append(body.description)
         return desc.joined(separator: "\n")
@@ -101,5 +110,6 @@ public struct HTTPRequest: HTTPMessage {
         self.head = head
         self.body = body
         self.channel = channel
+        self.url = URL(string: self.head.uri)!
     }
 }

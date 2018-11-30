@@ -24,10 +24,8 @@ func root(device: Device) -> Responder {
 func logger(_ application: @escaping Responder) -> Responder {
     return { context, request in
         let response = application(context, request)
-        // swiftlint:disable:next line_length
-
-        logger.info("\(context.channel.remoteAddress) \(request.method) \(request.uri) \(response.status.code) \(response.body.count ?? 0)")
-        logger.debug("- Response Messagea: \(String(data: response.body.data ?? Data(), encoding: .utf8) ?? "-")")
+        logger.info("\(context.channel.remoteAddress) \(request.method) \(request.urlString) (request.url.path) \(response.status.code) \(response.body.count ?? 0)")
+//        logger.debug("- Response Messagea: \(String(data: response.body.data ?? Data(), encoding: .utf8) ?? "-")")
         logger.debug(request.description)
         logger.debug(response.description)
         return response
@@ -36,7 +34,7 @@ func logger(_ application: @escaping Responder) -> Responder {
 
 func router(_ routes: [Route]) -> Responder {
     return { connection, request in
-        guard let route = routes.first(where: { $0.path == request.uri }) else {
+        guard let route = routes.first(where: { $0.path == request.url.path }) else {
             return HTTPResponse(status: .notFound)
         }
         return route.application(connection, request)
@@ -45,6 +43,7 @@ func router(_ routes: [Route]) -> Responder {
 
 func protect(_ application: @escaping Responder) -> Responder {
     return { connection, request in
+        // TODO!
 //        guard connection.isAuthenticated else {
 //            logger.warning("Unauthorized request to \(request.urlURL.path)")
 //            return .forbidden
