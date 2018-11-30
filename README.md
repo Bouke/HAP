@@ -11,6 +11,7 @@ The goal of this package is to provide a complete implementation of the Homekit 
 * Pair by scanning QR code (WWDC 2017)
 * Write custom services and characteristics
 * Linux support
+* Partial Raspberry Pi support! Application is now booting and setting up listening socket. mDNS not working yet, looking into it.
 
 ## How to build
 
