@@ -75,13 +75,9 @@ public class Server: NSObject, NetServiceDelegate {
         service.publish(options: NetService.Options(rawValue: 0))
     }
 
-    public func wait() {
-        try! channel.closeFuture.wait()
-//        try! channel6.closeFuture.wait()
-
-        defer {
-            try! group.syncShutdownGracefully()
-        }
+    public func stop() {
+        channel.close(promise: nil)
+        try! group.syncShutdownGracefully()
     }
 
     /// Publish the Accessory configuration on the Bonjour service
@@ -111,7 +107,7 @@ public class Server: NSObject, NetServiceDelegate {
     #elseif os(Linux)
         // MARK: Using Network Services
         public func netService(_ sender: NetService,
-                               didNotPublish error: Swift.Error) {
+                               didNotPublish error: NetServiceError) {
             logger.error("didNotPublish: \(error)")
         }
     #endif

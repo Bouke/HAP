@@ -97,7 +97,7 @@ signal(SIGINT) { _ in
     }
 }
 
-let server = try Server(device: device, listenPort: 8000)
+let server = try Server(device: device, listenPort: 0)
 
 print()
 print("Scan the following QR code using your iPhone to pair this device:")
@@ -105,18 +105,16 @@ print()
 print(device.setupQRCode.asText)
 print()
 
-server.wait()
-
 withExtendedLifetime([delegate]) {
     if CommandLine.arguments.contains("--test") {
         print("Running runloop for 10 seconds...")
         RunLoop.main.run(until: Date(timeIntervalSinceNow: 10))
     } else {
         while keepRunning {
-            RunLoop.current.run(until: Date().addingTimeInterval(2))
+            RunLoop.current.run(mode: .defaultRunLoopMode, before: Date.distantFuture)
         }
     }
 }
 
-//server.stop()
+server.stop()
 logger.info("Stopped")
