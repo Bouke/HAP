@@ -8,6 +8,8 @@ fileprivate let logger = getLogger("hap.endpoints.characteristics")
 // swiftlint:disable:next cyclomatic_complexity
 func characteristics(device: Device) -> Responder {
     return { context, request in
+        let channel = context.channel
+
         switch request.method {
         case .GET:
             guard
@@ -139,7 +141,6 @@ func characteristics(device: Device) -> Responder {
                     return .badRequest
                 }
 
-                // TODO: this
                 // set new value
                 VALUE: if let value = item.value {
                     guard characteristic.permissions.contains(.write) else {
@@ -153,18 +154,17 @@ func characteristics(device: Device) -> Responder {
                     }
 
                     logger.debug("Setting \(characteristic) to new value \(value) (type: \(type(of: value)))")
-                    // TODO
                     do {
-//                        switch value {
-//                        case let .string(value):
-//                            try characteristic.setValue(value, fromConnection: connection)
-//                        case let .int(int):
-//                            try characteristic.setValue(int, fromConnection: connection)
-//                        case let .double(double):
-//                            try characteristic.setValue(double, fromConnection: connection)
-//                        case let .bool(bool):
-//                            try characteristic.setValue(bool, fromConnection: connection)
-//                        }
+                        switch value {
+                        case let .string(value):
+                            try characteristic.setValue(value, fromChannel: channel)
+                        case let .int(int):
+                            try characteristic.setValue(int, fromChannel: channel)
+                        case let .double(double):
+                            try characteristic.setValue(double, fromChannel: channel)
+                        case let .bool(bool):
+                            try characteristic.setValue(bool, fromChannel: channel)
+                        }
                         status.status = .success
                     } catch {
                         logger.warning("Could not set value of type \(type(of: value)): \(error)")
@@ -173,7 +173,7 @@ func characteristics(device: Device) -> Responder {
                     }
 
                     // notify listeners
-//                    device.notifyListeners(of: characteristic, exceptListener: connection)
+                    device.fireCharacteristicChangeEvent(characteristic, source: channel)
                 }
 
                 // toggle events for this characteristic on this connection
@@ -183,12 +183,11 @@ func characteristics(device: Device) -> Responder {
                         statuses.append(status)
                         break
                     }
-                    // TODO
                     if events {
-//                        device.add(characteristic: characteristic, listener: connection)
+                        device.addSubscriber(channel, forCharacteristic: characteristic)
                         logger.debug("Added listener for \(characteristic)")
                     } else {
-//                        device.remove(characteristic: characteristic, listener: connection)
+                        device.removeSubscriber(channel, forCharacteristic: characteristic)
                         logger.debug("Removed listener for \(characteristic)")
                     }
                     status.status = .success

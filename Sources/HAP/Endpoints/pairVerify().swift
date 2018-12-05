@@ -43,8 +43,7 @@ func pairVerify(device: Device) -> Responder {
                 }
 
                 let (result, pairing) = try controller.finishRequest(data, session)
-                // TODO: what's this used for?
-                //connection.pairing = pairing
+                context.triggerUserOutboundEvent(PairingEvent.verified(pairing), promise: nil)
 
                 return HTTPResponse(
                     headers: HTTPHeaders([

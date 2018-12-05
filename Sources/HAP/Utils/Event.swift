@@ -53,7 +53,7 @@ struct Event {
     func serialized() -> Data {
         // @todo should set additional headers here as well?
         let headers = self.headers.map({ "\($0): \($1)\r\n" }).joined()
-        return "EVENT/1.0 \(status.rawValue) \(status.description)\r\n\(headers)\r\n".data(using: .utf8)! + body
+        return "EVENT/1.0 \(status.description)\r\n\(headers)\r\n".data(using: .utf8)! + body
     }
 
     init(valueChangedOfCharacteristics characteristics: [Characteristic]) throws {

@@ -12,6 +12,7 @@ fileprivate let logger = getLogger("demo")
 #endif
 
 getLogger("hap").logLevel = .debug
+getLogger("hap.encryption").logLevel = .warning
 
 let storage = FileStorage(filename: "configuration.json")
 if CommandLine.arguments.contains("--recreate") {
@@ -28,7 +29,7 @@ let device = Device(
     storage: storage,
     accessories: [
         livingRoomLightbulb,
-//        bedroomNightStand,
+        bedroomNightStand,
 //        Accessory.Door(info: Service.Info(name: "Front Door", serialNumber: "00005")),
 //        Accessory.Switch(info: Service.Info(name: "Garden Lights", serialNumber: "00006")),
 //        Accessory.Thermostat(info: Service.Info(name: "Living Room Thermostat", serialNumber: "00007")),
@@ -79,14 +80,7 @@ class MyDeviceDelegate: DeviceDelegate {
 
 var delegate = MyDeviceDelegate()
 device.delegate = delegate
-
-// Switch the lights every 5 seconds.
-let timer = DispatchSource.makeTimerSource()
-timer.schedule(deadline: .now() + .seconds(1), repeating: .seconds(5))
-timer.setEventHandler(handler: {
-    livingRoomLightbulb.lightbulb.on.value = !(livingRoomLightbulb.lightbulb.on.value ?? false)
-})
-timer.resume()
+let server = try Server(device: device, listenPort: 8000)
 
 // Stop server on interrupt.
 var keepRunning = true
@@ -97,7 +91,15 @@ signal(SIGINT) { _ in
     }
 }
 
-let server = try Server(device: device, listenPort: 0)
+print("Initializing the server...")
+
+// Switch the lights every 5 seconds.
+let timer = DispatchSource.makeTimerSource()
+timer.schedule(deadline: .now() + .seconds(1), repeating: .seconds(5))
+timer.setEventHandler(handler: {
+    livingRoomLightbulb.lightbulb.on.value = !(livingRoomLightbulb.lightbulb.on.value ?? false)
+})
+timer.resume()
 
 print()
 print("Scan the following QR code using your iPhone to pair this device:")

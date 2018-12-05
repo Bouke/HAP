@@ -21,15 +21,14 @@ class CryptographerHandler : ChannelDuplexHandler {
 
     func triggerUserOutboundEvent(ctx: ChannelHandlerContext, event: Any, promise: EventLoopPromise<Void>?) {
         if case let CryptographyEvent.sharedKey(sharedKey) = event {
-            print("did set cryptographer!")
             cryptographer = Cryptographer(sharedKey: sharedKey)
+            promise?.succeed(result: ())
         } else {
             ctx.triggerUserOutboundEvent(event, promise: promise)
         }
     }
 
     func channelRead(ctx: ChannelHandlerContext, data: NIOAny) {
-        print("IN: \(unwrapInboundIn(data).readableBytes) bytes")
         if let cryptographer = cryptographer {
             var buffer = unwrapInboundIn(data)
             let data = buffer.readData(length: buffer.readableBytes)!
@@ -43,9 +42,7 @@ class CryptographerHandler : ChannelDuplexHandler {
     }
 
     func write(ctx: ChannelHandlerContext, data: NIOAny, promise: EventLoopPromise<Void>?) {
-        print("OUT: \(unwrapOutboundIn(data).readableBytes) bytes")
         if let cryptographer = cryptographer {
-            print("written with cryptographer")
             var buffer = unwrapOutboundIn(data)
             let data = buffer.readData(length: buffer.readableBytes)!
             let encrypted = try! cryptographer.encrypt(data)
@@ -58,12 +55,40 @@ class CryptographerHandler : ChannelDuplexHandler {
     }
 }
 
-class ControllerHandler : ChannelInboundHandler {
+class EventHandler : ChannelOutboundHandler {
+    typealias OutboundIn = ByteBuffer
+    typealias OutboundOut = ByteBuffer
+
+    func triggerUserOutboundEvent(ctx: ChannelHandlerContext, event: Any, promise: EventLoopPromise<Void>?) {
+        // TODO: batch notifications
+        if case let CharacteristicEvent.changed(characteristic) = event {
+            let event = try! Event(valueChangedOfCharacteristics: [characteristic])
+            let serialized = event.serialized()
+            var buffer = ctx.channel.allocator.buffer(capacity: serialized.count)
+            buffer.write(bytes: serialized)
+            ctx.writeAndFlush(wrapOutboundOut(buffer), promise: promise)
+        } else {
+            ctx.triggerUserOutboundEvent(event, promise: promise)
+        }
+    }
+}
+
+enum PairingEvent {
+    case verified(Pairing)
+}
+
+enum CharacteristicEvent {
+    case changed(Characteristic)
+}
+
+class ControllerHandler : ChannelDuplexHandler {
     typealias InboundIn = HTTPServerRequestPart
+    typealias OutboundIn = HTTPServerResponsePart
 
     // All access to channels is guarded by channelsSyncQueue.
     private let channelsSyncQueue = DispatchQueue(label: "channelsQueue")
     private var channels: [ObjectIdentifier: Channel] = [:]
+    private var pairings: [ObjectIdentifier: Pairing] = [:]
 
     func channelActive(ctx: ChannelHandlerContext) {
         let channel = ctx.channel
@@ -75,7 +100,35 @@ class ControllerHandler : ChannelInboundHandler {
     func channelInactive(ctx: ChannelHandlerContext) {
         let channel = ctx.channel
         channelsSyncQueue.async {
+            // TODO: remove subscriber from device as well!
             self.channels.removeValue(forKey: ObjectIdentifier(channel))
+            self.pairings.removeValue(forKey: ObjectIdentifier(channel))
+        }
+    }
+
+    func triggerUserOutboundEvent(ctx: ChannelHandlerContext, event: Any, promise: EventLoopPromise<Void>?) {
+        if case let PairingEvent.verified(pairing) = event {
+            let channel = ctx.channel
+            channelsSyncQueue.async {
+                self.pairings[ObjectIdentifier(channel)] = pairing
+            }
+        } else {
+            ctx.triggerUserOutboundEvent(event, promise: promise)
+        }
+    }
+
+    func isChannelVerified(channel: Channel) -> Bool {
+        return channelsSyncQueue.sync {
+            pairings.keys.contains(ObjectIdentifier(channel))
+        }
+    }
+
+    func notifyChannel(identifier: ObjectIdentifier, ofCharacteristicChange characteristic: Characteristic) {
+        channelsSyncQueue.async {
+            guard let channel = self.channels[identifier] else {
+                fatalError("event for non-existing channel")
+            }
+            channel.triggerUserOutboundEvent(CharacteristicEvent.changed(characteristic), promise: nil)
         }
     }
 }
@@ -94,9 +147,6 @@ class UpgradeEventHandler: ChannelOutboundHandler {
         if let sharedKeyB64 = response.headers["x-shared-key"].first {
             let sharedKey = Data(base64Encoded: sharedKeyB64)!
             response.headers.remove(name: "x-shared-key")
-            print(response)
-            print(response.headers)
-            print(response.body.data?.base64EncodedString())
             ctx.write(wrapOutboundOut(response)).whenSuccess {
                 ctx.triggerUserOutboundEvent(CryptographyEvent.sharedKey(sharedKey), promise: nil)
             }
@@ -121,4 +171,3 @@ class ApplicationHandler: ChannelInboundHandler {
         ctx.write(wrapOutboundOut(responder(ctx, request)), promise: nil)
     }
 }
-

@@ -14,20 +14,17 @@ func root(device: Device) -> Responder {
         ("/pair-verify", pairVerify(device: device)),
 
         // Authenticated endpoints
-        ("/identify", protect(identify(device: device))),
-        ("/accessories", protect(accessories(device: device))),
-        ("/characteristics", protect(characteristics(device: device))),
-        ("/pairings", protect(pairings(device: device)))
+        ("/identify", protect(device, identify(device: device))),
+        ("/accessories", protect(device, accessories(device: device))),
+        ("/characteristics", protect(device, characteristics(device: device))),
+        ("/pairings", protect(device, pairings(device: device)))
     ]))
 }
 
 func logger(_ application: @escaping Responder) -> Responder {
     return { context, request in
         let response = application(context, request)
-        logger.info("\(context.channel.remoteAddress) \(request.method) \(request.urlString) (request.url.path) \(response.status.code) \(response.body.count ?? 0)")
-//        logger.debug("- Response Messagea: \(String(data: response.body.data ?? Data(), encoding: .utf8) ?? "-")")
-        logger.debug(request.description)
-        logger.debug(response.description)
+        logger.info("\(context.channel.remoteAddress) \(request.method) \(request.urlString) \(response.status.code) \(response.body.count ?? 0)")
         return response
     }
 }
@@ -41,13 +38,12 @@ func router(_ routes: [Route]) -> Responder {
     }
 }
 
-func protect(_ application: @escaping Responder) -> Responder {
-    return { connection, request in
-        // TODO!
-//        guard connection.isAuthenticated else {
-//            logger.warning("Unauthorized request to \(request.urlURL.path)")
-//            return .forbidden
-//        }
-        return application(connection, request)
+func protect(_ device: Device, _ application: @escaping Responder) -> Responder {
+    return { context, request in
+        guard device.controllerHandler?.isChannelVerified(channel: context.channel) ?? false else {
+            logger.warning("Unauthorized request to \(request.urlString)")
+            return HTTPResponse(status: .forbidden)
+        }
+        return application(context, request)
     }
 }
