@@ -26,6 +26,7 @@ public class Server: NSObject, NetServiceDelegate {
         self.device = device
 
         device.controllerHandler = ControllerHandler()
+        device.controllerHandler!.removeSubscriptions = device.removeSubscriberForAllCharacteristics
 
         let applicationHandler = ApplicationHandler(responder: root(device: device))
 

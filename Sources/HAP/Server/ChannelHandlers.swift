@@ -1,8 +1,11 @@
+import func Evergreen.getLogger
 import NIO
 import NIOHTTP1
 import Dispatch
 import HTTP
 import Foundation
+
+fileprivate let logger = getLogger("hap.nio")
 
 enum CryptographyEvent {
     case sharedKey(Data)
@@ -90,6 +93,8 @@ class ControllerHandler : ChannelDuplexHandler {
     private var channels: [ObjectIdentifier: Channel] = [:]
     private var pairings: [ObjectIdentifier: Pairing] = [:]
 
+    internal var removeSubscriptions: ((Channel) -> ())? = nil
+
     func channelActive(ctx: ChannelHandlerContext) {
         let channel = ctx.channel
         channelsSyncQueue.async {
@@ -103,6 +108,7 @@ class ControllerHandler : ChannelDuplexHandler {
             // TODO: remove subscriber from device as well!
             self.channels.removeValue(forKey: ObjectIdentifier(channel))
             self.pairings.removeValue(forKey: ObjectIdentifier(channel))
+            self.removeSubscriptions?(channel)
         }
     }
 
@@ -126,7 +132,9 @@ class ControllerHandler : ChannelDuplexHandler {
     func notifyChannel(identifier: ObjectIdentifier, ofCharacteristicChange characteristic: Characteristic) {
         channelsSyncQueue.async {
             guard let channel = self.channels[identifier] else {
-                fatalError("event for non-existing channel")
+                // todo... probably need to clean up?
+                logger.error("event for non-existing channel")
+                return
             }
             channel.triggerUserOutboundEvent(CharacteristicEvent.changed(characteristic), promise: nil)
         }
