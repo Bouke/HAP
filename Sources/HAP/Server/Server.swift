@@ -102,16 +102,7 @@ public class Server: NSObject, NetServiceDelegate {
         }
     }
 
-    #if os(macOS)
-        // MARK: Using Network Services
-        public func netService(_ sender: NetService, didNotPublish errorDict: [String: NSNumber]) {
-            logger.error("didNotPublish: \(errorDict)")
-        }
-    #elseif os(Linux)
-        // MARK: Using Network Services
-        public func netService(_ sender: NetService,
-                               didNotPublish error: NetServiceError) {
-            logger.error("didNotPublish: \(error)")
-        }
-    #endif
+    public func netService(_ sender: NetService, didNotPublish errorDict: [String: NSNumber]) {
+        logger.error("Did not publish Bonjour service: \(errorDict)")
+    }
 }
