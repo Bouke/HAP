@@ -62,17 +62,60 @@ class EventHandler : ChannelOutboundHandler {
     typealias OutboundIn = ByteBuffer
     typealias OutboundOut = ByteBuffer
 
+    var pendingNotifications: [Characteristic] = []
+    var pendingPromises: [EventLoopPromise<Void>] = []
+    var nextAllowableNotificationTime = Date()
+
     func triggerUserOutboundEvent(ctx: ChannelHandlerContext, event: Any, promise: EventLoopPromise<Void>?) {
-        // TODO: batch notifications
         if case let CharacteristicEvent.changed(characteristic) = event {
-            let event = try! Event(valueChangedOfCharacteristics: [characteristic])
-            let serialized = event.serialized()
-            var buffer = ctx.channel.allocator.buffer(capacity: serialized.count)
-            buffer.write(bytes: serialized)
-            ctx.writeAndFlush(wrapOutboundOut(buffer), promise: promise)
+            pendingNotifications.append(characteristic)
+            if let promise = promise {
+                pendingPromises.append(promise)
+            }
+
+            // We don't send notifications immediately to allow a small window
+            // to receive additional events, otherwise those events would have
+            // to wait for the next opportunity.
+            _ = ctx.eventLoop.scheduleTask(in: TimeAmount.milliseconds(5)) {
+                self.writePendingNotifications(ctx: ctx)
+            }
         } else {
             ctx.triggerUserOutboundEvent(event, promise: promise)
         }
+    }
+
+    func writePendingNotifications(ctx: ChannelHandlerContext) {
+        /* HAP Specification 5.8 (excerpts)
+         Network-based notifications must be coalesced
+         by the accessory using a delay of no less than 1 second.
+         Excessive or inappropriate notifications may result
+         in the user being notified of a misbehaving
+         accessory and/or termination of the pairing relationship.
+         */
+        if pendingNotifications.isEmpty {
+            return
+        }
+
+        if nextAllowableNotificationTime > Date() {
+            let waitms = TimeAmount.Value(nextAllowableNotificationTime.timeIntervalSinceNow * 1000)
+            _ = ctx.eventLoop.scheduleTask(in: TimeAmount.milliseconds(waitms)) {
+                self.writePendingNotifications(ctx: ctx)
+            }
+            return
+        }
+
+        let event = try! Event(valueChangedOfCharacteristics: pendingNotifications)
+        let serialized = event.serialized()
+        var buffer = ctx.channel.allocator.buffer(capacity: serialized.count)
+        buffer.write(bytes: serialized)
+        ctx.writeAndFlush(wrapOutboundOut(buffer), promise: nil)
+
+        for promise in pendingPromises {
+            promise.succeed(result: ())
+        }
+
+        pendingNotifications = []
+        nextAllowableNotificationTime = Date(timeIntervalSinceNow: 1)
     }
 }
 
