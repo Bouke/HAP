@@ -136,6 +136,7 @@ class ControllerHandler : ChannelDuplexHandler {
     private var channels: [ObjectIdentifier: Channel] = [:]
     private var pairings: [ObjectIdentifier: Pairing] = [:]
 
+    // TODO: tighter integration into Device
     internal var removeSubscriptions: ((Channel) -> ())? = nil
 
     func channelActive(ctx: ChannelHandlerContext) {
@@ -148,7 +149,6 @@ class ControllerHandler : ChannelDuplexHandler {
     func channelInactive(ctx: ChannelHandlerContext) {
         let channel = ctx.channel
         channelsSyncQueue.async {
-            // TODO: remove subscriber from device as well!
             self.channels.removeValue(forKey: ObjectIdentifier(channel))
             self.pairings.removeValue(forKey: ObjectIdentifier(channel))
             self.removeSubscriptions?(channel)

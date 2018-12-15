@@ -240,7 +240,7 @@ public class Device {
     /// - write the configuration to storage
     /// - notify interested parties of the change
     func updatedConfiguration() {
-        var newStableHash = generateStableHash()
+        let newStableHash = generateStableHash()
         if newStableHash != configuration.stableHash {
             configuration.number = configuration.number &+ 1
             configuration.stableHash = newStableHash
@@ -354,15 +354,13 @@ public class Device {
     func add(pairing: Pairing) {
         configuration.pairings[pairing.identifier] = pairing
         persistConfig()
-        if pairingState == .pairing {
-            // swiftlint:disable:next force_try
-            try! changePairingState(.paired)
-        }
+        try? changePairingState(.paired)
     }
 
     // Remove the pairing in the internal DB and notify the change
     // to update the Bonjour broadcast
     func remove(pairingWithIdentifier identifier: PairingIdentifier) {
+        // TODO: (re-)implement!
 //        if let pairing = configuration.pairings[identifier] {
 //
 //            server?.removeConnectionsFor(pairing: pairing)
