@@ -84,12 +84,14 @@ let server = try Server(device: device, listenPort: 8000)
 
 // Stop server on interrupt.
 var keepRunning = true
-signal(SIGINT) { _ in
-    logger.info("Caught interrupt, stopping...")
+func stop() {
     DispatchQueue.main.async {
+        logger.info("Shutting down...")
         keepRunning = false
     }
 }
+signal(SIGINT) { _ in stop() }
+signal(SIGTERM) { _ in stop() }
 
 print("Initializing the server...")
 
