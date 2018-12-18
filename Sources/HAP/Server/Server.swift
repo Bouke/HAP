@@ -128,18 +128,21 @@ public class Server: NSObject, NetServiceDelegate {
         let queue = DispatchQueue.global(qos: .userInteractive)
 
         // Create the run loop work item and dispatch to the default priority global queue...
-        queue.async { [unowned self, socket] in
+        queue.async { [weak self, socket] in
             let socketfd = socket.socketfd
-            let connection = Connection(server: self)
 
-            self.connectionsLockQueue.sync { [unowned self, socket, connection] in
-                self.connections[socket.socketfd] = connection
+            if let self = self {
+                let connection = Connection(server: self)
+
+                self.connectionsLockQueue.sync { [unowned self, socket, connection] in
+                    self.connections[socket.socketfd] = connection
+                }
+
+                connection.listen(socket: socket, application: self.application)
             }
 
-            connection.listen(socket: socket, application: self.application)
-
-            self.connectionsLockQueue.sync { [unowned self, socketfd] in
-                self.connections[socketfd] = nil
+            self?.connectionsLockQueue.sync { [weak self, socketfd] in
+                self?.connections[socketfd] = nil
             }
         }
     }
