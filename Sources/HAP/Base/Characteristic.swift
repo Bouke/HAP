@@ -109,11 +109,7 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
             _value = nil
         }
         service?.characteristic(self, didChangeValue: _value)
-        onSetValue?(_value)
     }
-
-    // triggered for value changes by the controller (user)
-    public var onSetValue: ((T?) -> ())? = nil
 
     public let permissions: [CharacteristicPermission]
 

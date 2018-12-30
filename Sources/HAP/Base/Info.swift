@@ -28,8 +28,8 @@ extension Service {
             self.firmwareRevision.value = firmwareRevision
         }
 
-        override func characteristic<T>(_ characteristic: GenericCharacteristic<T>,
-                                        didChangeValue newValue: T?) {
+        open override func characteristic<T>(_ characteristic: GenericCharacteristic<T>,
+                                             didChangeValue newValue: T?) {
             if characteristic === identify {
                 if let accessory = accessory {
                     accessory.device?.delegate?.didRequestIdentificationOf(accessory)

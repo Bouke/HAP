@@ -140,8 +140,8 @@ open class Service: NSObject, JSONSerializable {
 
     /// Characteristic's value was changed by controller. Used for bubbling up
     /// to the device, which will notify the delegate.
-    func characteristic<T>(_ characteristic: GenericCharacteristic<T>,
-                           didChangeValue newValue: T?) {
+    open func characteristic<T>(_ characteristic: GenericCharacteristic<T>,
+                                didChangeValue newValue: T?) {
         accessory?.characteristic(characteristic, ofService: self, didChangeValue: newValue)
     }
 
