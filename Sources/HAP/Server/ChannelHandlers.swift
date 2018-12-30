@@ -104,6 +104,8 @@ class EventHandler : ChannelOutboundHandler {
             return
         }
 
+        logger.debug("Writing \(self.pendingNotifications.count) notification to \(ctx.remoteAddress?.description ?? "???")")
+
         let event = try! Event(valueChangedOfCharacteristics: pendingNotifications)
         let serialized = event.serialized()
         var buffer = ctx.channel.allocator.buffer(capacity: serialized.count)
