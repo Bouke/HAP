@@ -1,3 +1,4 @@
+// swiftlint:disable all
 import COperatingSystem
 import Foundation
 import NIO
@@ -6,7 +7,7 @@ import NIO
 private final class RFC1123 {
     /// Thread-specific RFC1123
     private static let thread: ThreadSpecificVariable<RFC1123> = .init()
-    
+
     /// A static RFC1123 helper instance
     static var shared: RFC1123 {
         if let existing = thread.currentValue {
@@ -28,11 +29,11 @@ private final class RFC1123 {
         formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss z"
         self.formatter = formatter
     }
-    
+
     func string(from date: Date) -> String {
         return formatter.string(from: date)
     }
-    
+
     func date(from string: String) -> Date? {
         return formatter.date(from: string)
     }
@@ -43,13 +44,13 @@ extension Date {
     public var rfc1123: String {
         return RFC1123.shared.string(from: self)
     }
-    
+
     /// Creates a `Date` from an RFC1123 string
     public init?(rfc1123: String) {
         guard let date = RFC1123.shared.date(from: rfc1123) else {
             return nil
         }
-        
+
         self = date
     }
 }
@@ -58,7 +59,7 @@ extension Date {
 internal final class RFC1123DateCache {
     /// Thread-specific RFC1123
     private static let thread: ThreadSpecificVariable<RFC1123DateCache> = .init()
-    
+
     /// A static RFC1123 helper instance
     public static var shared: RFC1123DateCache {
         if let existing = thread.currentValue {
@@ -69,7 +70,7 @@ internal final class RFC1123DateCache {
             return new
         }
     }
-    
+
     /// Currently cached time components.
     private var cachedTimeComponents: (key: time_t, components: COperatingSystem.tm)?
 
@@ -78,7 +79,7 @@ internal final class RFC1123DateCache {
 
     /// Creates a new `RFC1123DateCache`.
     private init() { }
-    
+
     /// Gets the current RFC 1123 date string.
     func currentTimestamp() -> String {
         // get the current time

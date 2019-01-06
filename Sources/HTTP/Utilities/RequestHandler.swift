@@ -1,4 +1,6 @@
-public class RequestHandler : ChannelDuplexHandler {
+// swiftlint:disable all
+
+public class RequestHandler: ChannelDuplexHandler {
     public typealias InboundIn = HTTPServerRequestPart
     public typealias InboundOut = HTTPRequest
 

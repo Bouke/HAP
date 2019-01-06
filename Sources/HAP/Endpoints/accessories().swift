@@ -17,7 +17,7 @@ func accessories(device: Device) -> Responder {
             let json = try JSONSerialization.data(withJSONObject: serialized, options: [])
             return HTTPResponse(
                 headers: HTTPHeaders([
-                    ("Content-Type", "application/hap+json"),
+                    ("Content-Type", "application/hap+json")
                 ]),
                 body: json)
         } catch {

@@ -1,3 +1,4 @@
+// swiftlint:disable force_try
 import Foundation
 import HAP
 import XCTest
@@ -5,7 +6,7 @@ import XCTest
 class StorageTests: XCTestCase {
     static var allTests: [(String, (StorageTests) -> () throws -> Void)] {
         return [
-            ("testFileStorage", testFileStorage),
+            ("testFileStorage", testFileStorage)
         ]
     }
 

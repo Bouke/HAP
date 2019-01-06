@@ -79,7 +79,7 @@ open class Accessory: JSONSerializable {
                     .first(where: { $0.type == .reachable }) else {
                         return
             }
-//            try? characteristic.setValue(self.reachable, fromConnection: nil)
+            try? characteristic.setValue(self.reachable, fromChannel: nil)
         }
     }
 

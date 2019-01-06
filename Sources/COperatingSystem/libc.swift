@@ -4,14 +4,14 @@
     @_exported import Darwin.C
 #endif
 
-public func posix(_ cb: @autoclosure () -> Int32) throws {
-    guard cb() == 0 else {
+public func posix(_ action: @autoclosure () -> Int32) throws {
+    guard action() == 0 else {
         try throwError()
     }
 }
 
 public func throwError() throws -> Never {
-    guard let error = PosixError.init(rawValue: errno) else {
+    guard let error = PosixError(rawValue: errno) else {
         fatalError("Unknown errno \(errno)")
     }
     throw error

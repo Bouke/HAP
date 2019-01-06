@@ -108,7 +108,7 @@ func characteristics(device: Device) -> Responder {
                 let json = try JSONEncoder().encode(Protocol.CharacteristicContainer(characteristics: responses))
                 return HTTPResponse(status: responseStatus,
                                     headers: HTTPHeaders([
-                                        ("Content-Type", "application/hap+json"),
+                                        ("Content-Type", "application/hap+json")
                                     ]),
                                     body: json)
             } catch {
@@ -213,7 +213,7 @@ func characteristics(device: Device) -> Responder {
                     let json = try JSONEncoder().encode(Protocol.CharacteristicContainer(characteristics: statuses))
                     return HTTPResponse(status: statuses.count == 1 ? .badRequest : .multiStatus,
                                         headers: HTTPHeaders([
-                                            ("Content-Type", "application/hap+json"),
+                                            ("Content-Type", "application/hap+json")
                                         ]),
                                         body: json)
                 } catch {

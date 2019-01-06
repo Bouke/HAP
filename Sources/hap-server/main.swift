@@ -29,7 +29,7 @@ let device = Device(
     storage: storage,
     accessories: [
         livingRoomLightbulb,
-        bedroomNightStand,
+        bedroomNightStand
 //        Accessory.Door(info: Service.Info(name: "Front Door", serialNumber: "00005")),
 //        Accessory.Switch(info: Service.Info(name: "Garden Lights", serialNumber: "00006")),
 //        Accessory.Thermostat(info: Service.Info(name: "Living Room Thermostat", serialNumber: "00007")),
@@ -120,5 +120,5 @@ withExtendedLifetime([delegate]) {
     }
 }
 
-server.stop()
+try server.stop()
 logger.info("Stopped")

@@ -1,9 +1,9 @@
 import func Evergreen.getLogger
+import Dispatch
+import Foundation
+import HTTP
 import NIO
 import NIOHTTP1
-import Dispatch
-import HTTP
-import Foundation
 
 fileprivate let logger = getLogger("hap.nio")
 
@@ -14,13 +14,13 @@ enum CryptographyEvent {
 // TODO: use "cumulationBuffer" (similar to HTTPDecoder) and buffer until
 // correct amount of bytes is received.
 // TODO: merge with actual cryptographer.
-class CryptographerHandler : ChannelDuplexHandler {
+class CryptographerHandler: ChannelDuplexHandler {
     typealias InboundIn = ByteBuffer
     typealias InboundOut = ByteBuffer
     typealias OutboundIn = ByteBuffer
     typealias OutboundOut = ByteBuffer
 
-    var cryptographer: Cryptographer? = nil
+    var cryptographer: Cryptographer?
 
     func triggerUserOutboundEvent(ctx: ChannelHandlerContext, event: Any, promise: EventLoopPromise<Void>?) {
         if case let CryptographyEvent.sharedKey(sharedKey) = event {
@@ -35,7 +35,12 @@ class CryptographerHandler : ChannelDuplexHandler {
         if let cryptographer = cryptographer {
             var buffer = unwrapInboundIn(data)
             let data = buffer.readData(length: buffer.readableBytes)!
-            let decrypted = try! cryptographer.decrypt(data)
+            guard let decrypted = try? cryptographer.decrypt(data) else {
+                // swiftlint:disable:next line_length
+                logger.warning("Could not decrypt message from \(ctx.remoteAddress?.description ?? "???"), closing connection.")
+                ctx.close(promise: nil)
+                return
+            }
             var out = ctx.channel.allocator.buffer(capacity: decrypted.count)
             out.write(bytes: decrypted)
             ctx.fireChannelRead(wrapInboundOut(out))
@@ -48,7 +53,11 @@ class CryptographerHandler : ChannelDuplexHandler {
         if let cryptographer = cryptographer {
             var buffer = unwrapOutboundIn(data)
             let data = buffer.readData(length: buffer.readableBytes)!
-            let encrypted = try! cryptographer.encrypt(data)
+            guard let encrypted = try? cryptographer.encrypt(data) else {
+                // swiftlint:disable:next line_length
+                logger.warning("Could not encrypt message to \(ctx.remoteAddress?.description ?? "???"), closing connection.")
+                return
+            }
             var out = ctx.channel.allocator.buffer(capacity: encrypted.count)
             out.write(bytes: encrypted)
             ctx.write(wrapOutboundOut(out), promise: promise)
@@ -58,7 +67,7 @@ class CryptographerHandler : ChannelDuplexHandler {
     }
 }
 
-class EventHandler : ChannelOutboundHandler {
+class EventHandler: ChannelOutboundHandler {
     typealias OutboundIn = ByteBuffer
     typealias OutboundOut = ByteBuffer
 
@@ -104,9 +113,14 @@ class EventHandler : ChannelOutboundHandler {
             return
         }
 
-        logger.debug("Writing \(self.pendingNotifications.count) notification to \(ctx.remoteAddress?.description ?? "???")")
+        // swiftlint:disable:next line_length
+        logger.debug("Writing \(self.pendingNotifications.count) notification to \(ctx.remoteAddress?.description ?? "N/A")")
 
-        let event = try! Event(valueChangedOfCharacteristics: pendingNotifications)
+        guard let event = try? Event(valueChangedOfCharacteristics: pendingNotifications) else {
+            // swiftlint:disable:next line_length
+            logger.warning("Could not serialize events for \(ctx.remoteAddress?.description ?? "N/A"), closing connection.")
+            return
+        }
         let serialized = event.serialized()
         var buffer = ctx.channel.allocator.buffer(capacity: serialized.count)
         buffer.write(bytes: serialized)
@@ -129,7 +143,7 @@ enum CharacteristicEvent {
     case changed(Characteristic)
 }
 
-class ControllerHandler : ChannelDuplexHandler {
+class ControllerHandler: ChannelDuplexHandler {
     typealias InboundIn = HTTPServerRequestPart
     typealias OutboundIn = HTTPServerResponsePart
 
@@ -139,7 +153,7 @@ class ControllerHandler : ChannelDuplexHandler {
     private var pairings: [ObjectIdentifier: Pairing] = [:]
 
     // TODO: tighter integration into Device
-    internal var removeSubscriptions: ((Channel) -> ())? = nil
+    internal var removeSubscriptions: ((Channel) -> Void)?
 
     func channelActive(ctx: ChannelHandlerContext) {
         let channel = ctx.channel

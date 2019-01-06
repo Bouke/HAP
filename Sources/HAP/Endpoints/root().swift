@@ -24,7 +24,8 @@ func root(device: Device) -> Responder {
 func logger(_ application: @escaping Responder) -> Responder {
     return { context, request in
         let response = application(context, request)
-        logger.info("\(context.channel.remoteAddress) \(request.method) \(request.urlString) \(response.status.code) \(response.body.count ?? 0)")
+        // swiftlint:disable:next line_length
+        logger.info("\(context.channel.remoteAddress?.description ?? "N/A") \(request.method) \(request.urlString) \(response.status.code) \(response.body.count ?? 0)")
         return response
     }
 }

@@ -1,7 +1,6 @@
 disabled_rules:
   - function_body_length
   - private_over_fileprivate
-  - todo
 opt_in_rules:
   - array_init
   - attributes
@@ -36,6 +35,7 @@ included:
 identifier_name:
   excluded:
     - ev
+    - fd
     - ok
     - on
     - to
@@ -43,6 +43,7 @@ identifier_name:
     - y
     - SESSION_KEY
     - _value
+    - E2BIG
 type_name:
   excluded:
     - On

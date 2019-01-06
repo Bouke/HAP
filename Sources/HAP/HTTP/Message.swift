@@ -92,7 +92,6 @@ class Response {
     static var internalServerError: Response { return  Response(status: .internalServerError) }
 }
 
-
 extension HTTPResponse {
     init(tags: PairTagTLV8) {
         self.init(status: .ok,

@@ -1,3 +1,4 @@
+// swiftlint:disable all
 /// Type used for the name of a HTTP header in the `HTTPHeaders` storage.
 public struct HTTPHeaderName: Codable, Hashable, CustomStringConvertible {
     /// See `Hashable.hashValue`
@@ -421,4 +422,3 @@ public struct HTTPHeaderName: Codable, Hashable, CustomStringConvertible {
     /// X-Requested-With header.
     public static let xRequestedWith = HTTPHeaderName("X-Requested-With")
 }
-

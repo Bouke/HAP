@@ -48,7 +48,7 @@ func pairVerify(device: Device) -> Responder {
                 return HTTPResponse(
                     headers: HTTPHeaders([
                         ("x-shared-key", session.sharedSecret.base64EncodedString()),
-                        ("Content-Type", "application/pairing+tlv8"),
+                        ("Content-Type", "application/pairing+tlv8")
                     ]),
                     body: encode(result))
 

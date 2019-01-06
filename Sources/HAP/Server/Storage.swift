@@ -1,5 +1,5 @@
-import Foundation
 import COperatingSystem
+import Foundation
 
 public protocol Storage: class {
     func read() throws -> Data

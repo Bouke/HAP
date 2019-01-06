@@ -11,6 +11,11 @@ import NIOHTTP1
 
 fileprivate let logger = getLogger("hap.http")
 
+enum ServerError: Error {
+    case couldNotBindToPort(Error)
+    case couldNotStop(Error)
+}
+
 public class Server: NSObject, NetServiceDelegate {
     let device: Device
 
@@ -41,7 +46,8 @@ public class Server: NSObject, NetServiceDelegate {
                 channel.pipeline.add(handler: CryptographerHandler()).then {
                     channel.pipeline.add(handler: EventHandler()).then {
                         channel.pipeline.configureHTTPServerPipeline(withErrorHandling: true).then {
-                            // It's important we use the same handler for all accepted channels. The ControllerHandler is thread-safe!
+                            // It's important we use the same handler for all accepted channels.
+                            // The ControllerHandler is thread-safe!
                             channel.pipeline.add(handler: device.controllerHandler!).then {
                                 channel.pipeline.add(handler: RequestHandler()).then {
                                     channel.pipeline.add(handler: UpgradeEventHandler()).then {
@@ -61,13 +67,20 @@ public class Server: NSObject, NetServiceDelegate {
             .childChannelOption(ChannelOptions.recvAllocator, value: AdaptiveRecvByteBufferAllocator())
 
         logger.debug("binding listening port...")
-        channel = try! bootstrap.bind(to: SocketAddress(ipAddress: "::", port: UInt16(requestedPort))).wait()
+        do {
+            channel = try bootstrap.bind(to: SocketAddress(ipAddress: "::", port: UInt16(requestedPort))).wait()
+        } catch {
+            throw ServerError.couldNotBindToPort(error)
+        }
         let actualPort = channel.localAddress!.port!
         logger.debug("bound, listening on \(actualPort)")
 
         /* the server will now be accepting connections */
 
-        service = NetService(domain: "local.", type: "_hap._tcp.", name: device.name, port: Int32(channel.localAddress!.port!))
+        service = NetService(domain: "local.",
+                             type: "_hap._tcp.",
+                             name: device.name,
+                             port: Int32(channel.localAddress!.port!))
 
         super.init()
 
@@ -78,9 +91,13 @@ public class Server: NSObject, NetServiceDelegate {
         service.publish(options: NetService.Options(rawValue: 0))
     }
 
-    public func stop() {
+    public func stop() throws {
         channel.close(promise: nil)
-        try! group.syncShutdownGracefully()
+        do {
+            try group.syncShutdownGracefully()
+        } catch {
+            throw ServerError.couldNotStop(error)
+        }
     }
 
     /// Publish the Accessory configuration on the Bonjour service

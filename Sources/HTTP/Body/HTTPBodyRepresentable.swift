@@ -30,7 +30,6 @@ extension StaticString: LosslessHTTPBodyRepresentable {
     }
 }
 
-
 /// `ByteBuffer` can be represented as an `HTTPBody`.
 extension ByteBuffer: LosslessHTTPBodyRepresentable {
     /// See `LosslessHTTPBodyRepresentable`.
