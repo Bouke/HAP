@@ -60,12 +60,8 @@ public class Server: NSObject, NetServiceDelegate {
 
     /// Publish the Accessory configuration on the Bonjour service
     func updateDiscoveryRecord() {
-        #if os(macOS)
-            let record = device.config.dictionary(key: { $0.key }, value: { $0.value.data(using: .utf8)! })
-            service.setTXTRecord(NetService.data(fromTXTRecord: record))
-        #elseif os(Linux)
-            service.setTXTRecord(device.config)
-        #endif
+        let record = device.config.dictionary(key: { $0.key }, value: { $0.value.data(using: .utf8)! })
+        service.setTXTRecord(NetService.data(fromTXTRecord: record))
     }
 
     public func start() {
@@ -117,7 +113,7 @@ public class Server: NSObject, NetServiceDelegate {
 
         // Ideally we would call `.close()` on all open sockets. However
         // BlueSocket doesn't like us doing that from another thread than
-        // the one that's currently listening. As a workaround, we'll 
+        // the one that's currently listening. As a workaround, we'll
         // force close the file descriptor instead.
 
         Socket.forceClose(socketfd: listenSocket.socketfd)
