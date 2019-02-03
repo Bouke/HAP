@@ -45,6 +45,19 @@ public enum AccessoryType: String, Codable {
     case ipCamera = "17"
     case videoDoorBell = "18"
     case airPurifier = "19"
+    case airHeater = "20"       //Not in HAP Spec
+    case airConditioner = "21"  //Not in HAP Spec
+    case airHumidifier = "22"   //Not in HAP Spec
+    case airDehumidifier = "23" //Not in HAP Spec
+    case appleTV = "24"
+
+    case speaker = "26"
+    case airport = "27"
+    case sprinkler = "28"
+    case faucet = "29"
+    case showerHead = "30"
+    case television = "31"
+    case targetController = "32" // Remote Control
 }
 
 open class Accessory: JSONSerializable {

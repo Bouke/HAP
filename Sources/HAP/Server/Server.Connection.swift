@@ -133,6 +133,7 @@ extension Server {
 
             // Regularly check if the connection is still alive
             repeatingTickle()
+            var emptyResponseCount = 0
 
             let httpParser = HTTPParser(isRequest: true)
             let request = HTTPServerRequest(socket: socket, httpParser: httpParser)
@@ -142,8 +143,15 @@ extension Server {
                     let byteCount = try socket.read(into: &readBuffer)
                     guard byteCount > 0 else {
                         // 0 bytes read signals the socket has closed
-                        break
+                        logger.debug("Read zero bytes")
+                        emptyResponseCount += 1
+                        if emptyResponseCount < 8 {
+                            continue
+                        } else {
+                            break
+                        }
                     }
+                    emptyResponseCount = 0
                     if let cryptographer = self.cryptographer {
                         readBuffer = try cryptographer.decrypt(readBuffer)
                     }
@@ -166,7 +174,8 @@ extension Server {
                 }
 
                 guard httpParser.completed else {
-                    break
+                    logger.debug("Parsing incomplete")
+                    continue
                 }
 
                 request.parsingCompleted()

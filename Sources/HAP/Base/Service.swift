@@ -85,26 +85,43 @@ public extension ServiceType {
     static let garageDoorOpener = ServiceType(0x41)
     static let lockMechanism = ServiceType(0x45)
     static let securitySystem = ServiceType(0x7E)
+    // Television support
+    static let television = ServiceType(0xD8)
+    static let inputSource = ServiceType(0xD9)
+    static let televisionSpeaker = ServiceType(0x113)
 }
 
-open class Service: JSONSerializable {
+open class Service: NSObject, JSONSerializable {
     public let type: ServiceType
 
     weak var accessory: Accessory?
 
     var iid: InstanceID = 0
     let characteristics: [Characteristic]
+    var linkedServices = WeakObjectSet<Service>()
+    var primary: Bool?
+    var hidden: Bool?
 
     public init(type: ServiceType, characteristics: [AnyCharacteristic]) {
         self.type = type
         self.characteristics = characteristics.map { $0.wrapped }
+        super.init()
         self.verify()
     }
 
     init(type: ServiceType, characteristics: [Characteristic]) {
         self.type = type
         self.characteristics = characteristics
+        super.init()
         self.verify()
+    }
+
+    func addLinkedService(_ link: Service) {
+        linkedServices.addObject(object: link)
+    }
+
+    func removeLinkedService(_ link: Service) {
+        _ = linkedServices.remove(link)
     }
 
     func verify() {
@@ -129,10 +146,22 @@ open class Service: JSONSerializable {
     }
 
     public func serialized() -> [String: JSONValueType] {
-        return [
+        var json: [String: JSONValueType] = [
             "iid": iid,
             "type": type.rawValue,
             "characteristics": characteristics.map { $0.serialized() }
         ]
+
+        if let primary = primary {
+            json["primary"] = primary
+        }
+        if let hidden = hidden {
+            json["hidden"] = hidden
+        }
+
+        if !linkedServices.isEmpty {
+            json["linked"] = linkedServices.allObjects.map { $0.iid }
+        }
+        return json
     }
 }

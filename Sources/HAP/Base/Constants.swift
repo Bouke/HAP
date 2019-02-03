@@ -162,6 +162,28 @@ public extension CharacteristicType {
     static let serviceLabelIndex = CharacteristicType(0xCB)
     static let serviceLabelNamespace = CharacteristicType(0xCD)
     static let colorTemperature = CharacteristicType(0xCE)
+    
+    // Television support
+    static let activeIdentifier = CharacteristicType(0xE7)
+    static let configuredName = CharacteristicType(0xE3)
+    static let sleepDiscoveryMode = CharacteristicType(0xE8)
+    static let closedCaptions = CharacteristicType(0xDD)
+    static let displayOrder = CharacteristicType(0x136)
+    static let currentMediaState = CharacteristicType(0xE0)
+    static let targetMediaState = CharacteristicType(0x137)
+    static let pictureMode = CharacteristicType(0xE2)
+    static let powerModeSelection = CharacteristicType(0xDF)
+    static let remoteKey = CharacteristicType(0xE1)
+    static let inputSourceType = CharacteristicType(0xDB)
+    static let inputDeviceType = CharacteristicType(0xDC)
+    static let identifier = CharacteristicType(0xE6)
+    static let currentVisibilityState = CharacteristicType(0x135)
+    static let targetVisibilityState = CharacteristicType(0x134)
+    static let volumeControlType = CharacteristicType(0xE9)
+    static let volumeSelector = CharacteristicType(0xEA)
+    static let isConfigured = CharacteristicType(0xD6)
+
+    // Video streaming
     static let supportedVideoStreamConfiguration = CharacteristicType(0x114)
     static let supportedAudioStreamConfiguration = CharacteristicType(0x115)
     static let supportedRTPConfiguration = CharacteristicType(0x116)
@@ -197,6 +219,8 @@ public enum CharacteristicPermission: String, Codable {
 
     // This characteristic is hidden from the user
     case hidden = "hd"
+
+    case writeResponse = "wr"
 
     // Short-hand for "all" permissions.
     static let ReadWrite: [CharacteristicPermission] = [.read, .write, .events]
