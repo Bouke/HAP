@@ -1,4 +1,4 @@
-
+// swiftlint:disable identifier_name
 extension Accessory {
     open class Television: Accessory {
         public let television = Service.Television()
@@ -7,13 +7,16 @@ extension Accessory {
 
         public init(info: Service.Info, inputs: [(String, InputSourceType)], additionalServices: [Service] = []) {
 
-            precondition(inputs.count > 0)
-            var i: UInt32 = 0
+            precondition(!inputs.isEmpty)
+            var idx: UInt32 = 0
             for (name, type) in inputs {
-                sources.append(Service.InputSource(identifier: i, name: name, input: type))
-                i = i+1
+                sources.append(Service.InputSource(identifier: idx, name: name, input: type))
+                idx += 1
             }
-            super.init(info: info, type: .television, services: ([television, speaker] + sources as [Service]) + additionalServices)
+            super.init(info: info,
+                       type: .television,
+                       services: ([television, speaker] + sources as [Service]) + additionalServices)
+
             speaker.name.value = "Speaker"
             television.configuredName.value = info.name.value
             television.activeIdentifier.value = sources[0].identifier.value
@@ -33,7 +36,6 @@ public enum Active: UInt8, CharacteristicValueType {
 
 public typealias ActiveIdentifier = UInt32
 public typealias ConfiguredName = String
-
 
 public enum SleepDiscoveryMode: UInt8, CharacteristicValueType {
     case notDiscoverable = 0
@@ -62,12 +64,12 @@ public enum PictureMode: UInt16, CharacteristicValueType {
     case game = 5
     case computer = 6
     case custom = 7
-    case _other8 = 8
-    case _other9 = 9
-    case _other10 = 10
-    case _other11 = 11
-    case _other12 = 12
-    case _other13 = 13
+//    case _other8 = 8
+//    case _other9 = 9
+//    case _other10 = 10
+//    case _other11 = 11
+//    case _other12 = 12
+//    case _other13 = 13
 }
 
 public enum PowerModeSelection: UInt8, CharacteristicValueType {
@@ -89,7 +91,7 @@ public enum RemoteKey: UInt8, CharacteristicValueType {
     case exit = 10
     case playPause = 11
     case information = 15
-    case _other = 16
+//    case _other = 16
 }
 
 public enum InputSourceType: UInt8, CharacteristicValueType {
@@ -145,7 +147,6 @@ public enum IsConfigured: UInt8, CharacteristicValueType {
     case configured = 1
 }
 
-
 extension Service {
     open class Television: Service {
         public let active = GenericCharacteristic<Active>(
@@ -163,10 +164,8 @@ extension Service {
             value: .alwaysDiscoverable,
             permissions: [.read, .events])
 
-
         // Optional Characteristics
 
-        
         public let brightness = GenericCharacteristic<Brightness>(
             type: .brightness,
             value: 100,
@@ -207,12 +206,13 @@ extension Service {
             minValue: 0)
 
         public init() {
-            super.init(type: .television, characteristics: [active, activeIdentifier, configuredName, sleepDiscoveryMode, powerModeSelection, remoteKey])
+            super.init(type: .television,
+                       characteristics: [active, activeIdentifier, configuredName,
+                                         sleepDiscoveryMode, powerModeSelection, remoteKey])
             self.primary = true
         }
     }
 }
-
 
 extension Service {
     open class InputSource: Service {
@@ -259,7 +259,9 @@ extension Service {
             permissions: [.read])
 
         public init(identifier: UInt32, name: String, input: InputSourceType) {
-            super.init(type: .inputSource, characteristics: [configuredName, inputSourceType, isConfigured, currentVisibilityState, self.identifier, self.name])
+            super.init(type: .inputSource,
+                       characteristics: [configuredName, inputSourceType, isConfigured,
+                                         currentVisibilityState, self.identifier, self.name])
 
             self.name.value = name.replacingOccurrences(of: " ", with: "")
             configuredName.value = name
@@ -305,7 +307,9 @@ extension Service {
             permissions: [.read])
 
         public init() {
-            super.init(type: .televisionSpeaker, characteristics: [name, mute, active, volumeControlType, volumeSelector, volume])
+            super.init(type: .televisionSpeaker,
+                       characteristics: [name, mute, active, volumeControlType,
+                                         volumeSelector, volume])
         }
     }
 }

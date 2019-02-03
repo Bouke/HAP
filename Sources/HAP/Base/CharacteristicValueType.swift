@@ -143,7 +143,7 @@ extension Data: CharacteristicValueType, JSONValueTypeConvertible {
 
 extension RawRepresentable where RawValue: CharacteristicValueType & JSONValueType {
     public init?(value: Any) {
-        guard let rawValue = RawValue.init(value: value) else {
+        guard let rawValue = RawValue(value: value) else {
             return nil
         }
         self.init(rawValue: rawValue)

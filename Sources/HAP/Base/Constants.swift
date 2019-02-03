@@ -162,7 +162,7 @@ public extension CharacteristicType {
     static let serviceLabelIndex = CharacteristicType(0xCB)
     static let serviceLabelNamespace = CharacteristicType(0xCD)
     static let colorTemperature = CharacteristicType(0xCE)
-    
+
     // Television support
     static let activeIdentifier = CharacteristicType(0xE7)
     static let configuredName = CharacteristicType(0xE3)
