@@ -131,14 +131,14 @@ public class Server: NSObject, NetServiceDelegate {
         queue.async { [weak self, socket] in
             let socketfd = socket.socketfd
 
-            if let self = self {
-                let connection = Connection(server: self)
+            if let this = self {
+                let connection = Connection(server: this)
 
-                self.connectionsLockQueue.sync { [unowned self, socket, connection] in
-                    self.connections[socket.socketfd] = connection
+                this.connectionsLockQueue.sync { [weak self, socket, connection] in
+                    self?.connections[socket.socketfd] = connection
                 }
 
-                connection.listen(socket: socket, application: self.application)
+                connection.listen(socket: socket, application: this.application)
             }
 
             self?.connectionsLockQueue.sync { [weak self, socketfd] in
