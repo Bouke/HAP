@@ -360,30 +360,28 @@ public class Device {
     // Remove the pairing in the internal DB and notify the change
     // to update the Bonjour broadcast
     func remove(pairingWithIdentifier identifier: PairingIdentifier) {
-        // TODO: (re-)implement!
-//        if let pairing = configuration.pairings[identifier] {
-//
-//            server?.removeConnectionsFor(pairing: pairing)
-//            configuration.pairings[identifier] = nil
-//
-//            // If the last remaining admin controller pairing is removed, all
-//            // pairings on the accessory must be removed.
-//            if configuration.pairings.values.first(where: { $0.role == .admin }) == nil {
-//                logger.info("Last remaining admin controller pairing is removed, removing all pairings")
-//                let allPairingIdentifiers = configuration.pairings.keys
-//                for identifier in allPairingIdentifiers {
-//                    server?.removeConnectionsFor(pairing: pairing)
-//                    configuration.pairings[identifier] = nil
-//                }
-//            }
-//
-//            persistConfig()
-//            if pairingState == .paired && configuration.pairings.isEmpty {
-//                // swiftlint:disable:next force_try
-//                try! changePairingState(.notPaired)
-//            }
-//
-//        }
+        if let pairing = configuration.pairings[identifier] {
+
+            controllerHandler?.disconnectPairing(pairing)
+            configuration.pairings[identifier] = nil
+
+            // If the last remaining admin controller pairing is removed, all
+            // pairings on the accessory must be removed.
+            if configuration.pairings.values.first(where: { $0.role == .admin }) == nil {
+                logger.warning("Last remaining admin controller pairing is removed, removing all pairings")
+                let allPairingIdentifiers = configuration.pairings.keys
+                for identifier in allPairingIdentifiers {
+                    controllerHandler?.disconnectPairing(pairing)
+                    configuration.pairings[identifier] = nil
+                }
+            }
+
+            persistConfig()
+            if pairingState == .paired && configuration.pairings.isEmpty {
+                // swiftlint:disable:next force_try
+                try! changePairingState(.notPaired)
+            }
+        }
     }
 
     func get(pairingWithIdentifier identifier: PairingIdentifier) -> Pairing? {

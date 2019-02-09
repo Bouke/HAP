@@ -174,9 +174,7 @@ class ControllerHandler: ChannelDuplexHandler {
     func triggerUserOutboundEvent(ctx: ChannelHandlerContext, event: Any, promise: EventLoopPromise<Void>?) {
         if case let PairingEvent.verified(pairing) = event {
             let channel = ctx.channel
-            channelsSyncQueue.async {
-                self.pairings[ObjectIdentifier(channel)] = pairing
-            }
+            registerPairing(pairing, forChannel: channel)
         } else {
             ctx.triggerUserOutboundEvent(event, promise: promise)
         }
@@ -196,6 +194,22 @@ class ControllerHandler: ChannelDuplexHandler {
                 return
             }
             channel.triggerUserOutboundEvent(CharacteristicEvent.changed(characteristic), promise: nil)
+        }
+    }
+
+    func registerPairing(_ pairing: Pairing, forChannel channel: Channel) {
+        channelsSyncQueue.async {
+            self.pairings[ObjectIdentifier(channel)] = pairing
+        }
+    }
+
+    func disconnectPairing(_ pairing: Pairing) {
+        channelsSyncQueue.sync {
+            let channelIdentifiers = pairings.filter { $0.value.identifier == pairing.identifier }.keys
+            for channelIdentifier in channelIdentifiers {
+                channels[channelIdentifier]!.close(promise: nil)
+                pairings.removeValue(forKey: channelIdentifier)
+            }
         }
     }
 }
