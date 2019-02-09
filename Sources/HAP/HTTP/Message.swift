@@ -1,6 +1,7 @@
 import Foundation
 import HTTP
 
+// todo: remove
 class Response {
     var status = Status.ok
 
