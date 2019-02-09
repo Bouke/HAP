@@ -17,9 +17,3 @@ class MockContext : RequestContext {
         events.append(event)
     }
 }
-
-class MockRequest {
-    static func get(url: String) -> HTTPRequest {
-        return HTTPRequest(method: .GET, uri: url, version: .init(major: 1, minor: 0), headers: HTTPHeaders([]), body: HTTPBody())
-    }
-}
