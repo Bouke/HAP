@@ -26,7 +26,11 @@ public class Server: NSObject, NetServiceDelegate {
 
     let channel: Channel
 
-    public init(device: Device, listenPort requestedPort: Int = 0) throws {
+    public init(
+        device: Device,
+        listenPort requestedPort: Int = 0,
+        numberOfThreads: Int = System.coreCount
+    ) throws {
         precondition(device.server == nil, "Device already assigned to other Server instance")
         self.device = device
 
@@ -35,7 +39,7 @@ public class Server: NSObject, NetServiceDelegate {
 
         let applicationHandler = ApplicationHandler(responder: root(device: device))
 
-        group = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
+        group = MultiThreadedEventLoopGroup(numberOfThreads: numberOfThreads)
         bootstrap = ServerBootstrap(group: group)
             // Specify backlog and enable SO_REUSEADDR for the server itself
             .serverChannelOption(ChannelOptions.backlog, value: 256)
