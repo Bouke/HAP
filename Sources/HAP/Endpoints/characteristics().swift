@@ -47,10 +47,17 @@ func characteristics(device: Device) -> Application {
                 switch characteristic.getValue() {
                 case let _value as Double: value = .double(_value)
                 case let _value as Float: value = .double(Double(_value))
+                case let _value as UInt8: value = .int(Int(_value))
+                case let _value as UInt16: value = .int(Int(_value))
+                case let _value as UInt32: value = .int(Int(_value))
                 case let _value as Int: value = .int(_value)
                 case let _value as Bool: value = .int(_value ? 1 : 0)
                 case let _value as String: value = .string(_value)
-                default: value = nil
+                default:
+                    value = nil
+                    logger.error(
+                        "Characteristic \(characteristic.description) has unsupported type: " +
+                        "\(type(of: characteristic))")
                 }
 
                 var response = Protocol.Characteristic(aid: path.aid, iid: path.iid, value: value)
