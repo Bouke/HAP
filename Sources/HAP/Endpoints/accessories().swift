@@ -22,7 +22,7 @@ func accessories(device: Device) -> Responder {
                 body: json)
         } catch {
             logger.error("Could not serialize object", error: error)
-            return HTTPResponse(status: .internalServerError)
+            return .internalServerError
         }
     }
 }

@@ -233,3 +233,15 @@ enum PairError: UInt8 {
     // Server is busy and cannot accept a pairing request at this time.
     case busy = 0x07
 }
+
+import Foundation
+import HTTP
+
+extension HTTPResponse {
+    init(tags: PairTagTLV8) {
+        self.init(status: .ok,
+                  headers: HTTPHeaders([("Content-Type", "application/pairing+tlv8")]),
+                  body: encode(tags))
+    }
+}
+

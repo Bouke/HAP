@@ -113,7 +113,7 @@ func characteristics(device: Device) -> Responder {
                                     body: json)
             } catch {
                 logger.error("Could not serialize object", error: error)
-                return HTTPResponse(status: .internalServerError)
+                return .internalServerError
             }
 
         case .PUT:
@@ -218,7 +218,7 @@ func characteristics(device: Device) -> Responder {
                                         body: json)
                 } catch {
                     logger.error("Could not serialize object", error: error)
-                    return HTTPResponse(status: .internalServerError)
+                    return .internalServerError
                 }
             }
 
@@ -226,7 +226,7 @@ func characteristics(device: Device) -> Responder {
              If no error occurs, the accessory must send an HTTP response with
              a 204 No Content status code and an empty body.
              */
-            return HTTPResponse(status: .noContent)
+            return .noContent
 
         default:
             return .badRequest

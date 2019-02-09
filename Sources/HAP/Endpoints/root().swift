@@ -33,7 +33,7 @@ func logger(_ application: @escaping Responder) -> Responder {
 func router(_ routes: [Route]) -> Responder {
     return { connection, request in
         guard let route = routes.first(where: { $0.path == request.url.path }) else {
-            return HTTPResponse(status: .notFound)
+            return .notFound
         }
         return route.application(connection, request)
     }
