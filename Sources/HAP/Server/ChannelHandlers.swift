@@ -200,8 +200,6 @@ class ControllerHandler: ChannelDuplexHandler {
     }
 }
 
-typealias Responder = (ChannelHandlerContext, HTTPRequest) -> HTTPResponse
-
 // Abuse response headers to trigger outbound event AFTER the response itself was
 // written to the channel. Ideally we'd expose the `Future` to the `Responder`,
 // so itself can trigger this event instead.
@@ -223,6 +221,8 @@ class UpgradeEventHandler: ChannelOutboundHandler {
     }
 }
 
+typealias Responder = (RequestContext, HTTPRequest) -> HTTPResponse
+
 class ApplicationHandler: ChannelInboundHandler {
     typealias InboundIn = HTTPRequest
     typealias OutboundOut = HTTPResponse
@@ -238,3 +238,10 @@ class ApplicationHandler: ChannelInboundHandler {
         ctx.write(wrapOutboundOut(responder(ctx, request)), promise: nil)
     }
 }
+
+protocol RequestContext {
+    var channel: Channel { get }
+    func triggerUserOutboundEvent(_ event: Any, promise: EventLoopPromise<Void>?)
+}
+
+extension ChannelHandlerContext : RequestContext { }

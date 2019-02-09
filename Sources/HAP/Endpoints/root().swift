@@ -43,7 +43,9 @@ func protect(_ device: Device, _ application: @escaping Responder) -> Responder 
     return { context, request in
         guard device.controllerHandler?.isChannelVerified(channel: context.channel) ?? false else {
             logger.warning("Unauthorized request to \(request.urlString)")
-            return HTTPResponse(status: .forbidden)
+            return HTTPResponse(
+                status: .unauthorized,
+                body: "You are not authorized. Start a session through /pair-verify.")
         }
         return application(context, request)
     }
