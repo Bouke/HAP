@@ -197,6 +197,10 @@ class ControllerHandler: ChannelDuplexHandler {
         }
     }
 
+    func getPairingForChannel(_ channel: Channel) -> Pairing? {
+        return self.pairings[ObjectIdentifier(channel)]
+    }
+
     func registerPairing(_ pairing: Pairing, forChannel channel: Channel) {
         channelsSyncQueue.async {
             self.pairings[ObjectIdentifier(channel)] = pairing
