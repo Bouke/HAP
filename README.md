@@ -10,8 +10,7 @@ The goal of this package is to provide a complete implementation of the Homekit 
 * Persistent configuration
 * Pair by scanning QR code (WWDC 2017)
 * Write custom services and characteristics
-* Linux support
-* Partial Raspberry Pi support! Application is now booting and setting up listening socket. mDNS not working yet, looking into it.
+* Linux / Raspbian (Raspberry Pi) support
 
 ## How to build
 
@@ -44,6 +43,13 @@ Make sure you have libsodium 1.0.9 or above. Ubuntu 16.10 or later suffices. Oth
 And then build the project itself:
 
     swift build -c release
+
+## Raspberry Pi (Raspbian Stretch)
+
+There are currently no official binaries from swift.org targetting ARM / Raspbian, however there's an active community working on Swift on ARM. You can [install binaries from their repository][1]:
+
+    curl -s https://packagecloud.io/install/repositories/swift-arm/release/script.deb.sh | sudo bash
+    sudo apt install swift4
 
 ## Usage
 
@@ -145,3 +151,4 @@ This library was written by [Bouke Haarsma](https://twitter.com/BoukeHaarsma)
 and [contributors][0].
 
 [0]: https://github.com/Bouke/HAP/graphs/contributors
+[1]: https://swift-arm.com/install-swift/
