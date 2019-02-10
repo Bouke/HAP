@@ -75,7 +75,7 @@ class EndpointTests: XCTestCase {
     }
 
     class EnergyService: Service {
-        let on = GenericCharacteristic<Bool>(type: .on, value: false)
+        let on = GenericCharacteristic<Bool>(type: .powerState, value: false)
         let inUse = GenericCharacteristic<Bool>(type: .outletInUse, value: true, permissions: [.read, .events])
         let watt = GenericCharacteristic<Double>(type: EndpointTests.watt, value: 42, permissions: [.read, .events])
         let kiloWattHour = GenericCharacteristic<Double>(type: EndpointTests.kiloWattHour, value: 0, permissions: [.read, .events])
@@ -120,6 +120,7 @@ class EndpointTests: XCTestCase {
 
     func testGetCharacteristics() {
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00056", manufacturer: "Bouke"), isDimmable: true)
+        lamp.lightbulb.brightness!.value = 100
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = characteristics(device: device)
         do {
@@ -178,7 +179,7 @@ class EndpointTests: XCTestCase {
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = characteristics(device: device)
 
-        lamp.lightbulb.on.value = false
+        lamp.lightbulb.powerState.value = false
         lamp.lightbulb.brightness?.value = 0
 
         // turn lamp on
@@ -187,7 +188,7 @@ class EndpointTests: XCTestCase {
                 "characteristics": [
                     [
                         "aid": lamp.aid,
-                        "iid": lamp.lightbulb.on.iid,
+                        "iid": lamp.lightbulb.powerState.iid,
                         "value": 1
                     ]
                 ]
@@ -195,7 +196,7 @@ class EndpointTests: XCTestCase {
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
             let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
             XCTAssertEqual(response.status, .noContent)
-            XCTAssertEqual(lamp.lightbulb.on.value, true)
+            XCTAssertEqual(lamp.lightbulb.powerState.value, true)
         }
 
         // 50% brightness
@@ -256,7 +257,7 @@ class EndpointTests: XCTestCase {
                     [
                         "aid": thermostat.aid,
                         "iid": thermostat.thermostat.targetHeatingCoolingState.iid,
-                        "value": TargetHeatingCoolingState.auto.rawValue
+                        "value": HAP.TargetHeatingCoolingState.auto.rawValue
                     ]
                 ]
             ]
@@ -291,7 +292,7 @@ class EndpointTests: XCTestCase {
                     [
                         "aid": thermostat.aid,
                         "iid": thermostat.thermostat.targetHeatingCoolingState.iid,
-                        "value": TargetHeatingCoolingState.off.rawValue
+                        "value": HAP.TargetHeatingCoolingState.off.rawValue
                     ]
                 ]
             ]
@@ -308,7 +309,7 @@ class EndpointTests: XCTestCase {
                     [
                         "aid": thermostat.aid,
                         "iid": thermostat.thermostat.targetHeatingCoolingState.iid,
-                        "value": TargetHeatingCoolingState.off.rawValue,
+                        "value": HAP.TargetHeatingCoolingState.off.rawValue,
                         "ev": true,
                         "authData": "string",
                         "remote": true
@@ -402,7 +403,7 @@ class EndpointTests: XCTestCase {
                     ],
                     [
                         "aid": lamp.aid,
-                        "iid": lamp.lightbulb.on.iid,
+                        "iid": lamp.lightbulb.powerState.iid,
                         "value": "value"
                     ]
                 ]
@@ -428,7 +429,7 @@ class EndpointTests: XCTestCase {
                     ],
                     [
                         "aid": thermostat.aid,
-                        "iid": thermostat.info.firmwareRevision.iid,
+                        "iid": thermostat.info.firmwareRevision!.iid,
                         "value": "value"
                     ]
                 ]
@@ -556,7 +557,7 @@ class EndpointTests: XCTestCase {
         let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat", serialNumber: "00062"))
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00063"), isDimmable: true)
 
-        lightsensor.lightSensor.currentLight.value = 234
+        lightsensor.lightSensor.currentLightLevel.value = 234
         thermostat.thermostat.currentTemperature.value = 100
         lamp.lightbulb.brightness!.value = 53
         let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00063B"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [lightsensor, thermostat, lamp])
@@ -564,8 +565,13 @@ class EndpointTests: XCTestCase {
 
         // First a good one
         do {
+<<<<<<< HEAD
             let req = "\(lamp.aid).\(lamp.lightbulb.brightness!.iid),\(lightsensor.aid).\(lightsensor.lightSensor.currentLight.iid),\(thermostat.aid).\(thermostat.thermostat.currentTemperature.iid)"
             let response = application(MockContext(), HTTPRequest(uri: "/characteristics?id=\(req)"))
+=======
+            let req = "\(lamp.aid).\(lamp.lightbulb.brightness!.iid),\(lightsensor.aid).\(lightsensor.lightSensor.currentLightLevel.iid),\(thermostat.aid).\(thermostat.thermostat.currentTemperature.iid)"
+            let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=\(req)"))
+>>>>>>> Updating test-suite
 
             XCTAssertEqual(response.status, .ok)
 
@@ -588,11 +594,11 @@ class EndpointTests: XCTestCase {
                 return XCTFail("Could not get lampa aid")
             }
 
-            guard let lightVal = Double(value: light["value"] as Any) else {
+            guard let lightVal = Float(value: light["value"] as Any) else {
                 return XCTFail("light is not Double")
             }
 
-            guard let thermVal = Double(value: therm["value"] as Any) else {
+            guard let thermVal = Float(value: therm["value"] as Any) else {
                 return XCTFail("therm is not Double")
             }
 
@@ -600,7 +606,7 @@ class EndpointTests: XCTestCase {
                 return XCTFail("therm is not Int")
             }
 
-            XCTAssertEqual(lightVal, lightsensor.lightSensor.currentLight.value)
+            XCTAssertEqual(lightVal, lightsensor.lightSensor.currentLightLevel.value)
             XCTAssertEqual(thermVal, thermostat.thermostat.currentTemperature.value)
             XCTAssertEqual(lampaVal, lamp.lightbulb.brightness!.value)
         }
@@ -642,7 +648,7 @@ class EndpointTests: XCTestCase {
             XCTAssertNil(light["value"])
             XCTAssertEqual(light["status"] as? Int, HAPStatusCodes.writeOnly.rawValue)
             XCTAssertEqual(therm["status"] as? Int, HAPStatusCodes.success.rawValue)
-            XCTAssertEqual(Double(value: therm["value"] as Any), thermostat.thermostat.currentTemperature.value)
+            XCTAssertEqual(Float(value: therm["value"] as Any), thermostat.thermostat.currentTemperature.value)
         }
 
         // trying to read write only access and one with read access, reverse order
@@ -670,7 +676,7 @@ class EndpointTests: XCTestCase {
             XCTAssertNil(light["value"])
             XCTAssertEqual(light["status"] as? Int, HAPStatusCodes.writeOnly.rawValue)
             XCTAssertEqual(therm["status"] as? Int, HAPStatusCodes.success.rawValue)
-            XCTAssertEqual(Double(value: therm["value"] as Any), thermostat.thermostat.currentTemperature.value)
+            XCTAssertEqual(Float(value: therm["value"] as Any), thermostat.thermostat.currentTemperature.value)
         }
     }
 
@@ -709,7 +715,7 @@ class EndpointTests: XCTestCase {
 //            // subscribe to lamp events
 //            do {
 //                let body = try! JSONSerialization.data(withJSONObject: [
-//                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "ev": true]]
+//                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.powerState.iid, "ev": true]]
 //                ], options: [])
 //                let response = application(connection, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
 //                XCTAssertEqual(response.status, .noContent)
@@ -723,7 +729,7 @@ class EndpointTests: XCTestCase {
 //            // turn lamp on
 //            do {
 //                let body = try! JSONSerialization.data(withJSONObject: [
-//                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 1]]
+//                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.powerState.iid, "value": 1]]
 //                ], options: [])
 //                let response = application(connection, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
 //                XCTAssertEqual(response.status, .noContent)
@@ -746,7 +752,7 @@ class EndpointTests: XCTestCase {
 //            // subscribe to lamp events
 //            do {
 //                let body = try! JSONSerialization.data(withJSONObject: [
-//                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "ev": true]]
+//                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.powerState.iid, "ev": true]]
 //                ], options: [])
 //                let response = application(connection, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
 //                XCTAssertEqual(response.status, .noContent)
@@ -755,7 +761,7 @@ class EndpointTests: XCTestCase {
 //            // turn lamp on
 //            do {
 //                let body = try! JSONSerialization.data(withJSONObject: [
-//                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 1]]
+//                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.powerState.iid, "value": 1]]
 //                ], options: [])
 //                let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
 //                XCTAssertEqual(response.status, .noContent)
@@ -777,7 +783,7 @@ class EndpointTests: XCTestCase {
 //            // subscribe to lamp events
 //            do {
 //                let body = try! JSONSerialization.data(withJSONObject: [
-//                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "ev": true]]
+//                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.powerState.iid, "ev": true]]
 //                ], options: [])
 //                let response = application(connection, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
 //                XCTAssertEqual(response.status, .noContent)
@@ -793,7 +799,7 @@ class EndpointTests: XCTestCase {
 //                }
 //
 //                let body = try! JSONSerialization.data(withJSONObject: [
-//                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 1]]
+//                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.powerState.iid, "value": 1]]
 //                ], options: [])
 //                let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
 //                XCTAssertEqual(response.status, .noContent)
@@ -810,7 +816,7 @@ class EndpointTests: XCTestCase {
 //                    expectation.fulfill()
 //                }
 //                let body = try! JSONSerialization.data(withJSONObject: [
-//                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 0]]
+//                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.powerState.iid, "value": 0]]
 //                ], options: [])
 //                let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
 //                XCTAssertEqual(response.status, .noContent)
@@ -838,7 +844,7 @@ class EndpointTests: XCTestCase {
 //            do {
 //                let body = try! JSONSerialization.data(withJSONObject: [
 //                    "characteristics": [
-//                        ["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "ev": true],
+//                        ["aid": lamp.aid, "iid": lamp.lightbulb.powerState.iid, "ev": true],
 //                        ["aid": thermostat.aid, "iid": thermostat.thermostat.targetTemperature.iid, "ev": true]
 //                    ]
 //                ], options: [])
@@ -856,7 +862,7 @@ class EndpointTests: XCTestCase {
 //                }
 //
 //                let body = try! JSONSerialization.data(withJSONObject: [
-//                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 1]]
+//                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.powerState.iid, "value": 1]]
 //                ], options: [])
 //                let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
 //                XCTAssertEqual(response.status, .noContent)
@@ -877,7 +883,7 @@ class EndpointTests: XCTestCase {
 //                // second update: turn lamp off
 //                do {
 //                    let body = try! JSONSerialization.data(withJSONObject: [
-//                        "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 0]]
+//                        "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.powerState.iid, "value": 0]]
 //                    ], options: [])
 //                    let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
 //                    XCTAssertEqual(response.status, .noContent)
@@ -929,7 +935,7 @@ class EndpointTests: XCTestCase {
 //            // subscribe to lamp events
 //            do {
 //                let body = try! JSONSerialization.data(withJSONObject: [
-//                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "ev": true]]
+//                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.powerState.iid, "ev": true]]
 //                ], options: [])
 //                let response = application(connection, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
 //                XCTAssertEqual(response.status, .noContent)
@@ -945,7 +951,7 @@ class EndpointTests: XCTestCase {
 //                }
 //
 //                let body = try! JSONSerialization.data(withJSONObject: [
-//                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 1]]
+//                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.powerState.iid, "value": 1]]
 //                ], options: [])
 //                let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
 //                XCTAssertEqual(response.status, .noContent)
@@ -966,7 +972,7 @@ class EndpointTests: XCTestCase {
 //                // second update: turn lamp off
 //                do {
 //                    let body = try! JSONSerialization.data(withJSONObject: [
-//                        "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 0]]
+//                        "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.powerState.iid, "value": 0]]
 //                    ], options: [])
 //                    let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
 //                    XCTAssertEqual(response.status, .noContent)
@@ -974,7 +980,7 @@ class EndpointTests: XCTestCase {
 //                // second update: turn lamp on again
 //                do {
 //                    let body = try! JSONSerialization.data(withJSONObject: [
-//                        "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.on.iid, "value": 1]]
+//                        "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.powerState.iid, "value": 1]]
 //                    ], options: [])
 //                    let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
 //                    XCTAssertEqual(response.status, .noContent)

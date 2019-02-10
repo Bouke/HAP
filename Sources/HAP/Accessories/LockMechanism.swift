@@ -8,30 +8,7 @@ extension Accessory {
     }
 }
 
-public enum LockCurrentState: Int, CharacteristicValueType {
-    case unsecured = 0
-    case secured = 1
-    case jammed = 2
-    case unknown = 3
-}
-
-public enum LockTargetState: Int, CharacteristicValueType {
-    case unsecured = 0
-    case secured = 1
-}
-
 extension Service {
-    open class LockMechanism: Service {
-        public let lockCurrentState = GenericCharacteristic<LockCurrentState>(
-            type: .lockCurrentState,
-            value: .unsecured,
-            permissions: [.read, .events])
-        public let lockTargetState = GenericCharacteristic<LockTargetState>(
-            type: .lockTargetState,
-            value: .unsecured)
-
-        public init() {
-            super.init(type: .lockMechanism, characteristics: [lockCurrentState, lockTargetState])
-        }
+    open class LockMechanism: LockMechanismBase {
     }
 }

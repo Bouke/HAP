@@ -25,41 +25,6 @@ struct AIDGenerator: Sequence, IteratorProtocol, Codable {
     }
 }
 
-public enum AccessoryType: String, Codable {
-    case other = "1"
-    case bridge = "2"
-    case fan = "3"
-    case garage = "4"
-    case lightbulb = "5"
-    case doorLock = "6"
-    case outlet = "7"
-    case `switch` = "8"
-    case thermostat = "9"
-    case sensor = "10"
-    case securitySystem = "11"
-    case door = "12"
-    case window = "13"
-    case windowCovering = "14"
-    case programmableSwitch = "15"
-    case rangeExtender = "16"
-    case ipCamera = "17"
-    case videoDoorBell = "18"
-    case airPurifier = "19"
-    case airHeater = "20"       //Not in HAP Spec
-    case airConditioner = "21"  //Not in HAP Spec
-    case airHumidifier = "22"   //Not in HAP Spec
-    case airDehumidifier = "23" //Not in HAP Spec
-    case appleTV = "24"
-
-    case speaker = "26"
-    case airport = "27"
-    case sprinkler = "28"
-    case faucet = "29"
-    case showerHead = "30"
-    case television = "31"
-    case targetController = "32" // Remote Control
-}
-
 open class Accessory: JSONSerializable {
     public weak var device: Device?
     internal var aid: InstanceID = 0

@@ -45,7 +45,7 @@ extension Int: CharacteristicValueType {
     public var asInt: Int {
         return self
     }
-    static public let format = CharacteristicFormat.uint64
+    static public let format = CharacteristicFormat.int
     public var jsonValueType: JSONValueType {
         return self
     }
@@ -117,10 +117,26 @@ extension UInt32: CharacteristicValueType {
     }
 }
 
+extension Float: CharacteristicValueType {
+    public init?(value: Any) {
+        switch value {
+        case let value as Float: self = value
+        case let value as Double: self = Float(value)
+        case let value as Int: self = Float(value)
+        default: return nil
+        }
+    }
+    static public let format = CharacteristicFormat.float
+    public var jsonValueType: JSONValueType {
+        return self
+    }
+}
+
 extension Double: CharacteristicValueType {
     public init?(value: Any) {
         switch value {
         case let value as Double: self = value
+        case let value as Float: self = Double(value)
         case let value as Int: self = Double(value)
         default: return nil
         }
