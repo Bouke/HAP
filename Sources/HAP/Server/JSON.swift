@@ -18,6 +18,7 @@ extension Int: JSONValueType { }
 extension UInt8: JSONValueType { }
 extension UInt16: JSONValueType { }
 extension UInt32: JSONValueType { }
+extension Float: JSONValueType { }
 extension Double: JSONValueType { }
 extension NSNull: JSONValueType { }
 

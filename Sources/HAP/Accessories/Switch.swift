@@ -9,11 +9,6 @@ extension Accessory {
 }
 
 extension Service {
-    open class Switch: Service {
-        public let on = GenericCharacteristic<On>(type: .on, value: false)
-
-        public init() {
-            super.init(type: .switch, characteristics: [on])
-        }
+    open class Switch: SwitchBase {
     }
 }

@@ -9,12 +9,6 @@ extension Accessory {
 }
 
 extension Service {
-    open class Outlet: Service {
-        public let on = GenericCharacteristic<Bool>(type: .on, value: false)
-        public let inUse = GenericCharacteristic<Bool>(type: .outletInUse, value: true, permissions: [.read, .events])
-
-        public init() {
-            super.init(type: .outlet, characteristics: [on, inUse])
-        }
+    open class Outlet: OutletBase {
     }
 }

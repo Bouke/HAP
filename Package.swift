@@ -27,6 +27,11 @@ let package = Package(
     ]
 )
 
+#if os(macOS)
+    package.products.append(.executable(name: "hap-update", targets: ["HAPUpdate"]))
+    package.targets.append(.target(name: "HAPUpdate", dependencies: []))
+#endif
+
 #if os(Linux)
     package.dependencies.append(.package(url: "https://github.com/Bouke/NetService.git", from: "0.5.0"))
     package.targets.first(where: { $0.name == "HAP" })!.dependencies.append("NetService")

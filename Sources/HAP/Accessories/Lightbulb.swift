@@ -29,80 +29,38 @@ extension Accessory {
     }
 }
 
-public typealias On = Bool
-public typealias Brightness = Int
-public typealias Saturation = Int
-public typealias Hue = Int
-public typealias Temperature = Int
-
 extension Service {
-    open class Lightbulb: Service {
-
-        // Required Characteristics
-        public let on = GenericCharacteristic<On>(type: .on, value: false)
-
-        // Optional Characteristics
-        // Note temperature is mutually exclusive from hue & saturation
-        public let brightness: GenericCharacteristic<Brightness>?
-        public let saturation: GenericCharacteristic<Saturation>?
-        public let hue: GenericCharacteristic<Hue>?
-        public let temperature: GenericCharacteristic<Temperature>?
+    open class Lightbulb: LightbulbBase {
 
         public init(type: Accessory.Lightbulb.ColorType, isDimmable: Bool) {
-            var characteristics: [Characteristic] = [on]
+            var characteristics: [CharacteristicType] = []
+
+            var maxTemp = 0
+            var minTemp = 0
 
             if isDimmable {
-                brightness = GenericCharacteristic<Brightness>(
-                    type: .brightness,
-                    value: 100,
-                    unit: .percentage,
-                    maxValue: 100,
-                    minValue: 0,
-                    minStep: 1)
-                characteristics.append(brightness!)
-            } else {
-                brightness = nil
+                 characteristics.append(.brightness)
             }
 
             switch type {
             case .color:
-                saturation = GenericCharacteristic<Saturation>(
-                    type: .saturation,
-                    value: 0,
-                    unit: .percentage,
-                    maxValue: 100,
-                    minValue: 0,
-                    minStep: 1)
-                hue = GenericCharacteristic<Hue>(
-                    type: .hue,
-                    value: 0,
-                    unit: .arcdegrees,
-                    maxValue: 360,
-                    minValue: 0,
-                    minStep: 1)
-                characteristics.append(hue!)
-                characteristics.append(saturation!)
-                temperature = nil
+                characteristics.append(.hue)
+                characteristics.append(.saturation)
 
             case .colorTemperature(let min, let max):
                 precondition(min >= 50 && max <= 400,
                              "Maximum range for color temperature is 50...400, \(min)...\(max) is out of bounds")
-                temperature = GenericCharacteristic<Temperature>(
-                    type: .colorTemperature,
-                    value: max,
-                    maxValue: Double(max),
-                    minValue: Double(min),
-                    minStep: 1)
-                characteristics.append(temperature!)
-                hue = nil
-                saturation = nil
+                characteristics.append(CharacteristicType.colorTemperature)
+                maxTemp = max
+                minTemp = min
 
             default:
-                hue = nil
-                saturation = nil
-                temperature = nil
+                _ = 0
             }
-            super.init(type: .lightbulb, characteristics: characteristics)
+            super.init(optionalCharacteristics: characteristics)
+
+            colorTemperature?.maxValue = Double(maxTemp)
+            colorTemperature?.minValue = Double(minTemp)
         }
     }
 }

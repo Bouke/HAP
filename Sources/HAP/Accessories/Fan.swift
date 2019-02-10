@@ -9,11 +9,6 @@ extension Accessory {
 }
 
 extension Service {
-    public class Fan: Service {
-        open let on = GenericCharacteristic<On>(type: .on, value: false)
-
-        public init() {
-            super.init(type: .fan, characteristics: [on])
-        }
+    public class Fan: FanBase {
     }
 }

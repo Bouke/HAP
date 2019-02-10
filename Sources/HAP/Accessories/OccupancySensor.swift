@@ -8,20 +8,7 @@ extension Accessory {
     }
 }
 
-public enum OccupancyDetected: Int, CharacteristicValueType {
-    case notDetected = 0
-    case detected = 1
-}
-
 extension Service {
-    open class OccupancySensor: Service {
-        public let occupancyDetected = GenericCharacteristic<OccupancyDetected>(
-            type: .occupancyDetected,
-            value: .notDetected,
-            permissions: [.read, .events])
-
-        public init() {
-            super.init(type: .occupancySensor, characteristics: [occupancyDetected])
-        }
+    open class OccupancySensor: OccupancySensorBase {
     }
 }

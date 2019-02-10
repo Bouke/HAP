@@ -99,7 +99,7 @@ print("Initializing the server...")
 let timer = DispatchSource.makeTimerSource()
 timer.schedule(deadline: .now() + .seconds(1), repeating: .seconds(5))
 timer.setEventHandler(handler: {
-    livingRoomLightbulb.lightbulb.on.value = !(livingRoomLightbulb.lightbulb.on.value ?? false)
+    livingRoomLightbulb.lightbulb.powerState.value = !(livingRoomLightbulb.lightbulb.powerState.value ?? false)
 })
 timer.resume()
 

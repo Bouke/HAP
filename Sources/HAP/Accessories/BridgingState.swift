@@ -8,6 +8,17 @@ extension Accessory {
     }
 }
 
+public extension CharacteristicType {
+    static let accessoryIdentifier = CharacteristicType(0x00A6)
+    static let category = CharacteristicType(0x00A6)
+    static let linkQuality = CharacteristicType(0x00A6)
+    static let reachable = CharacteristicType(0x00A6)
+}
+
+public extension ServiceType {
+    static let bridgingState = ServiceType(0x62)
+}
+
 public typealias Reachable = Bool
 public typealias LinkQuality = Int
 public typealias AccessoryIdentifier = String
