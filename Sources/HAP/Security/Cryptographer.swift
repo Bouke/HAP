@@ -4,14 +4,6 @@ import HKDF
 
 fileprivate let logger = getLogger("hap.encryption")
 
-class UpgradeResponse: Response {
-    let cryptographer: Cryptographer
-    init(cryptographer: Cryptographer) {
-        self.cryptographer = cryptographer
-        super.init(status: .ok)
-    }
-}
-
 // 5.5.2 Session Security
 // (...)
 // Each HTTP message is split into frames no larger than 1024 bytes. Each frame has the following format:

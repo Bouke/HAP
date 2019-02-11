@@ -1,6 +1,5 @@
 import Foundation
 @testable import HAP
-@testable import KituraNet
 import XCTest
 
 class DeviceTests: XCTestCase {

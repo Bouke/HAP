@@ -11,7 +11,8 @@ fileprivate let logger = getLogger("demo")
     import Glibc
 #endif
 
-getLogger("hap").logLevel = .warning
+getLogger("hap").logLevel = .debug
+getLogger("hap.encryption").logLevel = .warning
 
 let storage = FileStorage(filename: "configuration.json")
 if CommandLine.arguments.contains("--recreate") {
@@ -28,18 +29,18 @@ let device = Device(
     storage: storage,
     accessories: [
         livingRoomLightbulb,
-        bedroomNightStand,
-        Accessory.Door(info: Service.Info(name: "Front Door", serialNumber: "00005")),
-        Accessory.Switch(info: Service.Info(name: "Garden Lights", serialNumber: "00006")),
-        Accessory.Thermostat(info: Service.Info(name: "Living Room Thermostat", serialNumber: "00007")),
-        Accessory.Thermometer(info: Service.Info(name: "Office Thermometer", serialNumber: "00008")),
-        Accessory.Outlet(info: Service.Info(name: "Coffee Machine", serialNumber: "00009")),
-        Accessory.Window(info: Service.Info(name: "Toilet Window", serialNumber: "00010")),
-        Accessory.WindowCovering(info: Service.Info(name: "Shades", serialNumber: "00011")),
-        Accessory.Fan(info: Service.Info(name: "Living Room Ceiling Fan", serialNumber: "00012")),
-        Accessory.GarageDoorOpener(info: Service.Info(name: "Garage", serialNumber: "00013")),
-        Accessory.LockMechanism(info: Service.Info(name: "Front Door Lock", serialNumber: "00014")),
-        Accessory.SecuritySystem(info: Service.Info(name: "Alarm", serialNumber: "00015"))
+        bedroomNightStand
+//        Accessory.Door(info: Service.Info(name: "Front Door", serialNumber: "00005")),
+//        Accessory.Switch(info: Service.Info(name: "Garden Lights", serialNumber: "00006")),
+//        Accessory.Thermostat(info: Service.Info(name: "Living Room Thermostat", serialNumber: "00007")),
+//        Accessory.Thermometer(info: Service.Info(name: "Office Thermometer", serialNumber: "00008")),
+//        Accessory.Outlet(info: Service.Info(name: "Coffee Machine", serialNumber: "00009")),
+//        Accessory.Window(info: Service.Info(name: "Toilet Window", serialNumber: "00010")),
+//        Accessory.WindowCovering(info: Service.Info(name: "Shades", serialNumber: "00011")),
+//        Accessory.Fan(info: Service.Info(name: "Living Room Ceiling Fan", serialNumber: "00012")),
+//        Accessory.GarageDoorOpener(info: Service.Info(name: "Garage", serialNumber: "00013")),
+//        Accessory.LockMechanism(info: Service.Info(name: "Front Door Lock", serialNumber: "00014")),
+//        Accessory.SecuritySystem(info: Service.Info(name: "Alarm", serialNumber: "00015"))
     ])
 
 class MyDeviceDelegate: DeviceDelegate {
@@ -79,6 +80,20 @@ class MyDeviceDelegate: DeviceDelegate {
 
 var delegate = MyDeviceDelegate()
 device.delegate = delegate
+let server = try Server(device: device, listenPort: 8000)
+
+// Stop server on interrupt.
+var keepRunning = true
+func stop() {
+    DispatchQueue.main.async {
+        logger.info("Shutting down...")
+        keepRunning = false
+    }
+}
+signal(SIGINT) { _ in stop() }
+signal(SIGTERM) { _ in stop() }
+
+print("Initializing the server...")
 
 // Switch the lights every 5 seconds.
 let timer = DispatchSource.makeTimerSource()
@@ -87,18 +102,6 @@ timer.setEventHandler(handler: {
     livingRoomLightbulb.lightbulb.on.value = !(livingRoomLightbulb.lightbulb.on.value ?? false)
 })
 timer.resume()
-
-// Stop server on interrupt.
-var keepRunning = true
-signal(SIGINT) { _ in
-    logger.info("Caught interrupt, stopping...")
-    DispatchQueue.main.async {
-        keepRunning = false
-    }
-}
-
-let server = try Server(device: device, port: 0)
-server.start()
 
 print()
 print("Scan the following QR code using your iPhone to pair this device:")
@@ -112,10 +115,10 @@ withExtendedLifetime([delegate]) {
         RunLoop.main.run(until: Date(timeIntervalSinceNow: 10))
     } else {
         while keepRunning {
-            RunLoop.current.run(until: Date().addingTimeInterval(2))
+            RunLoop.current.run(mode: .defaultRunLoopMode, before: Date.distantFuture)
         }
     }
 }
 
-server.stop()
+try server.stop()
 logger.info("Stopped")

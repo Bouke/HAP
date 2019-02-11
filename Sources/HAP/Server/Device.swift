@@ -2,6 +2,7 @@
 import Cryptor
 import Foundation
 import func Evergreen.getLogger
+import NIO
 
 fileprivate let logger = getLogger("hap.device")
 
@@ -37,8 +38,11 @@ public class Device {
     let storage: Storage
 
     weak var server: Server?
+    var controllerHandler: ControllerHandler?
 
-    private(set) var characteristicEventListeners: [Box<Characteristic>: WeakObjectSet<Server.Connection>]
+    // Mapping of Characteristic -> [Channel]
+    private(set) var characteristicSubscribers: [ObjectIdentifier: Set<ObjectIdentifier>] = [:]
+
     private(set) var configuration: Configuration
 
     /// A bridge is a special type of HAP accessory server that bridges HomeKit
@@ -134,8 +138,6 @@ public class Device {
 
         // restore state from configuration
         pairingState = configuration.pairings.isEmpty ? .notPaired : .paired
-
-        characteristicEventListeners = [:]
 
         // 2.6.1.1 Accessory Instance IDs
         // Accessory instance IDs, "aid", are assigned from the same number
@@ -238,7 +240,7 @@ public class Device {
     /// - write the configuration to storage
     /// - notify interested parties of the change
     func updatedConfiguration() {
-        var newStableHash = generateStableHash()
+        let newStableHash = generateStableHash()
         if newStableHash != configuration.stableHash {
             configuration.number = configuration.number &+ 1
             configuration.stableHash = newStableHash
@@ -352,10 +354,7 @@ public class Device {
     func add(pairing: Pairing) {
         configuration.pairings[pairing.identifier] = pairing
         persistConfig()
-        if pairingState == .pairing {
-            // swiftlint:disable:next force_try
-            try! changePairingState(.paired)
-        }
+        try? changePairingState(.paired)
     }
 
     // Remove the pairing in the internal DB and notify the change
@@ -363,16 +362,16 @@ public class Device {
     func remove(pairingWithIdentifier identifier: PairingIdentifier) {
         if let pairing = configuration.pairings[identifier] {
 
-            server?.removeConnectionsFor(pairing: pairing)
+            controllerHandler?.disconnectPairing(pairing)
             configuration.pairings[identifier] = nil
 
             // If the last remaining admin controller pairing is removed, all
             // pairings on the accessory must be removed.
             if configuration.pairings.values.first(where: { $0.role == .admin }) == nil {
-                logger.info("Last remaining admin controller pairing is removed, removing all pairings")
+                logger.warning("Last remaining admin controller pairing is removed, removing all pairings")
                 let allPairingIdentifiers = configuration.pairings.keys
                 for identifier in allPairingIdentifiers {
-                    server?.removeConnectionsFor(pairing: pairing)
+                    controllerHandler?.disconnectPairing(pairing)
                     configuration.pairings[identifier] = nil
                 }
             }
@@ -382,7 +381,6 @@ public class Device {
                 // swiftlint:disable:next force_try
                 try! changePairingState(.notPaired)
             }
-
         }
     }
 
@@ -393,13 +391,12 @@ public class Device {
     // MARK: - Characteristic listeners
 
     // Add an object which would be notified of changes to Characterisics
-    func add(characteristic: Characteristic,
-             listener: Server.Connection) {
-        if characteristicEventListeners[Box(characteristic)] != nil {
-            characteristicEventListeners[Box(characteristic)]!.addObject(object: listener)
-        } else {
-            characteristicEventListeners[Box(characteristic)] = [listener]
+    func addSubscriber(_ channel: Channel, forCharacteristic characteristic: Characteristic) {
+        if !characteristicSubscribers.keys.contains(ObjectIdentifier(characteristic)) {
+            characteristicSubscribers[ObjectIdentifier(characteristic)] = []
         }
+        characteristicSubscribers[ObjectIdentifier(characteristic)]!.insert(ObjectIdentifier(channel))
+
         if let service = characteristic.service, let accessory = service.accessory {
             delegate?.characteristicListenerDidSubscribe(accessory,
                                                          service: service,
@@ -408,39 +405,49 @@ public class Device {
     }
 
     @discardableResult
-    func remove(characteristic: Characteristic,
-                listener connection: Server.Connection) -> Server.Connection? {
-        guard characteristicEventListeners[Box(characteristic)] != nil else {
+    func removeSubscriber(_ channel: Channel, forCharacteristic characteristic: Characteristic) -> Channel? {
+        guard characteristicSubscribers.keys.contains(ObjectIdentifier(characteristic)) else {
             return nil
         }
-        let subscriber = characteristicEventListeners[Box(characteristic)]!.remove(connection)
+        let subscriber = characteristicSubscribers[ObjectIdentifier(characteristic)]!.remove(ObjectIdentifier(channel))
         if subscriber != nil, let service = characteristic.service, let accessory = service.accessory {
             delegate?.characteristicListenerDidUnsubscribe(accessory,
                                                            service: service,
                                                            characteristic: AnyCharacteristic(characteristic))
         }
-        return subscriber
-    }
-
-    /// Notifies listeners (controllers) of changes to a characteristic's value.
-    func notifyListeners(of characteristic: Characteristic,
-                         exceptListener except: Server.Connection? = nil) {
-        guard let listeners = characteristicEventListeners[Box(characteristic)]?.filter({ $0 != except }),
-            !listeners.isEmpty
-        else {
-            return logger.debug("Value changed, but nobody listening")
-        }
-
-        for listener in listeners {
-            listener.notificationQueue.append(characteristic: characteristic)
-        }
+        return channel
     }
 
     /// Remove a listener for any associated characteristics
-    func remove(listener connection: Server.Connection) {
-        for (boxedCharacteristic, _) in characteristicEventListeners {
-            let characteristic = boxedCharacteristic.value
-            remove(characteristic: characteristic, listener: connection)
+    func removeSubscriberForAllCharacteristics(_ channel: Channel) {
+        for characteristic in characteristicSubscribers.keys {
+            characteristicSubscribers[characteristic]!.remove(ObjectIdentifier(channel))
+        }
+        // TODO: call delegate, however we don't have the characteristic...
+    }
+
+    /// Notifies listeners (controllers) of changes to a characteristic's value.
+    func fireCharacteristicChangeEvent(_ characteristic: Characteristic) {
+        guard let subscribers = characteristicSubscribers[ObjectIdentifier(characteristic)],
+            !subscribers.isEmpty
+            else {
+                return
+        }
+
+        for subscriber in subscribers {
+            controllerHandler?.notifyChannel(identifier: subscriber, ofCharacteristicChange: characteristic)
+        }
+    }
+
+    func fireCharacteristicChangeEvent(_ characteristic: Characteristic, source: Channel) {
+        guard let subscribers = characteristicSubscribers[ObjectIdentifier(characteristic)]?.filter({ $0 != ObjectIdentifier(source) }),
+            !subscribers.isEmpty
+            else {
+                return
+        }
+
+        for subscriber in subscribers {
+            controllerHandler?.notifyChannel(identifier: subscriber, ofCharacteristicChange: characteristic)
         }
     }
 

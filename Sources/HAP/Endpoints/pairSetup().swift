@@ -1,6 +1,7 @@
 import Cryptor
 import func Evergreen.getLogger
 import Foundation
+import HTTP
 import SRP
 
 fileprivate let logger = getLogger("hap.pairSetup")
@@ -11,7 +12,7 @@ fileprivate enum Error: Swift.Error {
 }
 
 // swiftlint:disable:next cyclomatic_complexity
-func pairSetup(device: Device) -> Application {
+func pairSetup(device: Device) -> Responder {
     let group = Group.N3072
     let algorithm = Digest.Algorithm.sha512
 
@@ -28,17 +29,13 @@ func pairSetup(device: Device) -> Application {
                                           group: group,
                                           algorithm: algorithm))
     }
-    func getSession(_ connection: Server.Connection) throws -> Session {
-        guard let session = connection.context[SESSION_KEY] as? Session else {
-            throw Error.noSession
-        }
-        return session
-    }
 
-    return { connection, request in
-        var body = Data()
+    // TODO: this memory is not freed, not thread-safe either
+    var sessions: [ObjectIdentifier: Session] = [:]
+
+    return { context, request in
         guard
-            (try? request.readAllData(into: &body)) != nil,
+            let body = request.body.data,
             let data: PairTagTLV8 = try? decode(body),
             let sequence = data[.state]?.first.flatMap({ PairSetupStep(rawValue: $0) })
         else {
@@ -47,27 +44,38 @@ func pairSetup(device: Device) -> Application {
         let response: PairTagTLV8?
         do {
             switch sequence {
+
             // M1: iOS Device -> Accessory -- `SRP Start Request'
             case .startRequest:
                 let session = createSession()
                 response = try controller.startRequest(data, session)
-                connection.context[SESSION_KEY] = session
+                sessions[ObjectIdentifier(context.channel)] = session
+
             // M3: iOS Device -> Accessory -- `SRP Verify Request'
             case .verifyRequest:
-                let session = try getSession(connection)
+                guard let session = sessions[ObjectIdentifier(context.channel)] else {
+                    throw PairSetupController.Error.invalidSetupState
+                }
                 response = try controller.verifyRequest(data, session)
+
             // M5: iOS Device -> Accessory -- `Exchange Request'
             case .keyExchangeRequest:
-                let session = try getSession(connection)
+                guard let session = sessions[ObjectIdentifier(context.channel)] else {
+                    throw PairSetupController.Error.invalidSetupState
+                }
                 response = try controller.keyExchangeRequest(data, session)
+
             // Unknown state - return error and abort
             default:
                 throw PairSetupController.Error.invalidParameters
             }
         } catch {
             logger.warning(error)
-            connection.context[SESSION_KEY] = nil
+
+            sessions[ObjectIdentifier(context.channel)] = nil
+
             try? device.changePairingState(.notPaired)
+
             switch error {
             case PairSetupController.Error.invalidParameters:
                 response = [
@@ -98,8 +106,9 @@ func pairSetup(device: Device) -> Application {
                 response = nil
             }
         }
+
         if let response = response {
-            return Response(status: .ok, data: encode(response), mimeType: "application/pairing+tlv8")
+            return HTTPResponse(tags: response)
         } else {
             return .badRequest
         }

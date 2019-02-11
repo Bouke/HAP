@@ -1,4 +1,5 @@
 import Foundation
+import NIO
 
 public struct AnyCharacteristic {
     let wrapped: Characteristic
@@ -18,7 +19,7 @@ protocol Characteristic: class, JSONSerializable {
     var type: CharacteristicType { get }
     var permissions: [CharacteristicPermission] { get }
     func getValue() -> JSONValueType?
-    func setValue(_: Any?, fromConnection: Server.Connection?) throws
+    func setValue(_: Any?, fromChannel: Channel?) throws
     var description: String? { get }
     var format: CharacteristicFormat? { get }
     var unit: CharacteristicUnit? { get }
@@ -88,7 +89,7 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
             }
             _value = newValue
             if let device = service?.accessory?.device {
-                device.notifyListeners(of: self)
+                device.fireCharacteristicChangeEvent(self)
             }
         }
     }
@@ -97,7 +98,7 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
         return value?.jsonValueType
     }
 
-    func setValue(_ newValue: Any?, fromConnection connection: Server.Connection?) throws {
+    func setValue(_ newValue: Any?, fromChannel channel: Channel?) throws {
         switch newValue {
         case let some?:
             guard let newValue = T(value: some) else {

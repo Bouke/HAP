@@ -1,16 +1,17 @@
 // swiftlint:disable unused_optional_binding
 import Foundation
+import HTTP
 
 struct Event {
     enum Error: Swift.Error {
         case characteristicWithoutAccessory
     }
 
-    var status: Response.Status
+    var status: HTTPResponseStatus
     var body: Data
     var headers: [String: String] = [:]
 
-    init(status: Response.Status, body: Data, mimeType: String) {
+    init(status: HTTPResponseStatus, body: Data, mimeType: String) {
         self.status = status
         self.body = body
         headers["Content-Length"] = "\(body.count)"
@@ -25,14 +26,13 @@ struct Event {
         guard
             let _ = scanner.scan("EVENT/1.0 "),
             let statusCode = scanner.scanUpTo(" ").flatMap({ Int($0) }),
-            let status = Response.Status(rawValue: statusCode),
             let _ = scanner.scan(space),
             let _ = scanner.scanUpTo("\r\n"),
             let _ = scanner.scan(newline)
             else {
                 return nil
         }
-        self.status = status
+        self.status = HTTPResponseStatus(statusCode: statusCode)
         while true {
             if let _ = scanner.scan(newline) {
                 break
@@ -53,7 +53,7 @@ struct Event {
     func serialized() -> Data {
         // @todo should set additional headers here as well?
         let headers = self.headers.map({ "\($0): \($1)\r\n" }).joined()
-        return "EVENT/1.0 \(status.rawValue) \(status.description)\r\n\(headers)\r\n".data(using: .utf8)! + body
+        return "EVENT/1.0 \(status.code) \(status.reasonPhrase)\r\n\(headers)\r\n".data(using: .utf8)! + body
     }
 
     init(valueChangedOfCharacteristics characteristics: [Characteristic]) throws {

@@ -1,7 +1,7 @@
 // swiftlint:disable force_try line_length
 import Foundation
 @testable import HAP
-@testable import KituraNet
+import HTTP
 import XCTest
 
 class PairingsEndpointTests: XCTestCase {
@@ -14,22 +14,19 @@ class PairingsEndpointTests: XCTestCase {
     }
 
     var device: Device!
-    var connection: MockConnection!
-    var application: Application!
+    var connection: MockContext!
+    var pairing: Pairing!
+    var application: Responder!
+
     override func setUp() {
         device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00072B"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [])
-        connection = MockConnection()
-        connection.pairing = Pairing(identifier: Data(), publicKey: Data(), role: .regularUser)
-        device.add(pairing: connection.pairing!)
+        device.controllerHandler = ControllerHandler()
+        connection = MockContext()
         application = pairings(device: device)
     }
 
-    func call(_ data: PairTagTLV8) -> (Response, PairTagTLV8?) {
-        let response = application(connection, MockRequest(method: "POST", path: "/pairings", body: encode(data)))
-        return (response, try! decode(response.body!))
-    }
-
     func testListPairingsNonAdmin() {
+        setupPairingWithRole(.regularUser)
         let request = [
             (PairTag.state, Data(bytes: [PairStep.request.rawValue])),
             (PairTag.pairingMethod, Data(bytes: [PairingMethod.listPairings.rawValue]))
@@ -39,14 +36,26 @@ class PairingsEndpointTests: XCTestCase {
     }
 
     func testListPairingsAdmin() {
-        connection.pairing?.role = .admin
+        setupPairingWithRole(.admin)
         let request = [
             (PairTag.state, Data(bytes: [PairStep.request.rawValue])),
             (PairTag.pairingMethod, Data(bytes: [PairingMethod.listPairings.rawValue]))
         ]
         let (_, responseBody) = call(request)
         XCTAssertEqual(responseBody?.pairStep, PairStep.response)
+        XCTAssertEqual(responseBody?.error, nil)
         XCTAssertEqual(responseBody?.count, 4) // state, identifier, publicKey, permissions
+    }
+
+    func setupPairingWithRole(_ role: Pairing.Role) {
+        pairing = Pairing(identifier: Data(), publicKey: Data(), role: role)
+        device.controllerHandler!.registerPairing(pairing, forChannel: connection.channel)
+        device.add(pairing: pairing)
+    }
+
+    func call(_ data: PairTagTLV8) -> (HTTPResponse, PairTagTLV8?) {
+        let response = application(connection, HTTPRequest(method: .POST, uri: "/pairings", body: encode(data)))
+        return (response, try! decode(response.body.data!))
     }
 
     // from: https://oleb.net/blog/2017/03/keeping-xctest-in-sync/#appendix-code-generation-with-sourcery
