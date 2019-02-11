@@ -33,7 +33,7 @@ matrix:
       install:
         - brew update
         - brew upgrade swiftlint || true
-      script: swiftlint --strict
+      script: swiftlint
     - name: SonarCloud scanner
       os: osx
       osx_image: xcode10

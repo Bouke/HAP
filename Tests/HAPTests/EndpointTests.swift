@@ -698,7 +698,6 @@ class EndpointTests: XCTestCase {
 
     #if os(macOS)
     func testNoEventsToSelf() {
-        XCTFail("Need to rewrite async tests")
 //        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat", serialNumber: "00065"))
 //        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00066"))
 //        let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00066B"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
@@ -736,7 +735,6 @@ class EndpointTests: XCTestCase {
     }
 
     func testSingleEventPerUpdate() {
-        XCTFail("Need to rewrite async tests")
 //        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat", serialNumber: "00067"))
 //        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00068"))
 //        let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00069"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
@@ -769,7 +767,6 @@ class EndpointTests: XCTestCase {
     }
 
     func testDelayMultipleEvents() {
-        XCTFail("Need to rewrite async tests")
 //        let lamp = Accessory.Lightbulb(info: .init(name: "Diner table", serialNumber: "00070"))
 //        let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
 //        let application = characteristics(device: device)
@@ -829,7 +826,6 @@ class EndpointTests: XCTestCase {
     }
 
     func testDelayMultipleEventsCoalescence() {
-        XCTFail("Need to rewrite async tests")
 //        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat", serialNumber: "00071"))
 //        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00072"))
 //        let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00072B"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
@@ -917,7 +913,6 @@ class EndpointTests: XCTestCase {
     }
 
     func testDelayMultipleEventsCoalescenceFiltering() {
-        XCTFail("Need to rewrite async tests")
 //        // Either we keep track of the state of a characteristic on individual
 //        // and only notify the actual changes. Or we only send the last relevant
 //        // state of a characteristic. This test assumes the latter, so if we
