@@ -1,15 +1,19 @@
 ## [Unreleased]
 ### Added
-- Additional accessory and service types 
+- Additional accessory and service types.
+- Support for Raspberry Pi / Raspbian Stretch.
+
+### Changed
+- Network stack rewritten with SwiftNIO.
 
 ### Fixed
-- Fix to allow Bridges with spaces in name
+- Fix to allow Bridges with spaces in name.
 
 ## 0.5.0 - 2017-11-19
 ### Added
-- Swift 4
-- Improved HAP specification conformity (notification coalescence, multiple status return codes)
-- Additional builtin accessory and service types
+- Swift 4.
+- Improved HAP specification conformity (notification coalescence, multiple status return codes).
+- Additional builtin accessory and service types.
 
 ### Fixed
-- Resolved issue with pairings not being removed
+- Resolved issue with pairings not being removed.
