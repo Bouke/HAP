@@ -12,7 +12,7 @@ extension Accessory {
         public enum ColorType {
             case monochrome
             case color
-            case colorTemperature(min:Int, max:Int)
+            case colorTemperature(min: Double, max: Double)
         }
 
         public let lightbulb: Service.Lightbulb
@@ -33,34 +33,24 @@ extension Service {
     open class Lightbulb: LightbulbBase {
 
         public init(type: Accessory.Lightbulb.ColorType, isDimmable: Bool) {
-            var characteristics: [CharacteristicType] = []
-
-            var maxTemp = 0
-            var minTemp = 0
+            var characteristics: [AnyCharacteristic] = []
 
             if isDimmable {
-                 characteristics.append(.brightness)
+                 characteristics.append(.brightness())
             }
 
             switch type {
             case .color:
-                characteristics.append(.hue)
-                characteristics.append(.saturation)
-
+                characteristics.append(.hue())
+                characteristics.append(.saturation())
             case .colorTemperature(let min, let max):
                 precondition(min >= 50 && max <= 400,
                              "Maximum range for color temperature is 50...400, \(min)...\(max) is out of bounds")
-                characteristics.append(CharacteristicType.colorTemperature)
-                maxTemp = max
-                minTemp = min
-
+                characteristics.append(.colorTemperature(maxValue: max, minValue: min))
             default:
-                _ = 0
+                break
             }
             super.init(optionalCharacteristics: characteristics)
-
-            colorTemperature?.maxValue = Double(maxTemp)
-            colorTemperature?.minValue = Double(minTemp)
         }
     }
 }

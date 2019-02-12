@@ -342,12 +342,6 @@ public class Inspector {
 
         // Categories
 
-        write("""
-        //
-        // HAP Accessory Categories
-        //
-        """)
-
         struct CategoryInfo {
             let name: String
             let id: Int
@@ -363,7 +357,6 @@ public class Inspector {
         }
 
         write("""
-
         public enum AccessoryType: String, Codable {
         """)
         for c in categoryInfo.sorted(by: { $0.id < $1.id } ) {
@@ -413,13 +406,6 @@ public class Inspector {
 
         write("""
 
-        //
-        // HAP Service Types
-        //
-        """)
-
-        write("""
-
         public extension ServiceType {
         """)
         for service in serviceInfo.sorted(by: { $0.className < $1.className } ) {
@@ -428,13 +414,6 @@ public class Inspector {
         write("}")
 
         // Characteristic types
-
-        write("""
-
-        //
-        // HAP Characteristic Types
-        //
-        """)
 
         struct CharacteristicInfo {
             let hkname: String
@@ -479,22 +458,14 @@ public class Inspector {
         public extension CharacteristicType {
         """)
 
-        for charateristic in characteristicInfo.sorted(by: { $0.title < $1.title } ) {
-            write("\tstatic let \(serviceName(charateristic.title, uuid: charateristic.id)) = CharacteristicType(0x\(charateristic.id.suffix(4)))")
+        for characteristic in characteristicInfo.sorted(by: { $0.title < $1.title } ) {
+            write("\tstatic let \(serviceName(characteristic.title, uuid: characteristic.id)) = CharacteristicType(0x\(characteristic.id.suffix(4)))")
         }
         write("}")
 
-
         // Characteristic Formats
 
-        write("""
-
-        //
-        // HAP Characteristic Formats
-        //
-        """)
-
-        characteristicFormats = characteristicFormats.union(["data"])
+        characteristicFormats = characteristicFormats.union(["data", "uint16"])
 
         write("""
 
@@ -506,13 +477,6 @@ public class Inspector {
         write("}")
 
         // Characteristic Units
-
-        write("""
-
-        //
-        // HAP Characteristic Units
-        //
-        """)
 
         var unitInfo = [String]()
 
@@ -528,24 +492,11 @@ public class Inspector {
         for u in unitInfo.sorted(by: { $0 < $1 } ) {
             write("\tcase \(u)")
         }
-        write("}")
-
-        write("""
-
-        ///////////////////////////////////////////////////////////////////////////////
-        """)
+        write("}\n")
 
         // Characteristic enumerated types
 
-        write("""
-
-        //
-        // HAP Enumerated types
-        //
-
-        """)
-
-        write("public class HAP {\n")
+        write("public class Enums {")
 
         var enumeratedCharacteristics = Set<String>()
 
@@ -683,16 +634,9 @@ public class Inspector {
             }
 
         }
-        write("}\n")
-
+        write("}")
 
         // Service classes
-
-        write("""
-        //
-        // HAP Service classes
-        //
-        """)
 
         func writeCharacteristicParameters(info: CharacteristicInfo, indentLevel: Int) {
             let indent = String(repeating: "\t", count: indentLevel)
@@ -713,23 +657,19 @@ public class Inspector {
             if let step = info.stepValue {
                 write(",\n\(indent)minStep: \(step)", terminator:"")
             }
-            write(")\n")
+            write(")")
         }
 
 
         func writeCharacteristicProperty(info: CharacteristicInfo) {
             let name = info.title.parameterName()
-            let type = enumeratedCharacteristics.contains(info.hkname) ?
-                "HAP.\(name.uppercasedFirstLetter())" :
-                typeName(info.format)
-            write("\t\tpublic let \(name) = GenericCharacteristic<\(type)>(")
-            writeCharacteristicParameters(info: info, indentLevel: 3)
+            write("\t\tpublic let \(name) = PredefinedCharacteristic.\(serviceName(info.title, uuid: info.id))()")
         }
 
         func writeOptionalCharacteristicProperty(info: CharacteristicInfo) {
             let name = info.title.parameterName()
             let type = enumeratedCharacteristics.contains(info.hkname) ?
-                "HAP.\(name.uppercasedFirstLetter())" :
+                "Enums.\(name.uppercasedFirstLetter())" :
                 typeName(info.format)
             write("\t\tpublic let \(name): GenericCharacteristic<\(type)>?")
         }
@@ -738,64 +678,31 @@ public class Inspector {
         func writeOptionalCharacteristicInit(info: CharacteristicInfo) {
             let name = info.title.parameterName()
             let enumType = enumeratedCharacteristics.contains(info.hkname) ?
-                "HAP.\(name.uppercasedFirstLetter())" :
+                "Enums.\(name.uppercasedFirstLetter())" :
                 typeName(info.format)
             let characteristiceType = ".\(serviceName(info.title, uuid: info.id))"
             write("""
-
-                \t\t\t\(name) = !optionalCharacteristics.contains(\(characteristiceType)) ? nil :
-                \t\t\t\tGenericCharacteristic<\(enumType)>(
-                """)
-            writeCharacteristicParameters(info: info, indentLevel: 4)
-            write("""
-                \t\t\tif let \(name) = \(name) {
-                \t\t\t\tcharacteristics.append(\(name))
-                \t\t\t}
+                \t\t\t\(name) = unwrappedOptionalCharacteristics.first { $0.type == \(characteristiceType) } as? GenericCharacteristic<\(enumType)>
                 """)
         }
-        /*
 
-            if let _ = optionalCharacteristics?.first(where: { $0 == .statusTampered }) {
-            let statusTampered = GenericCharacteristic<UInt8>(
-            type: .statusTampered,
-            permissions: [.read, .events],
-            description: "Status Tampered")
+        write("""
 
-            self.statusTampered = statusTampered
-            characteristics.append(statusTampered)
-            } else {
-            self.statusTampered = nil
-            }
-
-            statusTampered = !optionalCharacteristics.contains(.statusTampered) ? nil :
-            GenericCharacteristic<UInt8>(
-            type: .statusTampered,
-            permissions: [.read, .events],
-            description: "Status Tampered")
-            if let statusTampered = statusTampered {
-            characteristics.append(statusTampered)
-            }
-
-
-            */
-
+        extension Service {
+        """)
         for service in serviceInfo.sorted(by: { $0.className < $1.className } ) {
-            write("""
-
-            extension Service {
-            """)
             write("\topen class \(service.className)Base: Service {")
 
             var requiredCharacteristicPropertyNames = [String]()
 
-            write("\n\t\t// Required Characteristics\n")
+            write("\t\t// Required Characteristics")
             for ch in service.required {
                 if let info = characteristicInfo.first(where: { $0.hkname == ch }) {
                     writeCharacteristicProperty(info: info)
                     requiredCharacteristicPropertyNames.append(info.title.parameterName())
                 }
             }
-            write("\t\t// Optional Characteristics\n")
+            write("\n\t\t// Optional Characteristics")
             for ch in service.optional {
                 if let info = characteristicInfo.first(where: { $0.hkname == ch }) {
                     writeOptionalCharacteristicProperty(info: info)
@@ -804,9 +711,9 @@ public class Inspector {
 
             write("""
 
-                \t\tpublic init(optionalCharacteristics: [CharacteristicType] = []) {
-
-                \t\t\tvar characteristics: [Characteristic] = [\(requiredCharacteristicPropertyNames.joined(separator: ", "))]
+                \t\tpublic init(optionalCharacteristics: [AnyCharacteristic] = []) {
+                \t\t\tlet requiredCharacteristics: [Characteristic] = [\(requiredCharacteristicPropertyNames.joined(separator: ", "))]
+                \t\t\tlet unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
                 """)
 
             for ch in service.optional {
@@ -816,12 +723,80 @@ public class Inspector {
             }
 
             write("""
-
-                \t\t\tsuper.init(type: .\(serviceName(service.title, uuid: service.id)), characteristics: characteristics)
+                \t\t\tsuper.init(type: .\(serviceName(service.title, uuid: service.id)), characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
                 \t\t}
-                \t}
-                }
+                \t}\n
                 """)
         }
-    }
+
+        write("""
+        }
+
+        public extension AnyCharacteristic {
+        """)
+
+        for characteristic in characteristicInfo.sorted(by: { $0.title < $1.title } ) {
+            let name = characteristic.title.parameterName()
+            let enumType = enumeratedCharacteristics.contains(characteristic.hkname) ?
+                "Enums.\(name.uppercasedFirstLetter())" :
+                typeName(characteristic.format)
+            write("\tpublic static func \(serviceName(characteristic.title, uuid: characteristic.id))(")
+            write("\t\t_ value: \(enumType)? = nil,")
+            write("\t\tpermissions: [CharacteristicPermission] = [\(permissions(characteristic.properties))],")
+            write("\t\tdescription: String? = \(characteristic.title != nil ? "\"\(characteristic.title)\"" : "nil"),")
+            write("\t\tformat: CharacteristicFormat? = .\(characteristic.format),")
+            write("\t\tunit: CharacteristicUnit? = \(characteristic.units != nil ? ".\(unitName(characteristic.units!))" : "nil"),")
+            write("\t\tmaxLength: Int? = nil,")
+            write("\t\tmaxValue: Double? = \(characteristic.maxValue),")
+            write("\t\tminValue: Double? = \(characteristic.minValue),")
+            write("\t\tminStep: Double? = \(characteristic.stepValue)")
+            write("\t) -> AnyCharacteristic {")
+            write("\t\treturn AnyCharacteristic(")
+            write("\t\t\tPredefinedCharacteristic.\(serviceName(characteristic.title, uuid: characteristic.id))(")
+            write("\t\t\t\tvalue,")
+            write("\t\t\t\tpermissions: permissions,")
+            write("\t\t\t\tdescription: description,")
+            write("\t\t\t\tformat: format,")
+            write("\t\t\t\tunit: unit,")
+            write("\t\t\t\tmaxLength: maxLength,")
+            write("\t\t\t\tmaxValue: maxValue,")
+            write("\t\t\t\tminValue: minValue,")
+            write("\t\t\t\tminStep: minStep)")
+            write("\t\t\tas Characteristic)")
+            write("\t}\n")
+        }
+
+        write("""
+        }
+        """)
+
+        write("""
+
+        public class PredefinedCharacteristic {
+        """)
+
+        for characteristic in characteristicInfo.sorted(by: { $0.title < $1.title } ) {
+            let name = characteristic.title.parameterName()
+            let enumType = enumeratedCharacteristics.contains(characteristic.hkname) ?
+                "Enums.\(name.uppercasedFirstLetter())" :
+                typeName(characteristic.format)
+            write("\tstatic func \(serviceName(characteristic.title, uuid: characteristic.id))(")
+            write("\t\t_ value: \(enumType)? = nil,")
+            write("\t\tpermissions: [CharacteristicPermission] = [.read, .write, .events],")
+            write("\t\tdescription: String? = nil,")
+            write("\t\tformat: CharacteristicFormat? = .\(characteristic.format),")
+            write("\t\tunit: CharacteristicUnit? = \(characteristic.units != nil ? ".\(unitName(characteristic.units!))" : "nil"),")
+            write("\t\tmaxLength: Int? = nil,")
+            write("\t\tmaxValue: Double? = \(characteristic.maxValue),")
+            write("\t\tminValue: Double? = \(characteristic.minValue),")
+            write("\t\tminStep: Double? = \(characteristic.stepValue)")
+            write("\t) -> GenericCharacteristic<\(enumType)> {")
+            write("\t\treturn GenericCharacteristic<\(enumType)>(")
+            writeCharacteristicParameters(info: characteristic, indentLevel: 3)
+            write("\t}\n")
+        }
+
+        write("""
+        }
+        """)    }
 }

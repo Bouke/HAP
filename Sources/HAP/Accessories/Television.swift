@@ -4,7 +4,7 @@ extension Accessory {
         public let speaker = Service.TelevisionSpeaker()
         public var sources = [Service.InputSource]()
 
-        public init(info: Service.Info, inputs: [(String, HAP.InputSourceType)], additionalServices: [Service] = []) {
+        public init(info: Service.Info, inputs: [(String, Enums.InputSourceType)], additionalServices: [Service] = []) {
 
             precondition(!inputs.isEmpty)
             var idx: UInt32 = 0
@@ -31,7 +31,7 @@ extension Accessory {
 extension Service {
     open class Television: TelevisionBase {
         public init() {
-            super.init(optionalCharacteristics: [.powerModeSelection, .remoteKey])
+            super.init(optionalCharacteristics: [.powerModeSelection(), .remoteKey()])
             self.primary = true
         }
     }
@@ -39,8 +39,8 @@ extension Service {
 
 extension Service {
     open class InputSource: InputSourceBase {
-        public init(identifier: UInt32, name: String, input: HAP.InputSourceType) {
-            super.init(optionalCharacteristics: [.identifier])
+        public init(identifier: UInt32, name: String, input: Enums.InputSourceType) {
+            super.init(optionalCharacteristics: [.identifier()])
 
             self.name.value = name.replacingOccurrences(of: " ", with: "")
             configuredName.value = name
@@ -52,10 +52,8 @@ extension Service {
 
 extension Service {
     open class TelevisionSpeaker: SpeakerBase {
-
         public init() {
-            super.init(optionalCharacteristics: [.active, .volumeControlType,
-                                         .volumeSelector, .volume])
+            super.init(optionalCharacteristics: [.active(), .volumeControlType(), .volumeSelector(), .volume()])
         }
     }
 }
