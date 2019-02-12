@@ -8,7 +8,7 @@ extension Service {
                     manufacturer: String = "undefined",
                     model: String = "undefined",
                     firmwareRevision: Revision = "1.0.0") {
-            super.init(optionalCharacteristics: [.firmwareRevision])
+            super.init(optionalCharacteristics: [.firmwareRevision()])
             self.name.value = name
             self.manufacturer.value = manufacturer
             self.model.value = model
