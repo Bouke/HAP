@@ -257,7 +257,7 @@ class EndpointTests: XCTestCase {
                     [
                         "aid": thermostat.aid,
                         "iid": thermostat.thermostat.targetHeatingCoolingState.iid,
-                        "value": HAP.TargetHeatingCoolingState.auto.rawValue
+                        "value": Enums.TargetHeatingCoolingState.auto.rawValue
                     ]
                 ]
             ]
@@ -292,7 +292,7 @@ class EndpointTests: XCTestCase {
                     [
                         "aid": thermostat.aid,
                         "iid": thermostat.thermostat.targetHeatingCoolingState.iid,
-                        "value": HAP.TargetHeatingCoolingState.off.rawValue
+                        "value": Enums.TargetHeatingCoolingState.off.rawValue
                     ]
                 ]
             ]
@@ -309,7 +309,7 @@ class EndpointTests: XCTestCase {
                     [
                         "aid": thermostat.aid,
                         "iid": thermostat.thermostat.targetHeatingCoolingState.iid,
-                        "value": HAP.TargetHeatingCoolingState.off.rawValue,
+                        "value": Enums.TargetHeatingCoolingState.off.rawValue,
                         "ev": true,
                         "authData": "string",
                         "remote": true
@@ -565,13 +565,8 @@ class EndpointTests: XCTestCase {
 
         // First a good one
         do {
-<<<<<<< HEAD
-            let req = "\(lamp.aid).\(lamp.lightbulb.brightness!.iid),\(lightsensor.aid).\(lightsensor.lightSensor.currentLight.iid),\(thermostat.aid).\(thermostat.thermostat.currentTemperature.iid)"
-            let response = application(MockContext(), HTTPRequest(uri: "/characteristics?id=\(req)"))
-=======
             let req = "\(lamp.aid).\(lamp.lightbulb.brightness!.iid),\(lightsensor.aid).\(lightsensor.lightSensor.currentLightLevel.iid),\(thermostat.aid).\(thermostat.thermostat.currentTemperature.iid)"
-            let response = application(MockConnection(), MockRequest.get(path: "/characteristics?id=\(req)"))
->>>>>>> Updating test-suite
+            let response = application(MockContext(), HTTPRequest(uri: "/characteristics?id=\(req)"))
 
             XCTAssertEqual(response.status, .ok)
 
