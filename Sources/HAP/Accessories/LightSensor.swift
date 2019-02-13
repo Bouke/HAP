@@ -8,8 +8,6 @@ extension Accessory {
     }
 }
 
-public typealias CurrentLight = Double
-
 extension Service {
     open class LightSensor: LightSensorBase {
     }

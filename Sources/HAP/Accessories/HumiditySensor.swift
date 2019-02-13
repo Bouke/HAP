@@ -8,8 +8,6 @@ extension Accessory {
     }
 }
 
-public typealias CurrentRelativeHumidity = Double
-
 extension Service {
     open class HumiditySensor: HumiditySensorBase {
     }
