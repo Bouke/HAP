@@ -661,19 +661,24 @@ public class Inspector {
         }
 
 
-        func writeCharacteristicProperty(info: CharacteristicInfo) {
-            let name = info.title.parameterName()
-            write("\t\tpublic let \(name) = PredefinedCharacteristic.\(serviceName(info.title, uuid: info.id))()")
-        }
-
-        func writeOptionalCharacteristicProperty(info: CharacteristicInfo) {
+        func writeCharacteristicProperty(info: CharacteristicInfo, isOptional: Bool) {
             let name = info.title.parameterName()
             let type = enumeratedCharacteristics.contains(info.hkname) ?
                 "Enums.\(name.uppercasedFirstLetter())" :
                 typeName(info.format)
-            write("\t\tpublic let \(name): GenericCharacteristic<\(type)>?")
+            write("\t\tpublic let \(name): GenericCharacteristic<\(type)>\(isOptional ? "?" : "")")
         }
 
+        func writeRequiredCharacteristicInit(info: CharacteristicInfo) {
+            let name = info.title.parameterName()
+            let enumType = enumeratedCharacteristics.contains(info.hkname) ?
+                "Enums.\(name.uppercasedFirstLetter())" :
+                typeName(info.format)
+            let characteristiceType = ".\(serviceName(info.title, uuid: info.id))"
+            write("""
+                \t\t\t\(name) = unwrappedCharacteristics.first { $0.type == \(characteristiceType) } as? GenericCharacteristic<\(enumType)> ?? PredefinedCharacteristic.\(serviceName(info.title, uuid: info.id))()
+                """)
+        }
 
         func writeOptionalCharacteristicInit(info: CharacteristicInfo) {
             let name = info.title.parameterName()
@@ -682,7 +687,7 @@ public class Inspector {
                 typeName(info.format)
             let characteristiceType = ".\(serviceName(info.title, uuid: info.id))"
             write("""
-                \t\t\t\(name) = unwrappedOptionalCharacteristics.first { $0.type == \(characteristiceType) } as? GenericCharacteristic<\(enumType)>
+                \t\t\t\(name) = unwrapped.first { $0.type == \(characteristiceType) } as? GenericCharacteristic<\(enumType)>
                 """)
         }
 
@@ -698,23 +703,32 @@ public class Inspector {
             write("\t\t// Required Characteristics")
             for ch in service.required {
                 if let info = characteristicInfo.first(where: { $0.hkname == ch }) {
-                    writeCharacteristicProperty(info: info)
+                    writeCharacteristicProperty(info: info, isOptional: false)
                     requiredCharacteristicPropertyNames.append(info.title.parameterName())
                 }
             }
             write("\n\t\t// Optional Characteristics")
             for ch in service.optional {
                 if let info = characteristicInfo.first(where: { $0.hkname == ch }) {
-                    writeOptionalCharacteristicProperty(info: info)
+                    writeCharacteristicProperty(info: info, isOptional: true)
                 }
             }
 
             write("""
 
-                \t\tpublic init(optionalCharacteristics: [AnyCharacteristic] = []) {
-                \t\t\tlet requiredCharacteristics: [Characteristic] = [\(requiredCharacteristicPropertyNames.joined(separator: ", "))]
-                \t\t\tlet unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
+                \t\tpublic init(characteristics: [AnyCharacteristic] = []) {
+                \t\t\tvar unwrapped = characteristics.map { $0.wrapped }
                 """)
+
+            for ch in service.required {
+                if let info = characteristicInfo.first(where: { $0.hkname == ch }) {
+                    let name = info.title.parameterName()
+                    let characteristiceType = ".\(serviceName(info.title, uuid: info.id))"
+                    write("""
+                        \t\t\t\(name) = getOrCreateAppend(type: \(characteristiceType), characteristics: &unwrapped, generator: { PredefinedCharacteristic.\(serviceName(info.title, uuid: info.id))() })
+                        """)
+                }
+            }
 
             for ch in service.optional {
                 if let info = characteristicInfo.first(where: { $0.hkname == ch }) {
@@ -723,7 +737,7 @@ public class Inspector {
             }
 
             write("""
-                \t\t\tsuper.init(type: .\(serviceName(service.title, uuid: service.id)), characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+                \t\t\tsuper.init(type: .\(serviceName(service.title, uuid: service.id)), characteristics: unwrapped)
                 \t\t}
                 \t}\n
                 """)
