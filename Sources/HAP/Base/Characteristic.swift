@@ -74,6 +74,10 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
             guard newValue != _value else {
                 return
             }
+            precondition(
+                permissions.contains(.read) && value != nil,
+                "Readable characteristics should have non nil value")
+
             // swiftlint:disable:next identifier_name
             if let _newValue = newValue, let doubleValue = Double(value: _newValue) {
                 if let min = minValue {
@@ -132,6 +136,9 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
                 maxValue: Double? = nil,
                 minValue: Double? = nil,
                 minStep: Double? = nil) {
+        precondition(
+            permissions.contains(.read) && value != nil,
+            "Readable characteristics should have non nil value")
 
         if let value = value, let doubleValue = Double(value: value) {
             if let min = minValue {
