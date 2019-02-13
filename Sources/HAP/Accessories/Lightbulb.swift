@@ -50,7 +50,7 @@ extension Service {
             default:
                 break
             }
-            super.init(optionalCharacteristics: characteristics)
+            super.init(characteristics: characteristics)
         }
     }
 }

@@ -31,7 +31,7 @@ extension Accessory {
 extension Service {
     open class Television: TelevisionBase {
         public init() {
-            super.init(optionalCharacteristics: [.powerModeSelection(), .remoteKey()])
+            super.init(characteristics: [.powerModeSelection(), .remoteKey()])
             self.primary = true
         }
     }
@@ -40,7 +40,7 @@ extension Service {
 extension Service {
     open class InputSource: InputSourceBase {
         public init(identifier: UInt32, name: String, input: Enums.InputSourceType) {
-            super.init(optionalCharacteristics: [.identifier()])
+            super.init(characteristics: [.identifier()])
 
             self.name.value = name.replacingOccurrences(of: " ", with: "")
             configuredName.value = name
@@ -53,7 +53,7 @@ extension Service {
 extension Service {
     open class TelevisionSpeaker: SpeakerBase {
         public init() {
-            super.init(optionalCharacteristics: [.active(), .volumeControlType(), .volumeSelector(), .volume()])
+            super.init(characteristics: [.active(), .volumeControlType(), .volumeSelector(), .volume()])
         }
     }
 }

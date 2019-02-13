@@ -2,7 +2,7 @@
 // Don't make changes to this file, but regenerate using `hap-update` instead.
 //
 //  macOS: Version 10.14.3 (Build 18D109)
-//  date: 12 February 2019
+//  date: 13 February 2019
 //  HAP Version: 718
 
 import Foundation
@@ -496,9 +496,9 @@ public class Enums {
 extension Service {
 	open class AirPurifierBase: Service {
 		// Required Characteristics
-		public let active = PredefinedCharacteristic.active()
-		public let currentAirPurifierState = PredefinedCharacteristic.currentAirPurifierState()
-		public let targetAirPurifierState = PredefinedCharacteristic.targetAirPurifierState()
+		public let active: GenericCharacteristic<Enums.Active>
+		public let currentAirPurifierState: GenericCharacteristic<Enums.CurrentAirPurifierState>
+		public let targetAirPurifierState: GenericCharacteristic<Enums.TargetAirPurifierState>
 
 		// Optional Characteristics
 		public let lockPhysicalControls: GenericCharacteristic<UInt8>?
@@ -506,20 +506,22 @@ extension Service {
 		public let rotationSpeed: GenericCharacteristic<Float>?
 		public let swingMode: GenericCharacteristic<UInt8>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [active, currentAirPurifierState, targetAirPurifierState]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			lockPhysicalControls = unwrappedOptionalCharacteristics.first { $0.type == .lockPhysicalControls } as? GenericCharacteristic<UInt8>
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			rotationSpeed = unwrappedOptionalCharacteristics.first { $0.type == .rotationSpeed } as? GenericCharacteristic<Float>
-			swingMode = unwrappedOptionalCharacteristics.first { $0.type == .swingMode } as? GenericCharacteristic<UInt8>
-			super.init(type: .airPurifier, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			active = getOrCreateAppend(type: .active, characteristics: &unwrapped, generator: { PredefinedCharacteristic.active() })
+			currentAirPurifierState = getOrCreateAppend(type: .currentAirPurifierState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentAirPurifierState() })
+			targetAirPurifierState = getOrCreateAppend(type: .targetAirPurifierState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.targetAirPurifierState() })
+			lockPhysicalControls = unwrapped.first { $0.type == .lockPhysicalControls } as? GenericCharacteristic<UInt8>
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			rotationSpeed = unwrapped.first { $0.type == .rotationSpeed } as? GenericCharacteristic<Float>
+			swingMode = unwrapped.first { $0.type == .swingMode } as? GenericCharacteristic<UInt8>
+			super.init(type: .airPurifier, characteristics: unwrapped)
 		}
 	}
 
 	open class AirQualitySensorBase: Service {
 		// Required Characteristics
-		public let currentAirQuality = PredefinedCharacteristic.currentAirQuality()
+		public let currentAirQuality: GenericCharacteristic<Enums.CurrentAirQuality>
 
 		// Optional Characteristics
 		public let nitrogenDioxideDensity: GenericCharacteristic<Float>?
@@ -534,44 +536,46 @@ extension Service {
 		public let statusLowBattery: GenericCharacteristic<Enums.StatusLowBattery>?
 		public let statusTampered: GenericCharacteristic<UInt8>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [currentAirQuality]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			nitrogenDioxideDensity = unwrappedOptionalCharacteristics.first { $0.type == .nitrogenDioxideDensity } as? GenericCharacteristic<Float>
-			ozoneDensity = unwrappedOptionalCharacteristics.first { $0.type == .ozoneDensity } as? GenericCharacteristic<Float>
-			pm10Density = unwrappedOptionalCharacteristics.first { $0.type == .pm10Density } as? GenericCharacteristic<Float>
-			pm2_5Density = unwrappedOptionalCharacteristics.first { $0.type == .pm2_5Density } as? GenericCharacteristic<Float>
-			sulphurDioxideDensity = unwrappedOptionalCharacteristics.first { $0.type == .sulphurDioxideDensity } as? GenericCharacteristic<Float>
-			volatileOrganicCompoundDensity = unwrappedOptionalCharacteristics.first { $0.type == .volatileOrganicCompoundDensity } as? GenericCharacteristic<Float>
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusActive = unwrappedOptionalCharacteristics.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
-			statusFault = unwrappedOptionalCharacteristics.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusLowBattery = unwrappedOptionalCharacteristics.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
-			statusTampered = unwrappedOptionalCharacteristics.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
-			super.init(type: .airQualitySensor, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			currentAirQuality = getOrCreateAppend(type: .currentAirQuality, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentAirQuality() })
+			nitrogenDioxideDensity = unwrapped.first { $0.type == .nitrogenDioxideDensity } as? GenericCharacteristic<Float>
+			ozoneDensity = unwrapped.first { $0.type == .ozoneDensity } as? GenericCharacteristic<Float>
+			pm10Density = unwrapped.first { $0.type == .pm10Density } as? GenericCharacteristic<Float>
+			pm2_5Density = unwrapped.first { $0.type == .pm2_5Density } as? GenericCharacteristic<Float>
+			sulphurDioxideDensity = unwrapped.first { $0.type == .sulphurDioxideDensity } as? GenericCharacteristic<Float>
+			volatileOrganicCompoundDensity = unwrapped.first { $0.type == .volatileOrganicCompoundDensity } as? GenericCharacteristic<Float>
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			statusActive = unwrapped.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
+			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
+			statusLowBattery = unwrapped.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
+			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			super.init(type: .airQualitySensor, characteristics: unwrapped)
 		}
 	}
 
 	open class BatteryBase: Service {
 		// Required Characteristics
-		public let batteryLevel = PredefinedCharacteristic.batteryLevel()
-		public let chargingState = PredefinedCharacteristic.chargingState()
-		public let statusLowBattery = PredefinedCharacteristic.statusLowBattery()
+		public let batteryLevel: GenericCharacteristic<UInt8>
+		public let chargingState: GenericCharacteristic<Enums.ChargingState>
+		public let statusLowBattery: GenericCharacteristic<Enums.StatusLowBattery>
 
 		// Optional Characteristics
 		public let name: GenericCharacteristic<String>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [batteryLevel, chargingState, statusLowBattery]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			super.init(type: .battery, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			batteryLevel = getOrCreateAppend(type: .batteryLevel, characteristics: &unwrapped, generator: { PredefinedCharacteristic.batteryLevel() })
+			chargingState = getOrCreateAppend(type: .chargingState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.chargingState() })
+			statusLowBattery = getOrCreateAppend(type: .statusLowBattery, characteristics: &unwrapped, generator: { PredefinedCharacteristic.statusLowBattery() })
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			super.init(type: .battery, characteristics: unwrapped)
 		}
 	}
 
 	open class CarbonDioxideSensorBase: Service {
 		// Required Characteristics
-		public let carbonDioxideDetected = PredefinedCharacteristic.carbonDioxideDetected()
+		public let carbonDioxideDetected: GenericCharacteristic<Enums.CarbonDioxideDetected>
 
 		// Optional Characteristics
 		public let carbonDioxideLevel: GenericCharacteristic<Float>?
@@ -582,23 +586,23 @@ extension Service {
 		public let statusLowBattery: GenericCharacteristic<Enums.StatusLowBattery>?
 		public let statusTampered: GenericCharacteristic<UInt8>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [carbonDioxideDetected]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			carbonDioxideLevel = unwrappedOptionalCharacteristics.first { $0.type == .carbonDioxideLevel } as? GenericCharacteristic<Float>
-			carbonDioxidePeakLevel = unwrappedOptionalCharacteristics.first { $0.type == .carbonDioxidePeakLevel } as? GenericCharacteristic<Float>
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusActive = unwrappedOptionalCharacteristics.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
-			statusFault = unwrappedOptionalCharacteristics.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusLowBattery = unwrappedOptionalCharacteristics.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
-			statusTampered = unwrappedOptionalCharacteristics.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
-			super.init(type: .carbonDioxideSensor, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			carbonDioxideDetected = getOrCreateAppend(type: .carbonDioxideDetected, characteristics: &unwrapped, generator: { PredefinedCharacteristic.carbonDioxideDetected() })
+			carbonDioxideLevel = unwrapped.first { $0.type == .carbonDioxideLevel } as? GenericCharacteristic<Float>
+			carbonDioxidePeakLevel = unwrapped.first { $0.type == .carbonDioxidePeakLevel } as? GenericCharacteristic<Float>
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			statusActive = unwrapped.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
+			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
+			statusLowBattery = unwrapped.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
+			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			super.init(type: .carbonDioxideSensor, characteristics: unwrapped)
 		}
 	}
 
 	open class CarbonMonoxideSensorBase: Service {
 		// Required Characteristics
-		public let carbonMonoxideDetected = PredefinedCharacteristic.carbonMonoxideDetected()
+		public let carbonMonoxideDetected: GenericCharacteristic<UInt8>
 
 		// Optional Characteristics
 		public let carbonMonoxideLevel: GenericCharacteristic<Float>?
@@ -609,23 +613,23 @@ extension Service {
 		public let statusLowBattery: GenericCharacteristic<Enums.StatusLowBattery>?
 		public let statusTampered: GenericCharacteristic<UInt8>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [carbonMonoxideDetected]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			carbonMonoxideLevel = unwrappedOptionalCharacteristics.first { $0.type == .carbonMonoxideLevel } as? GenericCharacteristic<Float>
-			carbonMonoxidePeakLevel = unwrappedOptionalCharacteristics.first { $0.type == .carbonMonoxidePeakLevel } as? GenericCharacteristic<Float>
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusActive = unwrappedOptionalCharacteristics.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
-			statusFault = unwrappedOptionalCharacteristics.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusLowBattery = unwrappedOptionalCharacteristics.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
-			statusTampered = unwrappedOptionalCharacteristics.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
-			super.init(type: .carbonMonoxideSensor, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			carbonMonoxideDetected = getOrCreateAppend(type: .carbonMonoxideDetected, characteristics: &unwrapped, generator: { PredefinedCharacteristic.carbonMonoxideDetected() })
+			carbonMonoxideLevel = unwrapped.first { $0.type == .carbonMonoxideLevel } as? GenericCharacteristic<Float>
+			carbonMonoxidePeakLevel = unwrapped.first { $0.type == .carbonMonoxidePeakLevel } as? GenericCharacteristic<Float>
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			statusActive = unwrapped.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
+			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
+			statusLowBattery = unwrapped.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
+			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			super.init(type: .carbonMonoxideSensor, characteristics: unwrapped)
 		}
 	}
 
 	open class ContactSensorBase: Service {
 		// Required Characteristics
-		public let contactSensorState = PredefinedCharacteristic.contactSensorState()
+		public let contactSensorState: GenericCharacteristic<Enums.ContactSensorState>
 
 		// Optional Characteristics
 		public let name: GenericCharacteristic<String>?
@@ -634,78 +638,80 @@ extension Service {
 		public let statusLowBattery: GenericCharacteristic<Enums.StatusLowBattery>?
 		public let statusTampered: GenericCharacteristic<UInt8>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [contactSensorState]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusActive = unwrappedOptionalCharacteristics.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
-			statusFault = unwrappedOptionalCharacteristics.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusLowBattery = unwrappedOptionalCharacteristics.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
-			statusTampered = unwrappedOptionalCharacteristics.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
-			super.init(type: .contactSensor, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			contactSensorState = getOrCreateAppend(type: .contactSensorState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.contactSensorState() })
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			statusActive = unwrapped.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
+			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
+			statusLowBattery = unwrapped.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
+			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			super.init(type: .contactSensor, characteristics: unwrapped)
 		}
 	}
 
 	open class DoorBase: Service {
 		// Required Characteristics
-		public let currentPosition = PredefinedCharacteristic.currentPosition()
-		public let positionState = PredefinedCharacteristic.positionState()
-		public let targetPosition = PredefinedCharacteristic.targetPosition()
+		public let currentPosition: GenericCharacteristic<UInt8>
+		public let positionState: GenericCharacteristic<Enums.PositionState>
+		public let targetPosition: GenericCharacteristic<UInt8>
 
 		// Optional Characteristics
 		public let name: GenericCharacteristic<String>?
 		public let obstructionDetected: GenericCharacteristic<Bool>?
 		public let holdPosition: GenericCharacteristic<Bool>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [currentPosition, positionState, targetPosition]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			obstructionDetected = unwrappedOptionalCharacteristics.first { $0.type == .obstructionDetected } as? GenericCharacteristic<Bool>
-			holdPosition = unwrappedOptionalCharacteristics.first { $0.type == .holdPosition } as? GenericCharacteristic<Bool>
-			super.init(type: .door, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			currentPosition = getOrCreateAppend(type: .currentPosition, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentPosition() })
+			positionState = getOrCreateAppend(type: .positionState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.positionState() })
+			targetPosition = getOrCreateAppend(type: .targetPosition, characteristics: &unwrapped, generator: { PredefinedCharacteristic.targetPosition() })
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			obstructionDetected = unwrapped.first { $0.type == .obstructionDetected } as? GenericCharacteristic<Bool>
+			holdPosition = unwrapped.first { $0.type == .holdPosition } as? GenericCharacteristic<Bool>
+			super.init(type: .door, characteristics: unwrapped)
 		}
 	}
 
 	open class DoorbellBase: Service {
 		// Required Characteristics
-		public let programmableSwitchEvent = PredefinedCharacteristic.programmableSwitchEvent()
+		public let programmableSwitchEvent: GenericCharacteristic<UInt8>
 
 		// Optional Characteristics
 		public let brightness: GenericCharacteristic<Int>?
 		public let volume: GenericCharacteristic<Int>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [programmableSwitchEvent]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			brightness = unwrappedOptionalCharacteristics.first { $0.type == .brightness } as? GenericCharacteristic<Int>
-			volume = unwrappedOptionalCharacteristics.first { $0.type == .volume } as? GenericCharacteristic<Int>
-			super.init(type: .doorbell, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			programmableSwitchEvent = getOrCreateAppend(type: .programmableSwitchEvent, characteristics: &unwrapped, generator: { PredefinedCharacteristic.programmableSwitchEvent() })
+			brightness = unwrapped.first { $0.type == .brightness } as? GenericCharacteristic<Int>
+			volume = unwrapped.first { $0.type == .volume } as? GenericCharacteristic<Int>
+			super.init(type: .doorbell, characteristics: unwrapped)
 		}
 	}
 
 	open class FanBase: Service {
 		// Required Characteristics
-		public let powerState = PredefinedCharacteristic.powerState()
+		public let powerState: GenericCharacteristic<Bool>
 
 		// Optional Characteristics
 		public let name: GenericCharacteristic<String>?
 		public let rotationDirection: GenericCharacteristic<Enums.RotationDirection>?
 		public let rotationSpeed: GenericCharacteristic<Float>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [powerState]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			rotationDirection = unwrappedOptionalCharacteristics.first { $0.type == .rotationDirection } as? GenericCharacteristic<Enums.RotationDirection>
-			rotationSpeed = unwrappedOptionalCharacteristics.first { $0.type == .rotationSpeed } as? GenericCharacteristic<Float>
-			super.init(type: .fan, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			powerState = getOrCreateAppend(type: .powerState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.powerState() })
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			rotationDirection = unwrapped.first { $0.type == .rotationDirection } as? GenericCharacteristic<Enums.RotationDirection>
+			rotationSpeed = unwrapped.first { $0.type == .rotationSpeed } as? GenericCharacteristic<Float>
+			super.init(type: .fan, characteristics: unwrapped)
 		}
 	}
 
 	open class FanV2Base: Service {
 		// Required Characteristics
-		public let active = PredefinedCharacteristic.active()
+		public let active: GenericCharacteristic<Enums.Active>
 
 		// Optional Characteristics
 		public let currentFanState: GenericCharacteristic<Enums.CurrentFanState>?
@@ -716,83 +722,85 @@ extension Service {
 		public let rotationSpeed: GenericCharacteristic<Float>?
 		public let swingMode: GenericCharacteristic<UInt8>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [active]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			currentFanState = unwrappedOptionalCharacteristics.first { $0.type == .currentFanState } as? GenericCharacteristic<Enums.CurrentFanState>
-			targetFanState = unwrappedOptionalCharacteristics.first { $0.type == .targetFanState } as? GenericCharacteristic<Enums.TargetFanState>
-			lockPhysicalControls = unwrappedOptionalCharacteristics.first { $0.type == .lockPhysicalControls } as? GenericCharacteristic<UInt8>
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			rotationDirection = unwrappedOptionalCharacteristics.first { $0.type == .rotationDirection } as? GenericCharacteristic<Enums.RotationDirection>
-			rotationSpeed = unwrappedOptionalCharacteristics.first { $0.type == .rotationSpeed } as? GenericCharacteristic<Float>
-			swingMode = unwrappedOptionalCharacteristics.first { $0.type == .swingMode } as? GenericCharacteristic<UInt8>
-			super.init(type: .fanV2, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			active = getOrCreateAppend(type: .active, characteristics: &unwrapped, generator: { PredefinedCharacteristic.active() })
+			currentFanState = unwrapped.first { $0.type == .currentFanState } as? GenericCharacteristic<Enums.CurrentFanState>
+			targetFanState = unwrapped.first { $0.type == .targetFanState } as? GenericCharacteristic<Enums.TargetFanState>
+			lockPhysicalControls = unwrapped.first { $0.type == .lockPhysicalControls } as? GenericCharacteristic<UInt8>
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			rotationDirection = unwrapped.first { $0.type == .rotationDirection } as? GenericCharacteristic<Enums.RotationDirection>
+			rotationSpeed = unwrapped.first { $0.type == .rotationSpeed } as? GenericCharacteristic<Float>
+			swingMode = unwrapped.first { $0.type == .swingMode } as? GenericCharacteristic<UInt8>
+			super.init(type: .fanV2, characteristics: unwrapped)
 		}
 	}
 
 	open class FaucetBase: Service {
 		// Required Characteristics
-		public let active = PredefinedCharacteristic.active()
+		public let active: GenericCharacteristic<Enums.Active>
 
 		// Optional Characteristics
 		public let name: GenericCharacteristic<String>?
 		public let statusFault: GenericCharacteristic<UInt8>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [active]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusFault = unwrappedOptionalCharacteristics.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			super.init(type: .faucet, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			active = getOrCreateAppend(type: .active, characteristics: &unwrapped, generator: { PredefinedCharacteristic.active() })
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
+			super.init(type: .faucet, characteristics: unwrapped)
 		}
 	}
 
 	open class FilterMaintenanceBase: Service {
 		// Required Characteristics
-		public let filterChangeIndication = PredefinedCharacteristic.filterChangeIndication()
+		public let filterChangeIndication: GenericCharacteristic<Enums.FilterChangeIndication>
 
 		// Optional Characteristics
 		public let filterLifeLevel: GenericCharacteristic<Float>?
 		public let filterResetChangeIndication: GenericCharacteristic<UInt8>?
 		public let name: GenericCharacteristic<String>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [filterChangeIndication]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			filterLifeLevel = unwrappedOptionalCharacteristics.first { $0.type == .filterLifeLevel } as? GenericCharacteristic<Float>
-			filterResetChangeIndication = unwrappedOptionalCharacteristics.first { $0.type == .filterResetChangeIndication } as? GenericCharacteristic<UInt8>
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			super.init(type: .filterMaintenance, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			filterChangeIndication = getOrCreateAppend(type: .filterChangeIndication, characteristics: &unwrapped, generator: { PredefinedCharacteristic.filterChangeIndication() })
+			filterLifeLevel = unwrapped.first { $0.type == .filterLifeLevel } as? GenericCharacteristic<Float>
+			filterResetChangeIndication = unwrapped.first { $0.type == .filterResetChangeIndication } as? GenericCharacteristic<UInt8>
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			super.init(type: .filterMaintenance, characteristics: unwrapped)
 		}
 	}
 
 	open class GarageDoorOpenerBase: Service {
 		// Required Characteristics
-		public let currentDoorState = PredefinedCharacteristic.currentDoorState()
-		public let targetDoorState = PredefinedCharacteristic.targetDoorState()
-		public let obstructionDetected = PredefinedCharacteristic.obstructionDetected()
+		public let currentDoorState: GenericCharacteristic<Enums.CurrentDoorState>
+		public let targetDoorState: GenericCharacteristic<Enums.TargetDoorState>
+		public let obstructionDetected: GenericCharacteristic<Bool>
 
 		// Optional Characteristics
 		public let lockCurrentState: GenericCharacteristic<Enums.LockCurrentState>?
 		public let lockTargetState: GenericCharacteristic<Enums.LockTargetState>?
 		public let name: GenericCharacteristic<String>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [currentDoorState, targetDoorState, obstructionDetected]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			lockCurrentState = unwrappedOptionalCharacteristics.first { $0.type == .lockCurrentState } as? GenericCharacteristic<Enums.LockCurrentState>
-			lockTargetState = unwrappedOptionalCharacteristics.first { $0.type == .lockTargetState } as? GenericCharacteristic<Enums.LockTargetState>
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			super.init(type: .garageDoorOpener, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			currentDoorState = getOrCreateAppend(type: .currentDoorState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentDoorState() })
+			targetDoorState = getOrCreateAppend(type: .targetDoorState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.targetDoorState() })
+			obstructionDetected = getOrCreateAppend(type: .obstructionDetected, characteristics: &unwrapped, generator: { PredefinedCharacteristic.obstructionDetected() })
+			lockCurrentState = unwrapped.first { $0.type == .lockCurrentState } as? GenericCharacteristic<Enums.LockCurrentState>
+			lockTargetState = unwrapped.first { $0.type == .lockTargetState } as? GenericCharacteristic<Enums.LockTargetState>
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			super.init(type: .garageDoorOpener, characteristics: unwrapped)
 		}
 	}
 
 	open class HeaterCoolerBase: Service {
 		// Required Characteristics
-		public let active = PredefinedCharacteristic.active()
-		public let currentHeaterCoolerState = PredefinedCharacteristic.currentHeaterCoolerState()
-		public let targetHeaterCoolerState = PredefinedCharacteristic.targetHeaterCoolerState()
-		public let currentTemperature = PredefinedCharacteristic.currentTemperature()
+		public let active: GenericCharacteristic<Enums.Active>
+		public let currentHeaterCoolerState: GenericCharacteristic<Enums.CurrentHeaterCoolerState>
+		public let targetHeaterCoolerState: GenericCharacteristic<Enums.TargetHeaterCoolerState>
+		public let currentTemperature: GenericCharacteristic<Float>
 
 		// Optional Characteristics
 		public let lockPhysicalControls: GenericCharacteristic<UInt8>?
@@ -803,26 +811,29 @@ extension Service {
 		public let heatingThresholdTemperature: GenericCharacteristic<Float>?
 		public let temperatureDisplayUnits: GenericCharacteristic<Enums.TemperatureDisplayUnits>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [active, currentHeaterCoolerState, targetHeaterCoolerState, currentTemperature]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			lockPhysicalControls = unwrappedOptionalCharacteristics.first { $0.type == .lockPhysicalControls } as? GenericCharacteristic<UInt8>
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			rotationSpeed = unwrappedOptionalCharacteristics.first { $0.type == .rotationSpeed } as? GenericCharacteristic<Float>
-			swingMode = unwrappedOptionalCharacteristics.first { $0.type == .swingMode } as? GenericCharacteristic<UInt8>
-			coolingThresholdTemperature = unwrappedOptionalCharacteristics.first { $0.type == .coolingThresholdTemperature } as? GenericCharacteristic<Float>
-			heatingThresholdTemperature = unwrappedOptionalCharacteristics.first { $0.type == .heatingThresholdTemperature } as? GenericCharacteristic<Float>
-			temperatureDisplayUnits = unwrappedOptionalCharacteristics.first { $0.type == .temperatureDisplayUnits } as? GenericCharacteristic<Enums.TemperatureDisplayUnits>
-			super.init(type: .heaterCooler, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			active = getOrCreateAppend(type: .active, characteristics: &unwrapped, generator: { PredefinedCharacteristic.active() })
+			currentHeaterCoolerState = getOrCreateAppend(type: .currentHeaterCoolerState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentHeaterCoolerState() })
+			targetHeaterCoolerState = getOrCreateAppend(type: .targetHeaterCoolerState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.targetHeaterCoolerState() })
+			currentTemperature = getOrCreateAppend(type: .currentTemperature, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentTemperature() })
+			lockPhysicalControls = unwrapped.first { $0.type == .lockPhysicalControls } as? GenericCharacteristic<UInt8>
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			rotationSpeed = unwrapped.first { $0.type == .rotationSpeed } as? GenericCharacteristic<Float>
+			swingMode = unwrapped.first { $0.type == .swingMode } as? GenericCharacteristic<UInt8>
+			coolingThresholdTemperature = unwrapped.first { $0.type == .coolingThresholdTemperature } as? GenericCharacteristic<Float>
+			heatingThresholdTemperature = unwrapped.first { $0.type == .heatingThresholdTemperature } as? GenericCharacteristic<Float>
+			temperatureDisplayUnits = unwrapped.first { $0.type == .temperatureDisplayUnits } as? GenericCharacteristic<Enums.TemperatureDisplayUnits>
+			super.init(type: .heaterCooler, characteristics: unwrapped)
 		}
 	}
 
 	open class HumidifierDehumidifierBase: Service {
 		// Required Characteristics
-		public let active = PredefinedCharacteristic.active()
-		public let currentHumidifierDehumidifierState = PredefinedCharacteristic.currentHumidifierDehumidifierState()
-		public let targetHumidifierDehumidifierState = PredefinedCharacteristic.targetHumidifierDehumidifierState()
-		public let currentRelativeHumidity = PredefinedCharacteristic.currentRelativeHumidity()
+		public let active: GenericCharacteristic<Enums.Active>
+		public let currentHumidifierDehumidifierState: GenericCharacteristic<Enums.CurrentHumidifierDehumidifierState>
+		public let targetHumidifierDehumidifierState: GenericCharacteristic<Enums.TargetHumidifierDehumidifierState>
+		public let currentRelativeHumidity: GenericCharacteristic<Float>
 
 		// Optional Characteristics
 		public let lockPhysicalControls: GenericCharacteristic<UInt8>?
@@ -833,23 +844,26 @@ extension Service {
 		public let swingMode: GenericCharacteristic<UInt8>?
 		public let currentWaterLevel: GenericCharacteristic<Float>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [active, currentHumidifierDehumidifierState, targetHumidifierDehumidifierState, currentRelativeHumidity]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			lockPhysicalControls = unwrappedOptionalCharacteristics.first { $0.type == .lockPhysicalControls } as? GenericCharacteristic<UInt8>
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			relativeHumidityDehumidifierThreshold = unwrappedOptionalCharacteristics.first { $0.type == .relativeHumidityDehumidifierThreshold } as? GenericCharacteristic<Float>
-			relativeHumidityHumidifierThreshold = unwrappedOptionalCharacteristics.first { $0.type == .relativeHumidityHumidifierThreshold } as? GenericCharacteristic<Float>
-			rotationSpeed = unwrappedOptionalCharacteristics.first { $0.type == .rotationSpeed } as? GenericCharacteristic<Float>
-			swingMode = unwrappedOptionalCharacteristics.first { $0.type == .swingMode } as? GenericCharacteristic<UInt8>
-			currentWaterLevel = unwrappedOptionalCharacteristics.first { $0.type == .currentWaterLevel } as? GenericCharacteristic<Float>
-			super.init(type: .humidifierDehumidifier, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			active = getOrCreateAppend(type: .active, characteristics: &unwrapped, generator: { PredefinedCharacteristic.active() })
+			currentHumidifierDehumidifierState = getOrCreateAppend(type: .currentHumidifierDehumidifierState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentHumidifierDehumidifierState() })
+			targetHumidifierDehumidifierState = getOrCreateAppend(type: .targetHumidifierDehumidifierState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.targetHumidifierDehumidifierState() })
+			currentRelativeHumidity = getOrCreateAppend(type: .currentRelativeHumidity, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentRelativeHumidity() })
+			lockPhysicalControls = unwrapped.first { $0.type == .lockPhysicalControls } as? GenericCharacteristic<UInt8>
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			relativeHumidityDehumidifierThreshold = unwrapped.first { $0.type == .relativeHumidityDehumidifierThreshold } as? GenericCharacteristic<Float>
+			relativeHumidityHumidifierThreshold = unwrapped.first { $0.type == .relativeHumidityHumidifierThreshold } as? GenericCharacteristic<Float>
+			rotationSpeed = unwrapped.first { $0.type == .rotationSpeed } as? GenericCharacteristic<Float>
+			swingMode = unwrapped.first { $0.type == .swingMode } as? GenericCharacteristic<UInt8>
+			currentWaterLevel = unwrapped.first { $0.type == .currentWaterLevel } as? GenericCharacteristic<Float>
+			super.init(type: .humidifierDehumidifier, characteristics: unwrapped)
 		}
 	}
 
 	open class HumiditySensorBase: Service {
 		// Required Characteristics
-		public let currentRelativeHumidity = PredefinedCharacteristic.currentRelativeHumidity()
+		public let currentRelativeHumidity: GenericCharacteristic<Float>
 
 		// Optional Characteristics
 		public let name: GenericCharacteristic<String>?
@@ -858,25 +872,25 @@ extension Service {
 		public let statusLowBattery: GenericCharacteristic<Enums.StatusLowBattery>?
 		public let statusTampered: GenericCharacteristic<UInt8>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [currentRelativeHumidity]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusActive = unwrappedOptionalCharacteristics.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
-			statusFault = unwrappedOptionalCharacteristics.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusLowBattery = unwrappedOptionalCharacteristics.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
-			statusTampered = unwrappedOptionalCharacteristics.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
-			super.init(type: .humiditySensor, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			currentRelativeHumidity = getOrCreateAppend(type: .currentRelativeHumidity, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentRelativeHumidity() })
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			statusActive = unwrapped.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
+			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
+			statusLowBattery = unwrapped.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
+			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			super.init(type: .humiditySensor, characteristics: unwrapped)
 		}
 	}
 
 	open class InfoBase: Service {
 		// Required Characteristics
-		public let identify = PredefinedCharacteristic.identify()
-		public let manufacturer = PredefinedCharacteristic.manufacturer()
-		public let model = PredefinedCharacteristic.model()
-		public let name = PredefinedCharacteristic.name()
-		public let serialNumber = PredefinedCharacteristic.serialNumber()
+		public let identify: GenericCharacteristic<Bool>
+		public let manufacturer: GenericCharacteristic<String>
+		public let model: GenericCharacteristic<String>
+		public let name: GenericCharacteristic<String>
+		public let serialNumber: GenericCharacteristic<String>
 
 		// Optional Characteristics
 		public let accessoryFlags: GenericCharacteristic<UInt32>?
@@ -885,77 +899,86 @@ extension Service {
 		public let hardwareRevision: GenericCharacteristic<String>?
 		public let softwareRevision: GenericCharacteristic<String>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [identify, manufacturer, model, name, serialNumber]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			accessoryFlags = unwrappedOptionalCharacteristics.first { $0.type == .accessoryFlags } as? GenericCharacteristic<UInt32>
-			applicationMatchingIdentifier = unwrappedOptionalCharacteristics.first { $0.type == .applicationMatchingIdentifier } as? GenericCharacteristic<Data>
-			firmwareRevision = unwrappedOptionalCharacteristics.first { $0.type == .firmwareRevision } as? GenericCharacteristic<String>
-			hardwareRevision = unwrappedOptionalCharacteristics.first { $0.type == .hardwareRevision } as? GenericCharacteristic<String>
-			softwareRevision = unwrappedOptionalCharacteristics.first { $0.type == .softwareRevision } as? GenericCharacteristic<String>
-			super.init(type: .info, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			identify = getOrCreateAppend(type: .identify, characteristics: &unwrapped, generator: { PredefinedCharacteristic.identify() })
+			manufacturer = getOrCreateAppend(type: .manufacturer, characteristics: &unwrapped, generator: { PredefinedCharacteristic.manufacturer() })
+			model = getOrCreateAppend(type: .model, characteristics: &unwrapped, generator: { PredefinedCharacteristic.model() })
+			name = getOrCreateAppend(type: .name, characteristics: &unwrapped, generator: { PredefinedCharacteristic.name() })
+			serialNumber = getOrCreateAppend(type: .serialNumber, characteristics: &unwrapped, generator: { PredefinedCharacteristic.serialNumber() })
+			accessoryFlags = unwrapped.first { $0.type == .accessoryFlags } as? GenericCharacteristic<UInt32>
+			applicationMatchingIdentifier = unwrapped.first { $0.type == .applicationMatchingIdentifier } as? GenericCharacteristic<Data>
+			firmwareRevision = unwrapped.first { $0.type == .firmwareRevision } as? GenericCharacteristic<String>
+			hardwareRevision = unwrapped.first { $0.type == .hardwareRevision } as? GenericCharacteristic<String>
+			softwareRevision = unwrapped.first { $0.type == .softwareRevision } as? GenericCharacteristic<String>
+			super.init(type: .info, characteristics: unwrapped)
 		}
 	}
 
 	open class InputSourceBase: Service {
 		// Required Characteristics
-		public let configuredName = PredefinedCharacteristic.configuredName()
-		public let inputSourceType = PredefinedCharacteristic.inputSourceType()
-		public let isConfigured = PredefinedCharacteristic.isConfigured()
-		public let name = PredefinedCharacteristic.name()
+		public let configuredName: GenericCharacteristic<String>
+		public let inputSourceType: GenericCharacteristic<Enums.InputSourceType>
+		public let isConfigured: GenericCharacteristic<Enums.IsConfigured>
+		public let name: GenericCharacteristic<String>
 
 		// Optional Characteristics
 		public let identifier: GenericCharacteristic<UInt32>?
 		public let inputDeviceType: GenericCharacteristic<Enums.InputDeviceType>?
 		public let isHidden: GenericCharacteristic<UInt8>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [configuredName, inputSourceType, isConfigured, name]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			identifier = unwrappedOptionalCharacteristics.first { $0.type == .identifier } as? GenericCharacteristic<UInt32>
-			inputDeviceType = unwrappedOptionalCharacteristics.first { $0.type == .inputDeviceType } as? GenericCharacteristic<Enums.InputDeviceType>
-			isHidden = unwrappedOptionalCharacteristics.first { $0.type == .isHidden } as? GenericCharacteristic<UInt8>
-			super.init(type: .inputSource, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			configuredName = getOrCreateAppend(type: .configuredName, characteristics: &unwrapped, generator: { PredefinedCharacteristic.configuredName() })
+			inputSourceType = getOrCreateAppend(type: .inputSourceType, characteristics: &unwrapped, generator: { PredefinedCharacteristic.inputSourceType() })
+			isConfigured = getOrCreateAppend(type: .isConfigured, characteristics: &unwrapped, generator: { PredefinedCharacteristic.isConfigured() })
+			name = getOrCreateAppend(type: .name, characteristics: &unwrapped, generator: { PredefinedCharacteristic.name() })
+			identifier = unwrapped.first { $0.type == .identifier } as? GenericCharacteristic<UInt32>
+			inputDeviceType = unwrapped.first { $0.type == .inputDeviceType } as? GenericCharacteristic<Enums.InputDeviceType>
+			isHidden = unwrapped.first { $0.type == .isHidden } as? GenericCharacteristic<UInt8>
+			super.init(type: .inputSource, characteristics: unwrapped)
 		}
 	}
 
 	open class IrrigationSystemBase: Service {
 		// Required Characteristics
-		public let active = PredefinedCharacteristic.active()
-		public let programMode = PredefinedCharacteristic.programMode()
-		public let inUse = PredefinedCharacteristic.inUse()
+		public let active: GenericCharacteristic<Enums.Active>
+		public let programMode: GenericCharacteristic<UInt8>
+		public let inUse: GenericCharacteristic<UInt8>
 
 		// Optional Characteristics
 		public let remainingDuration: GenericCharacteristic<UInt32>?
 		public let name: GenericCharacteristic<String>?
 		public let statusFault: GenericCharacteristic<UInt8>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [active, programMode, inUse]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			remainingDuration = unwrappedOptionalCharacteristics.first { $0.type == .remainingDuration } as? GenericCharacteristic<UInt32>
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusFault = unwrappedOptionalCharacteristics.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			super.init(type: .irrigationSystem, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			active = getOrCreateAppend(type: .active, characteristics: &unwrapped, generator: { PredefinedCharacteristic.active() })
+			programMode = getOrCreateAppend(type: .programMode, characteristics: &unwrapped, generator: { PredefinedCharacteristic.programMode() })
+			inUse = getOrCreateAppend(type: .inUse, characteristics: &unwrapped, generator: { PredefinedCharacteristic.inUse() })
+			remainingDuration = unwrapped.first { $0.type == .remainingDuration } as? GenericCharacteristic<UInt32>
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
+			super.init(type: .irrigationSystem, characteristics: unwrapped)
 		}
 	}
 
 	open class LabelBase: Service {
 		// Required Characteristics
-		public let labelNamespace = PredefinedCharacteristic.labelNamespace()
+		public let labelNamespace: GenericCharacteristic<UInt8>
 
 		// Optional Characteristics
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [labelNamespace]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			super.init(type: .label, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			labelNamespace = getOrCreateAppend(type: .labelNamespace, characteristics: &unwrapped, generator: { PredefinedCharacteristic.labelNamespace() })
+			super.init(type: .label, characteristics: unwrapped)
 		}
 	}
 
 	open class LeakSensorBase: Service {
 		// Required Characteristics
-		public let leakDetected = PredefinedCharacteristic.leakDetected()
+		public let leakDetected: GenericCharacteristic<Enums.LeakDetected>
 
 		// Optional Characteristics
 		public let name: GenericCharacteristic<String>?
@@ -964,21 +987,21 @@ extension Service {
 		public let statusLowBattery: GenericCharacteristic<Enums.StatusLowBattery>?
 		public let statusTampered: GenericCharacteristic<UInt8>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [leakDetected]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusActive = unwrappedOptionalCharacteristics.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
-			statusFault = unwrappedOptionalCharacteristics.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusLowBattery = unwrappedOptionalCharacteristics.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
-			statusTampered = unwrappedOptionalCharacteristics.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
-			super.init(type: .leakSensor, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			leakDetected = getOrCreateAppend(type: .leakDetected, characteristics: &unwrapped, generator: { PredefinedCharacteristic.leakDetected() })
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			statusActive = unwrapped.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
+			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
+			statusLowBattery = unwrapped.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
+			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			super.init(type: .leakSensor, characteristics: unwrapped)
 		}
 	}
 
 	open class LightSensorBase: Service {
 		// Required Characteristics
-		public let currentLightLevel = PredefinedCharacteristic.currentLightLevel()
+		public let currentLightLevel: GenericCharacteristic<Float>
 
 		// Optional Characteristics
 		public let name: GenericCharacteristic<String>?
@@ -987,21 +1010,21 @@ extension Service {
 		public let statusLowBattery: GenericCharacteristic<Enums.StatusLowBattery>?
 		public let statusTampered: GenericCharacteristic<UInt8>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [currentLightLevel]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusActive = unwrappedOptionalCharacteristics.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
-			statusFault = unwrappedOptionalCharacteristics.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusLowBattery = unwrappedOptionalCharacteristics.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
-			statusTampered = unwrappedOptionalCharacteristics.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
-			super.init(type: .lightSensor, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			currentLightLevel = getOrCreateAppend(type: .currentLightLevel, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentLightLevel() })
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			statusActive = unwrapped.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
+			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
+			statusLowBattery = unwrapped.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
+			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			super.init(type: .lightSensor, characteristics: unwrapped)
 		}
 	}
 
 	open class LightbulbBase: Service {
 		// Required Characteristics
-		public let powerState = PredefinedCharacteristic.powerState()
+		public let powerState: GenericCharacteristic<Bool>
 
 		// Optional Characteristics
 		public let brightness: GenericCharacteristic<Int>?
@@ -1010,22 +1033,22 @@ extension Service {
 		public let name: GenericCharacteristic<String>?
 		public let saturation: GenericCharacteristic<Float>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [powerState]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			brightness = unwrappedOptionalCharacteristics.first { $0.type == .brightness } as? GenericCharacteristic<Int>
-			colorTemperature = unwrappedOptionalCharacteristics.first { $0.type == .colorTemperature } as? GenericCharacteristic<Int>
-			hue = unwrappedOptionalCharacteristics.first { $0.type == .hue } as? GenericCharacteristic<Float>
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			saturation = unwrappedOptionalCharacteristics.first { $0.type == .saturation } as? GenericCharacteristic<Float>
-			super.init(type: .lightbulb, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			powerState = getOrCreateAppend(type: .powerState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.powerState() })
+			brightness = unwrapped.first { $0.type == .brightness } as? GenericCharacteristic<Int>
+			colorTemperature = unwrapped.first { $0.type == .colorTemperature } as? GenericCharacteristic<Int>
+			hue = unwrapped.first { $0.type == .hue } as? GenericCharacteristic<Float>
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			saturation = unwrapped.first { $0.type == .saturation } as? GenericCharacteristic<Float>
+			super.init(type: .lightbulb, characteristics: unwrapped)
 		}
 	}
 
 	open class LockManagementBase: Service {
 		// Required Characteristics
-		public let lockControlPoint = PredefinedCharacteristic.lockControlPoint()
-		public let version = PredefinedCharacteristic.version()
+		public let lockControlPoint: GenericCharacteristic<Data>
+		public let version: GenericCharacteristic<String>
 
 		// Optional Characteristics
 		public let administratorOnlyAccess: GenericCharacteristic<Bool>?
@@ -1036,54 +1059,56 @@ extension Service {
 		public let logs: GenericCharacteristic<Data>?
 		public let motionDetected: GenericCharacteristic<Bool>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [lockControlPoint, version]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			administratorOnlyAccess = unwrappedOptionalCharacteristics.first { $0.type == .administratorOnlyAccess } as? GenericCharacteristic<Bool>
-			audioFeedback = unwrappedOptionalCharacteristics.first { $0.type == .audioFeedback } as? GenericCharacteristic<Bool>
-			currentDoorState = unwrappedOptionalCharacteristics.first { $0.type == .currentDoorState } as? GenericCharacteristic<Enums.CurrentDoorState>
-			lockManagementAutoSecurityTimeout = unwrappedOptionalCharacteristics.first { $0.type == .lockManagementAutoSecurityTimeout } as? GenericCharacteristic<UInt32>
-			lockLastKnownAction = unwrappedOptionalCharacteristics.first { $0.type == .lockLastKnownAction } as? GenericCharacteristic<UInt8>
-			logs = unwrappedOptionalCharacteristics.first { $0.type == .logs } as? GenericCharacteristic<Data>
-			motionDetected = unwrappedOptionalCharacteristics.first { $0.type == .motionDetected } as? GenericCharacteristic<Bool>
-			super.init(type: .lockManagement, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			lockControlPoint = getOrCreateAppend(type: .lockControlPoint, characteristics: &unwrapped, generator: { PredefinedCharacteristic.lockControlPoint() })
+			version = getOrCreateAppend(type: .version, characteristics: &unwrapped, generator: { PredefinedCharacteristic.version() })
+			administratorOnlyAccess = unwrapped.first { $0.type == .administratorOnlyAccess } as? GenericCharacteristic<Bool>
+			audioFeedback = unwrapped.first { $0.type == .audioFeedback } as? GenericCharacteristic<Bool>
+			currentDoorState = unwrapped.first { $0.type == .currentDoorState } as? GenericCharacteristic<Enums.CurrentDoorState>
+			lockManagementAutoSecurityTimeout = unwrapped.first { $0.type == .lockManagementAutoSecurityTimeout } as? GenericCharacteristic<UInt32>
+			lockLastKnownAction = unwrapped.first { $0.type == .lockLastKnownAction } as? GenericCharacteristic<UInt8>
+			logs = unwrapped.first { $0.type == .logs } as? GenericCharacteristic<Data>
+			motionDetected = unwrapped.first { $0.type == .motionDetected } as? GenericCharacteristic<Bool>
+			super.init(type: .lockManagement, characteristics: unwrapped)
 		}
 	}
 
 	open class LockMechanismBase: Service {
 		// Required Characteristics
-		public let lockCurrentState = PredefinedCharacteristic.lockCurrentState()
-		public let lockTargetState = PredefinedCharacteristic.lockTargetState()
+		public let lockCurrentState: GenericCharacteristic<Enums.LockCurrentState>
+		public let lockTargetState: GenericCharacteristic<Enums.LockTargetState>
 
 		// Optional Characteristics
 		public let name: GenericCharacteristic<String>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [lockCurrentState, lockTargetState]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			super.init(type: .lockMechanism, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			lockCurrentState = getOrCreateAppend(type: .lockCurrentState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.lockCurrentState() })
+			lockTargetState = getOrCreateAppend(type: .lockTargetState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.lockTargetState() })
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			super.init(type: .lockMechanism, characteristics: unwrapped)
 		}
 	}
 
 	open class MicrophoneBase: Service {
 		// Required Characteristics
-		public let mute = PredefinedCharacteristic.mute()
+		public let mute: GenericCharacteristic<Bool>
 
 		// Optional Characteristics
 		public let volume: GenericCharacteristic<Int>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [mute]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			volume = unwrappedOptionalCharacteristics.first { $0.type == .volume } as? GenericCharacteristic<Int>
-			super.init(type: .microphone, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			mute = getOrCreateAppend(type: .mute, characteristics: &unwrapped, generator: { PredefinedCharacteristic.mute() })
+			volume = unwrapped.first { $0.type == .volume } as? GenericCharacteristic<Int>
+			super.init(type: .microphone, characteristics: unwrapped)
 		}
 	}
 
 	open class MotionSensorBase: Service {
 		// Required Characteristics
-		public let motionDetected = PredefinedCharacteristic.motionDetected()
+		public let motionDetected: GenericCharacteristic<Bool>
 
 		// Optional Characteristics
 		public let name: GenericCharacteristic<String>?
@@ -1092,21 +1117,21 @@ extension Service {
 		public let statusLowBattery: GenericCharacteristic<Enums.StatusLowBattery>?
 		public let statusTampered: GenericCharacteristic<UInt8>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [motionDetected]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusActive = unwrappedOptionalCharacteristics.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
-			statusFault = unwrappedOptionalCharacteristics.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusLowBattery = unwrappedOptionalCharacteristics.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
-			statusTampered = unwrappedOptionalCharacteristics.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
-			super.init(type: .motionSensor, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			motionDetected = getOrCreateAppend(type: .motionDetected, characteristics: &unwrapped, generator: { PredefinedCharacteristic.motionDetected() })
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			statusActive = unwrapped.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
+			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
+			statusLowBattery = unwrapped.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
+			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			super.init(type: .motionSensor, characteristics: unwrapped)
 		}
 	}
 
 	open class OccupancySensorBase: Service {
 		// Required Characteristics
-		public let occupancyDetected = PredefinedCharacteristic.occupancyDetected()
+		public let occupancyDetected: GenericCharacteristic<Enums.OccupancyDetected>
 
 		// Optional Characteristics
 		public let name: GenericCharacteristic<String>?
@@ -1115,38 +1140,39 @@ extension Service {
 		public let statusLowBattery: GenericCharacteristic<Enums.StatusLowBattery>?
 		public let statusTampered: GenericCharacteristic<UInt8>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [occupancyDetected]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusActive = unwrappedOptionalCharacteristics.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
-			statusFault = unwrappedOptionalCharacteristics.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusLowBattery = unwrappedOptionalCharacteristics.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
-			statusTampered = unwrappedOptionalCharacteristics.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
-			super.init(type: .occupancySensor, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			occupancyDetected = getOrCreateAppend(type: .occupancyDetected, characteristics: &unwrapped, generator: { PredefinedCharacteristic.occupancyDetected() })
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			statusActive = unwrapped.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
+			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
+			statusLowBattery = unwrapped.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
+			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			super.init(type: .occupancySensor, characteristics: unwrapped)
 		}
 	}
 
 	open class OutletBase: Service {
 		// Required Characteristics
-		public let powerState = PredefinedCharacteristic.powerState()
-		public let outletInUse = PredefinedCharacteristic.outletInUse()
+		public let powerState: GenericCharacteristic<Bool>
+		public let outletInUse: GenericCharacteristic<Bool>
 
 		// Optional Characteristics
 		public let name: GenericCharacteristic<String>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [powerState, outletInUse]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			super.init(type: .outlet, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			powerState = getOrCreateAppend(type: .powerState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.powerState() })
+			outletInUse = getOrCreateAppend(type: .outletInUse, characteristics: &unwrapped, generator: { PredefinedCharacteristic.outletInUse() })
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			super.init(type: .outlet, characteristics: unwrapped)
 		}
 	}
 
 	open class SecuritySystemBase: Service {
 		// Required Characteristics
-		public let securitySystemCurrentState = PredefinedCharacteristic.securitySystemCurrentState()
-		public let securitySystemTargetState = PredefinedCharacteristic.securitySystemTargetState()
+		public let securitySystemCurrentState: GenericCharacteristic<Enums.SecuritySystemCurrentState>
+		public let securitySystemTargetState: GenericCharacteristic<Enums.SecuritySystemTargetState>
 
 		// Optional Characteristics
 		public let name: GenericCharacteristic<String>?
@@ -1154,21 +1180,22 @@ extension Service {
 		public let statusFault: GenericCharacteristic<UInt8>?
 		public let statusTampered: GenericCharacteristic<UInt8>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [securitySystemCurrentState, securitySystemTargetState]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			securitySystemAlarmType = unwrappedOptionalCharacteristics.first { $0.type == .securitySystemAlarmType } as? GenericCharacteristic<UInt8>
-			statusFault = unwrappedOptionalCharacteristics.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusTampered = unwrappedOptionalCharacteristics.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
-			super.init(type: .securitySystem, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			securitySystemCurrentState = getOrCreateAppend(type: .securitySystemCurrentState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.securitySystemCurrentState() })
+			securitySystemTargetState = getOrCreateAppend(type: .securitySystemTargetState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.securitySystemTargetState() })
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			securitySystemAlarmType = unwrapped.first { $0.type == .securitySystemAlarmType } as? GenericCharacteristic<UInt8>
+			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
+			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			super.init(type: .securitySystem, characteristics: unwrapped)
 		}
 	}
 
 	open class SlatsBase: Service {
 		// Required Characteristics
-		public let currentSlatState = PredefinedCharacteristic.currentSlatState()
-		public let slatType = PredefinedCharacteristic.slatType()
+		public let currentSlatState: GenericCharacteristic<Enums.CurrentSlatState>
+		public let slatType: GenericCharacteristic<UInt8>
 
 		// Optional Characteristics
 		public let name: GenericCharacteristic<String>?
@@ -1176,20 +1203,21 @@ extension Service {
 		public let currentTiltAngle: GenericCharacteristic<Int>?
 		public let targetTiltAngle: GenericCharacteristic<Int>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [currentSlatState, slatType]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			swingMode = unwrappedOptionalCharacteristics.first { $0.type == .swingMode } as? GenericCharacteristic<UInt8>
-			currentTiltAngle = unwrappedOptionalCharacteristics.first { $0.type == .currentTiltAngle } as? GenericCharacteristic<Int>
-			targetTiltAngle = unwrappedOptionalCharacteristics.first { $0.type == .targetTiltAngle } as? GenericCharacteristic<Int>
-			super.init(type: .slats, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			currentSlatState = getOrCreateAppend(type: .currentSlatState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentSlatState() })
+			slatType = getOrCreateAppend(type: .slatType, characteristics: &unwrapped, generator: { PredefinedCharacteristic.slatType() })
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			swingMode = unwrapped.first { $0.type == .swingMode } as? GenericCharacteristic<UInt8>
+			currentTiltAngle = unwrapped.first { $0.type == .currentTiltAngle } as? GenericCharacteristic<Int>
+			targetTiltAngle = unwrapped.first { $0.type == .targetTiltAngle } as? GenericCharacteristic<Int>
+			super.init(type: .slats, characteristics: unwrapped)
 		}
 	}
 
 	open class SmokeSensorBase: Service {
 		// Required Characteristics
-		public let smokeDetected = PredefinedCharacteristic.smokeDetected()
+		public let smokeDetected: GenericCharacteristic<Enums.SmokeDetected>
 
 		// Optional Characteristics
 		public let name: GenericCharacteristic<String>?
@@ -1198,21 +1226,21 @@ extension Service {
 		public let statusLowBattery: GenericCharacteristic<Enums.StatusLowBattery>?
 		public let statusTampered: GenericCharacteristic<UInt8>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [smokeDetected]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusActive = unwrappedOptionalCharacteristics.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
-			statusFault = unwrappedOptionalCharacteristics.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusLowBattery = unwrappedOptionalCharacteristics.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
-			statusTampered = unwrappedOptionalCharacteristics.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
-			super.init(type: .smokeSensor, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			smokeDetected = getOrCreateAppend(type: .smokeDetected, characteristics: &unwrapped, generator: { PredefinedCharacteristic.smokeDetected() })
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			statusActive = unwrapped.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
+			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
+			statusLowBattery = unwrapped.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
+			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			super.init(type: .smokeSensor, characteristics: unwrapped)
 		}
 	}
 
 	open class SpeakerBase: Service {
 		// Required Characteristics
-		public let mute = PredefinedCharacteristic.mute()
+		public let mute: GenericCharacteristic<Bool>
 
 		// Optional Characteristics
 		public let active: GenericCharacteristic<Enums.Active>?
@@ -1220,71 +1248,72 @@ extension Service {
 		public let volumeControlType: GenericCharacteristic<Enums.VolumeControlType>?
 		public let volumeSelector: GenericCharacteristic<Enums.VolumeSelector>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [mute]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			active = unwrappedOptionalCharacteristics.first { $0.type == .active } as? GenericCharacteristic<Enums.Active>
-			volume = unwrappedOptionalCharacteristics.first { $0.type == .volume } as? GenericCharacteristic<Int>
-			volumeControlType = unwrappedOptionalCharacteristics.first { $0.type == .volumeControlType } as? GenericCharacteristic<Enums.VolumeControlType>
-			volumeSelector = unwrappedOptionalCharacteristics.first { $0.type == .volumeSelector } as? GenericCharacteristic<Enums.VolumeSelector>
-			super.init(type: .speaker, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			mute = getOrCreateAppend(type: .mute, characteristics: &unwrapped, generator: { PredefinedCharacteristic.mute() })
+			active = unwrapped.first { $0.type == .active } as? GenericCharacteristic<Enums.Active>
+			volume = unwrapped.first { $0.type == .volume } as? GenericCharacteristic<Int>
+			volumeControlType = unwrapped.first { $0.type == .volumeControlType } as? GenericCharacteristic<Enums.VolumeControlType>
+			volumeSelector = unwrapped.first { $0.type == .volumeSelector } as? GenericCharacteristic<Enums.VolumeSelector>
+			super.init(type: .speaker, characteristics: unwrapped)
 		}
 	}
 
 	open class StatefulProgrammableSwitchBase: Service {
 		// Required Characteristics
-		public let programmableSwitchEvent = PredefinedCharacteristic.programmableSwitchEvent()
-		public let programmableSwitchOutputState = PredefinedCharacteristic.programmableSwitchOutputState()
+		public let programmableSwitchEvent: GenericCharacteristic<UInt8>
+		public let programmableSwitchOutputState: GenericCharacteristic<UInt8>
 
 		// Optional Characteristics
 		public let name: GenericCharacteristic<String>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [programmableSwitchEvent, programmableSwitchOutputState]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			super.init(type: .statefulProgrammableSwitch, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			programmableSwitchEvent = getOrCreateAppend(type: .programmableSwitchEvent, characteristics: &unwrapped, generator: { PredefinedCharacteristic.programmableSwitchEvent() })
+			programmableSwitchOutputState = getOrCreateAppend(type: .programmableSwitchOutputState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.programmableSwitchOutputState() })
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			super.init(type: .statefulProgrammableSwitch, characteristics: unwrapped)
 		}
 	}
 
 	open class StatelessProgrammableSwitchBase: Service {
 		// Required Characteristics
-		public let programmableSwitchEvent = PredefinedCharacteristic.programmableSwitchEvent()
+		public let programmableSwitchEvent: GenericCharacteristic<UInt8>
 
 		// Optional Characteristics
 		public let name: GenericCharacteristic<String>?
 		public let labelIndex: GenericCharacteristic<UInt8>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [programmableSwitchEvent]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			labelIndex = unwrappedOptionalCharacteristics.first { $0.type == .labelIndex } as? GenericCharacteristic<UInt8>
-			super.init(type: .statelessProgrammableSwitch, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			programmableSwitchEvent = getOrCreateAppend(type: .programmableSwitchEvent, characteristics: &unwrapped, generator: { PredefinedCharacteristic.programmableSwitchEvent() })
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			labelIndex = unwrapped.first { $0.type == .labelIndex } as? GenericCharacteristic<UInt8>
+			super.init(type: .statelessProgrammableSwitch, characteristics: unwrapped)
 		}
 	}
 
 	open class SwitchBase: Service {
 		// Required Characteristics
-		public let powerState = PredefinedCharacteristic.powerState()
+		public let powerState: GenericCharacteristic<Bool>
 
 		// Optional Characteristics
 		public let name: GenericCharacteristic<String>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [powerState]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			super.init(type: .`switch`, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			powerState = getOrCreateAppend(type: .powerState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.powerState() })
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			super.init(type: .`switch`, characteristics: unwrapped)
 		}
 	}
 
 	open class TelevisionBase: Service {
 		// Required Characteristics
-		public let active = PredefinedCharacteristic.active()
-		public let activeIdentifier = PredefinedCharacteristic.activeIdentifier()
-		public let configuredName = PredefinedCharacteristic.configuredName()
-		public let sleepDiscoveryMode = PredefinedCharacteristic.sleepDiscoveryMode()
+		public let active: GenericCharacteristic<Enums.Active>
+		public let activeIdentifier: GenericCharacteristic<UInt32>
+		public let configuredName: GenericCharacteristic<String>
+		public let sleepDiscoveryMode: GenericCharacteristic<Enums.SleepDiscoveryMode>
 
 		// Optional Characteristics
 		public let brightness: GenericCharacteristic<Int>?
@@ -1295,23 +1324,26 @@ extension Service {
 		public let powerModeSelection: GenericCharacteristic<Enums.PowerModeSelection>?
 		public let remoteKey: GenericCharacteristic<Enums.RemoteKey>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [active, activeIdentifier, configuredName, sleepDiscoveryMode]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			brightness = unwrappedOptionalCharacteristics.first { $0.type == .brightness } as? GenericCharacteristic<Int>
-			closedCaptions = unwrappedOptionalCharacteristics.first { $0.type == .closedCaptions } as? GenericCharacteristic<Enums.ClosedCaptions>
-			mediaState = unwrappedOptionalCharacteristics.first { $0.type == .mediaState } as? GenericCharacteristic<UInt8>
-			pictureMode = unwrappedOptionalCharacteristics.first { $0.type == .pictureMode } as? GenericCharacteristic<Enums.PictureMode>
-			powerMode = unwrappedOptionalCharacteristics.first { $0.type == .powerMode } as? GenericCharacteristic<UInt8>
-			powerModeSelection = unwrappedOptionalCharacteristics.first { $0.type == .powerModeSelection } as? GenericCharacteristic<Enums.PowerModeSelection>
-			remoteKey = unwrappedOptionalCharacteristics.first { $0.type == .remoteKey } as? GenericCharacteristic<Enums.RemoteKey>
-			super.init(type: .television, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			active = getOrCreateAppend(type: .active, characteristics: &unwrapped, generator: { PredefinedCharacteristic.active() })
+			activeIdentifier = getOrCreateAppend(type: .activeIdentifier, characteristics: &unwrapped, generator: { PredefinedCharacteristic.activeIdentifier() })
+			configuredName = getOrCreateAppend(type: .configuredName, characteristics: &unwrapped, generator: { PredefinedCharacteristic.configuredName() })
+			sleepDiscoveryMode = getOrCreateAppend(type: .sleepDiscoveryMode, characteristics: &unwrapped, generator: { PredefinedCharacteristic.sleepDiscoveryMode() })
+			brightness = unwrapped.first { $0.type == .brightness } as? GenericCharacteristic<Int>
+			closedCaptions = unwrapped.first { $0.type == .closedCaptions } as? GenericCharacteristic<Enums.ClosedCaptions>
+			mediaState = unwrapped.first { $0.type == .mediaState } as? GenericCharacteristic<UInt8>
+			pictureMode = unwrapped.first { $0.type == .pictureMode } as? GenericCharacteristic<Enums.PictureMode>
+			powerMode = unwrapped.first { $0.type == .powerMode } as? GenericCharacteristic<UInt8>
+			powerModeSelection = unwrapped.first { $0.type == .powerModeSelection } as? GenericCharacteristic<Enums.PowerModeSelection>
+			remoteKey = unwrapped.first { $0.type == .remoteKey } as? GenericCharacteristic<Enums.RemoteKey>
+			super.init(type: .television, characteristics: unwrapped)
 		}
 	}
 
 	open class TemperatureSensorBase: Service {
 		// Required Characteristics
-		public let currentTemperature = PredefinedCharacteristic.currentTemperature()
+		public let currentTemperature: GenericCharacteristic<Float>
 
 		// Optional Characteristics
 		public let name: GenericCharacteristic<String>?
@@ -1320,25 +1352,25 @@ extension Service {
 		public let statusLowBattery: GenericCharacteristic<Enums.StatusLowBattery>?
 		public let statusTampered: GenericCharacteristic<UInt8>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [currentTemperature]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusActive = unwrappedOptionalCharacteristics.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
-			statusFault = unwrappedOptionalCharacteristics.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusLowBattery = unwrappedOptionalCharacteristics.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
-			statusTampered = unwrappedOptionalCharacteristics.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
-			super.init(type: .temperatureSensor, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			currentTemperature = getOrCreateAppend(type: .currentTemperature, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentTemperature() })
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			statusActive = unwrapped.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
+			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
+			statusLowBattery = unwrapped.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
+			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			super.init(type: .temperatureSensor, characteristics: unwrapped)
 		}
 	}
 
 	open class ThermostatBase: Service {
 		// Required Characteristics
-		public let currentHeatingCoolingState = PredefinedCharacteristic.currentHeatingCoolingState()
-		public let targetHeatingCoolingState = PredefinedCharacteristic.targetHeatingCoolingState()
-		public let currentTemperature = PredefinedCharacteristic.currentTemperature()
-		public let targetTemperature = PredefinedCharacteristic.targetTemperature()
-		public let temperatureDisplayUnits = PredefinedCharacteristic.temperatureDisplayUnits()
+		public let currentHeatingCoolingState: GenericCharacteristic<Enums.CurrentHeatingCoolingState>
+		public let targetHeatingCoolingState: GenericCharacteristic<Enums.TargetHeatingCoolingState>
+		public let currentTemperature: GenericCharacteristic<Float>
+		public let targetTemperature: GenericCharacteristic<Float>
+		public let temperatureDisplayUnits: GenericCharacteristic<Enums.TemperatureDisplayUnits>
 
 		// Optional Characteristics
 		public let name: GenericCharacteristic<String>?
@@ -1347,23 +1379,27 @@ extension Service {
 		public let coolingThresholdTemperature: GenericCharacteristic<Float>?
 		public let heatingThresholdTemperature: GenericCharacteristic<Float>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [currentHeatingCoolingState, targetHeatingCoolingState, currentTemperature, targetTemperature, temperatureDisplayUnits]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			currentRelativeHumidity = unwrappedOptionalCharacteristics.first { $0.type == .currentRelativeHumidity } as? GenericCharacteristic<Float>
-			targetRelativeHumidity = unwrappedOptionalCharacteristics.first { $0.type == .targetRelativeHumidity } as? GenericCharacteristic<Float>
-			coolingThresholdTemperature = unwrappedOptionalCharacteristics.first { $0.type == .coolingThresholdTemperature } as? GenericCharacteristic<Float>
-			heatingThresholdTemperature = unwrappedOptionalCharacteristics.first { $0.type == .heatingThresholdTemperature } as? GenericCharacteristic<Float>
-			super.init(type: .thermostat, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			currentHeatingCoolingState = getOrCreateAppend(type: .currentHeatingCoolingState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentHeatingCoolingState() })
+			targetHeatingCoolingState = getOrCreateAppend(type: .targetHeatingCoolingState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.targetHeatingCoolingState() })
+			currentTemperature = getOrCreateAppend(type: .currentTemperature, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentTemperature() })
+			targetTemperature = getOrCreateAppend(type: .targetTemperature, characteristics: &unwrapped, generator: { PredefinedCharacteristic.targetTemperature() })
+			temperatureDisplayUnits = getOrCreateAppend(type: .temperatureDisplayUnits, characteristics: &unwrapped, generator: { PredefinedCharacteristic.temperatureDisplayUnits() })
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			currentRelativeHumidity = unwrapped.first { $0.type == .currentRelativeHumidity } as? GenericCharacteristic<Float>
+			targetRelativeHumidity = unwrapped.first { $0.type == .targetRelativeHumidity } as? GenericCharacteristic<Float>
+			coolingThresholdTemperature = unwrapped.first { $0.type == .coolingThresholdTemperature } as? GenericCharacteristic<Float>
+			heatingThresholdTemperature = unwrapped.first { $0.type == .heatingThresholdTemperature } as? GenericCharacteristic<Float>
+			super.init(type: .thermostat, characteristics: unwrapped)
 		}
 	}
 
 	open class ValveBase: Service {
 		// Required Characteristics
-		public let active = PredefinedCharacteristic.active()
-		public let inUse = PredefinedCharacteristic.inUse()
-		public let valveType = PredefinedCharacteristic.valveType()
+		public let active: GenericCharacteristic<Enums.Active>
+		public let inUse: GenericCharacteristic<UInt8>
+		public let valveType: GenericCharacteristic<UInt8>
 
 		// Optional Characteristics
 		public let isConfigured: GenericCharacteristic<Enums.IsConfigured>?
@@ -1373,45 +1409,49 @@ extension Service {
 		public let setDuration: GenericCharacteristic<UInt32>?
 		public let statusFault: GenericCharacteristic<UInt8>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [active, inUse, valveType]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			isConfigured = unwrappedOptionalCharacteristics.first { $0.type == .isConfigured } as? GenericCharacteristic<Enums.IsConfigured>
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			remainingDuration = unwrappedOptionalCharacteristics.first { $0.type == .remainingDuration } as? GenericCharacteristic<UInt32>
-			labelIndex = unwrappedOptionalCharacteristics.first { $0.type == .labelIndex } as? GenericCharacteristic<UInt8>
-			setDuration = unwrappedOptionalCharacteristics.first { $0.type == .setDuration } as? GenericCharacteristic<UInt32>
-			statusFault = unwrappedOptionalCharacteristics.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			super.init(type: .valve, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			active = getOrCreateAppend(type: .active, characteristics: &unwrapped, generator: { PredefinedCharacteristic.active() })
+			inUse = getOrCreateAppend(type: .inUse, characteristics: &unwrapped, generator: { PredefinedCharacteristic.inUse() })
+			valveType = getOrCreateAppend(type: .valveType, characteristics: &unwrapped, generator: { PredefinedCharacteristic.valveType() })
+			isConfigured = unwrapped.first { $0.type == .isConfigured } as? GenericCharacteristic<Enums.IsConfigured>
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			remainingDuration = unwrapped.first { $0.type == .remainingDuration } as? GenericCharacteristic<UInt32>
+			labelIndex = unwrapped.first { $0.type == .labelIndex } as? GenericCharacteristic<UInt8>
+			setDuration = unwrapped.first { $0.type == .setDuration } as? GenericCharacteristic<UInt32>
+			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
+			super.init(type: .valve, characteristics: unwrapped)
 		}
 	}
 
 	open class WindowBase: Service {
 		// Required Characteristics
-		public let currentPosition = PredefinedCharacteristic.currentPosition()
-		public let positionState = PredefinedCharacteristic.positionState()
-		public let targetPosition = PredefinedCharacteristic.targetPosition()
+		public let currentPosition: GenericCharacteristic<UInt8>
+		public let positionState: GenericCharacteristic<Enums.PositionState>
+		public let targetPosition: GenericCharacteristic<UInt8>
 
 		// Optional Characteristics
 		public let name: GenericCharacteristic<String>?
 		public let obstructionDetected: GenericCharacteristic<Bool>?
 		public let holdPosition: GenericCharacteristic<Bool>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [currentPosition, positionState, targetPosition]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			obstructionDetected = unwrappedOptionalCharacteristics.first { $0.type == .obstructionDetected } as? GenericCharacteristic<Bool>
-			holdPosition = unwrappedOptionalCharacteristics.first { $0.type == .holdPosition } as? GenericCharacteristic<Bool>
-			super.init(type: .window, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			currentPosition = getOrCreateAppend(type: .currentPosition, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentPosition() })
+			positionState = getOrCreateAppend(type: .positionState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.positionState() })
+			targetPosition = getOrCreateAppend(type: .targetPosition, characteristics: &unwrapped, generator: { PredefinedCharacteristic.targetPosition() })
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			obstructionDetected = unwrapped.first { $0.type == .obstructionDetected } as? GenericCharacteristic<Bool>
+			holdPosition = unwrapped.first { $0.type == .holdPosition } as? GenericCharacteristic<Bool>
+			super.init(type: .window, characteristics: unwrapped)
 		}
 	}
 
 	open class WindowCoveringBase: Service {
 		// Required Characteristics
-		public let currentPosition = PredefinedCharacteristic.currentPosition()
-		public let positionState = PredefinedCharacteristic.positionState()
-		public let targetPosition = PredefinedCharacteristic.targetPosition()
+		public let currentPosition: GenericCharacteristic<UInt8>
+		public let positionState: GenericCharacteristic<Enums.PositionState>
+		public let targetPosition: GenericCharacteristic<UInt8>
 
 		// Optional Characteristics
 		public let currentHorizontalTiltAngle: GenericCharacteristic<Int>?
@@ -1422,17 +1462,19 @@ extension Service {
 		public let currentVerticalTiltAngle: GenericCharacteristic<Int>?
 		public let targetVerticalTiltAngle: GenericCharacteristic<Int>?
 
-		public init(optionalCharacteristics: [AnyCharacteristic] = []) {
-			let requiredCharacteristics: [Characteristic] = [currentPosition, positionState, targetPosition]
-			let unwrappedOptionalCharacteristics = optionalCharacteristics.map { $0.wrapped }
-			currentHorizontalTiltAngle = unwrappedOptionalCharacteristics.first { $0.type == .currentHorizontalTiltAngle } as? GenericCharacteristic<Int>
-			targetHorizontalTiltAngle = unwrappedOptionalCharacteristics.first { $0.type == .targetHorizontalTiltAngle } as? GenericCharacteristic<Int>
-			name = unwrappedOptionalCharacteristics.first { $0.type == .name } as? GenericCharacteristic<String>
-			obstructionDetected = unwrappedOptionalCharacteristics.first { $0.type == .obstructionDetected } as? GenericCharacteristic<Bool>
-			holdPosition = unwrappedOptionalCharacteristics.first { $0.type == .holdPosition } as? GenericCharacteristic<Bool>
-			currentVerticalTiltAngle = unwrappedOptionalCharacteristics.first { $0.type == .currentVerticalTiltAngle } as? GenericCharacteristic<Int>
-			targetVerticalTiltAngle = unwrappedOptionalCharacteristics.first { $0.type == .targetVerticalTiltAngle } as? GenericCharacteristic<Int>
-			super.init(type: .windowCovering, characteristics: requiredCharacteristics + unwrappedOptionalCharacteristics)
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			currentPosition = getOrCreateAppend(type: .currentPosition, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentPosition() })
+			positionState = getOrCreateAppend(type: .positionState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.positionState() })
+			targetPosition = getOrCreateAppend(type: .targetPosition, characteristics: &unwrapped, generator: { PredefinedCharacteristic.targetPosition() })
+			currentHorizontalTiltAngle = unwrapped.first { $0.type == .currentHorizontalTiltAngle } as? GenericCharacteristic<Int>
+			targetHorizontalTiltAngle = unwrapped.first { $0.type == .targetHorizontalTiltAngle } as? GenericCharacteristic<Int>
+			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			obstructionDetected = unwrapped.first { $0.type == .obstructionDetected } as? GenericCharacteristic<Bool>
+			holdPosition = unwrapped.first { $0.type == .holdPosition } as? GenericCharacteristic<Bool>
+			currentVerticalTiltAngle = unwrapped.first { $0.type == .currentVerticalTiltAngle } as? GenericCharacteristic<Int>
+			targetVerticalTiltAngle = unwrapped.first { $0.type == .targetVerticalTiltAngle } as? GenericCharacteristic<Int>
+			super.init(type: .windowCovering, characteristics: unwrapped)
 		}
 	}
 
