@@ -92,15 +92,6 @@ class PowerBankService: Service {
 }
 ```
 
-## Linux
-
-There is some support on Linux. It uses my own implementation of NetService
-for multicast DNS (mDNS). However this implementation might be working for
-some use-cases, it isn't production grade. Patches welcome. Another solution
-would be to switch to using Avahi instead.
-
-CommonCrypto has been replaced with the portable BlueCryptor; it uses CommonCrypto on Apple platforms and OpenSSL on Linux.
-
 ## Object-Oriented Design
 
 A high-level overview of the objects involved are shown in the diagram below.
