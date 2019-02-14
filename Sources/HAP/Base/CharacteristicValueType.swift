@@ -10,7 +10,7 @@ extension Optional: CharacteristicValueType, JSONValueTypeConvertible where Wrap
         if let wrapped = Wrapped(value: value) {
             self = .some(wrapped)
         } else {
-            self = .none
+            return nil
         }
     }
 
