@@ -3,6 +3,7 @@ import XCTest
 
 XCTMain([
     testCase(AccessoriesTests.allTests),
+    testCase(CharacteristicTests.allTests),
     testCase(DeviceTests.allTests),
     testCase(EndpointTests.allTests),
     testCase(PairingsEndpointTests.allTests),

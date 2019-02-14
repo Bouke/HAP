@@ -75,7 +75,7 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
                 return
             }
             precondition(
-                permissions.contains(.read) && value != nil,
+                !permissions.contains(.read) || value != nil,
                 "Readable characteristics should have non nil value")
 
             // swiftlint:disable:next identifier_name
@@ -137,7 +137,7 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
                 minValue: Double? = nil,
                 minStep: Double? = nil) {
         precondition(
-            permissions.contains(.read) && value != nil,
+            !permissions.contains(.read) || value != nil,
             "Readable characteristics should have non nil value")
 
         if let value = value, let doubleValue = Double(value: value) {
