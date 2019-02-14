@@ -656,29 +656,6 @@ public class Inspector {
 
         // Service classes
 
-        func writeCharacteristicParameters(info: CharacteristicInfo, indentLevel: Int) {
-            let indent = String(repeating: "\t", count: indentLevel)
-            write("\(indent)type: .\(serviceName(info.title, uuid: info.id))", terminator:"")
-            if info.properties & 7 != 7 {
-                write(",\n\(indent)permissions: [\(permissions(info.properties))]", terminator:"")
-            }
-            write(",\n\(indent)description: \"\(info.title)\"", terminator:"")
-            if let unit = info.units {
-                write(",\n\(indent)unit: .\(unitName(unit))", terminator:"")
-            }
-            if let max = info.maxValue {
-                write(",\n\(indent)maxValue: \(max)", terminator:"")
-            }
-            if let min = info.minValue {
-                write(",\n\(indent)minValue: \(min)", terminator:"")
-            }
-            if let step = info.stepValue {
-                write(",\n\(indent)minStep: \(step)", terminator:"")
-            }
-            write(")")
-        }
-
-
         func writeCharacteristicProperty(info: CharacteristicInfo, isOptional: Bool) {
             let name = info.title.parameterName()
             write("\t\tpublic let \(name): GenericCharacteristic<\(valueType(info))>\(isOptional ? "?" : "")")
@@ -787,14 +764,7 @@ public class Inspector {
             }
         }
 
-        write("""
-        }
-
-        public extension AnyCharacteristic {
-        """)
-
-        for characteristic in characteristicInfo.sorted(by: { $0.title < $1.title } ) {
-            write("\tpublic static func \(serviceName(characteristic.title, uuid: characteristic.id))(")
+        func writeFactoryArgumentsWithDefaults(_ characteristic: CharacteristicInfo) {
             write("\t\t_ value: \(valueType(characteristic)) = \(defaultValue(characteristic)),")
             write("\t\tpermissions: [CharacteristicPermission] = \(characteristic.permissions.arrayLiteral),")
             write("\t\tdescription: String? = \"\(characteristic.title)\",")
@@ -804,45 +774,34 @@ public class Inspector {
             write("\t\tmaxValue: Double? = \(characteristic.maxValue?.stringValue ?? "nil"),")
             write("\t\tminValue: Double? = \(characteristic.minValue?.stringValue ?? "nil"),")
             write("\t\tminStep: Double? = \(characteristic.stepValue?.stringValue ?? "nil")")
+        }
+
+        write("""
+        }
+
+        public extension AnyCharacteristic {
+        """)
+
+        for characteristic in characteristicInfo.sorted(by: { $0.title < $1.title } ) {
+            write("\tpublic static func \(serviceName(characteristic.title, uuid: characteristic.id))(")
+            writeFactoryArgumentsWithDefaults(characteristic)
             write("\t) -> AnyCharacteristic {")
             write("\t\treturn AnyCharacteristic(")
-            write("\t\t\tPredefinedCharacteristic.\(serviceName(characteristic.title, uuid: characteristic.id))(")
-            write("\t\t\t\tvalue,")
-            write("\t\t\t\tpermissions: permissions,")
-            write("\t\t\t\tdescription: description,")
-            write("\t\t\t\tformat: format,")
-            write("\t\t\t\tunit: unit,")
-            write("\t\t\t\tmaxLength: maxLength,")
-            write("\t\t\t\tmaxValue: maxValue,")
-            write("\t\t\t\tminValue: minValue,")
-            write("\t\t\t\tminStep: minStep)")
-            write("\t\t\tas Characteristic)")
+            write("\t\t\tPredefinedCharacteristic.\(serviceName(characteristic.title, uuid: characteristic.id))(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)")
             write("\t}\n")
         }
 
         write("""
         }
-        """)
-
-        write("""
 
         public class PredefinedCharacteristic {
         """)
 
         for characteristic in characteristicInfo.sorted(by: { $0.title < $1.title } ) {
             write("\tstatic func \(serviceName(characteristic.title, uuid: characteristic.id))(")
-            write("\t\t_ value: \(valueType(characteristic)) = \(defaultValue(characteristic)),")
-            write("\t\tpermissions: [CharacteristicPermission] = \(characteristic.permissions.arrayLiteral),")
-            write("\t\tdescription: String? = nil,")
-            write("\t\tformat: CharacteristicFormat? = .\(characteristic.format),")
-            write("\t\tunit: CharacteristicUnit? = \(characteristic.units != nil ? ".\(unitName(characteristic.units!))" : "nil"),")
-            write("\t\tmaxLength: Int? = nil,")
-            write("\t\tmaxValue: Double? = \(characteristic.maxValue?.stringValue ?? "nil"),")
-            write("\t\tminValue: Double? = \(characteristic.minValue?.stringValue ?? "nil"),")
-            write("\t\tminStep: Double? = \(characteristic.stepValue?.stringValue ?? "nil")")
+            writeFactoryArgumentsWithDefaults(characteristic)
             write("\t) -> GenericCharacteristic<\(valueType(characteristic))> {")
-            write("\t\treturn GenericCharacteristic<\(valueType(characteristic))>(")
-            writeCharacteristicParameters(info: characteristic, indentLevel: 3)
+            write("\t\treturn GenericCharacteristic<\(valueType(characteristic))>(type: .\(serviceName(characteristic.title, uuid: characteristic.id)), value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)")
             write("\t}\n")
         }
 

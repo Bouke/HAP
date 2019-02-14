@@ -7,15 +7,19 @@ public protocol CharacteristicValueType: Equatable, JSONValueTypeConvertible {
 
 extension Optional: CharacteristicValueType, JSONValueTypeConvertible where Wrapped: CharacteristicValueType {
     public init?(value: Any) {
-        abort()
+        if let wrapped = Wrapped(value: value) {
+            self = .some(wrapped)
+        } else {
+            self = .none
+        }
     }
 
     public static var format: CharacteristicFormat {
-        abort()
+        return Wrapped.format
     }
 
     public var jsonValueType: JSONValueType {
-        abort()
+        return map { $0.jsonValueType } ?? NSNull()
     }
 }
 
