@@ -5,6 +5,20 @@ public protocol CharacteristicValueType: Equatable, JSONValueTypeConvertible {
     static var format: CharacteristicFormat { get }
 }
 
+extension Optional: CharacteristicValueType, JSONValueTypeConvertible where Wrapped: CharacteristicValueType {
+    public init?(value: Any) {
+        abort()
+    }
+
+    public static var format: CharacteristicFormat {
+        abort()
+    }
+
+    public var jsonValueType: JSONValueType {
+        abort()
+    }
+}
+
 extension Bool: CharacteristicValueType {
     public init?(value: Any) {
         switch value {
