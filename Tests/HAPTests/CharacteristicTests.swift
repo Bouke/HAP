@@ -1,3 +1,4 @@
+// swiftlint:disable force_try
 @testable import HAP
 import XCTest
 
@@ -6,7 +7,7 @@ class CharacteristicTests: XCTestCase {
         return [
             ("testReadOptionalValueType", testReadOptionalValueType),
             ("testWriteOptionalValueType", testWriteOptionalValueType),
-            ("testReadWriteOptionalValueType", testReadWriteOptionalValueType),
+            ("testReadWriteOptionalValueType", testReadWriteOptionalValueType)
         ]
     }
 

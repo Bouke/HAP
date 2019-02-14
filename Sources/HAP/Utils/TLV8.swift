@@ -244,4 +244,3 @@ extension HTTPResponse {
                   body: encode(tags))
     }
 }
-

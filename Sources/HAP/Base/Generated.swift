@@ -508,13 +508,22 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			active = getOrCreateAppend(type: .active, characteristics: &unwrapped, generator: { PredefinedCharacteristic.active() })
-			currentAirPurifierState = getOrCreateAppend(type: .currentAirPurifierState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentAirPurifierState() })
-			targetAirPurifierState = getOrCreateAppend(type: .targetAirPurifierState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.targetAirPurifierState() })
-			lockPhysicalControls = unwrapped.first { $0.type == .lockPhysicalControls } as? GenericCharacteristic<UInt8>
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			rotationSpeed = unwrapped.first { $0.type == .rotationSpeed } as? GenericCharacteristic<Float>
-			swingMode = unwrapped.first { $0.type == .swingMode } as? GenericCharacteristic<UInt8>
+			active = getOrCreateAppend(
+				type: .active,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.active() })
+			currentAirPurifierState = getOrCreateAppend(
+				type: .currentAirPurifierState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.currentAirPurifierState() })
+			targetAirPurifierState = getOrCreateAppend(
+				type: .targetAirPurifierState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.targetAirPurifierState() })
+			lockPhysicalControls = get(type: .lockPhysicalControls, characteristics: unwrapped)
+			name = get(type: .name, characteristics: unwrapped)
+			rotationSpeed = get(type: .rotationSpeed, characteristics: unwrapped)
+			swingMode = get(type: .swingMode, characteristics: unwrapped)
 			super.init(type: .airPurifier, characteristics: unwrapped)
 		}
 	}
@@ -538,18 +547,21 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			currentAirQuality = getOrCreateAppend(type: .currentAirQuality, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentAirQuality() })
-			nitrogenDioxideDensity = unwrapped.first { $0.type == .nitrogenDioxideDensity } as? GenericCharacteristic<Float>
-			ozoneDensity = unwrapped.first { $0.type == .ozoneDensity } as? GenericCharacteristic<Float>
-			pm10Density = unwrapped.first { $0.type == .pm10Density } as? GenericCharacteristic<Float>
-			pm2_5Density = unwrapped.first { $0.type == .pm2_5Density } as? GenericCharacteristic<Float>
-			sulphurDioxideDensity = unwrapped.first { $0.type == .sulphurDioxideDensity } as? GenericCharacteristic<Float>
-			volatileOrganicCompoundDensity = unwrapped.first { $0.type == .volatileOrganicCompoundDensity } as? GenericCharacteristic<Float>
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusActive = unwrapped.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
-			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusLowBattery = unwrapped.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
-			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			currentAirQuality = getOrCreateAppend(
+				type: .currentAirQuality,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.currentAirQuality() })
+			nitrogenDioxideDensity = get(type: .nitrogenDioxideDensity, characteristics: unwrapped)
+			ozoneDensity = get(type: .ozoneDensity, characteristics: unwrapped)
+			pm10Density = get(type: .pm10Density, characteristics: unwrapped)
+			pm2_5Density = get(type: .pm2_5Density, characteristics: unwrapped)
+			sulphurDioxideDensity = get(type: .sulphurDioxideDensity, characteristics: unwrapped)
+			volatileOrganicCompoundDensity = get(type: .volatileOrganicCompoundDensity, characteristics: unwrapped)
+			name = get(type: .name, characteristics: unwrapped)
+			statusActive = get(type: .statusActive, characteristics: unwrapped)
+			statusFault = get(type: .statusFault, characteristics: unwrapped)
+			statusLowBattery = get(type: .statusLowBattery, characteristics: unwrapped)
+			statusTampered = get(type: .statusTampered, characteristics: unwrapped)
 			super.init(type: .airQualitySensor, characteristics: unwrapped)
 		}
 	}
@@ -565,10 +577,19 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			batteryLevel = getOrCreateAppend(type: .batteryLevel, characteristics: &unwrapped, generator: { PredefinedCharacteristic.batteryLevel() })
-			chargingState = getOrCreateAppend(type: .chargingState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.chargingState() })
-			statusLowBattery = getOrCreateAppend(type: .statusLowBattery, characteristics: &unwrapped, generator: { PredefinedCharacteristic.statusLowBattery() })
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			batteryLevel = getOrCreateAppend(
+				type: .batteryLevel,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.batteryLevel() })
+			chargingState = getOrCreateAppend(
+				type: .chargingState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.chargingState() })
+			statusLowBattery = getOrCreateAppend(
+				type: .statusLowBattery,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.statusLowBattery() })
+			name = get(type: .name, characteristics: unwrapped)
 			super.init(type: .battery, characteristics: unwrapped)
 		}
 	}
@@ -588,14 +609,17 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			carbonDioxideDetected = getOrCreateAppend(type: .carbonDioxideDetected, characteristics: &unwrapped, generator: { PredefinedCharacteristic.carbonDioxideDetected() })
-			carbonDioxideLevel = unwrapped.first { $0.type == .carbonDioxideLevel } as? GenericCharacteristic<Float>
-			carbonDioxidePeakLevel = unwrapped.first { $0.type == .carbonDioxidePeakLevel } as? GenericCharacteristic<Float>
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusActive = unwrapped.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
-			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusLowBattery = unwrapped.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
-			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			carbonDioxideDetected = getOrCreateAppend(
+				type: .carbonDioxideDetected,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.carbonDioxideDetected() })
+			carbonDioxideLevel = get(type: .carbonDioxideLevel, characteristics: unwrapped)
+			carbonDioxidePeakLevel = get(type: .carbonDioxidePeakLevel, characteristics: unwrapped)
+			name = get(type: .name, characteristics: unwrapped)
+			statusActive = get(type: .statusActive, characteristics: unwrapped)
+			statusFault = get(type: .statusFault, characteristics: unwrapped)
+			statusLowBattery = get(type: .statusLowBattery, characteristics: unwrapped)
+			statusTampered = get(type: .statusTampered, characteristics: unwrapped)
 			super.init(type: .carbonDioxideSensor, characteristics: unwrapped)
 		}
 	}
@@ -615,14 +639,17 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			carbonMonoxideDetected = getOrCreateAppend(type: .carbonMonoxideDetected, characteristics: &unwrapped, generator: { PredefinedCharacteristic.carbonMonoxideDetected() })
-			carbonMonoxideLevel = unwrapped.first { $0.type == .carbonMonoxideLevel } as? GenericCharacteristic<Float>
-			carbonMonoxidePeakLevel = unwrapped.first { $0.type == .carbonMonoxidePeakLevel } as? GenericCharacteristic<Float>
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusActive = unwrapped.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
-			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusLowBattery = unwrapped.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
-			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			carbonMonoxideDetected = getOrCreateAppend(
+				type: .carbonMonoxideDetected,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.carbonMonoxideDetected() })
+			carbonMonoxideLevel = get(type: .carbonMonoxideLevel, characteristics: unwrapped)
+			carbonMonoxidePeakLevel = get(type: .carbonMonoxidePeakLevel, characteristics: unwrapped)
+			name = get(type: .name, characteristics: unwrapped)
+			statusActive = get(type: .statusActive, characteristics: unwrapped)
+			statusFault = get(type: .statusFault, characteristics: unwrapped)
+			statusLowBattery = get(type: .statusLowBattery, characteristics: unwrapped)
+			statusTampered = get(type: .statusTampered, characteristics: unwrapped)
 			super.init(type: .carbonMonoxideSensor, characteristics: unwrapped)
 		}
 	}
@@ -640,12 +667,15 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			contactSensorState = getOrCreateAppend(type: .contactSensorState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.contactSensorState() })
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusActive = unwrapped.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
-			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusLowBattery = unwrapped.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
-			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			contactSensorState = getOrCreateAppend(
+				type: .contactSensorState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.contactSensorState() })
+			name = get(type: .name, characteristics: unwrapped)
+			statusActive = get(type: .statusActive, characteristics: unwrapped)
+			statusFault = get(type: .statusFault, characteristics: unwrapped)
+			statusLowBattery = get(type: .statusLowBattery, characteristics: unwrapped)
+			statusTampered = get(type: .statusTampered, characteristics: unwrapped)
 			super.init(type: .contactSensor, characteristics: unwrapped)
 		}
 	}
@@ -663,12 +693,21 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			currentPosition = getOrCreateAppend(type: .currentPosition, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentPosition() })
-			positionState = getOrCreateAppend(type: .positionState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.positionState() })
-			targetPosition = getOrCreateAppend(type: .targetPosition, characteristics: &unwrapped, generator: { PredefinedCharacteristic.targetPosition() })
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			obstructionDetected = unwrapped.first { $0.type == .obstructionDetected } as? GenericCharacteristic<Bool>
-			holdPosition = unwrapped.first { $0.type == .holdPosition } as? GenericCharacteristic<Bool?>
+			currentPosition = getOrCreateAppend(
+				type: .currentPosition,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.currentPosition() })
+			positionState = getOrCreateAppend(
+				type: .positionState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.positionState() })
+			targetPosition = getOrCreateAppend(
+				type: .targetPosition,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.targetPosition() })
+			name = get(type: .name, characteristics: unwrapped)
+			obstructionDetected = get(type: .obstructionDetected, characteristics: unwrapped)
+			holdPosition = get(type: .holdPosition, characteristics: unwrapped)
 			super.init(type: .door, characteristics: unwrapped)
 		}
 	}
@@ -683,9 +722,12 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			programmableSwitchEvent = getOrCreateAppend(type: .programmableSwitchEvent, characteristics: &unwrapped, generator: { PredefinedCharacteristic.programmableSwitchEvent() })
-			brightness = unwrapped.first { $0.type == .brightness } as? GenericCharacteristic<Int>
-			volume = unwrapped.first { $0.type == .volume } as? GenericCharacteristic<Int>
+			programmableSwitchEvent = getOrCreateAppend(
+				type: .programmableSwitchEvent,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.programmableSwitchEvent() })
+			brightness = get(type: .brightness, characteristics: unwrapped)
+			volume = get(type: .volume, characteristics: unwrapped)
 			super.init(type: .doorbell, characteristics: unwrapped)
 		}
 	}
@@ -701,10 +743,13 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			powerState = getOrCreateAppend(type: .powerState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.powerState() })
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			rotationDirection = unwrapped.first { $0.type == .rotationDirection } as? GenericCharacteristic<Enums.RotationDirection>
-			rotationSpeed = unwrapped.first { $0.type == .rotationSpeed } as? GenericCharacteristic<Float>
+			powerState = getOrCreateAppend(
+				type: .powerState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.powerState() })
+			name = get(type: .name, characteristics: unwrapped)
+			rotationDirection = get(type: .rotationDirection, characteristics: unwrapped)
+			rotationSpeed = get(type: .rotationSpeed, characteristics: unwrapped)
 			super.init(type: .fan, characteristics: unwrapped)
 		}
 	}
@@ -724,14 +769,17 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			active = getOrCreateAppend(type: .active, characteristics: &unwrapped, generator: { PredefinedCharacteristic.active() })
-			currentFanState = unwrapped.first { $0.type == .currentFanState } as? GenericCharacteristic<Enums.CurrentFanState>
-			targetFanState = unwrapped.first { $0.type == .targetFanState } as? GenericCharacteristic<Enums.TargetFanState>
-			lockPhysicalControls = unwrapped.first { $0.type == .lockPhysicalControls } as? GenericCharacteristic<UInt8>
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			rotationDirection = unwrapped.first { $0.type == .rotationDirection } as? GenericCharacteristic<Enums.RotationDirection>
-			rotationSpeed = unwrapped.first { $0.type == .rotationSpeed } as? GenericCharacteristic<Float>
-			swingMode = unwrapped.first { $0.type == .swingMode } as? GenericCharacteristic<UInt8>
+			active = getOrCreateAppend(
+				type: .active,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.active() })
+			currentFanState = get(type: .currentFanState, characteristics: unwrapped)
+			targetFanState = get(type: .targetFanState, characteristics: unwrapped)
+			lockPhysicalControls = get(type: .lockPhysicalControls, characteristics: unwrapped)
+			name = get(type: .name, characteristics: unwrapped)
+			rotationDirection = get(type: .rotationDirection, characteristics: unwrapped)
+			rotationSpeed = get(type: .rotationSpeed, characteristics: unwrapped)
+			swingMode = get(type: .swingMode, characteristics: unwrapped)
 			super.init(type: .fanV2, characteristics: unwrapped)
 		}
 	}
@@ -746,9 +794,12 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			active = getOrCreateAppend(type: .active, characteristics: &unwrapped, generator: { PredefinedCharacteristic.active() })
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
+			active = getOrCreateAppend(
+				type: .active,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.active() })
+			name = get(type: .name, characteristics: unwrapped)
+			statusFault = get(type: .statusFault, characteristics: unwrapped)
 			super.init(type: .faucet, characteristics: unwrapped)
 		}
 	}
@@ -764,10 +815,13 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			filterChangeIndication = getOrCreateAppend(type: .filterChangeIndication, characteristics: &unwrapped, generator: { PredefinedCharacteristic.filterChangeIndication() })
-			filterLifeLevel = unwrapped.first { $0.type == .filterLifeLevel } as? GenericCharacteristic<Float>
-			filterResetChangeIndication = unwrapped.first { $0.type == .filterResetChangeIndication } as? GenericCharacteristic<UInt8?>
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			filterChangeIndication = getOrCreateAppend(
+				type: .filterChangeIndication,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.filterChangeIndication() })
+			filterLifeLevel = get(type: .filterLifeLevel, characteristics: unwrapped)
+			filterResetChangeIndication = get(type: .filterResetChangeIndication, characteristics: unwrapped)
+			name = get(type: .name, characteristics: unwrapped)
 			super.init(type: .filterMaintenance, characteristics: unwrapped)
 		}
 	}
@@ -785,12 +839,21 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			currentDoorState = getOrCreateAppend(type: .currentDoorState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentDoorState() })
-			targetDoorState = getOrCreateAppend(type: .targetDoorState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.targetDoorState() })
-			obstructionDetected = getOrCreateAppend(type: .obstructionDetected, characteristics: &unwrapped, generator: { PredefinedCharacteristic.obstructionDetected() })
-			lockCurrentState = unwrapped.first { $0.type == .lockCurrentState } as? GenericCharacteristic<Enums.LockCurrentState>
-			lockTargetState = unwrapped.first { $0.type == .lockTargetState } as? GenericCharacteristic<Enums.LockTargetState>
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			currentDoorState = getOrCreateAppend(
+				type: .currentDoorState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.currentDoorState() })
+			targetDoorState = getOrCreateAppend(
+				type: .targetDoorState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.targetDoorState() })
+			obstructionDetected = getOrCreateAppend(
+				type: .obstructionDetected,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.obstructionDetected() })
+			lockCurrentState = get(type: .lockCurrentState, characteristics: unwrapped)
+			lockTargetState = get(type: .lockTargetState, characteristics: unwrapped)
+			name = get(type: .name, characteristics: unwrapped)
 			super.init(type: .garageDoorOpener, characteristics: unwrapped)
 		}
 	}
@@ -813,17 +876,29 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			active = getOrCreateAppend(type: .active, characteristics: &unwrapped, generator: { PredefinedCharacteristic.active() })
-			currentHeaterCoolerState = getOrCreateAppend(type: .currentHeaterCoolerState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentHeaterCoolerState() })
-			targetHeaterCoolerState = getOrCreateAppend(type: .targetHeaterCoolerState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.targetHeaterCoolerState() })
-			currentTemperature = getOrCreateAppend(type: .currentTemperature, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentTemperature() })
-			lockPhysicalControls = unwrapped.first { $0.type == .lockPhysicalControls } as? GenericCharacteristic<UInt8>
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			rotationSpeed = unwrapped.first { $0.type == .rotationSpeed } as? GenericCharacteristic<Float>
-			swingMode = unwrapped.first { $0.type == .swingMode } as? GenericCharacteristic<UInt8>
-			coolingThresholdTemperature = unwrapped.first { $0.type == .coolingThresholdTemperature } as? GenericCharacteristic<Float>
-			heatingThresholdTemperature = unwrapped.first { $0.type == .heatingThresholdTemperature } as? GenericCharacteristic<Float>
-			temperatureDisplayUnits = unwrapped.first { $0.type == .temperatureDisplayUnits } as? GenericCharacteristic<Enums.TemperatureDisplayUnits>
+			active = getOrCreateAppend(
+				type: .active,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.active() })
+			currentHeaterCoolerState = getOrCreateAppend(
+				type: .currentHeaterCoolerState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.currentHeaterCoolerState() })
+			targetHeaterCoolerState = getOrCreateAppend(
+				type: .targetHeaterCoolerState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.targetHeaterCoolerState() })
+			currentTemperature = getOrCreateAppend(
+				type: .currentTemperature,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.currentTemperature() })
+			lockPhysicalControls = get(type: .lockPhysicalControls, characteristics: unwrapped)
+			name = get(type: .name, characteristics: unwrapped)
+			rotationSpeed = get(type: .rotationSpeed, characteristics: unwrapped)
+			swingMode = get(type: .swingMode, characteristics: unwrapped)
+			coolingThresholdTemperature = get(type: .coolingThresholdTemperature, characteristics: unwrapped)
+			heatingThresholdTemperature = get(type: .heatingThresholdTemperature, characteristics: unwrapped)
+			temperatureDisplayUnits = get(type: .temperatureDisplayUnits, characteristics: unwrapped)
 			super.init(type: .heaterCooler, characteristics: unwrapped)
 		}
 	}
@@ -846,17 +921,29 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			active = getOrCreateAppend(type: .active, characteristics: &unwrapped, generator: { PredefinedCharacteristic.active() })
-			currentHumidifierDehumidifierState = getOrCreateAppend(type: .currentHumidifierDehumidifierState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentHumidifierDehumidifierState() })
-			targetHumidifierDehumidifierState = getOrCreateAppend(type: .targetHumidifierDehumidifierState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.targetHumidifierDehumidifierState() })
-			currentRelativeHumidity = getOrCreateAppend(type: .currentRelativeHumidity, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentRelativeHumidity() })
-			lockPhysicalControls = unwrapped.first { $0.type == .lockPhysicalControls } as? GenericCharacteristic<UInt8>
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			relativeHumidityDehumidifierThreshold = unwrapped.first { $0.type == .relativeHumidityDehumidifierThreshold } as? GenericCharacteristic<Float>
-			relativeHumidityHumidifierThreshold = unwrapped.first { $0.type == .relativeHumidityHumidifierThreshold } as? GenericCharacteristic<Float>
-			rotationSpeed = unwrapped.first { $0.type == .rotationSpeed } as? GenericCharacteristic<Float>
-			swingMode = unwrapped.first { $0.type == .swingMode } as? GenericCharacteristic<UInt8>
-			currentWaterLevel = unwrapped.first { $0.type == .currentWaterLevel } as? GenericCharacteristic<Float>
+			active = getOrCreateAppend(
+				type: .active,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.active() })
+			currentHumidifierDehumidifierState = getOrCreateAppend(
+				type: .currentHumidifierDehumidifierState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.currentHumidifierDehumidifierState() })
+			targetHumidifierDehumidifierState = getOrCreateAppend(
+				type: .targetHumidifierDehumidifierState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.targetHumidifierDehumidifierState() })
+			currentRelativeHumidity = getOrCreateAppend(
+				type: .currentRelativeHumidity,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.currentRelativeHumidity() })
+			lockPhysicalControls = get(type: .lockPhysicalControls, characteristics: unwrapped)
+			name = get(type: .name, characteristics: unwrapped)
+			relativeHumidityDehumidifierThreshold = get(type: .relativeHumidityDehumidifierThreshold, characteristics: unwrapped)
+			relativeHumidityHumidifierThreshold = get(type: .relativeHumidityHumidifierThreshold, characteristics: unwrapped)
+			rotationSpeed = get(type: .rotationSpeed, characteristics: unwrapped)
+			swingMode = get(type: .swingMode, characteristics: unwrapped)
+			currentWaterLevel = get(type: .currentWaterLevel, characteristics: unwrapped)
 			super.init(type: .humidifierDehumidifier, characteristics: unwrapped)
 		}
 	}
@@ -874,12 +961,15 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			currentRelativeHumidity = getOrCreateAppend(type: .currentRelativeHumidity, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentRelativeHumidity() })
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusActive = unwrapped.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
-			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusLowBattery = unwrapped.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
-			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			currentRelativeHumidity = getOrCreateAppend(
+				type: .currentRelativeHumidity,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.currentRelativeHumidity() })
+			name = get(type: .name, characteristics: unwrapped)
+			statusActive = get(type: .statusActive, characteristics: unwrapped)
+			statusFault = get(type: .statusFault, characteristics: unwrapped)
+			statusLowBattery = get(type: .statusLowBattery, characteristics: unwrapped)
+			statusTampered = get(type: .statusTampered, characteristics: unwrapped)
 			super.init(type: .humiditySensor, characteristics: unwrapped)
 		}
 	}
@@ -901,16 +991,31 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			identify = getOrCreateAppend(type: .identify, characteristics: &unwrapped, generator: { PredefinedCharacteristic.identify() })
-			manufacturer = getOrCreateAppend(type: .manufacturer, characteristics: &unwrapped, generator: { PredefinedCharacteristic.manufacturer() })
-			model = getOrCreateAppend(type: .model, characteristics: &unwrapped, generator: { PredefinedCharacteristic.model() })
-			name = getOrCreateAppend(type: .name, characteristics: &unwrapped, generator: { PredefinedCharacteristic.name() })
-			serialNumber = getOrCreateAppend(type: .serialNumber, characteristics: &unwrapped, generator: { PredefinedCharacteristic.serialNumber() })
-			accessoryFlags = unwrapped.first { $0.type == .accessoryFlags } as? GenericCharacteristic<UInt32>
-			applicationMatchingIdentifier = unwrapped.first { $0.type == .applicationMatchingIdentifier } as? GenericCharacteristic<Data>
-			firmwareRevision = unwrapped.first { $0.type == .firmwareRevision } as? GenericCharacteristic<String>
-			hardwareRevision = unwrapped.first { $0.type == .hardwareRevision } as? GenericCharacteristic<String>
-			softwareRevision = unwrapped.first { $0.type == .softwareRevision } as? GenericCharacteristic<String>
+			identify = getOrCreateAppend(
+				type: .identify,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.identify() })
+			manufacturer = getOrCreateAppend(
+				type: .manufacturer,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.manufacturer() })
+			model = getOrCreateAppend(
+				type: .model,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.model() })
+			name = getOrCreateAppend(
+				type: .name,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.name() })
+			serialNumber = getOrCreateAppend(
+				type: .serialNumber,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.serialNumber() })
+			accessoryFlags = get(type: .accessoryFlags, characteristics: unwrapped)
+			applicationMatchingIdentifier = get(type: .applicationMatchingIdentifier, characteristics: unwrapped)
+			firmwareRevision = get(type: .firmwareRevision, characteristics: unwrapped)
+			hardwareRevision = get(type: .hardwareRevision, characteristics: unwrapped)
+			softwareRevision = get(type: .softwareRevision, characteristics: unwrapped)
 			super.init(type: .info, characteristics: unwrapped)
 		}
 	}
@@ -929,13 +1034,25 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			configuredName = getOrCreateAppend(type: .configuredName, characteristics: &unwrapped, generator: { PredefinedCharacteristic.configuredName() })
-			inputSourceType = getOrCreateAppend(type: .inputSourceType, characteristics: &unwrapped, generator: { PredefinedCharacteristic.inputSourceType() })
-			isConfigured = getOrCreateAppend(type: .isConfigured, characteristics: &unwrapped, generator: { PredefinedCharacteristic.isConfigured() })
-			name = getOrCreateAppend(type: .name, characteristics: &unwrapped, generator: { PredefinedCharacteristic.name() })
-			identifier = unwrapped.first { $0.type == .identifier } as? GenericCharacteristic<UInt32>
-			inputDeviceType = unwrapped.first { $0.type == .inputDeviceType } as? GenericCharacteristic<Enums.InputDeviceType>
-			isHidden = unwrapped.first { $0.type == .isHidden } as? GenericCharacteristic<UInt8>
+			configuredName = getOrCreateAppend(
+				type: .configuredName,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.configuredName() })
+			inputSourceType = getOrCreateAppend(
+				type: .inputSourceType,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.inputSourceType() })
+			isConfigured = getOrCreateAppend(
+				type: .isConfigured,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.isConfigured() })
+			name = getOrCreateAppend(
+				type: .name,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.name() })
+			identifier = get(type: .identifier, characteristics: unwrapped)
+			inputDeviceType = get(type: .inputDeviceType, characteristics: unwrapped)
+			isHidden = get(type: .isHidden, characteristics: unwrapped)
 			super.init(type: .inputSource, characteristics: unwrapped)
 		}
 	}
@@ -953,12 +1070,21 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			active = getOrCreateAppend(type: .active, characteristics: &unwrapped, generator: { PredefinedCharacteristic.active() })
-			programMode = getOrCreateAppend(type: .programMode, characteristics: &unwrapped, generator: { PredefinedCharacteristic.programMode() })
-			inUse = getOrCreateAppend(type: .inUse, characteristics: &unwrapped, generator: { PredefinedCharacteristic.inUse() })
-			remainingDuration = unwrapped.first { $0.type == .remainingDuration } as? GenericCharacteristic<UInt32>
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
+			active = getOrCreateAppend(
+				type: .active,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.active() })
+			programMode = getOrCreateAppend(
+				type: .programMode,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.programMode() })
+			inUse = getOrCreateAppend(
+				type: .inUse,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.inUse() })
+			remainingDuration = get(type: .remainingDuration, characteristics: unwrapped)
+			name = get(type: .name, characteristics: unwrapped)
+			statusFault = get(type: .statusFault, characteristics: unwrapped)
 			super.init(type: .irrigationSystem, characteristics: unwrapped)
 		}
 	}
@@ -971,7 +1097,10 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			labelNamespace = getOrCreateAppend(type: .labelNamespace, characteristics: &unwrapped, generator: { PredefinedCharacteristic.labelNamespace() })
+			labelNamespace = getOrCreateAppend(
+				type: .labelNamespace,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.labelNamespace() })
 			super.init(type: .label, characteristics: unwrapped)
 		}
 	}
@@ -989,12 +1118,15 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			leakDetected = getOrCreateAppend(type: .leakDetected, characteristics: &unwrapped, generator: { PredefinedCharacteristic.leakDetected() })
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusActive = unwrapped.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
-			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusLowBattery = unwrapped.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
-			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			leakDetected = getOrCreateAppend(
+				type: .leakDetected,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.leakDetected() })
+			name = get(type: .name, characteristics: unwrapped)
+			statusActive = get(type: .statusActive, characteristics: unwrapped)
+			statusFault = get(type: .statusFault, characteristics: unwrapped)
+			statusLowBattery = get(type: .statusLowBattery, characteristics: unwrapped)
+			statusTampered = get(type: .statusTampered, characteristics: unwrapped)
 			super.init(type: .leakSensor, characteristics: unwrapped)
 		}
 	}
@@ -1012,12 +1144,15 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			currentLightLevel = getOrCreateAppend(type: .currentLightLevel, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentLightLevel() })
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusActive = unwrapped.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
-			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusLowBattery = unwrapped.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
-			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			currentLightLevel = getOrCreateAppend(
+				type: .currentLightLevel,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.currentLightLevel() })
+			name = get(type: .name, characteristics: unwrapped)
+			statusActive = get(type: .statusActive, characteristics: unwrapped)
+			statusFault = get(type: .statusFault, characteristics: unwrapped)
+			statusLowBattery = get(type: .statusLowBattery, characteristics: unwrapped)
+			statusTampered = get(type: .statusTampered, characteristics: unwrapped)
 			super.init(type: .lightSensor, characteristics: unwrapped)
 		}
 	}
@@ -1035,12 +1170,15 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			powerState = getOrCreateAppend(type: .powerState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.powerState() })
-			brightness = unwrapped.first { $0.type == .brightness } as? GenericCharacteristic<Int>
-			colorTemperature = unwrapped.first { $0.type == .colorTemperature } as? GenericCharacteristic<Int>
-			hue = unwrapped.first { $0.type == .hue } as? GenericCharacteristic<Float>
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			saturation = unwrapped.first { $0.type == .saturation } as? GenericCharacteristic<Float>
+			powerState = getOrCreateAppend(
+				type: .powerState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.powerState() })
+			brightness = get(type: .brightness, characteristics: unwrapped)
+			colorTemperature = get(type: .colorTemperature, characteristics: unwrapped)
+			hue = get(type: .hue, characteristics: unwrapped)
+			name = get(type: .name, characteristics: unwrapped)
+			saturation = get(type: .saturation, characteristics: unwrapped)
 			super.init(type: .lightbulb, characteristics: unwrapped)
 		}
 	}
@@ -1061,15 +1199,21 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			lockControlPoint = getOrCreateAppend(type: .lockControlPoint, characteristics: &unwrapped, generator: { PredefinedCharacteristic.lockControlPoint() })
-			version = getOrCreateAppend(type: .version, characteristics: &unwrapped, generator: { PredefinedCharacteristic.version() })
-			administratorOnlyAccess = unwrapped.first { $0.type == .administratorOnlyAccess } as? GenericCharacteristic<Bool>
-			audioFeedback = unwrapped.first { $0.type == .audioFeedback } as? GenericCharacteristic<Bool>
-			currentDoorState = unwrapped.first { $0.type == .currentDoorState } as? GenericCharacteristic<Enums.CurrentDoorState>
-			lockManagementAutoSecurityTimeout = unwrapped.first { $0.type == .lockManagementAutoSecurityTimeout } as? GenericCharacteristic<UInt32>
-			lockLastKnownAction = unwrapped.first { $0.type == .lockLastKnownAction } as? GenericCharacteristic<UInt8>
-			logs = unwrapped.first { $0.type == .logs } as? GenericCharacteristic<Data>
-			motionDetected = unwrapped.first { $0.type == .motionDetected } as? GenericCharacteristic<Bool>
+			lockControlPoint = getOrCreateAppend(
+				type: .lockControlPoint,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.lockControlPoint() })
+			version = getOrCreateAppend(
+				type: .version,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.version() })
+			administratorOnlyAccess = get(type: .administratorOnlyAccess, characteristics: unwrapped)
+			audioFeedback = get(type: .audioFeedback, characteristics: unwrapped)
+			currentDoorState = get(type: .currentDoorState, characteristics: unwrapped)
+			lockManagementAutoSecurityTimeout = get(type: .lockManagementAutoSecurityTimeout, characteristics: unwrapped)
+			lockLastKnownAction = get(type: .lockLastKnownAction, characteristics: unwrapped)
+			logs = get(type: .logs, characteristics: unwrapped)
+			motionDetected = get(type: .motionDetected, characteristics: unwrapped)
 			super.init(type: .lockManagement, characteristics: unwrapped)
 		}
 	}
@@ -1084,9 +1228,15 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			lockCurrentState = getOrCreateAppend(type: .lockCurrentState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.lockCurrentState() })
-			lockTargetState = getOrCreateAppend(type: .lockTargetState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.lockTargetState() })
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			lockCurrentState = getOrCreateAppend(
+				type: .lockCurrentState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.lockCurrentState() })
+			lockTargetState = getOrCreateAppend(
+				type: .lockTargetState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.lockTargetState() })
+			name = get(type: .name, characteristics: unwrapped)
 			super.init(type: .lockMechanism, characteristics: unwrapped)
 		}
 	}
@@ -1100,8 +1250,11 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			mute = getOrCreateAppend(type: .mute, characteristics: &unwrapped, generator: { PredefinedCharacteristic.mute() })
-			volume = unwrapped.first { $0.type == .volume } as? GenericCharacteristic<Int>
+			mute = getOrCreateAppend(
+				type: .mute,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.mute() })
+			volume = get(type: .volume, characteristics: unwrapped)
 			super.init(type: .microphone, characteristics: unwrapped)
 		}
 	}
@@ -1119,12 +1272,15 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			motionDetected = getOrCreateAppend(type: .motionDetected, characteristics: &unwrapped, generator: { PredefinedCharacteristic.motionDetected() })
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusActive = unwrapped.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
-			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusLowBattery = unwrapped.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
-			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			motionDetected = getOrCreateAppend(
+				type: .motionDetected,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.motionDetected() })
+			name = get(type: .name, characteristics: unwrapped)
+			statusActive = get(type: .statusActive, characteristics: unwrapped)
+			statusFault = get(type: .statusFault, characteristics: unwrapped)
+			statusLowBattery = get(type: .statusLowBattery, characteristics: unwrapped)
+			statusTampered = get(type: .statusTampered, characteristics: unwrapped)
 			super.init(type: .motionSensor, characteristics: unwrapped)
 		}
 	}
@@ -1142,12 +1298,15 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			occupancyDetected = getOrCreateAppend(type: .occupancyDetected, characteristics: &unwrapped, generator: { PredefinedCharacteristic.occupancyDetected() })
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusActive = unwrapped.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
-			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusLowBattery = unwrapped.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
-			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			occupancyDetected = getOrCreateAppend(
+				type: .occupancyDetected,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.occupancyDetected() })
+			name = get(type: .name, characteristics: unwrapped)
+			statusActive = get(type: .statusActive, characteristics: unwrapped)
+			statusFault = get(type: .statusFault, characteristics: unwrapped)
+			statusLowBattery = get(type: .statusLowBattery, characteristics: unwrapped)
+			statusTampered = get(type: .statusTampered, characteristics: unwrapped)
 			super.init(type: .occupancySensor, characteristics: unwrapped)
 		}
 	}
@@ -1162,9 +1321,15 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			powerState = getOrCreateAppend(type: .powerState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.powerState() })
-			outletInUse = getOrCreateAppend(type: .outletInUse, characteristics: &unwrapped, generator: { PredefinedCharacteristic.outletInUse() })
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			powerState = getOrCreateAppend(
+				type: .powerState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.powerState() })
+			outletInUse = getOrCreateAppend(
+				type: .outletInUse,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.outletInUse() })
+			name = get(type: .name, characteristics: unwrapped)
 			super.init(type: .outlet, characteristics: unwrapped)
 		}
 	}
@@ -1182,12 +1347,18 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			securitySystemCurrentState = getOrCreateAppend(type: .securitySystemCurrentState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.securitySystemCurrentState() })
-			securitySystemTargetState = getOrCreateAppend(type: .securitySystemTargetState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.securitySystemTargetState() })
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			securitySystemAlarmType = unwrapped.first { $0.type == .securitySystemAlarmType } as? GenericCharacteristic<UInt8>
-			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			securitySystemCurrentState = getOrCreateAppend(
+				type: .securitySystemCurrentState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.securitySystemCurrentState() })
+			securitySystemTargetState = getOrCreateAppend(
+				type: .securitySystemTargetState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.securitySystemTargetState() })
+			name = get(type: .name, characteristics: unwrapped)
+			securitySystemAlarmType = get(type: .securitySystemAlarmType, characteristics: unwrapped)
+			statusFault = get(type: .statusFault, characteristics: unwrapped)
+			statusTampered = get(type: .statusTampered, characteristics: unwrapped)
 			super.init(type: .securitySystem, characteristics: unwrapped)
 		}
 	}
@@ -1205,12 +1376,18 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			currentSlatState = getOrCreateAppend(type: .currentSlatState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentSlatState() })
-			slatType = getOrCreateAppend(type: .slatType, characteristics: &unwrapped, generator: { PredefinedCharacteristic.slatType() })
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			swingMode = unwrapped.first { $0.type == .swingMode } as? GenericCharacteristic<UInt8>
-			currentTiltAngle = unwrapped.first { $0.type == .currentTiltAngle } as? GenericCharacteristic<Int>
-			targetTiltAngle = unwrapped.first { $0.type == .targetTiltAngle } as? GenericCharacteristic<Int>
+			currentSlatState = getOrCreateAppend(
+				type: .currentSlatState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.currentSlatState() })
+			slatType = getOrCreateAppend(
+				type: .slatType,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.slatType() })
+			name = get(type: .name, characteristics: unwrapped)
+			swingMode = get(type: .swingMode, characteristics: unwrapped)
+			currentTiltAngle = get(type: .currentTiltAngle, characteristics: unwrapped)
+			targetTiltAngle = get(type: .targetTiltAngle, characteristics: unwrapped)
 			super.init(type: .slats, characteristics: unwrapped)
 		}
 	}
@@ -1228,12 +1405,15 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			smokeDetected = getOrCreateAppend(type: .smokeDetected, characteristics: &unwrapped, generator: { PredefinedCharacteristic.smokeDetected() })
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusActive = unwrapped.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
-			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusLowBattery = unwrapped.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
-			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			smokeDetected = getOrCreateAppend(
+				type: .smokeDetected,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.smokeDetected() })
+			name = get(type: .name, characteristics: unwrapped)
+			statusActive = get(type: .statusActive, characteristics: unwrapped)
+			statusFault = get(type: .statusFault, characteristics: unwrapped)
+			statusLowBattery = get(type: .statusLowBattery, characteristics: unwrapped)
+			statusTampered = get(type: .statusTampered, characteristics: unwrapped)
 			super.init(type: .smokeSensor, characteristics: unwrapped)
 		}
 	}
@@ -1250,11 +1430,14 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			mute = getOrCreateAppend(type: .mute, characteristics: &unwrapped, generator: { PredefinedCharacteristic.mute() })
-			active = unwrapped.first { $0.type == .active } as? GenericCharacteristic<Enums.Active>
-			volume = unwrapped.first { $0.type == .volume } as? GenericCharacteristic<Int>
-			volumeControlType = unwrapped.first { $0.type == .volumeControlType } as? GenericCharacteristic<Enums.VolumeControlType>
-			volumeSelector = unwrapped.first { $0.type == .volumeSelector } as? GenericCharacteristic<Enums.VolumeSelector?>
+			mute = getOrCreateAppend(
+				type: .mute,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.mute() })
+			active = get(type: .active, characteristics: unwrapped)
+			volume = get(type: .volume, characteristics: unwrapped)
+			volumeControlType = get(type: .volumeControlType, characteristics: unwrapped)
+			volumeSelector = get(type: .volumeSelector, characteristics: unwrapped)
 			super.init(type: .speaker, characteristics: unwrapped)
 		}
 	}
@@ -1269,9 +1452,15 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			programmableSwitchEvent = getOrCreateAppend(type: .programmableSwitchEvent, characteristics: &unwrapped, generator: { PredefinedCharacteristic.programmableSwitchEvent() })
-			programmableSwitchOutputState = getOrCreateAppend(type: .programmableSwitchOutputState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.programmableSwitchOutputState() })
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			programmableSwitchEvent = getOrCreateAppend(
+				type: .programmableSwitchEvent,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.programmableSwitchEvent() })
+			programmableSwitchOutputState = getOrCreateAppend(
+				type: .programmableSwitchOutputState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.programmableSwitchOutputState() })
+			name = get(type: .name, characteristics: unwrapped)
 			super.init(type: .statefulProgrammableSwitch, characteristics: unwrapped)
 		}
 	}
@@ -1286,9 +1475,12 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			programmableSwitchEvent = getOrCreateAppend(type: .programmableSwitchEvent, characteristics: &unwrapped, generator: { PredefinedCharacteristic.programmableSwitchEvent() })
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			labelIndex = unwrapped.first { $0.type == .labelIndex } as? GenericCharacteristic<UInt8>
+			programmableSwitchEvent = getOrCreateAppend(
+				type: .programmableSwitchEvent,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.programmableSwitchEvent() })
+			name = get(type: .name, characteristics: unwrapped)
+			labelIndex = get(type: .labelIndex, characteristics: unwrapped)
 			super.init(type: .statelessProgrammableSwitch, characteristics: unwrapped)
 		}
 	}
@@ -1302,8 +1494,11 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			powerState = getOrCreateAppend(type: .powerState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.powerState() })
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
+			powerState = getOrCreateAppend(
+				type: .powerState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.powerState() })
+			name = get(type: .name, characteristics: unwrapped)
 			super.init(type: .`switch`, characteristics: unwrapped)
 		}
 	}
@@ -1326,17 +1521,29 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			active = getOrCreateAppend(type: .active, characteristics: &unwrapped, generator: { PredefinedCharacteristic.active() })
-			activeIdentifier = getOrCreateAppend(type: .activeIdentifier, characteristics: &unwrapped, generator: { PredefinedCharacteristic.activeIdentifier() })
-			configuredName = getOrCreateAppend(type: .configuredName, characteristics: &unwrapped, generator: { PredefinedCharacteristic.configuredName() })
-			sleepDiscoveryMode = getOrCreateAppend(type: .sleepDiscoveryMode, characteristics: &unwrapped, generator: { PredefinedCharacteristic.sleepDiscoveryMode() })
-			brightness = unwrapped.first { $0.type == .brightness } as? GenericCharacteristic<Int>
-			closedCaptions = unwrapped.first { $0.type == .closedCaptions } as? GenericCharacteristic<Enums.ClosedCaptions>
-			mediaState = unwrapped.first { $0.type == .mediaState } as? GenericCharacteristic<UInt8>
-			pictureMode = unwrapped.first { $0.type == .pictureMode } as? GenericCharacteristic<Enums.PictureMode>
-			powerMode = unwrapped.first { $0.type == .powerMode } as? GenericCharacteristic<UInt8>
-			powerModeSelection = unwrapped.first { $0.type == .powerModeSelection } as? GenericCharacteristic<Enums.PowerModeSelection?>
-			remoteKey = unwrapped.first { $0.type == .remoteKey } as? GenericCharacteristic<Enums.RemoteKey?>
+			active = getOrCreateAppend(
+				type: .active,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.active() })
+			activeIdentifier = getOrCreateAppend(
+				type: .activeIdentifier,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.activeIdentifier() })
+			configuredName = getOrCreateAppend(
+				type: .configuredName,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.configuredName() })
+			sleepDiscoveryMode = getOrCreateAppend(
+				type: .sleepDiscoveryMode,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.sleepDiscoveryMode() })
+			brightness = get(type: .brightness, characteristics: unwrapped)
+			closedCaptions = get(type: .closedCaptions, characteristics: unwrapped)
+			mediaState = get(type: .mediaState, characteristics: unwrapped)
+			pictureMode = get(type: .pictureMode, characteristics: unwrapped)
+			powerMode = get(type: .powerMode, characteristics: unwrapped)
+			powerModeSelection = get(type: .powerModeSelection, characteristics: unwrapped)
+			remoteKey = get(type: .remoteKey, characteristics: unwrapped)
 			super.init(type: .television, characteristics: unwrapped)
 		}
 	}
@@ -1354,12 +1561,15 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			currentTemperature = getOrCreateAppend(type: .currentTemperature, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentTemperature() })
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			statusActive = unwrapped.first { $0.type == .statusActive } as? GenericCharacteristic<Bool>
-			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
-			statusLowBattery = unwrapped.first { $0.type == .statusLowBattery } as? GenericCharacteristic<Enums.StatusLowBattery>
-			statusTampered = unwrapped.first { $0.type == .statusTampered } as? GenericCharacteristic<UInt8>
+			currentTemperature = getOrCreateAppend(
+				type: .currentTemperature,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.currentTemperature() })
+			name = get(type: .name, characteristics: unwrapped)
+			statusActive = get(type: .statusActive, characteristics: unwrapped)
+			statusFault = get(type: .statusFault, characteristics: unwrapped)
+			statusLowBattery = get(type: .statusLowBattery, characteristics: unwrapped)
+			statusTampered = get(type: .statusTampered, characteristics: unwrapped)
 			super.init(type: .temperatureSensor, characteristics: unwrapped)
 		}
 	}
@@ -1381,16 +1591,31 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			currentHeatingCoolingState = getOrCreateAppend(type: .currentHeatingCoolingState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentHeatingCoolingState() })
-			targetHeatingCoolingState = getOrCreateAppend(type: .targetHeatingCoolingState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.targetHeatingCoolingState() })
-			currentTemperature = getOrCreateAppend(type: .currentTemperature, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentTemperature() })
-			targetTemperature = getOrCreateAppend(type: .targetTemperature, characteristics: &unwrapped, generator: { PredefinedCharacteristic.targetTemperature() })
-			temperatureDisplayUnits = getOrCreateAppend(type: .temperatureDisplayUnits, characteristics: &unwrapped, generator: { PredefinedCharacteristic.temperatureDisplayUnits() })
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			currentRelativeHumidity = unwrapped.first { $0.type == .currentRelativeHumidity } as? GenericCharacteristic<Float>
-			targetRelativeHumidity = unwrapped.first { $0.type == .targetRelativeHumidity } as? GenericCharacteristic<Float>
-			coolingThresholdTemperature = unwrapped.first { $0.type == .coolingThresholdTemperature } as? GenericCharacteristic<Float>
-			heatingThresholdTemperature = unwrapped.first { $0.type == .heatingThresholdTemperature } as? GenericCharacteristic<Float>
+			currentHeatingCoolingState = getOrCreateAppend(
+				type: .currentHeatingCoolingState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.currentHeatingCoolingState() })
+			targetHeatingCoolingState = getOrCreateAppend(
+				type: .targetHeatingCoolingState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.targetHeatingCoolingState() })
+			currentTemperature = getOrCreateAppend(
+				type: .currentTemperature,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.currentTemperature() })
+			targetTemperature = getOrCreateAppend(
+				type: .targetTemperature,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.targetTemperature() })
+			temperatureDisplayUnits = getOrCreateAppend(
+				type: .temperatureDisplayUnits,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.temperatureDisplayUnits() })
+			name = get(type: .name, characteristics: unwrapped)
+			currentRelativeHumidity = get(type: .currentRelativeHumidity, characteristics: unwrapped)
+			targetRelativeHumidity = get(type: .targetRelativeHumidity, characteristics: unwrapped)
+			coolingThresholdTemperature = get(type: .coolingThresholdTemperature, characteristics: unwrapped)
+			heatingThresholdTemperature = get(type: .heatingThresholdTemperature, characteristics: unwrapped)
 			super.init(type: .thermostat, characteristics: unwrapped)
 		}
 	}
@@ -1411,15 +1636,24 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			active = getOrCreateAppend(type: .active, characteristics: &unwrapped, generator: { PredefinedCharacteristic.active() })
-			inUse = getOrCreateAppend(type: .inUse, characteristics: &unwrapped, generator: { PredefinedCharacteristic.inUse() })
-			valveType = getOrCreateAppend(type: .valveType, characteristics: &unwrapped, generator: { PredefinedCharacteristic.valveType() })
-			isConfigured = unwrapped.first { $0.type == .isConfigured } as? GenericCharacteristic<Enums.IsConfigured>
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			remainingDuration = unwrapped.first { $0.type == .remainingDuration } as? GenericCharacteristic<UInt32>
-			labelIndex = unwrapped.first { $0.type == .labelIndex } as? GenericCharacteristic<UInt8>
-			setDuration = unwrapped.first { $0.type == .setDuration } as? GenericCharacteristic<UInt32>
-			statusFault = unwrapped.first { $0.type == .statusFault } as? GenericCharacteristic<UInt8>
+			active = getOrCreateAppend(
+				type: .active,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.active() })
+			inUse = getOrCreateAppend(
+				type: .inUse,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.inUse() })
+			valveType = getOrCreateAppend(
+				type: .valveType,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.valveType() })
+			isConfigured = get(type: .isConfigured, characteristics: unwrapped)
+			name = get(type: .name, characteristics: unwrapped)
+			remainingDuration = get(type: .remainingDuration, characteristics: unwrapped)
+			labelIndex = get(type: .labelIndex, characteristics: unwrapped)
+			setDuration = get(type: .setDuration, characteristics: unwrapped)
+			statusFault = get(type: .statusFault, characteristics: unwrapped)
 			super.init(type: .valve, characteristics: unwrapped)
 		}
 	}
@@ -1437,12 +1671,21 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			currentPosition = getOrCreateAppend(type: .currentPosition, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentPosition() })
-			positionState = getOrCreateAppend(type: .positionState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.positionState() })
-			targetPosition = getOrCreateAppend(type: .targetPosition, characteristics: &unwrapped, generator: { PredefinedCharacteristic.targetPosition() })
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			obstructionDetected = unwrapped.first { $0.type == .obstructionDetected } as? GenericCharacteristic<Bool>
-			holdPosition = unwrapped.first { $0.type == .holdPosition } as? GenericCharacteristic<Bool?>
+			currentPosition = getOrCreateAppend(
+				type: .currentPosition,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.currentPosition() })
+			positionState = getOrCreateAppend(
+				type: .positionState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.positionState() })
+			targetPosition = getOrCreateAppend(
+				type: .targetPosition,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.targetPosition() })
+			name = get(type: .name, characteristics: unwrapped)
+			obstructionDetected = get(type: .obstructionDetected, characteristics: unwrapped)
+			holdPosition = get(type: .holdPosition, characteristics: unwrapped)
 			super.init(type: .window, characteristics: unwrapped)
 		}
 	}
@@ -1464,16 +1707,25 @@ extension Service {
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			currentPosition = getOrCreateAppend(type: .currentPosition, characteristics: &unwrapped, generator: { PredefinedCharacteristic.currentPosition() })
-			positionState = getOrCreateAppend(type: .positionState, characteristics: &unwrapped, generator: { PredefinedCharacteristic.positionState() })
-			targetPosition = getOrCreateAppend(type: .targetPosition, characteristics: &unwrapped, generator: { PredefinedCharacteristic.targetPosition() })
-			currentHorizontalTiltAngle = unwrapped.first { $0.type == .currentHorizontalTiltAngle } as? GenericCharacteristic<Int>
-			targetHorizontalTiltAngle = unwrapped.first { $0.type == .targetHorizontalTiltAngle } as? GenericCharacteristic<Int>
-			name = unwrapped.first { $0.type == .name } as? GenericCharacteristic<String>
-			obstructionDetected = unwrapped.first { $0.type == .obstructionDetected } as? GenericCharacteristic<Bool>
-			holdPosition = unwrapped.first { $0.type == .holdPosition } as? GenericCharacteristic<Bool?>
-			currentVerticalTiltAngle = unwrapped.first { $0.type == .currentVerticalTiltAngle } as? GenericCharacteristic<Int>
-			targetVerticalTiltAngle = unwrapped.first { $0.type == .targetVerticalTiltAngle } as? GenericCharacteristic<Int>
+			currentPosition = getOrCreateAppend(
+				type: .currentPosition,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.currentPosition() })
+			positionState = getOrCreateAppend(
+				type: .positionState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.positionState() })
+			targetPosition = getOrCreateAppend(
+				type: .targetPosition,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.targetPosition() })
+			currentHorizontalTiltAngle = get(type: .currentHorizontalTiltAngle, characteristics: unwrapped)
+			targetHorizontalTiltAngle = get(type: .targetHorizontalTiltAngle, characteristics: unwrapped)
+			name = get(type: .name, characteristics: unwrapped)
+			obstructionDetected = get(type: .obstructionDetected, characteristics: unwrapped)
+			holdPosition = get(type: .holdPosition, characteristics: unwrapped)
+			currentVerticalTiltAngle = get(type: .currentVerticalTiltAngle, characteristics: unwrapped)
+			targetVerticalTiltAngle = get(type: .targetVerticalTiltAngle, characteristics: unwrapped)
 			super.init(type: .windowCovering, characteristics: unwrapped)
 		}
 	}
@@ -1493,7 +1745,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.accessoryFlags(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.accessoryFlags(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func active(
@@ -1508,7 +1769,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.active(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.active(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func activeIdentifier(
@@ -1523,7 +1793,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.activeIdentifier(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.activeIdentifier(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func administratorOnlyAccess(
@@ -1538,7 +1817,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.administratorOnlyAccess(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.administratorOnlyAccess(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func applicationMatchingIdentifier(
@@ -1553,7 +1841,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.applicationMatchingIdentifier(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.applicationMatchingIdentifier(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func audioFeedback(
@@ -1568,7 +1865,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.audioFeedback(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.audioFeedback(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func batteryLevel(
@@ -1583,7 +1889,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.batteryLevel(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.batteryLevel(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func brightness(
@@ -1598,7 +1913,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.brightness(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.brightness(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func carbonDioxideDetected(
@@ -1613,7 +1937,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.carbonDioxideDetected(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.carbonDioxideDetected(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func carbonDioxideLevel(
@@ -1628,7 +1961,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.carbonDioxideLevel(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.carbonDioxideLevel(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func carbonDioxidePeakLevel(
@@ -1643,7 +1985,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.carbonDioxidePeakLevel(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.carbonDioxidePeakLevel(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func carbonMonoxideDetected(
@@ -1658,7 +2009,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.carbonMonoxideDetected(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.carbonMonoxideDetected(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func carbonMonoxideLevel(
@@ -1673,7 +2033,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.carbonMonoxideLevel(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.carbonMonoxideLevel(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func carbonMonoxidePeakLevel(
@@ -1688,7 +2057,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.carbonMonoxidePeakLevel(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.carbonMonoxidePeakLevel(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func chargingState(
@@ -1703,7 +2081,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.chargingState(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.chargingState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func closedCaptions(
@@ -1718,7 +2105,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.closedCaptions(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.closedCaptions(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func colorTemperature(
@@ -1733,7 +2129,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.colorTemperature(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.colorTemperature(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func configuredName(
@@ -1748,7 +2153,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.configuredName(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.configuredName(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func contactSensorState(
@@ -1763,7 +2177,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.contactSensorState(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.contactSensorState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func coolingThresholdTemperature(
@@ -1778,7 +2201,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 0.1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.coolingThresholdTemperature(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.coolingThresholdTemperature(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func currentAirPurifierState(
@@ -1793,7 +2225,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.currentAirPurifierState(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.currentAirPurifierState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func currentAirQuality(
@@ -1808,7 +2249,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.currentAirQuality(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.currentAirQuality(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func currentDoorState(
@@ -1823,7 +2273,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.currentDoorState(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.currentDoorState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func currentFanState(
@@ -1838,7 +2297,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.currentFanState(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.currentFanState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func currentHeaterCoolerState(
@@ -1853,7 +2321,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.currentHeaterCoolerState(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.currentHeaterCoolerState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func currentHeatingCoolingState(
@@ -1868,7 +2345,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.currentHeatingCoolingState(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.currentHeatingCoolingState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func currentHorizontalTiltAngle(
@@ -1883,7 +2369,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.currentHorizontalTiltAngle(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.currentHorizontalTiltAngle(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func currentHumidifierDehumidifierState(
@@ -1898,7 +2393,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.currentHumidifierDehumidifierState(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.currentHumidifierDehumidifierState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func currentLightLevel(
@@ -1913,7 +2417,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.currentLightLevel(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.currentLightLevel(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func currentPosition(
@@ -1928,7 +2441,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.currentPosition(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.currentPosition(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func currentRelativeHumidity(
@@ -1943,7 +2465,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.currentRelativeHumidity(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.currentRelativeHumidity(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func currentSlatState(
@@ -1958,7 +2489,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.currentSlatState(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.currentSlatState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func currentTemperature(
@@ -1973,7 +2513,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 0.1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.currentTemperature(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.currentTemperature(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func currentTiltAngle(
@@ -1988,7 +2537,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.currentTiltAngle(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.currentTiltAngle(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func currentVerticalTiltAngle(
@@ -2003,7 +2561,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.currentVerticalTiltAngle(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.currentVerticalTiltAngle(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func currentWaterLevel(
@@ -2018,7 +2585,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.currentWaterLevel(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.currentWaterLevel(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func filterChangeIndication(
@@ -2033,7 +2609,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.filterChangeIndication(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.filterChangeIndication(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func filterLifeLevel(
@@ -2048,7 +2633,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.filterLifeLevel(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.filterLifeLevel(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func filterResetChangeIndication(
@@ -2063,7 +2657,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.filterResetChangeIndication(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.filterResetChangeIndication(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func firmwareRevision(
@@ -2078,7 +2681,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.firmwareRevision(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.firmwareRevision(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func hardwareRevision(
@@ -2093,7 +2705,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.hardwareRevision(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.hardwareRevision(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func heatingThresholdTemperature(
@@ -2108,7 +2729,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 0.1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.heatingThresholdTemperature(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.heatingThresholdTemperature(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func holdPosition(
@@ -2123,7 +2753,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.holdPosition(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.holdPosition(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func hue(
@@ -2138,7 +2777,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.hue(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.hue(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func identifier(
@@ -2153,7 +2801,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.identifier(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.identifier(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func identify(
@@ -2168,7 +2825,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.identify(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.identify(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func inUse(
@@ -2183,7 +2849,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.inUse(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.inUse(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func inputDeviceType(
@@ -2198,7 +2873,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.inputDeviceType(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.inputDeviceType(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func inputSourceType(
@@ -2213,7 +2897,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.inputSourceType(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.inputSourceType(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func isConfigured(
@@ -2228,7 +2921,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.isConfigured(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.isConfigured(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func isHidden(
@@ -2243,7 +2945,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.isHidden(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.isHidden(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func labelIndex(
@@ -2258,7 +2969,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.labelIndex(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.labelIndex(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func labelNamespace(
@@ -2273,7 +2993,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.labelNamespace(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.labelNamespace(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func leakDetected(
@@ -2288,7 +3017,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.leakDetected(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.leakDetected(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func lockControlPoint(
@@ -2303,7 +3041,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.lockControlPoint(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.lockControlPoint(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func lockCurrentState(
@@ -2318,7 +3065,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.lockCurrentState(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.lockCurrentState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func lockLastKnownAction(
@@ -2333,7 +3089,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.lockLastKnownAction(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.lockLastKnownAction(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func lockManagementAutoSecurityTimeout(
@@ -2348,7 +3113,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.lockManagementAutoSecurityTimeout(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.lockManagementAutoSecurityTimeout(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func lockPhysicalControls(
@@ -2363,7 +3137,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.lockPhysicalControls(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.lockPhysicalControls(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func lockTargetState(
@@ -2378,7 +3161,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.lockTargetState(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.lockTargetState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func logs(
@@ -2393,7 +3185,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.logs(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.logs(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func manufacturer(
@@ -2408,7 +3209,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.manufacturer(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.manufacturer(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func mediaState(
@@ -2423,7 +3233,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.mediaState(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.mediaState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func model(
@@ -2438,7 +3257,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.model(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.model(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func motionDetected(
@@ -2453,7 +3281,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.motionDetected(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.motionDetected(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func mute(
@@ -2468,7 +3305,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.mute(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.mute(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func name(
@@ -2483,7 +3329,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.name(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.name(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func nitrogenDioxideDensity(
@@ -2498,7 +3353,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.nitrogenDioxideDensity(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.nitrogenDioxideDensity(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func obstructionDetected(
@@ -2513,7 +3377,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.obstructionDetected(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.obstructionDetected(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func occupancyDetected(
@@ -2528,7 +3401,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.occupancyDetected(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.occupancyDetected(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func outletInUse(
@@ -2543,7 +3425,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.outletInUse(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.outletInUse(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func ozoneDensity(
@@ -2558,7 +3449,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.ozoneDensity(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.ozoneDensity(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func pm10Density(
@@ -2573,7 +3473,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.pm10Density(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.pm10Density(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func pm2_5Density(
@@ -2588,7 +3497,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.pm2_5Density(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.pm2_5Density(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func pictureMode(
@@ -2603,7 +3521,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.pictureMode(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.pictureMode(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func positionState(
@@ -2618,7 +3545,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.positionState(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.positionState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func powerMode(
@@ -2633,7 +3569,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.powerMode(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.powerMode(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func powerModeSelection(
@@ -2648,7 +3593,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.powerModeSelection(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.powerModeSelection(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func powerState(
@@ -2663,7 +3617,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.powerState(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.powerState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func programMode(
@@ -2678,7 +3641,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.programMode(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.programMode(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func programmableSwitchEvent(
@@ -2693,7 +3665,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.programmableSwitchEvent(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.programmableSwitchEvent(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func programmableSwitchOutputState(
@@ -2708,7 +3689,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.programmableSwitchOutputState(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.programmableSwitchOutputState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func relativeHumidityDehumidifierThreshold(
@@ -2723,7 +3713,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.relativeHumidityDehumidifierThreshold(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.relativeHumidityDehumidifierThreshold(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func relativeHumidityHumidifierThreshold(
@@ -2738,7 +3737,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.relativeHumidityHumidifierThreshold(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.relativeHumidityHumidifierThreshold(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func remainingDuration(
@@ -2753,7 +3761,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.remainingDuration(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.remainingDuration(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func remoteKey(
@@ -2768,7 +3785,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.remoteKey(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.remoteKey(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func rotationDirection(
@@ -2783,7 +3809,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.rotationDirection(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.rotationDirection(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func rotationSpeed(
@@ -2798,7 +3833,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.rotationSpeed(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.rotationSpeed(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func saturation(
@@ -2813,7 +3857,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.saturation(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.saturation(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func securitySystemAlarmType(
@@ -2828,7 +3881,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.securitySystemAlarmType(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.securitySystemAlarmType(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func securitySystemCurrentState(
@@ -2843,7 +3905,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.securitySystemCurrentState(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.securitySystemCurrentState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func securitySystemTargetState(
@@ -2858,7 +3929,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.securitySystemTargetState(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.securitySystemTargetState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func serialNumber(
@@ -2873,7 +3953,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.serialNumber(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.serialNumber(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func setDuration(
@@ -2888,7 +3977,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.setDuration(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.setDuration(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func slatType(
@@ -2903,7 +4001,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.slatType(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.slatType(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func sleepDiscoveryMode(
@@ -2918,7 +4025,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.sleepDiscoveryMode(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.sleepDiscoveryMode(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func smokeDetected(
@@ -2933,7 +4049,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.smokeDetected(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.smokeDetected(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func softwareRevision(
@@ -2948,7 +4073,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.softwareRevision(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.softwareRevision(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func statusActive(
@@ -2963,7 +4097,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.statusActive(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.statusActive(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func statusFault(
@@ -2978,7 +4121,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.statusFault(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.statusFault(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func statusLowBattery(
@@ -2993,7 +4145,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.statusLowBattery(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.statusLowBattery(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func statusTampered(
@@ -3008,7 +4169,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.statusTampered(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.statusTampered(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func sulphurDioxideDensity(
@@ -3023,7 +4193,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.sulphurDioxideDensity(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.sulphurDioxideDensity(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func swingMode(
@@ -3038,7 +4217,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.swingMode(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.swingMode(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func targetAirPurifierState(
@@ -3053,7 +4241,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.targetAirPurifierState(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.targetAirPurifierState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func targetDoorState(
@@ -3068,7 +4265,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.targetDoorState(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.targetDoorState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func targetFanState(
@@ -3083,7 +4289,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.targetFanState(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.targetFanState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func targetHeaterCoolerState(
@@ -3098,7 +4313,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.targetHeaterCoolerState(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.targetHeaterCoolerState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func targetHeatingCoolingState(
@@ -3113,7 +4337,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.targetHeatingCoolingState(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.targetHeatingCoolingState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func targetHorizontalTiltAngle(
@@ -3128,7 +4361,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.targetHorizontalTiltAngle(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.targetHorizontalTiltAngle(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func targetHumidifierDehumidifierState(
@@ -3143,7 +4385,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.targetHumidifierDehumidifierState(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.targetHumidifierDehumidifierState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func targetPosition(
@@ -3158,7 +4409,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.targetPosition(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.targetPosition(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func targetRelativeHumidity(
@@ -3173,7 +4433,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.targetRelativeHumidity(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.targetRelativeHumidity(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func targetTemperature(
@@ -3188,7 +4457,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 0.1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.targetTemperature(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.targetTemperature(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func targetTiltAngle(
@@ -3203,7 +4481,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.targetTiltAngle(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.targetTiltAngle(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func targetVerticalTiltAngle(
@@ -3218,7 +4505,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.targetVerticalTiltAngle(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.targetVerticalTiltAngle(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func temperatureDisplayUnits(
@@ -3233,7 +4529,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.temperatureDisplayUnits(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.temperatureDisplayUnits(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func valveType(
@@ -3248,7 +4553,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.valveType(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.valveType(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func version(
@@ -3263,7 +4577,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.version(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.version(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func volatileOrganicCompoundDensity(
@@ -3278,7 +4601,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.volatileOrganicCompoundDensity(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.volatileOrganicCompoundDensity(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func volume(
@@ -3293,7 +4625,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.volume(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.volume(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func volumeControlType(
@@ -3308,7 +4649,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.volumeControlType(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.volumeControlType(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 	public static func volumeSelector(
@@ -3323,7 +4673,16 @@ public extension AnyCharacteristic {
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
-			PredefinedCharacteristic.volumeSelector(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)
+			PredefinedCharacteristic.volumeSelector(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
 	}
 
 }
@@ -3340,7 +4699,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<UInt32> {
-		return GenericCharacteristic<UInt32>(type: .accessoryFlags, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt32>(
+			type: .accessoryFlags,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func active(
@@ -3354,7 +4723,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.Active> {
-		return GenericCharacteristic<Enums.Active>(type: .active, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.Active>(
+			type: .active,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func activeIdentifier(
@@ -3368,7 +4747,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<UInt32> {
-		return GenericCharacteristic<UInt32>(type: .activeIdentifier, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt32>(
+			type: .activeIdentifier,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func administratorOnlyAccess(
@@ -3382,7 +4771,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<Bool> {
-		return GenericCharacteristic<Bool>(type: .administratorOnlyAccess, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Bool>(
+			type: .administratorOnlyAccess,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func applicationMatchingIdentifier(
@@ -3396,7 +4795,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<Data> {
-		return GenericCharacteristic<Data>(type: .applicationMatchingIdentifier, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Data>(
+			type: .applicationMatchingIdentifier,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func audioFeedback(
@@ -3410,7 +4819,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<Bool> {
-		return GenericCharacteristic<Bool>(type: .audioFeedback, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Bool>(
+			type: .audioFeedback,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func batteryLevel(
@@ -3424,7 +4843,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(type: .batteryLevel, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt8>(
+			type: .batteryLevel,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func brightness(
@@ -3438,7 +4867,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Int> {
-		return GenericCharacteristic<Int>(type: .brightness, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Int>(
+			type: .brightness,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func carbonDioxideDetected(
@@ -3452,7 +4891,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.CarbonDioxideDetected> {
-		return GenericCharacteristic<Enums.CarbonDioxideDetected>(type: .carbonDioxideDetected, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.CarbonDioxideDetected>(
+			type: .carbonDioxideDetected,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func carbonDioxideLevel(
@@ -3466,7 +4915,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .carbonDioxideLevel, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .carbonDioxideLevel,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func carbonDioxidePeakLevel(
@@ -3480,7 +4939,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .carbonDioxidePeakLevel, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .carbonDioxidePeakLevel,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func carbonMonoxideDetected(
@@ -3494,7 +4963,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(type: .carbonMonoxideDetected, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt8>(
+			type: .carbonMonoxideDetected,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func carbonMonoxideLevel(
@@ -3508,7 +4987,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .carbonMonoxideLevel, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .carbonMonoxideLevel,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func carbonMonoxidePeakLevel(
@@ -3522,7 +5011,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .carbonMonoxidePeakLevel, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .carbonMonoxidePeakLevel,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func chargingState(
@@ -3536,7 +5035,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.ChargingState> {
-		return GenericCharacteristic<Enums.ChargingState>(type: .chargingState, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.ChargingState>(
+			type: .chargingState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func closedCaptions(
@@ -3550,7 +5059,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.ClosedCaptions> {
-		return GenericCharacteristic<Enums.ClosedCaptions>(type: .closedCaptions, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.ClosedCaptions>(
+			type: .closedCaptions,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func colorTemperature(
@@ -3564,7 +5083,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 140,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Int> {
-		return GenericCharacteristic<Int>(type: .colorTemperature, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Int>(
+			type: .colorTemperature,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func configuredName(
@@ -3578,7 +5107,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<String> {
-		return GenericCharacteristic<String>(type: .configuredName, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<String>(
+			type: .configuredName,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func contactSensorState(
@@ -3592,7 +5131,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.ContactSensorState> {
-		return GenericCharacteristic<Enums.ContactSensorState>(type: .contactSensorState, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.ContactSensorState>(
+			type: .contactSensorState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func coolingThresholdTemperature(
@@ -3606,7 +5155,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 10,
 		minStep: Double? = 0.1
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .coolingThresholdTemperature, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .coolingThresholdTemperature,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func currentAirPurifierState(
@@ -3620,7 +5179,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.CurrentAirPurifierState> {
-		return GenericCharacteristic<Enums.CurrentAirPurifierState>(type: .currentAirPurifierState, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.CurrentAirPurifierState>(
+			type: .currentAirPurifierState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func currentAirQuality(
@@ -3634,7 +5203,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.CurrentAirQuality> {
-		return GenericCharacteristic<Enums.CurrentAirQuality>(type: .currentAirQuality, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.CurrentAirQuality>(
+			type: .currentAirQuality,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func currentDoorState(
@@ -3648,7 +5227,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.CurrentDoorState> {
-		return GenericCharacteristic<Enums.CurrentDoorState>(type: .currentDoorState, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.CurrentDoorState>(
+			type: .currentDoorState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func currentFanState(
@@ -3662,7 +5251,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.CurrentFanState> {
-		return GenericCharacteristic<Enums.CurrentFanState>(type: .currentFanState, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.CurrentFanState>(
+			type: .currentFanState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func currentHeaterCoolerState(
@@ -3676,7 +5275,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.CurrentHeaterCoolerState> {
-		return GenericCharacteristic<Enums.CurrentHeaterCoolerState>(type: .currentHeaterCoolerState, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.CurrentHeaterCoolerState>(
+			type: .currentHeaterCoolerState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func currentHeatingCoolingState(
@@ -3690,7 +5299,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.CurrentHeatingCoolingState> {
-		return GenericCharacteristic<Enums.CurrentHeatingCoolingState>(type: .currentHeatingCoolingState, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.CurrentHeatingCoolingState>(
+			type: .currentHeatingCoolingState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func currentHorizontalTiltAngle(
@@ -3704,7 +5323,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = -90,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Int> {
-		return GenericCharacteristic<Int>(type: .currentHorizontalTiltAngle, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Int>(
+			type: .currentHorizontalTiltAngle,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func currentHumidifierDehumidifierState(
@@ -3718,7 +5347,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.CurrentHumidifierDehumidifierState> {
-		return GenericCharacteristic<Enums.CurrentHumidifierDehumidifierState>(type: .currentHumidifierDehumidifierState, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.CurrentHumidifierDehumidifierState>(
+			type: .currentHumidifierDehumidifierState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func currentLightLevel(
@@ -3732,7 +5371,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0.0001,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .currentLightLevel, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .currentLightLevel,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func currentPosition(
@@ -3746,7 +5395,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(type: .currentPosition, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt8>(
+			type: .currentPosition,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func currentRelativeHumidity(
@@ -3760,7 +5419,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .currentRelativeHumidity, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .currentRelativeHumidity,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func currentSlatState(
@@ -3774,7 +5443,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.CurrentSlatState> {
-		return GenericCharacteristic<Enums.CurrentSlatState>(type: .currentSlatState, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.CurrentSlatState>(
+			type: .currentSlatState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func currentTemperature(
@@ -3788,7 +5467,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 0.1
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .currentTemperature, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .currentTemperature,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func currentTiltAngle(
@@ -3802,7 +5491,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = -90,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Int> {
-		return GenericCharacteristic<Int>(type: .currentTiltAngle, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Int>(
+			type: .currentTiltAngle,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func currentVerticalTiltAngle(
@@ -3816,7 +5515,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = -90,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Int> {
-		return GenericCharacteristic<Int>(type: .currentVerticalTiltAngle, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Int>(
+			type: .currentVerticalTiltAngle,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func currentWaterLevel(
@@ -3830,7 +5539,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .currentWaterLevel, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .currentWaterLevel,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func filterChangeIndication(
@@ -3844,7 +5563,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.FilterChangeIndication> {
-		return GenericCharacteristic<Enums.FilterChangeIndication>(type: .filterChangeIndication, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.FilterChangeIndication>(
+			type: .filterChangeIndication,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func filterLifeLevel(
@@ -3858,7 +5587,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .filterLifeLevel, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .filterLifeLevel,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func filterResetChangeIndication(
@@ -3872,7 +5611,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 1,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt8?> {
-		return GenericCharacteristic<UInt8?>(type: .filterResetChangeIndication, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt8?>(
+			type: .filterResetChangeIndication,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func firmwareRevision(
@@ -3886,7 +5635,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<String> {
-		return GenericCharacteristic<String>(type: .firmwareRevision, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<String>(
+			type: .firmwareRevision,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func hardwareRevision(
@@ -3900,7 +5659,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<String> {
-		return GenericCharacteristic<String>(type: .hardwareRevision, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<String>(
+			type: .hardwareRevision,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func heatingThresholdTemperature(
@@ -3914,7 +5683,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 0.1
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .heatingThresholdTemperature, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .heatingThresholdTemperature,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func holdPosition(
@@ -3928,7 +5707,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<Bool?> {
-		return GenericCharacteristic<Bool?>(type: .holdPosition, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Bool?>(
+			type: .holdPosition,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func hue(
@@ -3942,7 +5731,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .hue, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .hue,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func identifier(
@@ -3956,7 +5755,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<UInt32> {
-		return GenericCharacteristic<UInt32>(type: .identifier, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt32>(
+			type: .identifier,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func identify(
@@ -3970,7 +5779,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<Bool?> {
-		return GenericCharacteristic<Bool?>(type: .identify, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Bool?>(
+			type: .identify,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func inUse(
@@ -3984,7 +5803,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(type: .inUse, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt8>(
+			type: .inUse,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func inputDeviceType(
@@ -3998,7 +5827,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.InputDeviceType> {
-		return GenericCharacteristic<Enums.InputDeviceType>(type: .inputDeviceType, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.InputDeviceType>(
+			type: .inputDeviceType,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func inputSourceType(
@@ -4012,7 +5851,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.InputSourceType> {
-		return GenericCharacteristic<Enums.InputSourceType>(type: .inputSourceType, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.InputSourceType>(
+			type: .inputSourceType,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func isConfigured(
@@ -4026,7 +5875,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.IsConfigured> {
-		return GenericCharacteristic<Enums.IsConfigured>(type: .isConfigured, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.IsConfigured>(
+			type: .isConfigured,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func isHidden(
@@ -4040,7 +5899,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(type: .isHidden, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt8>(
+			type: .isHidden,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func labelIndex(
@@ -4054,7 +5923,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 1,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(type: .labelIndex, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt8>(
+			type: .labelIndex,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func labelNamespace(
@@ -4068,7 +5947,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(type: .labelNamespace, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt8>(
+			type: .labelNamespace,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func leakDetected(
@@ -4082,7 +5971,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.LeakDetected> {
-		return GenericCharacteristic<Enums.LeakDetected>(type: .leakDetected, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.LeakDetected>(
+			type: .leakDetected,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func lockControlPoint(
@@ -4096,7 +5995,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<Data?> {
-		return GenericCharacteristic<Data?>(type: .lockControlPoint, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Data?>(
+			type: .lockControlPoint,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func lockCurrentState(
@@ -4110,7 +6019,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.LockCurrentState> {
-		return GenericCharacteristic<Enums.LockCurrentState>(type: .lockCurrentState, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.LockCurrentState>(
+			type: .lockCurrentState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func lockLastKnownAction(
@@ -4124,7 +6043,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(type: .lockLastKnownAction, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt8>(
+			type: .lockLastKnownAction,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func lockManagementAutoSecurityTimeout(
@@ -4138,7 +6067,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<UInt32> {
-		return GenericCharacteristic<UInt32>(type: .lockManagementAutoSecurityTimeout, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt32>(
+			type: .lockManagementAutoSecurityTimeout,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func lockPhysicalControls(
@@ -4152,7 +6091,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(type: .lockPhysicalControls, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt8>(
+			type: .lockPhysicalControls,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func lockTargetState(
@@ -4166,7 +6115,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.LockTargetState> {
-		return GenericCharacteristic<Enums.LockTargetState>(type: .lockTargetState, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.LockTargetState>(
+			type: .lockTargetState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func logs(
@@ -4180,7 +6139,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<Data> {
-		return GenericCharacteristic<Data>(type: .logs, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Data>(
+			type: .logs,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func manufacturer(
@@ -4194,7 +6163,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<String> {
-		return GenericCharacteristic<String>(type: .manufacturer, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<String>(
+			type: .manufacturer,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func mediaState(
@@ -4208,7 +6187,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(type: .mediaState, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt8>(
+			type: .mediaState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func model(
@@ -4222,7 +6211,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<String> {
-		return GenericCharacteristic<String>(type: .model, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<String>(
+			type: .model,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func motionDetected(
@@ -4236,7 +6235,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<Bool> {
-		return GenericCharacteristic<Bool>(type: .motionDetected, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Bool>(
+			type: .motionDetected,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func mute(
@@ -4250,7 +6259,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<Bool> {
-		return GenericCharacteristic<Bool>(type: .mute, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Bool>(
+			type: .mute,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func name(
@@ -4264,7 +6283,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<String> {
-		return GenericCharacteristic<String>(type: .name, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<String>(
+			type: .name,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func nitrogenDioxideDensity(
@@ -4278,7 +6307,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .nitrogenDioxideDensity, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .nitrogenDioxideDensity,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func obstructionDetected(
@@ -4292,7 +6331,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<Bool> {
-		return GenericCharacteristic<Bool>(type: .obstructionDetected, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Bool>(
+			type: .obstructionDetected,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func occupancyDetected(
@@ -4306,7 +6355,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.OccupancyDetected> {
-		return GenericCharacteristic<Enums.OccupancyDetected>(type: .occupancyDetected, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.OccupancyDetected>(
+			type: .occupancyDetected,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func outletInUse(
@@ -4320,7 +6379,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<Bool> {
-		return GenericCharacteristic<Bool>(type: .outletInUse, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Bool>(
+			type: .outletInUse,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func ozoneDensity(
@@ -4334,7 +6403,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .ozoneDensity, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .ozoneDensity,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func pm10Density(
@@ -4348,7 +6427,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .pm10Density, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .pm10Density,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func pm2_5Density(
@@ -4362,7 +6451,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .pm2_5Density, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .pm2_5Density,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func pictureMode(
@@ -4376,7 +6475,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.PictureMode> {
-		return GenericCharacteristic<Enums.PictureMode>(type: .pictureMode, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.PictureMode>(
+			type: .pictureMode,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func positionState(
@@ -4390,7 +6499,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.PositionState> {
-		return GenericCharacteristic<Enums.PositionState>(type: .positionState, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.PositionState>(
+			type: .positionState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func powerMode(
@@ -4404,7 +6523,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(type: .powerMode, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt8>(
+			type: .powerMode,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func powerModeSelection(
@@ -4418,7 +6547,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.PowerModeSelection?> {
-		return GenericCharacteristic<Enums.PowerModeSelection?>(type: .powerModeSelection, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.PowerModeSelection?>(
+			type: .powerModeSelection,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func powerState(
@@ -4432,7 +6571,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<Bool> {
-		return GenericCharacteristic<Bool>(type: .powerState, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Bool>(
+			type: .powerState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func programMode(
@@ -4446,7 +6595,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(type: .programMode, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt8>(
+			type: .programMode,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func programmableSwitchEvent(
@@ -4460,7 +6619,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(type: .programmableSwitchEvent, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt8>(
+			type: .programmableSwitchEvent,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func programmableSwitchOutputState(
@@ -4474,7 +6643,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(type: .programmableSwitchOutputState, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt8>(
+			type: .programmableSwitchOutputState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func relativeHumidityDehumidifierThreshold(
@@ -4488,7 +6667,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .relativeHumidityDehumidifierThreshold, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .relativeHumidityDehumidifierThreshold,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func relativeHumidityHumidifierThreshold(
@@ -4502,7 +6691,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .relativeHumidityHumidifierThreshold, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .relativeHumidityHumidifierThreshold,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func remainingDuration(
@@ -4516,7 +6715,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt32> {
-		return GenericCharacteristic<UInt32>(type: .remainingDuration, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt32>(
+			type: .remainingDuration,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func remoteKey(
@@ -4530,7 +6739,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.RemoteKey?> {
-		return GenericCharacteristic<Enums.RemoteKey?>(type: .remoteKey, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.RemoteKey?>(
+			type: .remoteKey,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func rotationDirection(
@@ -4544,7 +6763,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.RotationDirection> {
-		return GenericCharacteristic<Enums.RotationDirection>(type: .rotationDirection, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.RotationDirection>(
+			type: .rotationDirection,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func rotationSpeed(
@@ -4558,7 +6787,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .rotationSpeed, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .rotationSpeed,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func saturation(
@@ -4572,7 +6811,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .saturation, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .saturation,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func securitySystemAlarmType(
@@ -4586,7 +6835,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(type: .securitySystemAlarmType, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt8>(
+			type: .securitySystemAlarmType,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func securitySystemCurrentState(
@@ -4600,7 +6859,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.SecuritySystemCurrentState> {
-		return GenericCharacteristic<Enums.SecuritySystemCurrentState>(type: .securitySystemCurrentState, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.SecuritySystemCurrentState>(
+			type: .securitySystemCurrentState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func securitySystemTargetState(
@@ -4614,7 +6883,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.SecuritySystemTargetState> {
-		return GenericCharacteristic<Enums.SecuritySystemTargetState>(type: .securitySystemTargetState, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.SecuritySystemTargetState>(
+			type: .securitySystemTargetState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func serialNumber(
@@ -4628,7 +6907,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<String> {
-		return GenericCharacteristic<String>(type: .serialNumber, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<String>(
+			type: .serialNumber,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func setDuration(
@@ -4642,7 +6931,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt32> {
-		return GenericCharacteristic<UInt32>(type: .setDuration, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt32>(
+			type: .setDuration,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func slatType(
@@ -4656,7 +6955,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(type: .slatType, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt8>(
+			type: .slatType,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func sleepDiscoveryMode(
@@ -4670,7 +6979,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.SleepDiscoveryMode> {
-		return GenericCharacteristic<Enums.SleepDiscoveryMode>(type: .sleepDiscoveryMode, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.SleepDiscoveryMode>(
+			type: .sleepDiscoveryMode,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func smokeDetected(
@@ -4684,7 +7003,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.SmokeDetected> {
-		return GenericCharacteristic<Enums.SmokeDetected>(type: .smokeDetected, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.SmokeDetected>(
+			type: .smokeDetected,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func softwareRevision(
@@ -4698,7 +7027,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<String> {
-		return GenericCharacteristic<String>(type: .softwareRevision, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<String>(
+			type: .softwareRevision,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func statusActive(
@@ -4712,7 +7051,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<Bool> {
-		return GenericCharacteristic<Bool>(type: .statusActive, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Bool>(
+			type: .statusActive,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func statusFault(
@@ -4726,7 +7075,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(type: .statusFault, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt8>(
+			type: .statusFault,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func statusLowBattery(
@@ -4740,7 +7099,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.StatusLowBattery> {
-		return GenericCharacteristic<Enums.StatusLowBattery>(type: .statusLowBattery, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.StatusLowBattery>(
+			type: .statusLowBattery,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func statusTampered(
@@ -4754,7 +7123,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(type: .statusTampered, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt8>(
+			type: .statusTampered,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func sulphurDioxideDensity(
@@ -4768,7 +7147,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .sulphurDioxideDensity, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .sulphurDioxideDensity,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func swingMode(
@@ -4782,7 +7171,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(type: .swingMode, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt8>(
+			type: .swingMode,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func targetAirPurifierState(
@@ -4796,7 +7195,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.TargetAirPurifierState> {
-		return GenericCharacteristic<Enums.TargetAirPurifierState>(type: .targetAirPurifierState, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.TargetAirPurifierState>(
+			type: .targetAirPurifierState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func targetDoorState(
@@ -4810,7 +7219,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.TargetDoorState> {
-		return GenericCharacteristic<Enums.TargetDoorState>(type: .targetDoorState, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.TargetDoorState>(
+			type: .targetDoorState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func targetFanState(
@@ -4824,7 +7243,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.TargetFanState> {
-		return GenericCharacteristic<Enums.TargetFanState>(type: .targetFanState, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.TargetFanState>(
+			type: .targetFanState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func targetHeaterCoolerState(
@@ -4838,7 +7267,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.TargetHeaterCoolerState> {
-		return GenericCharacteristic<Enums.TargetHeaterCoolerState>(type: .targetHeaterCoolerState, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.TargetHeaterCoolerState>(
+			type: .targetHeaterCoolerState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func targetHeatingCoolingState(
@@ -4852,7 +7291,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.TargetHeatingCoolingState> {
-		return GenericCharacteristic<Enums.TargetHeatingCoolingState>(type: .targetHeatingCoolingState, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.TargetHeatingCoolingState>(
+			type: .targetHeatingCoolingState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func targetHorizontalTiltAngle(
@@ -4866,7 +7315,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = -90,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Int> {
-		return GenericCharacteristic<Int>(type: .targetHorizontalTiltAngle, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Int>(
+			type: .targetHorizontalTiltAngle,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func targetHumidifierDehumidifierState(
@@ -4880,7 +7339,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.TargetHumidifierDehumidifierState> {
-		return GenericCharacteristic<Enums.TargetHumidifierDehumidifierState>(type: .targetHumidifierDehumidifierState, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.TargetHumidifierDehumidifierState>(
+			type: .targetHumidifierDehumidifierState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func targetPosition(
@@ -4894,7 +7363,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(type: .targetPosition, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt8>(
+			type: .targetPosition,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func targetRelativeHumidity(
@@ -4908,7 +7387,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .targetRelativeHumidity, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .targetRelativeHumidity,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func targetTemperature(
@@ -4922,7 +7411,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 10,
 		minStep: Double? = 0.1
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .targetTemperature, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .targetTemperature,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func targetTiltAngle(
@@ -4936,7 +7435,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = -90,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Int> {
-		return GenericCharacteristic<Int>(type: .targetTiltAngle, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Int>(
+			type: .targetTiltAngle,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func targetVerticalTiltAngle(
@@ -4950,7 +7459,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = -90,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Int> {
-		return GenericCharacteristic<Int>(type: .targetVerticalTiltAngle, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Int>(
+			type: .targetVerticalTiltAngle,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func temperatureDisplayUnits(
@@ -4964,7 +7483,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.TemperatureDisplayUnits> {
-		return GenericCharacteristic<Enums.TemperatureDisplayUnits>(type: .temperatureDisplayUnits, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.TemperatureDisplayUnits>(
+			type: .temperatureDisplayUnits,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func valveType(
@@ -4978,7 +7507,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(type: .valveType, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<UInt8>(
+			type: .valveType,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func version(
@@ -4992,7 +7531,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = nil,
 		minStep: Double? = nil
 	) -> GenericCharacteristic<String> {
-		return GenericCharacteristic<String>(type: .version, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<String>(
+			type: .version,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func volatileOrganicCompoundDensity(
@@ -5006,7 +7555,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Float> {
-		return GenericCharacteristic<Float>(type: .volatileOrganicCompoundDensity, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Float>(
+			type: .volatileOrganicCompoundDensity,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func volume(
@@ -5020,7 +7579,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Int> {
-		return GenericCharacteristic<Int>(type: .volume, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Int>(
+			type: .volume,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func volumeControlType(
@@ -5034,7 +7603,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.VolumeControlType> {
-		return GenericCharacteristic<Enums.VolumeControlType>(type: .volumeControlType, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.VolumeControlType>(
+			type: .volumeControlType,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 	static func volumeSelector(
@@ -5048,7 +7627,17 @@ public class PredefinedCharacteristic {
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.VolumeSelector?> {
-		return GenericCharacteristic<Enums.VolumeSelector?>(type: .volumeSelector, value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)
+		return GenericCharacteristic<Enums.VolumeSelector?>(
+			type: .volumeSelector,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
 	}
 
 }

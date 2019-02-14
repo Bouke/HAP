@@ -1,3 +1,4 @@
+// swiftlint:disable force_cast
 import Foundation
 
 extension String {
@@ -9,8 +10,8 @@ extension String {
         self = self.lowercasedFirstLetter()
     }
     func uppercasedFirstLetter() -> String {
-        let s = self.replacingOccurrences(of: "`", with: "")
-        return s.prefix(1).uppercased() + s.dropFirst()
+        let string = self.replacingOccurrences(of: "`", with: "")
+        return string.prefix(1).uppercased() + string.dropFirst()
     }
 
     mutating func uppercasedFirstLetter() {
@@ -29,8 +30,8 @@ extension String {
     }
 }
 
+// swiftlint:disable:next type_body_length
 public class Inspector {
-
     struct DefaultType {
         let enumName: String
         let baseType: String
@@ -49,65 +50,65 @@ public class Inspector {
 
         DefaultType("ContactSensorState", "UInt8", "contact-state", [
             ("detected", 0),
-            ("notDetected", 1),
-            ]),
+            ("notDetected", 1)
+        ]),
 
         DefaultType("PositionState", "UInt8", "position.state", [
             ("decreasing", 0),
             ("increasing", 1),
-            ("stopped", 2),
-            ]),
+            ("stopped", 2)
+        ]),
 
         DefaultType("CurrentDoorState", "UInt8", "door-state.current", [
             ("open", 0),
             ("closed", 1),
             ("opening", 2),
             ("closing", 3),
-            ("stopped", 4),
-            ]),
+            ("stopped", 4)
+        ]),
 
         DefaultType("TargetDoorState", "UInt8", "door-state.target", [
             ("open", 0),
-            ("closed", 1),
-            ]),
+            ("closed", 1)
+        ]),
 
         DefaultType("LockCurrentState", "UInt8", "lock-mechanism.current-state", [
             ("unsecured", 0),
             ("secured", 1),
             ("jammed", 2),
-            ("unknown", 3),
-            ]),
+            ("unknown", 3)
+        ]),
 
         DefaultType("LockTargetState", "UInt8", "lock-mechanism.target-state", [
             ("unsecured", 0),
-            ("secured", 1),
-            ]),
+            ("secured", 1)
+        ]),
 
         DefaultType("SmokeDetected", "UInt8", "smoke-detected", [
             ("smokeNotDetected", 0),
-            ("smokeDetected", 1),
-            ]),
+            ("smokeDetected", 1)
+        ]),
 
         DefaultType("Active", "UInt8", "active", [
             ("inactive", 0),
-            ("active", 1),
-            ]),
+            ("active", 1)
+        ]),
 
         DefaultType("SleepDiscoveryMode", "UInt8", "sleep-discovery-mode", [
             ("notDiscoverable", 0),
-            ("alwaysDiscoverable", 1),
-            ]),
+            ("alwaysDiscoverable", 1)
+        ]),
 
         DefaultType("ClosedCaptions", "UInt8", "closed-captions", [
             ("disabled", 0),
-            ("enabled", 1),
-            ]),
+            ("enabled", 1)
+        ]),
 
         DefaultType("TargetMediaState", "UInt8", "media-state.target", [
             ("play", 0),
             ("pause", 1),
-            ("stop", 2),
-            ]),
+            ("stop", 2)
+        ]),
 
         DefaultType("PictureMode", "UInt16", "picture-mode", [
             ("other", 0),
@@ -117,13 +118,13 @@ public class Inspector {
             ("vivid", 4),
             ("game", 5),
             ("computer", 6),
-            ("custom", 7),
-            ]),
+            ("custom", 7)
+        ]),
 
         DefaultType("PowerModeSelection", "UInt8", "power-mode-selection", [
             ("show", 0),
-            ("hide", 1),
-            ]),
+            ("hide", 1)
+        ]),
 
         DefaultType("RemoteKey", "UInt8", "remote-key", [
             ("rewind", 0),
@@ -138,8 +139,8 @@ public class Inspector {
             ("back", 9),
             ("exit", 10),
             ("playPause", 11),
-            ("information", 15),
-            ]),
+            ("information", 15)
+        ]),
 
         DefaultType("InputSourceType", "UInt8", "input-source-type", [
             ("other", 0),
@@ -152,8 +153,8 @@ public class Inspector {
             ("dvi", 7),
             ("airplay", 8),
             ("usb", 9),
-            ("application", 10),
-            ]),
+            ("application", 10)
+        ]),
 
         DefaultType("InputDeviceType", "UInt8", "input-device-type", [
             ("other", 0),
@@ -161,42 +162,42 @@ public class Inspector {
             ("recording", 2),
             ("tuner", 3),
             ("playback", 4),
-            ("audioSystem", 5),
-            ]),
+            ("audioSystem", 5)
+        ]),
 
         DefaultType("CurrentVisibilityState", "UInt8", "visibility-state.current", [
             ("shown", 0),
-            ("hidden", 1),
-            ]),
+            ("hidden", 1)
+        ]),
 
         DefaultType("TargetVisibilityState", "UInt8", "visibility-state.target", [
             ("shown", 0),
-            ("hidden", 1),
-            ]),
+            ("hidden", 1)
+        ]),
 
         DefaultType("VolumeControlType", "UInt8", "volume-control-type", [
             ("none", 0),
             ("relative", 1),
             ("relativeWithCurrent", 2),
-            ("absolute", 3),
-            ]),
+            ("absolute", 3)
+        ]),
 
         DefaultType("VolumeSelector", "UInt8", "volume-selector", [
             ("increment", 0),
-            ("decrement", 1),
-            ]),
+            ("decrement", 1)
+        ]),
 
         DefaultType("IsConfigured", "UInt8", "is-configured", [
             ("notConfigured", 0),
-            ("configured", 1),
-            ]),
+            ("configured", 1)
+        ]),
 
         DefaultType("TemperatureDisplayUnits", "UInt8", "temperature.units", [
             ("celcius", 0),
-            ("fahrenheit", 1),
-            ]),
+            ("fahrenheit", 1)
+        ])
 
-        ]
+    ]
 
     struct FileHandlerOutputStream: TextOutputStream {
         private let fileHandle: FileHandle
@@ -216,6 +217,7 @@ public class Inspector {
 
     static let outFile = "Generated.swift"
 
+    // swiftlint:disable:next cyclomatic_complexity
     class func inspect(source plistPath: URL, target outputPath: String) throws {
         // Convert HAP unit names to swift instance variable name
         func unitName(_ name: String) -> String {
@@ -238,7 +240,7 @@ public class Inspector {
 
         // Convert HAP accessory category name to swift instance variable name
         func categoryName(_ name: String) -> String {
-            let knownConversion = ["Apple TV":"appleTV", "Switch":"`switch`"]
+            let knownConversion = ["Apple TV": "appleTV", "Switch": "`switch`"]
             if let knownName = knownConversion[name] {
                 return knownName
             }
@@ -250,7 +252,7 @@ public class Inspector {
             if uuid == "000000B7" {
                 return "fanV2"
             }
-            let knownConversion = ["Accessory Information Service":"info", "Switch":"`switch`"]
+            let knownConversion = ["Accessory Information Service": "info", "Switch": "`switch`"]
             if let knownName = knownConversion[name] {
                 return knownName
             }
@@ -279,13 +281,13 @@ public class Inspector {
             let assistantDict = plistDict["Assistant"] as? NSDictionary,
             let hapDict = plistDict["HAP"] as? NSDictionary,
             let homekitDict = plistDict["HomeKit"] as? NSDictionary,
-            let categories = homekitDict["Categories"] as? [String:NSDictionary],
-            let services = hapDict["Services"] as? [String:NSDictionary],
-            let characteristics = hapDict["Characteristics"]  as? [String:NSDictionary],
-            let characteristicConstants = assistantDict["Characteristics"] as? [String:NSDictionary],
-            let units = hapDict["Units"]  as? [String:NSDictionary],
-            let blacklist = homekitDict["Blacklist"] as? [String:[String]],
-            let blacklistApps = homekitDict["BlacklistFromApplications"] as? [String:[String]],
+            let categories = homekitDict["Categories"] as? [String: NSDictionary],
+            let services = hapDict["Services"] as? [String: NSDictionary],
+            let characteristics = hapDict["Characteristics"]  as? [String: NSDictionary],
+            let characteristicConstants = assistantDict["Characteristics"] as? [String: NSDictionary],
+            let units = hapDict["Units"]  as? [String: NSDictionary],
+            let blacklist = homekitDict["Blacklist"] as? [String: [String]],
+            let blacklistApps = homekitDict["BlacklistFromApplications"] as? [String: [String]],
             let blacklistCharacteristics = blacklist["Characteristics"],
             let blacklistAppCharacteristics = blacklistApps["Characteristics"],
             let blacklistServices = blacklist["Services"],
@@ -300,7 +302,6 @@ public class Inspector {
         var blacklistedCharacteristics = blacklistCharacteristics
         // Don't remove characteristics from app blacklist
         //blacklistedCharacteristics.append(contentsOf: blacklistAppCharacteristics)
-
 
         print("Writing to \(outputPath)")
 
@@ -359,8 +360,8 @@ public class Inspector {
         write("""
         public enum AccessoryType: String, Codable {
         """)
-        for c in categoryInfo.sorted(by: { $0.id < $1.id } ) {
-            write("\tcase \(categoryName(c.name)) = \"\(c.id)\"")
+        for category in categoryInfo.sorted(by: { $0.id < $1.id }) {
+            write("\tcase \(categoryName(category.name)) = \"\(category.id)\"")
         }
         write("}")
 
@@ -382,7 +383,7 @@ public class Inspector {
             if let title = dict["DefaultDescription"] as? String,
                 let id = dict["ShortUUID"] as? String {
                 if !blacklistedServices.contains(name),
-                    let serviceCharacteristics = dict["Characteristics"] as? [String:[String]] {
+                    let serviceCharacteristics = dict["Characteristics"] as? [String: [String]] {
 
                     let required = serviceCharacteristics["Required"] ?? []
                     let optional = serviceCharacteristics["Optional"] ?? []
@@ -392,7 +393,7 @@ public class Inspector {
                                                     className: serviceName(title, uuid: id).uppercasedFirstLetter(),
                                                     id: id,
                                                     required: required,
-                                                    optional:optional
+                                                    optional: optional
                     ))
 
                     whitelistedCharacteristics = whitelistedCharacteristics.union(required)
@@ -408,7 +409,7 @@ public class Inspector {
 
         public extension ServiceType {
         """)
-        for service in serviceInfo.sorted(by: { $0.className < $1.className } ) {
+        for service in serviceInfo.sorted(by: { $0.className < $1.className }) {
             write("\tstatic let \(serviceName(service.title, uuid: service.id)) = ServiceType(0x\(service.id.suffix(4)))")
         }
         write("}")
@@ -451,7 +452,7 @@ public class Inspector {
             if let title = dict["DefaultDescription"] as? String,
                 let id = dict["ShortUUID"] as? String,
                 let format = dict["Format"] as? String {
-                if !blacklistedCharacteristics.contains(name) && whitelistedCharacteristics.contains(name){
+                if !blacklistedCharacteristics.contains(name) && whitelistedCharacteristics.contains(name) {
 
                     characteristicInfo.append(
                         CharacteristicInfo(hkname: name,
@@ -460,7 +461,7 @@ public class Inspector {
                                             format: format,
                                             maxValue: dict["MaxValue"] as? NSNumber,
                                             minValue: dict["MinValue"] as? NSNumber,
-                                            properties: dict["Properties"] as? Int ?? Int(dict["Properties"] as! String)!,
+                                            properties: dict["Properties"] as? Int ?? Int(dict["Properties"].debugDescription as! String)!,
                                             stepValue: dict["StepValue"] as? NSNumber,
                                             units: dict["Units"] as? String))
                     characteristicFormats.insert(format)
@@ -474,7 +475,7 @@ public class Inspector {
         public extension CharacteristicType {
         """)
 
-        for characteristic in characteristicInfo.sorted(by: { $0.title < $1.title } ) {
+        for characteristic in characteristicInfo.sorted(by: { $0.title < $1.title }) {
             write("\tstatic let \(serviceName(characteristic.title, uuid: characteristic.id)) = CharacteristicType(0x\(characteristic.id.suffix(4)))")
         }
         write("}")
@@ -487,7 +488,7 @@ public class Inspector {
 
         public enum CharacteristicFormat: String, Codable {
         """)
-        for format in characteristicFormats.sorted(by: { $0 < $1 } ) {
+        for format in characteristicFormats.sorted(by: { $0 < $1 }) {
             write("\tcase \(format.lowercased())")
         }
         write("}")
@@ -505,8 +506,8 @@ public class Inspector {
 
         public enum CharacteristicUnit: String, Codable {
         """)
-        for u in unitInfo.sorted(by: { $0 < $1 } ) {
-            write("\tcase \(u)")
+        for unit in unitInfo.sorted(by: { $0 < $1 }) {
+            write("\tcase \(unit)")
         }
         write("}\n")
 
@@ -522,11 +523,11 @@ public class Inspector {
 
             // Check if keys are digits
 
-            let numberedKeys = values.allKeys.compactMap({($0 as? NSNumber)?.intValue ?? Int($0 as? String ?? "x")})
+            let numberedKeys = values.allKeys.compactMap({ ($0 as? NSNumber)?.intValue ?? Int($0 as? String ?? "x") })
             if numberedKeys.count == values.count {
 
                 // Check if vals are also all digits
-                let numberedValues = values.allValues.compactMap({($0 as? NSNumber)?.intValue ?? Int($0 as? String ?? "x")})
+                let numberedValues = values.allValues.compactMap({ ($0 as? NSNumber)?.intValue ?? Int($0 as? String ?? "x") })
 
                 if numberedValues.count == values.count {
                     return nil
@@ -556,7 +557,7 @@ public class Inspector {
                     return v0 < ($1.value as! String)
                 }
                 return false
-            }).filter( {
+            }).filter({
                 guard let max = max else {
                     return true
                 }
@@ -571,9 +572,9 @@ public class Inspector {
                 }
                 return !(max.compare(val) == .orderedAscending)
             })
-            for c in cases {
-                if let name = (c.key as? String) {
-                    write("\t\tcase \(name.parameterName()) = \(c.value)")
+            for enumCase in cases {
+                if let name = (enumCase.key as? String) {
+                    write("\t\tcase \(name.parameterName()) = \(enumCase.value)")
                 }
             }
 
@@ -627,11 +628,11 @@ public class Inspector {
 
         // Add any default enums which are not defined in the HAP config
         for defaultType in Inspector.defaultTypes {
-            if let enumInfo = enums.first(where: { $0.info.hkname == defaultType.characteristic } ) {
+            if let enumInfo = enums.first(where: { $0.info.hkname == defaultType.characteristic }) {
                 // Already defined
             } else if let info = characteristicInfo.first(where: { $0.hkname == defaultType.characteristic }) {
                 var valuedict = NSMutableDictionary()
-                defaultType.values.map( { valuedict[$0.0] = $0.1} )
+                defaultType.values.map({ valuedict[$0.0] = $0.1 })
                 enums.append((enumName: defaultType.enumName, type: defaultType.baseType, newValues: valuedict, info: info))
             }
         }
@@ -645,7 +646,7 @@ public class Inspector {
                 // The HAP config definition couldn't be written, likely because both key and values are digits
                 // Fallback to a default definition if it exists
                 var valuedict = NSMutableDictionary()
-                defaultType.values.map( { valuedict[$0.0] = $0.1} )
+                defaultType.values.map({ valuedict[$0.0] = $0.1 })
                 writeEnumeration(enumName: defaultType.enumName, type: defaultType.baseType, values: valuedict, max: info.maxValue)
                 enumeratedCharacteristics.insert(info.hkname)
                 defaultEnumCase[info.hkname] = defaultType.values[0].0.parameterName()
@@ -661,33 +662,19 @@ public class Inspector {
             write("\t\tpublic let \(name): GenericCharacteristic<\(valueType(info))>\(isOptional ? "?" : "")")
         }
 
-        func writeRequiredCharacteristicInit(info: CharacteristicInfo) {
-            let name = info.title.parameterName()
-            let enumType = enumeratedCharacteristics.contains(info.hkname) ?
+        func valueType(_ characteristic: CharacteristicInfo) -> String {
+            let name = characteristic.title.parameterName()
+            let enumType = enumeratedCharacteristics.contains(characteristic.hkname) ?
                 "Enums.\(name.uppercasedFirstLetter())" :
-                typeName(info.format)
-            let characteristiceType = ".\(serviceName(info.title, uuid: info.id))"
-            write("""
-                \t\t\t\(name) = unwrappedCharacteristics.first { $0.type == \(characteristiceType) } as? GenericCharacteristic<\(valueType(info))> ?? PredefinedCharacteristic.\(serviceName(info.title, uuid: info.id))()
-                """)
-        }
-
-        func writeOptionalCharacteristicInit(info: CharacteristicInfo) {
-            let name = info.title.parameterName()
-            let enumType = enumeratedCharacteristics.contains(info.hkname) ?
-                "Enums.\(name.uppercasedFirstLetter())" :
-                typeName(info.format)
-            let characteristiceType = ".\(serviceName(info.title, uuid: info.id))"
-            write("""
-                \t\t\t\(name) = unwrapped.first { $0.type == \(characteristiceType) } as? GenericCharacteristic<\(valueType(info))>
-                """)
+                typeName(characteristic.format)
+            return enumType + (characteristic.isReadable ? "" : "?")
         }
 
         write("""
 
         extension Service {
         """)
-        for service in serviceInfo.sorted(by: { $0.className < $1.className } ) {
+        for service in serviceInfo.sorted(by: { $0.className < $1.className }) {
             write("\topen class \(service.className)Base: Service {")
 
             var requiredCharacteristicPropertyNames = [String]()
@@ -717,14 +704,21 @@ public class Inspector {
                     let name = info.title.parameterName()
                     let characteristiceType = ".\(serviceName(info.title, uuid: info.id))"
                     write("""
-                        \t\t\t\(name) = getOrCreateAppend(type: \(characteristiceType), characteristics: &unwrapped, generator: { PredefinedCharacteristic.\(serviceName(info.title, uuid: info.id))() })
+                        \t\t\t\(name) = getOrCreateAppend(
+                        \t\t\t\ttype: \(characteristiceType),
+                        \t\t\t\tcharacteristics: &unwrapped,
+                        \t\t\t\tgenerator: { PredefinedCharacteristic.\(serviceName(info.title, uuid: info.id))() })
                         """)
                 }
             }
 
             for ch in service.optional {
                 if let info = characteristicInfo.first(where: { $0.hkname == ch }) {
-                    writeOptionalCharacteristicInit(info: info)
+                    let name = info.title.parameterName()
+                    let characteristiceType = ".\(serviceName(info.title, uuid: info.id))"
+                    write("""
+                        \t\t\t\(name) = get(type: \(characteristiceType), characteristics: unwrapped)
+                        """)
                 }
             }
 
@@ -733,14 +727,6 @@ public class Inspector {
                 \t\t}
                 \t}\n
                 """)
-        }
-
-        func valueType(_ characteristic: CharacteristicInfo) -> String {
-            let name = characteristic.title.parameterName()
-            let enumType = enumeratedCharacteristics.contains(characteristic.hkname) ?
-                "Enums.\(name.uppercasedFirstLetter())" :
-                typeName(characteristic.format)
-            return enumType + (characteristic.isReadable ? "" : "?")
         }
 
         func defaultValue(_ characteristic: CharacteristicInfo) -> String {
@@ -782,12 +768,21 @@ public class Inspector {
         public extension AnyCharacteristic {
         """)
 
-        for characteristic in characteristicInfo.sorted(by: { $0.title < $1.title } ) {
+        for characteristic in characteristicInfo.sorted(by: { $0.title < $1.title }) {
             write("\tpublic static func \(serviceName(characteristic.title, uuid: characteristic.id))(")
             writeFactoryArgumentsWithDefaults(characteristic)
             write("\t) -> AnyCharacteristic {")
             write("\t\treturn AnyCharacteristic(")
-            write("\t\t\tPredefinedCharacteristic.\(serviceName(characteristic.title, uuid: characteristic.id))(value,  permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep) as Characteristic)")
+            write("\t\t\tPredefinedCharacteristic.\(serviceName(characteristic.title, uuid: characteristic.id))(")
+            write("\t\t\tvalue,")
+            write("\t\t\tpermissions: permissions,")
+            write("\t\t\tdescription: description,")
+            write("\t\t\tformat: format,")
+            write("\t\t\tunit: unit,")
+            write("\t\t\tmaxLength: maxLength,")
+            write("\t\t\tmaxValue: maxValue,")
+            write("\t\t\tminValue: minValue,")
+            write("\t\t\tminStep: minStep) as Characteristic)")
             write("\t}\n")
         }
 
@@ -797,11 +792,21 @@ public class Inspector {
         public class PredefinedCharacteristic {
         """)
 
-        for characteristic in characteristicInfo.sorted(by: { $0.title < $1.title } ) {
+        for characteristic in characteristicInfo.sorted(by: { $0.title < $1.title }) {
             write("\tstatic func \(serviceName(characteristic.title, uuid: characteristic.id))(")
             writeFactoryArgumentsWithDefaults(characteristic)
             write("\t) -> GenericCharacteristic<\(valueType(characteristic))> {")
-            write("\t\treturn GenericCharacteristic<\(valueType(characteristic))>(type: .\(serviceName(characteristic.title, uuid: characteristic.id)), value: value, permissions: permissions, description: description, format: format, unit: unit, maxLength: maxLength, maxValue: maxValue, minValue: minValue, minStep: minStep)")
+            write("\t\treturn GenericCharacteristic<\(valueType(characteristic))>(")
+            write("\t\t\ttype: .\(serviceName(characteristic.title, uuid: characteristic.id)),")
+            write("\t\t\tvalue: value,")
+            write("\t\t\tpermissions: permissions,")
+            write("\t\t\tdescription: description,")
+            write("\t\t\tformat: format,")
+            write("\t\t\tunit: unit,")
+            write("\t\t\tmaxLength: maxLength,")
+            write("\t\t\tmaxValue: maxValue,")
+            write("\t\t\tminValue: minValue,")
+            write("\t\t\tminStep: minStep)")
             write("\t}\n")
         }
 
