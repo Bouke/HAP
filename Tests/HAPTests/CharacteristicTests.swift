@@ -41,4 +41,26 @@ class CharacteristicTests: XCTestCase {
         }
         XCTAssertTrue(value == true)
     }
+
+    func testInitFloatValueType() {
+        // This used to trap, as `value` would be a `Float` and `minValue` a `Double`, and
+        // `Double(Float(0.0001)) < Double(0.0001)`, so: the initial value would be smaller
+        // than the minimum value.
+        let characteristic = GenericCharacteristic<Float>(type: .batteryLevel, value: 0.0001, minValue: 0.0001)
+        XCTAssertEqual(characteristic.value, 0.0001)
+    }
+
+    func testValueClippingToBounds() {
+        // clip to bounds using `init()`
+        let characteristic = GenericCharacteristic<Float>(type: .batteryLevel, value: 2, maxValue: 1, minValue: 0)
+        XCTAssertEqual(characteristic.value, 1)
+
+        // clip to bounds using `value.setter`
+        characteristic.value = -1
+        XCTAssertEqual(characteristic.value, 0)
+
+        // clip to bounds using `setValue`
+        try! characteristic.setValue(2, fromChannel: nil)
+        XCTAssertEqual(characteristic.value, 1)
+    }
 }
