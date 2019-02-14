@@ -1,9 +1,10 @@
-// This file has been generated automatically from macOS HAP definitions.
-// Don't make changes to this file, but regenerate using `hap-update` instead.
+// This file has been generated automatically from the macOS HomeKit
+// framework definitions. Don't make changes to this file directly.
+// Update this file using the `hap-update` tool.
 //
-//  macOS: Version 10.14.3 (Build 18D109)
-//  date: 14 February 2019
-//  HAP Version: 718
+// Generated on:              14 February 2019
+// HomeKit framework version: 718
+// macOS:                     Version 10.14.3 (Build 18D109)
 
 import Foundation
 
