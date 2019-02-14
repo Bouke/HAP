@@ -13,6 +13,9 @@
 - Naming of some service / characteristic / enum types.
 - Characteristics with read permission (Paired Read) require a value, no value
   is no longer valid.
+- Characteristic bounds no longer trap when out of bound values are set
+  programmatically, but will clip the value instead. This resolves an issue
+  where setting a value to the minimum value would trap in some situations.
 
 ### Fixed
 - Allow bridges with spaces in name.

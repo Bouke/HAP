@@ -78,20 +78,7 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
                 !permissions.contains(.read) || value != nil,
                 "Readable characteristics should have non nil value")
 
-            // swiftlint:disable:next identifier_name
-            if let _newValue = newValue, let doubleValue = Double(value: _newValue) {
-                if let min = minValue {
-                    precondition(
-                        doubleValue >= min,
-                        "Characteristic \(type) value \(_newValue) is lower than minValue \(min)")
-                }
-                if let max = maxValue {
-                    precondition(
-                        doubleValue <= max,
-                        "Characteristic \(type) value \(_newValue) is higher than maxValue \(max)")
-                }
-            }
-            _value = newValue
+            _value = clip(value: newValue)
             if let device = service?.accessory?.device {
                 device.fireCharacteristicChangeEvent(self)
             }
@@ -108,7 +95,7 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
             guard let newValue = T(value: some) else {
                 throw Error.valueTypeException
             }
-            _value = newValue
+            _value = clip(value: newValue)
         case .none:
             _value = nil
         }
@@ -140,14 +127,6 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
             !permissions.contains(.read) || value != nil,
             "Readable characteristics should have non nil value")
 
-        if let value = value, let doubleValue = Double(value: value) {
-            if let min = minValue {
-                precondition(doubleValue >= min, "Characteristic \(type) value \(value) is lower than minValue \(min)")
-            }
-            if let max = maxValue {
-                precondition(doubleValue <= max, "Characteristic \(type) value \(value) is higher than maxValue \(max)")
-            }
-        }
         self.type = type
         self._value = value
         self.permissions = permissions
@@ -160,6 +139,20 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
         self.maxValue = maxValue
         self.minValue = minValue
         self.minStep = minStep
+
+        self._value = clip(value: value)
+    }
+
+    func clip(value: T?) -> T? {
+        if let unwrappedValue = value, let doubleValue = Double(value: unwrappedValue) {
+            if let unwrappedMinValue = minValue, doubleValue < unwrappedMinValue {
+                return T(value: unwrappedMinValue)!
+            }
+            if let unwrappedMaxValue = maxValue, doubleValue > unwrappedMaxValue {
+                return T(value: unwrappedMaxValue)!
+            }
+        }
+        return value
     }
 
     public var hashValue: Int {
