@@ -330,12 +330,13 @@ public class Inspector {
         let today = formatter.string(from: currentDateTime)
 
         write("""
-            // This file has been generated automatically from macOS HAP definitions.
-            // Don't make changes to this file, but regenerate using `hap-update` instead.
+            // This file has been generated automatically from the macOS HomeKit
+            // framework definitions. Don't make changes to this file directly.
+            // Update this file using the `hap-update` tool.
             //
-            //  macOS: \(osVersion)
-            //  date: \(today)
-            //  HAP Version: \(plist["Version"] ?? "?")
+            // Generated on:              \(today)
+            // HomeKit framework version: \(plist["Version"] ?? "?")
+            // macOS:                     \(osVersion)
 
             import Foundation
 
