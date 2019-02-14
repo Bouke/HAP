@@ -1,16 +1,17 @@
 Homekit Accessory Protocol, implemented in Swift
 ================================================
 
-The goal of this package is to provide a complete implementation of the Homekit Accessory Protocol, to build your DIY accessories, or provide a bridge for non-HAP devices.
+The goal of this package is to provide a complete implementation of the Homekit Accessory Protocol, enabling you to build your DIY accessories, and connect your non-HAP devices.
 
 [![Build Status](https://travis-ci.org/Bouke/HAP.svg?branch=master)](https://travis-ci.org/Bouke/HAP)
 
 ## Features
 
-* Persistent configuration
-* Pair by scanning QR code (WWDC 2017)
-* Write custom services and characteristics
-* Linux / Raspbian (Raspberry Pi) support
+* Persistent configuration across reboots.
+* Homekit pairing by scanning QR code (shipped in iOS 11).
+* Speakers and Remote Control accessories (shipped in iOS 12 / macOS Mojave).
+* Extensibility through custom services and characteristics.
+* Runs on Linux / Raspbian (Raspberry Pi).
 
 ## How to build
 
