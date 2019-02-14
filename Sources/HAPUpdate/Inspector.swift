@@ -425,6 +425,22 @@ public class Inspector {
             let properties: Int
             let stepValue: NSNumber?
             let units: String?
+            var permissions: [CharacteristicInfoPermission] {
+                var list = [CharacteristicInfoPermission]()
+                if properties & 2 == 2 {
+                    list.append(.read)
+                }
+                if properties & 4 == 4 {
+                    list.append(.write)
+                }
+                if properties & 1 == 1 {
+                    list.append(.events)
+                }
+                return list
+            }
+            var isReadable: Bool {
+                return permissions.contains(.read)
+            }
         }
 
         var characteristicInfo = [CharacteristicInfo]()
@@ -499,9 +515,9 @@ public class Inspector {
         write("public class Enums {")
 
         var enumeratedCharacteristics = Set<String>()
+        var defaultEnumCase = [String: String]()
 
-        func writeEnumeration(enumName: String, type: String, _ newValues: NSDictionary, max: NSNumber?) -> Bool {
-
+        func determineEnumerationCases(_ newValues: NSDictionary) -> NSDictionary? {
             var values = newValues
 
             // Check if keys are digits
@@ -513,7 +529,7 @@ public class Inspector {
                 let numberedValues = values.allValues.compactMap({($0 as? NSNumber)?.intValue ?? Int($0 as? String ?? "x")})
 
                 if numberedValues.count == values.count {
-                    return false
+                    return nil
                 }
 
                 // Swap keys and values
@@ -521,15 +537,15 @@ public class Inspector {
                 let keys = values.allKeys
                 let vals = values.allValues
                 values = NSDictionary(objects: keys, forKeys: vals as! [NSCopying])
-
             }
 
+            return values
+        }
+
+        func writeEnumeration(enumName: String, type: String, values: NSDictionary, max: NSNumber?) {
             write("\tpublic enum \(enumName): \(type), CharacteristicValueType {")
             writeEnumerationCases(values, max: max)
             write("\t}\n")
-
-            return true
-
         }
 
         func writeEnumerationCases(_ unsortedCases: NSDictionary, max: NSNumber?) {
@@ -621,16 +637,18 @@ public class Inspector {
         }
 
         for (enumName, type, values, info) in enums.sorted(by: { $0.enumName < $1.enumName }) {
-            if writeEnumeration(enumName: enumName, type: type, values, max: info.maxValue) {
+            if let enumCases = determineEnumerationCases(values) {
+                writeEnumeration(enumName: enumName, type: type, values: enumCases, max: info.maxValue)
                 enumeratedCharacteristics.insert(info.hkname)
+                defaultEnumCase[info.hkname] = (enumCases.allKeys[0] as! String).parameterName()
             } else if let defaultType = Inspector.defaultTypes.first(where: { $0.characteristic == info.hkname }) {
                 // The HAP config definition couldn't be written, likely because both key and values are digits
                 // Fallback to a default definition if it exists
                 var valuedict = NSMutableDictionary()
                 defaultType.values.map( { valuedict[$0.0] = $0.1} )
-                if writeEnumeration(enumName: defaultType.enumName, type: defaultType.baseType, valuedict, max: info.maxValue) {
-                    enumeratedCharacteristics.insert(info.hkname)
-                }
+                writeEnumeration(enumName: defaultType.enumName, type: defaultType.baseType, values: valuedict, max: info.maxValue)
+                enumeratedCharacteristics.insert(info.hkname)
+                defaultEnumCase[info.hkname] = defaultType.values[0].0.parameterName()
             }
 
         }
@@ -663,10 +681,7 @@ public class Inspector {
 
         func writeCharacteristicProperty(info: CharacteristicInfo, isOptional: Bool) {
             let name = info.title.parameterName()
-            let type = enumeratedCharacteristics.contains(info.hkname) ?
-                "Enums.\(name.uppercasedFirstLetter())" :
-                typeName(info.format)
-            write("\t\tpublic let \(name): GenericCharacteristic<\(type)>\(isOptional ? "?" : "")")
+            write("\t\tpublic let \(name): GenericCharacteristic<\(valueType(info))>\(isOptional ? "?" : "")")
         }
 
         func writeRequiredCharacteristicInit(info: CharacteristicInfo) {
@@ -676,7 +691,7 @@ public class Inspector {
                 typeName(info.format)
             let characteristiceType = ".\(serviceName(info.title, uuid: info.id))"
             write("""
-                \t\t\t\(name) = unwrappedCharacteristics.first { $0.type == \(characteristiceType) } as? GenericCharacteristic<\(enumType)> ?? PredefinedCharacteristic.\(serviceName(info.title, uuid: info.id))()
+                \t\t\t\(name) = unwrappedCharacteristics.first { $0.type == \(characteristiceType) } as? GenericCharacteristic<\(valueType(info))> ?? PredefinedCharacteristic.\(serviceName(info.title, uuid: info.id))()
                 """)
         }
 
@@ -687,7 +702,7 @@ public class Inspector {
                 typeName(info.format)
             let characteristiceType = ".\(serviceName(info.title, uuid: info.id))"
             write("""
-                \t\t\t\(name) = unwrapped.first { $0.type == \(characteristiceType) } as? GenericCharacteristic<\(enumType)>
+                \t\t\t\(name) = unwrapped.first { $0.type == \(characteristiceType) } as? GenericCharacteristic<\(valueType(info))>
                 """)
         }
 
@@ -743,6 +758,35 @@ public class Inspector {
                 """)
         }
 
+        func valueType(_ characteristic: CharacteristicInfo) -> String {
+            let name = characteristic.title.parameterName()
+            let enumType = enumeratedCharacteristics.contains(characteristic.hkname) ?
+                "Enums.\(name.uppercasedFirstLetter())" :
+                typeName(characteristic.format)
+            return enumType + (characteristic.isReadable ? "" : "?")
+        }
+
+        func defaultValue(_ characteristic: CharacteristicInfo) -> String {
+            if characteristic.isReadable {
+                if (enumeratedCharacteristics.contains(characteristic.hkname)) {
+                    guard let defaultCase = defaultEnumCase[characteristic.hkname] else {
+                        preconditionFailure("No default enum case for enum \(characteristic.hkname)")
+                    }
+                    return "." + defaultCase
+                } else {
+                    switch valueType(characteristic) {
+                    case "Bool": return "false"
+                    case "Data": return "Data()"
+                    case "String": return "\"\""
+                    case "Float", "Int", "UInt8", "UInt32": return characteristic.minValue?.stringValue ?? "0"
+                    default: preconditionFailure("No default value for value type \(valueType(characteristic))")
+                    }
+                }
+            } else {
+                return "nil"
+            }
+        }
+
         write("""
         }
 
@@ -750,20 +794,16 @@ public class Inspector {
         """)
 
         for characteristic in characteristicInfo.sorted(by: { $0.title < $1.title } ) {
-            let name = characteristic.title.parameterName()
-            let enumType = enumeratedCharacteristics.contains(characteristic.hkname) ?
-                "Enums.\(name.uppercasedFirstLetter())" :
-                typeName(characteristic.format)
             write("\tpublic static func \(serviceName(characteristic.title, uuid: characteristic.id))(")
-            write("\t\t_ value: \(enumType)? = nil,")
-            write("\t\tpermissions: [CharacteristicPermission] = [\(permissions(characteristic.properties))],")
-            write("\t\tdescription: String? = \(characteristic.title != nil ? "\"\(characteristic.title)\"" : "nil"),")
+            write("\t\t_ value: \(valueType(characteristic)) = \(defaultValue(characteristic)),")
+            write("\t\tpermissions: [CharacteristicPermission] = \(characteristic.permissions.arrayLiteral),")
+            write("\t\tdescription: String? = \"\(characteristic.title)\",")
             write("\t\tformat: CharacteristicFormat? = .\(characteristic.format),")
             write("\t\tunit: CharacteristicUnit? = \(characteristic.units != nil ? ".\(unitName(characteristic.units!))" : "nil"),")
             write("\t\tmaxLength: Int? = nil,")
-            write("\t\tmaxValue: Double? = \(characteristic.maxValue),")
-            write("\t\tminValue: Double? = \(characteristic.minValue),")
-            write("\t\tminStep: Double? = \(characteristic.stepValue)")
+            write("\t\tmaxValue: Double? = \(characteristic.maxValue?.stringValue ?? "nil"),")
+            write("\t\tminValue: Double? = \(characteristic.minValue?.stringValue ?? "nil"),")
+            write("\t\tminStep: Double? = \(characteristic.stepValue?.stringValue ?? "nil")")
             write("\t) -> AnyCharacteristic {")
             write("\t\treturn AnyCharacteristic(")
             write("\t\t\tPredefinedCharacteristic.\(serviceName(characteristic.title, uuid: characteristic.id))(")
@@ -790,22 +830,18 @@ public class Inspector {
         """)
 
         for characteristic in characteristicInfo.sorted(by: { $0.title < $1.title } ) {
-            let name = characteristic.title.parameterName()
-            let enumType = enumeratedCharacteristics.contains(characteristic.hkname) ?
-                "Enums.\(name.uppercasedFirstLetter())" :
-                typeName(characteristic.format)
             write("\tstatic func \(serviceName(characteristic.title, uuid: characteristic.id))(")
-            write("\t\t_ value: \(enumType)? = nil,")
-            write("\t\tpermissions: [CharacteristicPermission] = [.read, .write, .events],")
+            write("\t\t_ value: \(valueType(characteristic)) = \(defaultValue(characteristic)),")
+            write("\t\tpermissions: [CharacteristicPermission] = \(characteristic.permissions.arrayLiteral),")
             write("\t\tdescription: String? = nil,")
             write("\t\tformat: CharacteristicFormat? = .\(characteristic.format),")
             write("\t\tunit: CharacteristicUnit? = \(characteristic.units != nil ? ".\(unitName(characteristic.units!))" : "nil"),")
             write("\t\tmaxLength: Int? = nil,")
-            write("\t\tmaxValue: Double? = \(characteristic.maxValue),")
-            write("\t\tminValue: Double? = \(characteristic.minValue),")
-            write("\t\tminStep: Double? = \(characteristic.stepValue)")
-            write("\t) -> GenericCharacteristic<\(enumType)> {")
-            write("\t\treturn GenericCharacteristic<\(enumType)>(")
+            write("\t\tmaxValue: Double? = \(characteristic.maxValue?.stringValue ?? "nil"),")
+            write("\t\tminValue: Double? = \(characteristic.minValue?.stringValue ?? "nil"),")
+            write("\t\tminStep: Double? = \(characteristic.stepValue?.stringValue ?? "nil")")
+            write("\t) -> GenericCharacteristic<\(valueType(characteristic))> {")
+            write("\t\treturn GenericCharacteristic<\(valueType(characteristic))>(")
             writeCharacteristicParameters(info: characteristic, indentLevel: 3)
             write("\t}\n")
         }
@@ -813,4 +849,16 @@ public class Inspector {
         write("""
         }
         """)    }
+}
+
+enum CharacteristicInfoPermission: String {
+    case read = "read"
+    case write = "write"
+    case events = "events"
+}
+
+extension Array where Element == CharacteristicInfoPermission {
+    var arrayLiteral: String {
+        return "[" + self.map { ".\($0)" }.joined(separator: ", ") + "]"
+    }
 }
