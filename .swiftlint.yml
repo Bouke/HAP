@@ -1,3 +1,5 @@
+excluded:
+  - Sources/HAP/Base/Generated.swift
 disabled_rules:
   - function_body_length
   - private_over_fileprivate
@@ -36,6 +38,7 @@ identifier_name:
   excluded:
     - ev
     - fd
+    - id
     - ok
     - on
     - to

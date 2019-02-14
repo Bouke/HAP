@@ -262,4 +262,4 @@ protocol RequestContext {
     func triggerUserOutboundEvent(_ event: Any, promise: EventLoopPromise<Void>?)
 }
 
-extension ChannelHandlerContext : RequestContext { }
+extension ChannelHandlerContext: RequestContext { }

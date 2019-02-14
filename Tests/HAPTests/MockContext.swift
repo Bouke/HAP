@@ -4,7 +4,7 @@ import Foundation
 import HTTP
 import NIO
 
-class MockContext : RequestContext {
+class MockContext: RequestContext {
     init() {
         channel = EmbeddedChannel(handler: nil, loop: EmbeddedEventLoop())
         events = []
