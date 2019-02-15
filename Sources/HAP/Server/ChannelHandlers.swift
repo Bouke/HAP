@@ -152,23 +152,27 @@ class ControllerHandler: ChannelDuplexHandler {
     private var channels: [ObjectIdentifier: Channel] = [:]
     private var pairings: [ObjectIdentifier: Pairing] = [:]
 
-    // TODO: tighter integration into Device
+    // TODO: tighter integration into Device.
     internal var removeSubscriptions: ((Channel) -> Void)?
 
     func channelActive(ctx: ChannelHandlerContext) {
         let channel = ctx.channel
-        channelsSyncQueue.async {
+        channelsSyncQueue.sync {
             self.channels[ObjectIdentifier(channel)] = channel
         }
+        logger.info("Controller \(channel.remoteAddress?.description ?? "N/A") connected, \(self.channels.count) controllers total")
+        ctx.fireChannelActive()
     }
 
     func channelInactive(ctx: ChannelHandlerContext) {
         let channel = ctx.channel
-        channelsSyncQueue.async {
+        channelsSyncQueue.sync {
             self.channels.removeValue(forKey: ObjectIdentifier(channel))
             self.pairings.removeValue(forKey: ObjectIdentifier(channel))
-            self.removeSubscriptions?(channel)
         }
+        self.removeSubscriptions?(channel)
+        logger.info("Controller \(channel.remoteAddress?.description ?? "N/A") disconnected, \(self.channels.count) controllers total")
+        ctx.fireChannelInactive()
     }
 
     func triggerUserOutboundEvent(ctx: ChannelHandlerContext, event: Any, promise: EventLoopPromise<Void>?) {
@@ -187,7 +191,7 @@ class ControllerHandler: ChannelDuplexHandler {
     }
 
     func notifyChannel(identifier: ObjectIdentifier, ofCharacteristicChange characteristic: Characteristic) {
-        channelsSyncQueue.async {
+        channelsSyncQueue.sync {
             guard let channel = self.channels[identifier] else {
                 // todo... probably need to clean up?
                 logger.error("event for non-existing channel")
@@ -198,7 +202,9 @@ class ControllerHandler: ChannelDuplexHandler {
     }
 
     func getPairingForChannel(_ channel: Channel) -> Pairing? {
-        return self.pairings[ObjectIdentifier(channel)]
+        return channelsSyncQueue.sync {
+            self.pairings[ObjectIdentifier(channel)]
+        }
     }
 
     func registerPairing(_ pairing: Pairing, forChannel channel: Channel) {
@@ -211,8 +217,8 @@ class ControllerHandler: ChannelDuplexHandler {
         channelsSyncQueue.sync {
             let channelIdentifiers = pairings.filter { $0.value.identifier == pairing.identifier }.keys
             for channelIdentifier in channelIdentifiers {
+                // This will trigger `channelInactive(ctx:)`.
                 channels[channelIdentifier]!.close(promise: nil)
-                pairings.removeValue(forKey: channelIdentifier)
             }
         }
     }
