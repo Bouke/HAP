@@ -5,15 +5,16 @@ extension Service {
 
         public init(name: String,
                     serialNumber: String,
-                    manufacturer: String = "undefined",
-                    model: String = "undefined",
-                    firmwareRevision: Revision = "1.0.0") {
-            super.init(characteristics: [.firmwareRevision()])
-            self.name.value = name
-            self.manufacturer.value = manufacturer
-            self.model.value = model
-            self.serialNumber.value = serialNumber
-            self.firmwareRevision?.value = firmwareRevision
+                    manufacturer: String = "unknown",
+                    model: String = "unknown",
+                    firmwareRevision: Revision = "1") {
+            super.init(characteristics: [
+                .name(name),
+                .serialNumber(serialNumber),
+                .manufacturer(manufacturer),
+                .model(model),
+                .firmwareRevision(firmwareRevision)
+            ])
         }
 
         open override func characteristic<T>(_ characteristic: GenericCharacteristic<T>,
