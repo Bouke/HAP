@@ -9,6 +9,16 @@ fileprivate let logger = getLogger("hap.endpoints.characteristics")
 func characteristics(device: Device) -> Responder {
     return { context, request in
         let channel = context.channel
+        var response: HTTPResponse?
+        DispatchQueue.main.sync {
+            response = characteristics(device: device, channel: channel, request: request)
+        }
+        return response!
+    }
+}
+
+// swiftlint:disable:next cyclomatic_complexity
+func characteristics(device: Device, channel: Channel, request: HTTPRequest) -> HTTPResponse {
 
         switch request.method {
         case .GET:
@@ -231,5 +241,4 @@ func characteristics(device: Device) -> Responder {
         default:
             return .badRequest
         }
-    }
 }
