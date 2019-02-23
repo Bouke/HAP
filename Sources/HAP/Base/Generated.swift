@@ -2,9 +2,9 @@
 // framework definitions. Don't make changes to this file directly.
 // Update this file using the `hap-update` tool.
 //
-// Generated on:              14 February 2019
-// HomeKit framework version: 718
-// macOS:                     Version 10.14.3 (Build 18D109)
+// Generated on:              24 February 2019
+// HomeKit framework version: 725
+// macOS:                     Version 10.14.4 (Build 18E194d)
 
 import Foundation
 
@@ -118,13 +118,16 @@ public extension CharacteristicType {
 	static let currentHorizontalTiltAngle = CharacteristicType(0x006C)
 	static let currentHumidifierDehumidifierState = CharacteristicType(0x00B3)
 	static let currentLightLevel = CharacteristicType(0x006B)
+	static let currentMediaState = CharacteristicType(0x00E0)
 	static let currentPosition = CharacteristicType(0x006D)
 	static let currentRelativeHumidity = CharacteristicType(0x0010)
 	static let currentSlatState = CharacteristicType(0x00AA)
 	static let currentTemperature = CharacteristicType(0x0011)
 	static let currentTiltAngle = CharacteristicType(0x00C1)
 	static let currentVerticalTiltAngle = CharacteristicType(0x006E)
+	static let currentVisibilityState = CharacteristicType(0x0135)
 	static let currentWaterLevel = CharacteristicType(0x00B5)
+	static let displayOrder = CharacteristicType(0x0136)
 	static let filterChangeIndication = CharacteristicType(0x00AC)
 	static let filterLifeLevel = CharacteristicType(0x00AB)
 	static let filterResetChangeIndication = CharacteristicType(0x00AD)
@@ -139,7 +142,6 @@ public extension CharacteristicType {
 	static let inputDeviceType = CharacteristicType(0x00DC)
 	static let inputSourceType = CharacteristicType(0x00DB)
 	static let isConfigured = CharacteristicType(0x00D6)
-	static let isHidden = CharacteristicType(0x00EB)
 	static let labelIndex = CharacteristicType(0x00CB)
 	static let labelNamespace = CharacteristicType(0x00CD)
 	static let leakDetected = CharacteristicType(0x0070)
@@ -151,7 +153,6 @@ public extension CharacteristicType {
 	static let lockTargetState = CharacteristicType(0x001E)
 	static let logs = CharacteristicType(0x001F)
 	static let manufacturer = CharacteristicType(0x0020)
-	static let mediaState = CharacteristicType(0x00E0)
 	static let model = CharacteristicType(0x0021)
 	static let motionDetected = CharacteristicType(0x0022)
 	static let mute = CharacteristicType(0x011A)
@@ -165,7 +166,6 @@ public extension CharacteristicType {
 	static let pm2_5Density = CharacteristicType(0x00C6)
 	static let pictureMode = CharacteristicType(0x00E2)
 	static let positionState = CharacteristicType(0x0072)
-	static let powerMode = CharacteristicType(0x00DE)
 	static let powerModeSelection = CharacteristicType(0x00DF)
 	static let powerState = CharacteristicType(0x0025)
 	static let programMode = CharacteristicType(0x00D1)
@@ -200,11 +200,13 @@ public extension CharacteristicType {
 	static let targetHeatingCoolingState = CharacteristicType(0x0033)
 	static let targetHorizontalTiltAngle = CharacteristicType(0x007B)
 	static let targetHumidifierDehumidifierState = CharacteristicType(0x00B4)
+	static let targetMediaState = CharacteristicType(0x0137)
 	static let targetPosition = CharacteristicType(0x007C)
 	static let targetRelativeHumidity = CharacteristicType(0x0034)
 	static let targetTemperature = CharacteristicType(0x0035)
 	static let targetTiltAngle = CharacteristicType(0x00C2)
 	static let targetVerticalTiltAngle = CharacteristicType(0x007D)
+	static let targetVisibilityState = CharacteristicType(0x0134)
 	static let temperatureDisplayUnits = CharacteristicType(0x0036)
 	static let valveType = CharacteristicType(0x00D5)
 	static let version = CharacteristicType(0x0037)
@@ -314,6 +316,11 @@ public class Enums {
 		case auto = 1
 	}
 
+	public enum CurrentVisibilityState: UInt8, CharacteristicValueType {
+		case shown = 0
+		case hidden = 1
+	}
+
 	public enum FilterChangeIndication: UInt8, CharacteristicValueType {
 		case noChange = 0
 		case change = 1
@@ -404,6 +411,7 @@ public class Enums {
 		case back = 9
 		case exit = 10
 		case playpause = 11
+		case information = 15
 	}
 
 	public enum RotationDirection: Int, CharacteristicValueType {
@@ -473,6 +481,17 @@ public class Enums {
 		case inactive = 0
 		case idle = 1
 		case humidifying = 2
+	}
+
+	public enum TargetMediaState: UInt8, CharacteristicValueType {
+		case play = 0
+		case pause = 1
+		case stop = 2
+	}
+
+	public enum TargetVisibilityState: UInt8, CharacteristicValueType {
+		case shown = 0
+		case hidden = 1
 	}
 
 	public enum TemperatureDisplayUnits: UInt8, CharacteristicValueType {
@@ -1027,11 +1046,12 @@ extension Service {
 		public let inputSourceType: GenericCharacteristic<Enums.InputSourceType>
 		public let isConfigured: GenericCharacteristic<Enums.IsConfigured>
 		public let name: GenericCharacteristic<String>
+		public let currentVisibilityState: GenericCharacteristic<Enums.CurrentVisibilityState>
 
 		// Optional Characteristics
 		public let identifier: GenericCharacteristic<UInt32>?
 		public let inputDeviceType: GenericCharacteristic<Enums.InputDeviceType>?
-		public let isHidden: GenericCharacteristic<UInt8>?
+		public let targetVisibilityState: GenericCharacteristic<Enums.TargetVisibilityState>?
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
@@ -1051,9 +1071,13 @@ extension Service {
 				type: .name,
 				characteristics: &unwrapped,
 				generator: { PredefinedCharacteristic.name() })
+			currentVisibilityState = getOrCreateAppend(
+				type: .currentVisibilityState,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.currentVisibilityState() })
 			identifier = get(type: .identifier, characteristics: unwrapped)
 			inputDeviceType = get(type: .inputDeviceType, characteristics: unwrapped)
-			isHidden = get(type: .isHidden, characteristics: unwrapped)
+			targetVisibilityState = get(type: .targetVisibilityState, characteristics: unwrapped)
 			super.init(type: .inputSource, characteristics: unwrapped)
 		}
 	}
@@ -1514,9 +1538,10 @@ extension Service {
 		// Optional Characteristics
 		public let brightness: GenericCharacteristic<Int>?
 		public let closedCaptions: GenericCharacteristic<Enums.ClosedCaptions>?
-		public let mediaState: GenericCharacteristic<UInt8>?
+		public let displayOrder: GenericCharacteristic<Data>?
+		public let currentMediaState: GenericCharacteristic<UInt8>?
+		public let targetMediaState: GenericCharacteristic<Enums.TargetMediaState>?
 		public let pictureMode: GenericCharacteristic<Enums.PictureMode>?
-		public let powerMode: GenericCharacteristic<UInt8>?
 		public let powerModeSelection: GenericCharacteristic<Enums.PowerModeSelection?>?
 		public let remoteKey: GenericCharacteristic<Enums.RemoteKey?>?
 
@@ -1540,9 +1565,10 @@ extension Service {
 				generator: { PredefinedCharacteristic.sleepDiscoveryMode() })
 			brightness = get(type: .brightness, characteristics: unwrapped)
 			closedCaptions = get(type: .closedCaptions, characteristics: unwrapped)
-			mediaState = get(type: .mediaState, characteristics: unwrapped)
+			displayOrder = get(type: .displayOrder, characteristics: unwrapped)
+			currentMediaState = get(type: .currentMediaState, characteristics: unwrapped)
+			targetMediaState = get(type: .targetMediaState, characteristics: unwrapped)
 			pictureMode = get(type: .pictureMode, characteristics: unwrapped)
-			powerMode = get(type: .powerMode, characteristics: unwrapped)
 			powerModeSelection = get(type: .powerModeSelection, characteristics: unwrapped)
 			remoteKey = get(type: .remoteKey, characteristics: unwrapped)
 			super.init(type: .television, characteristics: unwrapped)
@@ -2144,7 +2170,7 @@ public extension AnyCharacteristic {
 
 	public static func configuredName(
 		_ value: String = "",
-		permissions: [CharacteristicPermission] = [.read, .write, .events],
+		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Configured Name",
 		format: CharacteristicFormat? = .string,
 		unit: CharacteristicUnit? = nil,
@@ -2430,6 +2456,30 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
+	public static func currentMediaState(
+		_ value: UInt8 = 0,
+		permissions: [CharacteristicPermission] = [.read, .events],
+		description: String? = "Current Media State",
+		format: CharacteristicFormat? = .uint8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = 3,
+		minValue: Double? = 0,
+		minStep: Double? = 1
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.currentMediaState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
+	}
+
 	public static func currentPosition(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
@@ -2574,6 +2624,30 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
+	public static func currentVisibilityState(
+		_ value: Enums.CurrentVisibilityState = .shown,
+		permissions: [CharacteristicPermission] = [.read, .events],
+		description: String? = "Current Visibility State",
+		format: CharacteristicFormat? = .uint8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = 3,
+		minValue: Double? = 0,
+		minStep: Double? = 1
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.currentVisibilityState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
+	}
+
 	public static func currentWaterLevel(
 		_ value: Float = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
@@ -2587,6 +2661,30 @@ public extension AnyCharacteristic {
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.currentWaterLevel(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
+	}
+
+	public static func displayOrder(
+		_ value: Data = Data(),
+		permissions: [CharacteristicPermission] = [.read, .events],
+		description: String? = "Display Order",
+		format: CharacteristicFormat? = .tlv8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.displayOrder(
 			value,
 			permissions: permissions,
 			description: description,
@@ -2912,7 +3010,7 @@ public extension AnyCharacteristic {
 
 	public static func isConfigured(
 		_ value: Enums.IsConfigured = .notconfigured,
-		permissions: [CharacteristicPermission] = [.read, .write, .events],
+		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Is Configured",
 		format: CharacteristicFormat? = .uint8,
 		unit: CharacteristicUnit? = nil,
@@ -2923,30 +3021,6 @@ public extension AnyCharacteristic {
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.isConfigured(
-			value,
-			permissions: permissions,
-			description: description,
-			format: format,
-			unit: unit,
-			maxLength: maxLength,
-			maxValue: maxValue,
-			minValue: minValue,
-			minStep: minStep) as Characteristic)
-	}
-
-	public static func isHidden(
-		_ value: UInt8 = 0,
-		permissions: [CharacteristicPermission] = [.read, .write, .events],
-		description: String? = "Is Hidden",
-		format: CharacteristicFormat? = .uint8,
-		unit: CharacteristicUnit? = nil,
-		maxLength: Int? = nil,
-		maxValue: Double? = 1,
-		minValue: Double? = 0,
-		minStep: Double? = 1
-	) -> AnyCharacteristic {
-		return AnyCharacteristic(
-			PredefinedCharacteristic.isHidden(
 			value,
 			permissions: permissions,
 			description: description,
@@ -3211,30 +3285,6 @@ public extension AnyCharacteristic {
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.manufacturer(
-			value,
-			permissions: permissions,
-			description: description,
-			format: format,
-			unit: unit,
-			maxLength: maxLength,
-			maxValue: maxValue,
-			minValue: minValue,
-			minStep: minStep) as Characteristic)
-	}
-
-	public static func mediaState(
-		_ value: UInt8 = 0,
-		permissions: [CharacteristicPermission] = [.read, .write, .events],
-		description: String? = "Media State",
-		format: CharacteristicFormat? = .uint8,
-		unit: CharacteristicUnit? = nil,
-		maxLength: Int? = nil,
-		maxValue: Double? = 2,
-		minValue: Double? = 0,
-		minStep: Double? = 1
-	) -> AnyCharacteristic {
-		return AnyCharacteristic(
-			PredefinedCharacteristic.mediaState(
 			value,
 			permissions: permissions,
 			description: description,
@@ -3514,10 +3564,10 @@ public extension AnyCharacteristic {
 		_ value: Enums.PictureMode = .game,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Picture Mode",
-		format: CharacteristicFormat? = .uint8,
+		format: CharacteristicFormat? = .uint16,
 		unit: CharacteristicUnit? = nil,
 		maxLength: Int? = nil,
-		maxValue: Double? = 7,
+		maxValue: Double? = 13,
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
@@ -3547,30 +3597,6 @@ public extension AnyCharacteristic {
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.positionState(
-			value,
-			permissions: permissions,
-			description: description,
-			format: format,
-			unit: unit,
-			maxLength: maxLength,
-			maxValue: maxValue,
-			minValue: minValue,
-			minStep: minStep) as Characteristic)
-	}
-
-	public static func powerMode(
-		_ value: UInt8 = 0,
-		permissions: [CharacteristicPermission] = [.read, .write, .events],
-		description: String? = "Power Mode",
-		format: CharacteristicFormat? = .uint8,
-		unit: CharacteristicUnit? = nil,
-		maxLength: Int? = nil,
-		maxValue: Double? = 3,
-		minValue: Double? = 0,
-		minStep: Double? = 1
-	) -> AnyCharacteristic {
-		return AnyCharacteristic(
-			PredefinedCharacteristic.powerMode(
 			value,
 			permissions: permissions,
 			description: description,
@@ -3781,7 +3807,7 @@ public extension AnyCharacteristic {
 		format: CharacteristicFormat? = .uint8,
 		unit: CharacteristicUnit? = nil,
 		maxLength: Int? = nil,
-		maxValue: Double? = 11,
+		maxValue: Double? = 16,
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> AnyCharacteristic {
@@ -4398,6 +4424,30 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
+	public static func targetMediaState(
+		_ value: Enums.TargetMediaState = .pause,
+		permissions: [CharacteristicPermission] = [.read, .write, .events],
+		description: String? = "Target Media State",
+		format: CharacteristicFormat? = .uint8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = 2,
+		minValue: Double? = 0,
+		minStep: Double? = 1
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.targetMediaState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
+	}
+
 	public static func targetPosition(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
@@ -4507,6 +4557,30 @@ public extension AnyCharacteristic {
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.targetVerticalTiltAngle(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
+	}
+
+	public static func targetVisibilityState(
+		_ value: Enums.TargetVisibilityState = .shown,
+		permissions: [CharacteristicPermission] = [.read, .write, .events],
+		description: String? = "Target Visibility State",
+		format: CharacteristicFormat? = .uint8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = 1,
+		minValue: Double? = 0,
+		minStep: Double? = 1
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.targetVisibilityState(
 			value,
 			permissions: permissions,
 			description: description,
@@ -5099,7 +5173,7 @@ public class PredefinedCharacteristic {
 
 	static func configuredName(
 		_ value: String = "",
-		permissions: [CharacteristicPermission] = [.read, .write, .events],
+		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Configured Name",
 		format: CharacteristicFormat? = .string,
 		unit: CharacteristicUnit? = nil,
@@ -5385,6 +5459,30 @@ public class PredefinedCharacteristic {
 			minStep: minStep)
 	}
 
+	static func currentMediaState(
+		_ value: UInt8 = 0,
+		permissions: [CharacteristicPermission] = [.read, .events],
+		description: String? = "Current Media State",
+		format: CharacteristicFormat? = .uint8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = 3,
+		minValue: Double? = 0,
+		minStep: Double? = 1
+	) -> GenericCharacteristic<UInt8> {
+		return GenericCharacteristic<UInt8>(
+			type: .currentMediaState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
+	}
+
 	static func currentPosition(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
@@ -5529,6 +5627,30 @@ public class PredefinedCharacteristic {
 			minStep: minStep)
 	}
 
+	static func currentVisibilityState(
+		_ value: Enums.CurrentVisibilityState = .shown,
+		permissions: [CharacteristicPermission] = [.read, .events],
+		description: String? = "Current Visibility State",
+		format: CharacteristicFormat? = .uint8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = 3,
+		minValue: Double? = 0,
+		minStep: Double? = 1
+	) -> GenericCharacteristic<Enums.CurrentVisibilityState> {
+		return GenericCharacteristic<Enums.CurrentVisibilityState>(
+			type: .currentVisibilityState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
+	}
+
 	static func currentWaterLevel(
 		_ value: Float = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
@@ -5542,6 +5664,30 @@ public class PredefinedCharacteristic {
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .currentWaterLevel,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
+	}
+
+	static func displayOrder(
+		_ value: Data = Data(),
+		permissions: [CharacteristicPermission] = [.read, .events],
+		description: String? = "Display Order",
+		format: CharacteristicFormat? = .tlv8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil
+	) -> GenericCharacteristic<Data> {
+		return GenericCharacteristic<Data>(
+			type: .displayOrder,
 			value: value,
 			permissions: permissions,
 			description: description,
@@ -5867,7 +6013,7 @@ public class PredefinedCharacteristic {
 
 	static func isConfigured(
 		_ value: Enums.IsConfigured = .notconfigured,
-		permissions: [CharacteristicPermission] = [.read, .write, .events],
+		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Is Configured",
 		format: CharacteristicFormat? = .uint8,
 		unit: CharacteristicUnit? = nil,
@@ -5878,30 +6024,6 @@ public class PredefinedCharacteristic {
 	) -> GenericCharacteristic<Enums.IsConfigured> {
 		return GenericCharacteristic<Enums.IsConfigured>(
 			type: .isConfigured,
-			value: value,
-			permissions: permissions,
-			description: description,
-			format: format,
-			unit: unit,
-			maxLength: maxLength,
-			maxValue: maxValue,
-			minValue: minValue,
-			minStep: minStep)
-	}
-
-	static func isHidden(
-		_ value: UInt8 = 0,
-		permissions: [CharacteristicPermission] = [.read, .write, .events],
-		description: String? = "Is Hidden",
-		format: CharacteristicFormat? = .uint8,
-		unit: CharacteristicUnit? = nil,
-		maxLength: Int? = nil,
-		maxValue: Double? = 1,
-		minValue: Double? = 0,
-		minStep: Double? = 1
-	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(
-			type: .isHidden,
 			value: value,
 			permissions: permissions,
 			description: description,
@@ -6166,30 +6288,6 @@ public class PredefinedCharacteristic {
 	) -> GenericCharacteristic<String> {
 		return GenericCharacteristic<String>(
 			type: .manufacturer,
-			value: value,
-			permissions: permissions,
-			description: description,
-			format: format,
-			unit: unit,
-			maxLength: maxLength,
-			maxValue: maxValue,
-			minValue: minValue,
-			minStep: minStep)
-	}
-
-	static func mediaState(
-		_ value: UInt8 = 0,
-		permissions: [CharacteristicPermission] = [.read, .write, .events],
-		description: String? = "Media State",
-		format: CharacteristicFormat? = .uint8,
-		unit: CharacteristicUnit? = nil,
-		maxLength: Int? = nil,
-		maxValue: Double? = 2,
-		minValue: Double? = 0,
-		minStep: Double? = 1
-	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(
-			type: .mediaState,
 			value: value,
 			permissions: permissions,
 			description: description,
@@ -6469,10 +6567,10 @@ public class PredefinedCharacteristic {
 		_ value: Enums.PictureMode = .game,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Picture Mode",
-		format: CharacteristicFormat? = .uint8,
+		format: CharacteristicFormat? = .uint16,
 		unit: CharacteristicUnit? = nil,
 		maxLength: Int? = nil,
-		maxValue: Double? = 7,
+		maxValue: Double? = 13,
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.PictureMode> {
@@ -6502,30 +6600,6 @@ public class PredefinedCharacteristic {
 	) -> GenericCharacteristic<Enums.PositionState> {
 		return GenericCharacteristic<Enums.PositionState>(
 			type: .positionState,
-			value: value,
-			permissions: permissions,
-			description: description,
-			format: format,
-			unit: unit,
-			maxLength: maxLength,
-			maxValue: maxValue,
-			minValue: minValue,
-			minStep: minStep)
-	}
-
-	static func powerMode(
-		_ value: UInt8 = 0,
-		permissions: [CharacteristicPermission] = [.read, .write, .events],
-		description: String? = "Power Mode",
-		format: CharacteristicFormat? = .uint8,
-		unit: CharacteristicUnit? = nil,
-		maxLength: Int? = nil,
-		maxValue: Double? = 3,
-		minValue: Double? = 0,
-		minStep: Double? = 1
-	) -> GenericCharacteristic<UInt8> {
-		return GenericCharacteristic<UInt8>(
-			type: .powerMode,
 			value: value,
 			permissions: permissions,
 			description: description,
@@ -6736,7 +6810,7 @@ public class PredefinedCharacteristic {
 		format: CharacteristicFormat? = .uint8,
 		unit: CharacteristicUnit? = nil,
 		maxLength: Int? = nil,
-		maxValue: Double? = 11,
+		maxValue: Double? = 16,
 		minValue: Double? = 0,
 		minStep: Double? = 1
 	) -> GenericCharacteristic<Enums.RemoteKey?> {
@@ -7353,6 +7427,30 @@ public class PredefinedCharacteristic {
 			minStep: minStep)
 	}
 
+	static func targetMediaState(
+		_ value: Enums.TargetMediaState = .pause,
+		permissions: [CharacteristicPermission] = [.read, .write, .events],
+		description: String? = "Target Media State",
+		format: CharacteristicFormat? = .uint8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = 2,
+		minValue: Double? = 0,
+		minStep: Double? = 1
+	) -> GenericCharacteristic<Enums.TargetMediaState> {
+		return GenericCharacteristic<Enums.TargetMediaState>(
+			type: .targetMediaState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
+	}
+
 	static func targetPosition(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
@@ -7462,6 +7560,30 @@ public class PredefinedCharacteristic {
 	) -> GenericCharacteristic<Int> {
 		return GenericCharacteristic<Int>(
 			type: .targetVerticalTiltAngle,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
+	}
+
+	static func targetVisibilityState(
+		_ value: Enums.TargetVisibilityState = .shown,
+		permissions: [CharacteristicPermission] = [.read, .write, .events],
+		description: String? = "Target Visibility State",
+		format: CharacteristicFormat? = .uint8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = 1,
+		minValue: Double? = 0,
+		minStep: Double? = 1
+	) -> GenericCharacteristic<Enums.TargetVisibilityState> {
+		return GenericCharacteristic<Enums.TargetVisibilityState>(
+			type: .targetVisibilityState,
 			value: value,
 			permissions: permissions,
 			description: description,
