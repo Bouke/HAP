@@ -33,6 +33,7 @@ extension Service {
         public init() {
             super.init(characteristics: [.powerModeSelection(), .remoteKey()])
             self.primary = true
+            sleepDiscoveryMode.value = .alwaysdiscoverable
         }
     }
 }
@@ -46,6 +47,7 @@ extension Service {
             configuredName.value = name
             inputSourceType.value = input
             self.identifier?.value = identifier
+            isConfigured.value = .configured
         }
     }
 }
@@ -53,7 +55,7 @@ extension Service {
 extension Service {
     open class TelevisionSpeaker: SpeakerBase {
         public init() {
-            super.init(characteristics: [.active(), .volumeControlType(), .volumeSelector(), .volume()])
+            super.init(characteristics: [.active(), .volumeControlType(), .volumeSelector(), .volume(), .name("Speaker")])
         }
     }
 }

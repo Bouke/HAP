@@ -319,7 +319,8 @@ public class Enums {
 	public enum CurrentVisibilityState: UInt8, CharacteristicValueType {
 		case shown = 0
 		case hidden = 1
-	}
+        case state2 = 2
+        case state3 = 3	}
 
 	public enum FilterChangeIndication: UInt8, CharacteristicValueType {
 		case noChange = 0
