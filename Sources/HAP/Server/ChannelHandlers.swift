@@ -32,38 +32,38 @@ class CryptographerHandler: ChannelDuplexHandler {
     }
 
     func channelRead(ctx: ChannelHandlerContext, data: NIOAny) {
-        if let cryptographer = cryptographer {
-            var buffer = unwrapInboundIn(data)
-            let data = buffer.readData(length: buffer.readableBytes)!
-            guard let decrypted = try? cryptographer.decrypt(data) else {
-                // swiftlint:disable:next line_length
-                logger.warning("Could not decrypt message from \(ctx.remoteAddress?.description ?? "???"), closing connection.")
-                ctx.close(promise: nil)
-                return
-            }
-            var out = ctx.channel.allocator.buffer(capacity: decrypted.count)
-            out.write(bytes: decrypted)
-            ctx.fireChannelRead(wrapInboundOut(out))
-        } else {
-            ctx.fireChannelRead(data)
+        guard let cryptographer = cryptographer else {
+            return ctx.fireChannelRead(data)
         }
+
+        var buffer = unwrapInboundIn(data)
+        let data = buffer.readData(length: buffer.readableBytes)!
+        guard let decrypted = try? cryptographer.decrypt(data) else {
+            // swiftlint:disable:next line_length
+            logger.warning("Could not decrypt message from \(ctx.remoteAddress?.description ?? "???"), closing connection.")
+            ctx.close(promise: nil)
+            return
+        }
+        var out = ctx.channel.allocator.buffer(capacity: decrypted.count)
+        out.write(bytes: decrypted)
+        ctx.fireChannelRead(wrapInboundOut(out))
     }
 
     func write(ctx: ChannelHandlerContext, data: NIOAny, promise: EventLoopPromise<Void>?) {
-        if let cryptographer = cryptographer {
-            var buffer = unwrapOutboundIn(data)
-            let data = buffer.readData(length: buffer.readableBytes)!
-            guard let encrypted = try? cryptographer.encrypt(data) else {
-                // swiftlint:disable:next line_length
-                logger.warning("Could not encrypt message to \(ctx.remoteAddress?.description ?? "???"), closing connection.")
-                return
-            }
-            var out = ctx.channel.allocator.buffer(capacity: encrypted.count)
-            out.write(bytes: encrypted)
-            ctx.write(wrapOutboundOut(out), promise: promise)
-        } else {
-            ctx.write(data, promise: promise)
+        guard let cryptographer = cryptographer else {
+            return ctx.write(data, promise: promise)
         }
+
+        var buffer = unwrapOutboundIn(data)
+        let data = buffer.readData(length: buffer.readableBytes)!
+        guard let encrypted = try? cryptographer.encrypt(data) else {
+            // swiftlint:disable:next line_length
+            logger.warning("Could not encrypt message to \(ctx.remoteAddress?.description ?? "???"), closing connection.")
+            return
+        }
+        var out = ctx.channel.allocator.buffer(capacity: encrypted.count)
+        out.write(bytes: encrypted)
+        ctx.write(wrapOutboundOut(out), promise: promise)
     }
 }
 
