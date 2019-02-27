@@ -26,7 +26,7 @@ func logger(_ application: @escaping Responder) -> Responder {
         let response = application(context, request)
         // swiftlint:disable:next line_length
         logger.info("\(context.channel.remoteAddress?.description ?? "N/A") \(request.method) \(request.urlString) \(response.status.code) \(response.body.count ?? 0)")
-        logger.debug("- Response Messagea: \(String(data: response.body.data ?? "nil".data(using: .utf8)!, encoding: .utf8) ?? "-")\n")
+        logger.debug("Response Message: \(String(data: response.body.data ?? "nil".data(using: .utf8)!, encoding: .utf8) ?? "-")\n")
        return response
     }
 }
