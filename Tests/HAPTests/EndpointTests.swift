@@ -117,6 +117,9 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(wattCharacteristic["value"] as? Int, 42)
             XCTAssertEqual(wattCharacteristic["type"] as? String, "E863F10D-079E-48FF-8F27-9C2605A29F52")
         }
+        let expectation = self.expectation(description: "Test Complete")
+        testQueue.async { expectation.fulfill() }
+        waitForExpectations(timeout: 5, handler: nil)
     }
 
     func testGetCharacteristics() {
@@ -174,6 +177,9 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(brightnessCharacteristic["type"] as? String, "8")
             XCTAssertEqual(brightnessCharacteristic["ev"] as? Bool, true)
         }
+        let expectation = self.expectation(description: "Test Complete")
+        testQueue.async { expectation.fulfill() }
+        waitForExpectations(timeout: 5, handler: nil)
     }
 
     func testPutBoolAndIntCharacteristics() {
@@ -235,6 +241,9 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(response.status, .noContent)
             XCTAssertEqual(lamp.lightbulb.brightness!.value, 100)
         }
+        let expectation = self.expectation(description: "Test Complete")
+        testQueue.async { expectation.fulfill() }
+        waitForExpectations(timeout: 5, handler: nil)
     }
 
     func testPutDoubleAndEnumCharacteristics() {
@@ -325,6 +334,9 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(response.status, .noContent)
             XCTAssertEqual(thermostat.thermostat.targetHeatingCoolingState.value, .off)
         }
+        let expectation = self.expectation(description: "Test Complete")
+        testQueue.async { expectation.fulfill() }
+        waitForExpectations(timeout: 5, handler: nil)
     }
 
     func testPutBadCharacteristics() {
@@ -554,6 +566,9 @@ class EndpointTests: XCTestCase {
             let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
             XCTAssertEqual(response.status, .unprocessableEntity)
         }
+        let expectation = self.expectation(description: "Test Complete")
+        testQueue.async { expectation.fulfill() }
+        waitForExpectations(timeout: 5, handler: nil)
     }
 
     func testGetBadCharacteristics() {
@@ -678,6 +693,9 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(therm["status"] as? Int, HAPStatusCodes.success.rawValue)
             XCTAssertEqual(Float(value: therm["value"] as Any), thermostat.thermostat.currentTemperature.value)
         }
+        let expectation = self.expectation(description: "Test Complete")
+        testQueue.async { expectation.fulfill() }
+        waitForExpectations(timeout: 5, handler: nil)
     }
 
     func testAuthentication() {
