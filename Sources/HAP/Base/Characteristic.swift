@@ -75,7 +75,7 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
                 return
             }
             precondition(
-                !permissions.contains(.read) || value != nil,
+                !permissions.contains(.read) || newValue != nil,
                 "Readable characteristics should have non nil value")
 
             _value = clip(value: newValue)

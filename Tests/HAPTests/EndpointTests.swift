@@ -93,7 +93,8 @@ class EndpointTests: XCTestCase {
         let energy = Energy(info: .init(name: "Energy", serialNumber: "00057"))
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: energy)
         let application = characteristics(device: device)
-        do {
+        let testQueue = DispatchQueue(label: "TestQueue")
+        testQueue.async {
             let response = application(MockContext(), HTTPRequest(uri: "/characteristics?id=\(energy.aid).\(energy.info.name.iid),\(energy.aid).\(energy.service.watt.iid)&meta=1&perms=1&type=1&ev=1"))
             guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body.data ?? Data(), options: [])) as? [String: [[String: Any]]] else {
                 return XCTFail("Could not decode")
@@ -116,6 +117,9 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(wattCharacteristic["value"] as? Int, 42)
             XCTAssertEqual(wattCharacteristic["type"] as? String, "E863F10D-079E-48FF-8F27-9C2605A29F52")
         }
+        let expectation = self.expectation(description: "Test Complete")
+        testQueue.async { expectation.fulfill() }
+        waitForExpectations(timeout: 5, handler: nil)
     }
 
     func testGetCharacteristics() {
@@ -123,7 +127,8 @@ class EndpointTests: XCTestCase {
         lamp.lightbulb.brightness!.value = 100
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = characteristics(device: device)
-        do {
+        let testQueue = DispatchQueue(label: "TestQueue")
+        testQueue.async {
             let response = application(MockContext(), HTTPRequest(uri: "/characteristics?id=\(lamp.aid).\(lamp.info.manufacturer.iid),\(lamp.aid).\(lamp.info.name.iid)"))
             guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body.data ?? Data(), options: [])) as? [String: [[String: Any]]] else {
                 return XCTFail("Could not decode")
@@ -143,7 +148,7 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(nameCharacteristic["value"] as? String, "Night stand left")
         }
 
-        do {
+        testQueue.async {
             let response = application(MockContext(), HTTPRequest(uri: "/characteristics?id=\(lamp.aid).\(lamp.info.name.iid),\(lamp.aid).\(lamp.lightbulb.brightness!.iid)&meta=1&perms=1&type=1&ev=1"))
             guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body.data ?? Data(), options: [])) as? [String: [[String: Any]]] else {
                 return XCTFail("Could not decode")
@@ -172,18 +177,22 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(brightnessCharacteristic["type"] as? String, "8")
             XCTAssertEqual(brightnessCharacteristic["ev"] as? Bool, true)
         }
+        let expectation = self.expectation(description: "Test Complete")
+        testQueue.async { expectation.fulfill() }
+        waitForExpectations(timeout: 5, handler: nil)
     }
 
     func testPutBoolAndIntCharacteristics() {
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00057", manufacturer: "Bouke"), isDimmable: true)
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = characteristics(device: device)
+        let testQueue = DispatchQueue(label: "TestQueue")
 
         lamp.lightbulb.powerState.value = false
         lamp.lightbulb.brightness?.value = 0
 
         // turn lamp on
-        do {
+        testQueue.async {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
@@ -200,7 +209,7 @@ class EndpointTests: XCTestCase {
         }
 
         // 50% brightness
-        do {
+        testQueue.async {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
@@ -217,7 +226,7 @@ class EndpointTests: XCTestCase {
         }
 
         // 100% brightness
-        do {
+        testQueue.async {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
@@ -232,12 +241,16 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(response.status, .noContent)
             XCTAssertEqual(lamp.lightbulb.brightness!.value, 100)
         }
+        let expectation = self.expectation(description: "Test Complete")
+        testQueue.async { expectation.fulfill() }
+        waitForExpectations(timeout: 5, handler: nil)
     }
 
     func testPutDoubleAndEnumCharacteristics() {
         let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat", serialNumber: "00058", manufacturer: "Bouke"))
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: thermostat)
         let application = characteristics(device: device)
+        let testQueue = DispatchQueue(label: "TestQueue")
 
         thermostat.thermostat.currentHeatingCoolingState.value = .off
         thermostat.thermostat.currentTemperature.value = 18
@@ -246,7 +259,7 @@ class EndpointTests: XCTestCase {
         thermostat.thermostat.targetTemperature.value = 15
 
         // turn up the heat
-        do {
+        testQueue.async {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
@@ -269,7 +282,7 @@ class EndpointTests: XCTestCase {
         }
 
         // turn up the heat some more (value is an Int on Linux, needs to be cast to Double)
-        do {
+        testQueue.async {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
@@ -286,7 +299,7 @@ class EndpointTests: XCTestCase {
         }
 
         // turn off
-        do {
+        testQueue.async {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
@@ -303,7 +316,7 @@ class EndpointTests: XCTestCase {
         }
 
         // wirting all Apple defined properties
-        do {
+        testQueue.async {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
@@ -321,6 +334,9 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(response.status, .noContent)
             XCTAssertEqual(thermostat.thermostat.targetHeatingCoolingState.value, .off)
         }
+        let expectation = self.expectation(description: "Test Complete")
+        testQueue.async { expectation.fulfill() }
+        waitForExpectations(timeout: 5, handler: nil)
     }
 
     func testPutBadCharacteristics() {
@@ -328,9 +344,9 @@ class EndpointTests: XCTestCase {
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00060"), isDimmable: true)
         let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00060B"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
         let application = characteristics(device: device)
-
+        let testQueue = DispatchQueue(label: "TestQueue")
         // Writing to read only value should not succeed.
-        do {
+        testQueue.async {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
@@ -346,7 +362,7 @@ class EndpointTests: XCTestCase {
         }
 
         // Writing incorrect value should not succeed.
-        do {
+        testQueue.async {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
@@ -365,7 +381,7 @@ class EndpointTests: XCTestCase {
 
         // Writing two values, one should fail as it is read only, the other
         // should succeed.
-        do {
+        testQueue.async {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
@@ -393,7 +409,7 @@ class EndpointTests: XCTestCase {
 
         // Writing two values, both should fail as the first one is read only
         // and the second receives an invalid value.
-        do {
+        testQueue.async {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
@@ -419,7 +435,7 @@ class EndpointTests: XCTestCase {
         }
 
         // Writing two values, one should succeed and the other should fail as it is read only.
-        do {
+        testQueue.async {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
@@ -445,7 +461,7 @@ class EndpointTests: XCTestCase {
         }
 
         // Writing two values, both should fail as they are read only.
-        do {
+        testQueue.async {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
@@ -473,7 +489,7 @@ class EndpointTests: XCTestCase {
 
         // "400 Bad Request" on HAP client error, e.g. a malformed request
         // at least one of `value` or `ev` should be present.
-        do {
+        testQueue.async {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
@@ -488,7 +504,7 @@ class EndpointTests: XCTestCase {
         }
 
         // Leaving out the `iid` field should not succeed.
-        do {
+        testQueue.async {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
@@ -503,7 +519,7 @@ class EndpointTests: XCTestCase {
         }
 
         // Leaving out the `aid` field should not succeed.
-        do {
+        testQueue.async {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
@@ -519,7 +535,7 @@ class EndpointTests: XCTestCase {
 
         // "422 Unprocessable Entity" for a well-formed request that contains
         // invalid parameters.
-        do {
+        testQueue.async {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
@@ -536,7 +552,7 @@ class EndpointTests: XCTestCase {
 
         // "422 Unprocessable Entity" for a well-formed request that contains
         // invalid parameters.
-        do {
+        testQueue.async {
             let jsonObject: [String: [[String: Any]]] = [
                 "characteristics": [
                     [
@@ -550,6 +566,9 @@ class EndpointTests: XCTestCase {
             let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
             XCTAssertEqual(response.status, .unprocessableEntity)
         }
+        let expectation = self.expectation(description: "Test Complete")
+        testQueue.async { expectation.fulfill() }
+        waitForExpectations(timeout: 5, handler: nil)
     }
 
     func testGetBadCharacteristics() {
@@ -562,9 +581,10 @@ class EndpointTests: XCTestCase {
         lamp.lightbulb.brightness!.value = 53
         let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00063B"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [lightsensor, thermostat, lamp])
         let application = characteristics(device: device)
+        let testQueue = DispatchQueue(label: "TestQueue")
 
         // First a good one
-        do {
+        testQueue.async {
             let req = "\(lamp.aid).\(lamp.lightbulb.brightness!.iid),\(lightsensor.aid).\(lightsensor.lightSensor.currentLightLevel.iid),\(thermostat.aid).\(thermostat.thermostat.currentTemperature.iid)"
             let response = application(MockContext(), HTTPRequest(uri: "/characteristics?id=\(req)"))
 
@@ -607,7 +627,7 @@ class EndpointTests: XCTestCase {
         }
 
         // trying to read write only access
-        do {
+        testQueue.async {
             let iid = lightsensor.info.identify.iid
             let aid = lightsensor.aid
             let response = application(MockContext(), HTTPRequest(uri: "/characteristics?id=\(aid).\(iid)"))
@@ -619,7 +639,7 @@ class EndpointTests: XCTestCase {
         }
 
         // trying to read write only access and one with read access
-        do {
+        testQueue.async {
             let iid = lightsensor.info.identify.iid
             let aid = lightsensor.aid
             let iid2 = thermostat.thermostat.currentTemperature.iid
@@ -647,7 +667,7 @@ class EndpointTests: XCTestCase {
         }
 
         // trying to read write only access and one with read access, reverse order
-        do {
+        testQueue.async {
             let iid = lightsensor.info.identify.iid
             let aid = lightsensor.aid
             let iid2 = thermostat.thermostat.currentTemperature.iid
@@ -673,6 +693,9 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(therm["status"] as? Int, HAPStatusCodes.success.rawValue)
             XCTAssertEqual(Float(value: therm["value"] as Any), thermostat.thermostat.currentTemperature.value)
         }
+        let expectation = self.expectation(description: "Test Complete")
+        testQueue.async { expectation.fulfill() }
+        waitForExpectations(timeout: 5, handler: nil)
     }
 
     func testAuthentication() {
