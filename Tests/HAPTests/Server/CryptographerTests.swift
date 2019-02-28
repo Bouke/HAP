@@ -66,15 +66,28 @@ class CryptographerTests: XCTestCase {
                        [plaintextBuffer])
     }
 
-    func testReadPartialFrames() {
+    func testReadMultipleFramesSingleRead() {
+        var encryptedBuffer = channel.allocator.buffer(capacity: 93)
+        encryptedBuffer.write(bytes: Data(hex: "0d0086707542af59d8a62123455257e9f45b349501f46cad0e5f6ded6aab98")!)
+        encryptedBuffer.write(bytes: Data(hex: "0d008b0d47a5c7e28b261015018c275ea42388d7284df1bb0737bcc7b5b5f5")!)
+        encryptedBuffer.write(bytes: Data(hex: "0d0008557d6198431e6121f10b8f9739009732201c917d67c9b05355bcb733")!)
+        handler.channelRead(ctx: context, data: NIOAny(encryptedBuffer))
+
+        var plaintextBuffer = channel.allocator.buffer(capacity: 39)
+        plaintextBuffer.write(string: "Hello, world!")
+        XCTAssertEqual(readRecorder.reads,
+                       [plaintextBuffer, plaintextBuffer, plaintextBuffer])
+    }
+
+    func testReadPartialFramesMultipleReads() {
         var encryptedBufferFirst = channel.allocator.buffer(capacity: 1)
-        encryptedBufferFirst.write(bytes: Data(hex: "0d")!)
+        encryptedBufferFirst.write(bytes: Data(hex: "0d00")!)
         handler.channelRead(ctx: context, data: NIOAny(encryptedBufferFirst))
 
         XCTAssertEqual(readRecorder.reads, [])
 
         var encryptedBufferLast = channel.allocator.buffer(capacity: 30)
-        encryptedBufferLast.write(bytes: Data(hex: "0086707542af59d8a62123455257e9f45b349501f46cad0e5f6ded6aab98")!)
+        encryptedBufferLast.write(bytes: Data(hex: "86707542af59d8a62123455257e9f45b349501f46cad0e5f6ded6aab98")!)
         handler.channelRead(ctx: context, data: NIOAny(encryptedBufferLast))
 
         var plaintextBuffer = channel.allocator.buffer(capacity: 13)
@@ -86,6 +99,8 @@ class CryptographerTests: XCTestCase {
     func testWriteSingleFrame() {
         var plaintextBuffer = channel.allocator.buffer(capacity: 13)
         plaintextBuffer.write(string: "Hello, world!")
+        handler.write(ctx: context, data: NIOAny(plaintextBuffer), promise: nil)
+        handler.write(ctx: context, data: NIOAny(plaintextBuffer), promise: nil)
         handler.write(ctx: context, data: NIOAny(plaintextBuffer), promise: nil)
 
         var expectedBuffer = channel.allocator.buffer(capacity: 31)

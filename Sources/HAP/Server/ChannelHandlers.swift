@@ -21,6 +21,7 @@ class CryptographerHandler: ChannelDuplexHandler {
     typealias OutboundOut = ByteBuffer
 
     var cryptographer: Cryptographer?
+    var cumulationBuffer: ByteBuffer?
 
     func triggerUserOutboundEvent(ctx: ChannelHandlerContext, event: Any, promise: EventLoopPromise<Void>?) {
         if case let CryptographyEvent.sharedKey(sharedKey) = event {
@@ -37,13 +38,29 @@ class CryptographerHandler: ChannelDuplexHandler {
         }
 
         var buffer = unwrapInboundIn(data)
-        let data = buffer.readData(length: buffer.readableBytes)!
+        if cumulationBuffer == nil {
+            cumulationBuffer = buffer
+        } else {
+            cumulationBuffer!.write(buffer: &buffer)
+        }
+
+        let startIndex = cumulationBuffer!.readerIndex
+        guard let length = cumulationBuffer!.readInteger(endianness: Endianness.little, as: Int16.self) else { return }
+        cumulationBuffer!.moveReaderIndex(to: startIndex)
+        guard 2 + length + 16 <= cumulationBuffer!.readableBytes else { return }
+
+        // TODO: don't copy bytes, but pass buffer slice instead
+        let data = cumulationBuffer!.readData(length: Int(2 + length + 16))!
         guard let decrypted = try? cryptographer.decrypt(data) else {
             // swiftlint:disable:next line_length
             logger.warning("Could not decrypt message from \(ctx.remoteAddress?.description ?? "???"), closing connection.")
             ctx.close(promise: nil)
             return
         }
+        if cumulationBuffer!.readableBytes == 0 {
+            cumulationBuffer = nil
+        }
+        // TODO: don't copy bytes, but pass buffer slice instead
         var out = ctx.channel.allocator.buffer(capacity: decrypted.count)
         out.write(bytes: decrypted)
         ctx.fireChannelRead(wrapInboundOut(out))
