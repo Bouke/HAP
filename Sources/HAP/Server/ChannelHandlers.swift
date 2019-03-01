@@ -44,7 +44,7 @@ class CryptographerHandler: ChannelDuplexHandler {
             cumulationBuffer!.write(buffer: &buffer)
         }
 
-        while true {
+        repeat {
             let startIndex = cumulationBuffer!.readerIndex
             guard let length = cumulationBuffer!.readInteger(endianness: Endianness.little, as: Int16.self) else { return }
             cumulationBuffer!.moveReaderIndex(to: startIndex)
@@ -65,9 +65,8 @@ class CryptographerHandler: ChannelDuplexHandler {
 
             if cumulationBuffer!.readableBytes == 0 {
                 cumulationBuffer = nil
-                return
             }
-        }
+        } while cumulationBuffer != nil
     }
 
     func write(ctx: ChannelHandlerContext, data: NIOAny, promise: EventLoopPromise<Void>?) {
