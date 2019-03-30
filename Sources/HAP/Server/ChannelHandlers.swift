@@ -155,6 +155,16 @@ class ControllerHandler: ChannelDuplexHandler {
     // TODO: tighter integration into Device.
     internal var removeSubscriptions: ((Channel) -> Void)?
 
+    private func sync(execute block: () -> Void) {
+        // Execute block directly if called on channelsQueue
+        let queueLabel = String(validatingUTF8: __dispatch_queue_get_label(nil))
+        if queueLabel == "channelsQueue" {
+            block()
+        } else {
+            channelsSyncQueue.sync(execute: block)
+        }
+    }
+
     func channelActive(ctx: ChannelHandlerContext) {
         let channel = ctx.channel
         channelsSyncQueue.sync {
@@ -166,7 +176,7 @@ class ControllerHandler: ChannelDuplexHandler {
 
     func channelInactive(ctx: ChannelHandlerContext) {
         let channel = ctx.channel
-        channelsSyncQueue.sync {
+        sync {
             self.channels.removeValue(forKey: ObjectIdentifier(channel))
             self.pairings.removeValue(forKey: ObjectIdentifier(channel))
         }
