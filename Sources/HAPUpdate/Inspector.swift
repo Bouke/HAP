@@ -167,7 +167,9 @@ public class Inspector {
 
         DefaultType("CurrentVisibilityState", "UInt8", "visibility-state.current", [
             ("shown", 0),
-            ("hidden", 1)
+            ("hidden", 1),
+            ("state2", 2),
+            ("state3", 3)
         ]),
 
         DefaultType("TargetVisibilityState", "UInt8", "visibility-state.target", [
