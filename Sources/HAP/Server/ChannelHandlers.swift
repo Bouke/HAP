@@ -157,7 +157,13 @@ class ControllerHandler: ChannelDuplexHandler {
 
     private func sync(execute block: () -> Void) {
         // Execute block directly if called on channelsQueue
+
+#if os(macOS)
         let queueLabel = String(validatingUTF8: __dispatch_queue_get_label(nil))
+#elseif os(Linux)
+        let queueLabel = String(validatingUTF8: dispatch_queue_get_label(nil))
+#endif
+
         if queueLabel == "channelsQueue" {
             block()
         } else {
