@@ -149,22 +149,21 @@ class ControllerHandler: ChannelDuplexHandler {
 
     // All access to channels is guarded by channelsSyncQueue.
     private let channelsSyncQueue = DispatchQueue(label: "channelsQueue")
+    private let channelsSyncKey = DispatchSpecificKey<Int>()
     private var channels: [ObjectIdentifier: Channel] = [:]
     private var pairings: [ObjectIdentifier: Pairing] = [:]
+
+    internal init() {
+        channelsSyncQueue.setSpecific(key: channelsSyncKey, value: 88)
+    }
 
     // TODO: tighter integration into Device.
     internal var removeSubscriptions: ((Channel) -> Void)?
 
     private func sync(execute block: () -> Void) {
         // Execute block directly if called on channelsQueue
-
-#if os(macOS)
-        let queueLabel = String(validatingUTF8: __dispatch_queue_get_label(nil))
-#elseif os(Linux)
-        let queueLabel = String(validatingUTF8: dispatch_queue_get_label(nil))
-#endif
-
-        if queueLabel == "channelsQueue" {
+        //        let queueLabel = String(validatingUTF8: __dispatch_queue_get_label(nil))
+        if let _ = DispatchQueue.getSpecific(key: channelsSyncKey) {
             block()
         } else {
             channelsSyncQueue.sync(execute: block)
