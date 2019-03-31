@@ -115,7 +115,7 @@ withExtendedLifetime([delegate]) {
         RunLoop.main.run(until: Date(timeIntervalSinceNow: 10))
     } else {
         while keepRunning {
-            RunLoop.current.run(mode: .default, before: Date.distantFuture)
+            RunLoop.current.run()
         }
     }
 }
