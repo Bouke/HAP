@@ -1,4 +1,4 @@
-// swiftlint:disable force_try
+// swiftlint:disable force_try line_length
 @testable import HAP
 import NIO
 import XCTest
@@ -12,7 +12,6 @@ private final class ReadRecorder: ChannelInboundHandler {
         self.reads.append(self.unwrapInboundIn(data))
     }
 }
-
 
 private final class WriteRecorder: ChannelOutboundHandler {
     typealias OutboundIn = ByteBuffer
