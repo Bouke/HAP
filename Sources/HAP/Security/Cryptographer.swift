@@ -1,6 +1,7 @@
 import Evergreen
 import Foundation
 import HKDF
+import NIO
 
 fileprivate let logger = getLogger("hap.encryption")
 
@@ -38,54 +39,20 @@ class Cryptographer {
         logger.debug("Encrypt key: \(self.encryptKey.hex)")
     }
 
-    func decrypt(_ data: Data) throws -> Data {
-        guard !data.isEmpty else {
-            throw Error.invalidArgument
-        }
-        logger.info("Decrypt message #\(self.decryptCount), length: \(data.count)")
-        logger.debug("Message cipher: \(data.hex)")
-        var buffer = Data()
-        var position = data.startIndex
-        repeat {
-            defer { decryptCount += 1 }
-            let lengthBytes = data[position..<(position + 2)]
-            let length = Int(UInt16(data: lengthBytes))
-            guard position + 2 + length + 16 <= data.endIndex else {
-                throw Error.indexOutOfBounds
-            }
-            let nonce = decryptCount.bigEndian.bytes
-            let cipher = data[(position + 2)..<(position + 2 + length + 16)]
-            logger.debug("Ciphertext: \(cipher.hex), Nonce: \(nonce.hex), Length: \(length)")
-            buffer += try ChaCha20Poly1305.decrypt(cipher: cipher,
-                                                   additional: lengthBytes,
-                                                   nonce: nonce,
-                                                   key: decryptKey)
-            data.formIndex(&position, offsetBy: 2 + length + 16)
-        } while position < data.endIndex
-        logger.debug("Message data: \(data.hex)")
-        return buffer
+    func decrypt(length: Int, cipher: inout ByteBuffer, message: inout ByteBuffer) throws {
+        logger.info("Decrypt message #\(self.decryptCount), length: \(length)")
+        defer { decryptCount += 1 }
+        var lengthBytes = cipher.readSlice(length: 2)!
+        let nonce = decryptCount.bigEndian.bytes
+        try ChaCha20Poly1305.decrypt(cipher: &cipher, additional: &lengthBytes, nonce: nonce, key: decryptKey, message: &message)
     }
 
-    func encrypt(_ data: Data) throws -> Data {
-        logger.info("Encrypt message #\(self.encryptCount), length: \(data.count)")
-        logger.debug("Message data: \(data.hex)")
-        var buffer = Data()
-        var position = data.startIndex
-        repeat {
-            defer { encryptCount += 1 }
-            let length = min(data.endIndex - position, 1024)
-            let chunk = data[position..<(position + length)]
-            let nonce = encryptCount.bigEndian.bytes
-            let lengthBytes = UInt16(length).bigEndian.bytes
-            logger.debug("Chunk: \(chunk.hex), Nonce: \(nonce.hex), Length: \(lengthBytes.hex)")
-            let encrypted = try ChaCha20Poly1305.encrypt(message: chunk,
-                                                         additional: lengthBytes,
-                                                         nonce: nonce,
-                                                         key: encryptKey)
-            buffer += lengthBytes + encrypted
-            data.formIndex(&position, offsetBy: length)
-        } while position < data.endIndex
-        logger.debug("Cipher: \(buffer.hex)")
-        return buffer
+    func encrypt(length: Int, plaintext: inout ByteBuffer, cipher: inout ByteBuffer) throws {
+        logger.info("Encrypt message #\(self.encryptCount), length: \(length)")
+        defer { encryptCount += 1 }
+        cipher.write(integer: Int16(length), endianness: Endianness.little, as: Int16.self)
+        let additional = cipher.viewBytes(at: 0, length: 2)
+        let nonce = encryptCount.bigEndian.bytes
+        try ChaCha20Poly1305.encrypt(message: &plaintext, additional: additional, nonce: nonce, key: encryptKey, cipher: &cipher)
     }
 }

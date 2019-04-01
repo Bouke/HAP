@@ -11,9 +11,6 @@ enum CryptographyEvent {
     case sharedKey(Data)
 }
 
-// TODO: use "cumulationBuffer" (similar to HTTPDecoder) and buffer until
-// correct amount of bytes is received.
-// TODO: merge with actual cryptographer.
 class CryptographerHandler: ChannelDuplexHandler {
     typealias InboundIn = ByteBuffer
     typealias InboundOut = ByteBuffer
@@ -21,6 +18,7 @@ class CryptographerHandler: ChannelDuplexHandler {
     typealias OutboundOut = ByteBuffer
 
     var cryptographer: Cryptographer?
+    var cumulationBuffer: ByteBuffer?
 
     func triggerUserOutboundEvent(ctx: ChannelHandlerContext, event: Any, promise: EventLoopPromise<Void>?) {
         if case let CryptographyEvent.sharedKey(sharedKey) = event {
@@ -32,37 +30,75 @@ class CryptographerHandler: ChannelDuplexHandler {
     }
 
     func channelRead(ctx: ChannelHandlerContext, data: NIOAny) {
-        if let cryptographer = cryptographer {
-            var buffer = unwrapInboundIn(data)
-            let data = buffer.readData(length: buffer.readableBytes)!
-            guard let decrypted = try? cryptographer.decrypt(data) else {
-                // swiftlint:disable:next line_length
-                logger.warning("Could not decrypt message from \(ctx.remoteAddress?.description ?? "???"), closing connection.")
-                ctx.close(promise: nil)
-                return
-            }
-            var out = ctx.channel.allocator.buffer(capacity: decrypted.count)
-            out.write(bytes: decrypted)
-            ctx.fireChannelRead(wrapInboundOut(out))
+        guard cryptographer != nil else {
+            return ctx.fireChannelRead(data)
+        }
+
+        var buffer = unwrapInboundIn(data)
+        if cumulationBuffer == nil {
+            cumulationBuffer = buffer
         } else {
-            ctx.fireChannelRead(data)
+            cumulationBuffer!.write(buffer: &buffer)
+        }
+
+        repeat {
+            let startIndex = cumulationBuffer!.readerIndex
+            guard let length = cumulationBuffer!.readInteger(endianness: Endianness.little, as: Int16.self) else { return }
+            cumulationBuffer!.moveReaderIndex(to: startIndex)
+            guard 2 + length + 16 <= cumulationBuffer!.readableBytes else { return }
+
+            readOneFrame(ctx: ctx, length: Int(length))
+        } while cumulationBuffer != nil
+    }
+
+    func readOneFrame(ctx: ChannelHandlerContext, length: Int) {
+        var cipher = cumulationBuffer!.readSlice(length: 2 + length + 16)!
+        var message = ctx.channel.allocator.buffer(capacity: length)
+        do {
+            try cryptographer!.decrypt(length: length, cipher: &cipher, message: &message)
+        } catch {
+            // swiftlint:disable:next line_length
+            logger.warning("Could not decrypt message from \(ctx.remoteAddress?.description ?? "???"): \(error), closing connection.")
+            cumulationBuffer!.clear()
+            ctx.close(promise: nil)
+            return
+        }
+        ctx.fireChannelRead(wrapInboundOut(message))
+
+        if cumulationBuffer!.readableBytes == 0 {
+            cumulationBuffer = nil
         }
     }
 
     func write(ctx: ChannelHandlerContext, data: NIOAny, promise: EventLoopPromise<Void>?) {
-        if let cryptographer = cryptographer {
-            var buffer = unwrapOutboundIn(data)
-            let data = buffer.readData(length: buffer.readableBytes)!
-            guard let encrypted = try? cryptographer.encrypt(data) else {
-                // swiftlint:disable:next line_length
-                logger.warning("Could not encrypt message to \(ctx.remoteAddress?.description ?? "???"), closing connection.")
-                return
-            }
-            var out = ctx.channel.allocator.buffer(capacity: encrypted.count)
-            out.write(bytes: encrypted)
-            ctx.write(wrapOutboundOut(out), promise: promise)
+        guard cryptographer != nil else {
+            return ctx.write(data, promise: promise)
+        }
+
+        var buffer = unwrapOutboundIn(data)
+        while (buffer.readableBytes > 0) {
+            writeOneFrame(ctx: ctx, buffer: &buffer, promise: promise)
+        }
+    }
+
+    func writeOneFrame(ctx: ChannelHandlerContext, buffer: inout ByteBuffer, promise: EventLoopPromise<Void>?) {
+        let length = min(1024, buffer.readableBytes)
+        var frame = buffer.readSlice(length: length)!
+        var cipher = ctx.channel.allocator.buffer(capacity: 0)
+        do {
+            try cryptographer!.encrypt(length: length, plaintext: &frame, cipher: &cipher)
+        } catch {
+            // swiftlint:disable:next line_length
+            logger.warning("Could not decrypt message from \(ctx.remoteAddress?.description ?? "???"): \(error), closing connection.")
+            buffer.clear()
+            ctx.close(promise: nil)
+            return
+        }
+
+        if (buffer.readableBytes > 0) {
+            ctx.write(wrapOutboundOut(cipher), promise: nil)
         } else {
-            ctx.write(data, promise: promise)
+            ctx.write(wrapOutboundOut(cipher), promise: promise)
         }
     }
 }
