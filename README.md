@@ -10,6 +10,7 @@ The goal of this package is to provide a complete implementation of the Homekit 
 * Persistent configuration across reboots.
 * Homekit pairing by scanning QR code (shipped in iOS 11).
 * Speakers and Remote Control accessories (shipped in iOS 12 / macOS Mojave).
+* Television accessories (shipped in iOS 12.2 / macOS 10.14.3).
 * Extensibility through custom services and characteristics.
 * Runs on Linux / Raspbian (Raspberry Pi).
 
