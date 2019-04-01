@@ -1,16 +1,26 @@
 import Foundation
 
-let path = "/System/Library/PrivateFrameworks/HomeKitDaemon.framework"
-guard let framework = Bundle(path: path) else {
-    print("No HomeKitDaemon private framework found")
-    exit(1)
-}
-guard let plistUrl = framework.url(forResource: "plain-metadata-full", withExtension: "config") else {
-    print("Resource plain-metadata-full.config not found in HomeKitDaemon.framework")
-    exit(1)
+var sourceURL: URL
+
+print("Args: \(CommandLine.argc)")
+if CommandLine.argc > 1 {
+    let arg = CommandLine.arguments[1]
+    sourceURL = URL(fileURLWithPath: arg)
+} else {
+    let path = "/System/Library/PrivateFrameworks/HomeKitDaemon.framework"
+    guard let framework = Bundle(path: path) else {
+        print("No HomeKitDaemon private framework found")
+        exit(1)
+    }
+    guard let plistUrl = framework.url(forResource: "plain-metadata", withExtension: "config") else {
+        print("Resource plain-metadata.config not found in HomeKitDaemon.framework")
+        exit(1)
+    }
+    sourceURL = plistUrl
 }
 do {
-    try Inspector.inspect(source: plistUrl, target: "Sources/HAP/Base/Generated.swift")
+    print("Generating from \(sourceURL)")
+    try Inspector.inspect(source: sourceURL, target: "Sources/HAP/Base/Generated.swift")
 } catch {
     print("Couldn't update: \(error)")
 }
