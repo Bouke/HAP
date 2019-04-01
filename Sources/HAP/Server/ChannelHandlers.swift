@@ -149,26 +149,11 @@ class ControllerHandler: ChannelDuplexHandler {
 
     // All access to channels is guarded by channelsSyncQueue.
     private let channelsSyncQueue = DispatchQueue(label: "channelsQueue")
-    private let channelsSyncKey = DispatchSpecificKey<Int>()
     private var channels: [ObjectIdentifier: Channel] = [:]
     private var pairings: [ObjectIdentifier: Pairing] = [:]
 
-    internal init() {
-        channelsSyncQueue.setSpecific(key: channelsSyncKey, value: 88)
-    }
-
     // TODO: tighter integration into Device.
     internal var removeSubscriptions: ((Channel) -> Void)?
-
-    private func sync(execute block: () -> Void) {
-        // Execute block directly if called on channelsQueue
-        //        let queueLabel = String(validatingUTF8: __dispatch_queue_get_label(nil))
-        if let _ = DispatchQueue.getSpecific(key: channelsSyncKey) {
-            block()
-        } else {
-            channelsSyncQueue.sync(execute: block)
-        }
-    }
 
     func channelActive(ctx: ChannelHandlerContext) {
         let channel = ctx.channel
@@ -181,7 +166,7 @@ class ControllerHandler: ChannelDuplexHandler {
 
     func channelInactive(ctx: ChannelHandlerContext) {
         let channel = ctx.channel
-        sync {
+        channelsSyncQueue.sync {
             self.channels.removeValue(forKey: ObjectIdentifier(channel))
             self.pairings.removeValue(forKey: ObjectIdentifier(channel))
         }
@@ -229,13 +214,16 @@ class ControllerHandler: ChannelDuplexHandler {
     }
 
     func disconnectPairing(_ pairing: Pairing) {
+        var channelsToClose = [Channel]()
         channelsSyncQueue.sync {
             let channelIdentifiers = pairings.filter { $0.value.identifier == pairing.identifier }.keys
-            for channelIdentifier in channelIdentifiers {
-                // This will trigger `channelInactive(ctx:)`.
-                channels[channelIdentifier]!.close(promise: nil)
-            }
+            channelsToClose = channelIdentifiers.compactMap( { channels[$0] } )
         }
+        for channel in channelsToClose {
+            // This will trigger `channelInactive(ctx:)`.
+            channel.close(promise: nil)
+        }
+
     }
 }
 
