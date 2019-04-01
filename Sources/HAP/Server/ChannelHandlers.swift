@@ -214,13 +214,16 @@ class ControllerHandler: ChannelDuplexHandler {
     }
 
     func disconnectPairing(_ pairing: Pairing) {
+        var channelsToClose = [Channel]()
         channelsSyncQueue.sync {
             let channelIdentifiers = pairings.filter { $0.value.identifier == pairing.identifier }.keys
-            for channelIdentifier in channelIdentifiers {
-                // This will trigger `channelInactive(ctx:)`.
-                channels[channelIdentifier]!.close(promise: nil)
-            }
+            channelsToClose = channelIdentifiers.compactMap( { channels[$0] } )
         }
+        for channel in channelsToClose {
+            // This will trigger `channelInactive(ctx:)`.
+            channel.close(promise: nil)
+        }
+
     }
 }
 
