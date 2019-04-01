@@ -3,12 +3,20 @@ sudo: required
 script: swift test -c release -Xswiftc -enable-testing
 matrix:
   include:
-    - os: osx
+    - name: Swift 4.2
+      os: osx
       osx_image: xcode10.1
       before_install:
         - brew update
         - brew install libsodium
-    - os: linux
+    - name: Swift 5.0
+      os: osx
+      osx_image: xcode10.2
+      before_install:
+        - brew update
+        - brew install libsodium
+    - name: Swift 4.2
+      os: linux
       dist: trusty
       before_install:
         # workaround for https://travis-ci.community/t/then-sudo-apt-get-update-failed-public-key-is-not-available-no-pubkey-6b05f25d762e3157-in-ubuntu-xenial/1728
@@ -27,16 +35,36 @@ matrix:
         - sudo make install
         - cd ..
         - sudo ldconfig
+    - name: Swift 5.0
+      os: linux
+      dist: trusty
+      before_install:
+        # workaround for https://travis-ci.community/t/then-sudo-apt-get-update-failed-public-key-is-not-available-no-pubkey-6b05f25d762e3157-in-ubuntu-xenial/1728
+        - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 762E3157
+        - sudo apt update
+        - sudo apt install libavahi-compat-libdnssd-dev
+        - wget https://swift.org/builds/swift-5.0-release/ubuntu1404/swift-5.0-RELEASE/swift-5.0-RELEASE-ubuntu14.04.tar.gz
+        - tar xzf swift-5.0-RELEASE-ubuntu14.04.tar.gz
+        - export PATH=`pwd`/swift-5.0-RELEASE-ubuntu14.04/usr/bin:"${PATH}"
+        - sudo apt-get install -y libssl-dev
+        - wget https://download.libsodium.org/libsodium/releases/libsodium-1.0.16.tar.gz
+        - tar xzf libsodium-1.0.16.tar.gz
+        - cd libsodium-1.0.16
+        - ./configure
+        - make && make check
+        - sudo make install
+        - cd ..
+        - sudo ldconfig
     - name: Code Quality Checks
       os: osx
-      osx_image: xcode10.1
+      osx_image: xcode10.2
       install:
         - brew update
         - brew upgrade swiftlint || true
       script: swiftlint
     - name: SonarCloud scanner
       os: osx
-      osx_image: xcode10.1
+      osx_image: xcode10.2
       addons:
         sonarcloud:
           organization: bouke-github

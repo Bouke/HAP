@@ -115,11 +115,7 @@ withExtendedLifetime([delegate]) {
         RunLoop.main.run(until: Date(timeIntervalSinceNow: 10))
     } else {
         while keepRunning {
-#if os(macOS)
             RunLoop.current.run(mode: .default, before: Date.distantFuture)
-#elseif os(Linux)
-            RunLoop.current.run(mode: .defaultRunLoopMode, before: Date.distantFuture)
-#endif
         }
     }
 }
