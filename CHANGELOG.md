@@ -7,6 +7,7 @@
   on macOS. This means that those definitions are more easily kept up-to-date.
   Contribution by Guy Brooker.
 - Television accessory support. Contribution by Guy Brooker.
+- Swift 5 support.
 
 ### Changed
 - Network stack rewritten with SwiftNIO.
@@ -16,6 +17,7 @@
 - Characteristic bounds no longer trap when out of bound values are set
   programmatically, but will clip the value instead. This resolves an issue
   where setting a value to the minimum value would trap in some situations.
+- Swift 4.1 and below dropped.
 
 ### Fixed
 - Allow bridges with spaces in name.
