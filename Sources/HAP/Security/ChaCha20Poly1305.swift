@@ -39,7 +39,7 @@ class ChaCha20Poly1305 {
     static func encrypt(message: inout ByteBuffer, additional: ByteBufferView, nonce: Data, key: Data, cipher: inout ByteBuffer) throws {
         let nonce = upgradeNonce(nonce)
         let messageLength = UInt64(message.readableBytes)
-        cipher.reserveCapacity(message.readableBytes + Int(crypto_aead_chacha20poly1305_ABYTES))
+        cipher.reserveWritableCapacity(message.readableBytes + Int(crypto_aead_chacha20poly1305_ABYTES))
         let additionalLength = UInt64(additional.count)
         let cipherLength = UnsafeMutablePointer<UInt64>.allocate(capacity: 1)
         let result = cipher.withUnsafeMutableWritableBytes { (cBuffer: UnsafeMutableRawBufferPointer) -> Int32 in
@@ -84,7 +84,7 @@ class ChaCha20Poly1305 {
 
     static func decrypt(cipher: inout ByteBuffer, additional: inout ByteBuffer, nonce: Data, key: Data, message: inout ByteBuffer) throws {
         let nonce = upgradeNonce(nonce)
-        message.reserveCapacity(cipher.readableBytes - Int(crypto_aead_chacha20poly1305_ietf_ABYTES))
+        message.reserveWritableCapacity(cipher.readableBytes - Int(crypto_aead_chacha20poly1305_ietf_ABYTES))
         let cipherLength = UInt64(cipher.readableBytes)
         let additionalLength = UInt64(additional.readableBytes)
         let messageLength = UnsafeMutablePointer<UInt64>.allocate(capacity: 1)
