@@ -12,9 +12,23 @@ fileprivate enum Error: Swift.Error {
 func pairVerify(device: Device) -> Responder {
     let controller = PairVerifyController(device: device)
 
-    // TODO: this memory is not freed, not thread-safe either
-    var sessions: [ObjectIdentifier: PairVerifyController.Session] = [:]
+    // TODO: this memory is not freed
+    var threadUnsafeSessions: [ObjectIdentifier: Session] = [:]
+    let rwQueue = DispatchQueue(label: "HAP-PairVerify-\(device.identifier)-lock", attributes: .concurrent)
 
+    func getSession(for context: RequestContext) -> Session? {
+        var session: Session?
+        rwQueue.sync { // Concurrent read
+            session = threadUnsafeSessions[ObjectIdentifier(context.channel)]
+        }
+        return session
+    }
+
+    func setSession(for context: RequestContext, to session: Session?) {
+        rwQueue.async(flags: .barrier) {
+            threadUnsafeSessions[ObjectIdentifier(context.channel)] = session
+        }
+    }
     return { context, request in
         guard
             let body = request.body.data,
@@ -31,14 +45,14 @@ func pairVerify(device: Device) -> Responder {
 
             case .startRequest:
                 let (response, session) = try controller.startRequest(data)
-                sessions[ObjectIdentifier(context.channel)] = session
+                setSession(for:context, to: session)
                 return HTTPResponse(tags: response)
 
             case .finishRequest:
                 defer {
-                    sessions[ObjectIdentifier(context.channel)] = nil
+                    setSession(for:context, to: nil)
                 }
-                guard let session = sessions[ObjectIdentifier(context.channel)] else {
+                guard let session = getSession(for:context) else {
                     throw Error.noSession
                 }
 
