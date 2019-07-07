@@ -30,8 +30,23 @@ func pairSetup(device: Device) -> Responder {
                                           algorithm: algorithm))
     }
 
-    // TODO: this memory is not freed, not thread-safe either
-    var sessions: [ObjectIdentifier: Session] = [:]
+    // TODO: this memory is not freed
+    var threadUnsafeSessions: [ObjectIdentifier: Session] = [:]
+    let rwQueue = DispatchQueue(label: "HAP-\(username)-\(device.identifier)-lock", attributes: .concurrent)
+
+    func getSession(for context: RequestContext) -> Session? {
+        var session: Session?
+        rwQueue.sync { // Concurrent read
+            session = threadUnsafeSessions[ObjectIdentifier(context.channel)]
+        }
+        return session
+    }
+
+    func setSession(for context: RequestContext, to session: Session?) {
+        rwQueue.async(flags: .barrier) {
+            threadUnsafeSessions[ObjectIdentifier(context.channel)] = session
+        }
+    }
 
     return { context, request in
         guard
@@ -49,18 +64,18 @@ func pairSetup(device: Device) -> Responder {
             case .startRequest:
                 let session = createSession()
                 response = try controller.startRequest(data, session)
-                sessions[ObjectIdentifier(context.channel)] = session
+                setSession(for:context, to: session)
 
             // M3: iOS Device -> Accessory -- `SRP Verify Request'
             case .verifyRequest:
-                guard let session = sessions[ObjectIdentifier(context.channel)] else {
+                guard let session = getSession(for:context) else {
                     throw PairSetupController.Error.invalidSetupState
                 }
                 response = try controller.verifyRequest(data, session)
 
             // M5: iOS Device -> Accessory -- `Exchange Request'
             case .keyExchangeRequest:
-                guard let session = sessions[ObjectIdentifier(context.channel)] else {
+                guard let session = getSession(for:context) else {
                     throw PairSetupController.Error.invalidSetupState
                 }
                 response = try controller.keyExchangeRequest(data, session)
@@ -72,7 +87,7 @@ func pairSetup(device: Device) -> Responder {
         } catch {
             logger.warning(error)
 
-            sessions[ObjectIdentifier(context.channel)] = nil
+            setSession(for:context, to: nil)
 
             try? device.changePairingState(.notPaired)
 

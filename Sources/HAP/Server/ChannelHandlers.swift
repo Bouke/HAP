@@ -193,21 +193,25 @@ class ControllerHandler: ChannelDuplexHandler {
 
     func channelActive(ctx: ChannelHandlerContext) {
         let channel = ctx.channel
+        var channelsCount = 0
         channelsSyncQueue.sync {
             self.channels[ObjectIdentifier(channel)] = channel
+            channelsCount = self.channels.count
         }
-        logger.info("Controller \(channel.remoteAddress?.description ?? "N/A") connected, \(self.channels.count) controllers total")
+        logger.info("Controller \(channel.remoteAddress?.description ?? "N/A") connected, \(channelsCount) controllers total")
         ctx.fireChannelActive()
     }
 
     func channelInactive(ctx: ChannelHandlerContext) {
         let channel = ctx.channel
+        var channelsCount = 0
         channelsSyncQueue.sync {
             self.channels.removeValue(forKey: ObjectIdentifier(channel))
             self.pairings.removeValue(forKey: ObjectIdentifier(channel))
+            channelsCount = self.channels.count
         }
         self.removeSubscriptions?(channel)
-        logger.info("Controller \(channel.remoteAddress?.description ?? "N/A") disconnected, \(self.channels.count) controllers total")
+        logger.info("Controller \(channel.remoteAddress?.description ?? "N/A") disconnected, \(channelsCount) controllers total")
         ctx.fireChannelInactive()
     }
 
