@@ -275,7 +275,7 @@ public class Device {
         server?.updateDiscoveryRecord()
     }
 
-    public func removeAccessories(_ unwantedAccessories: [Accessory]) {
+    public func removeAccessories(_ unwantedAccessories: [Accessory], andForgetSerialNumbers: Bool = true) {
         if unwantedAccessories.isEmpty {
             return
         }
@@ -286,8 +286,10 @@ public class Device {
                 preconditionFailure("Removing a non-existant accessory from the Bridge")
             }
             accessories.remove(at: index)
-            let serialNumber = accessory.serialNumber
-            configuration.aidForAccessorySerialNumber.removeValue(forKey: serialNumber)
+            if andForgetSerialNumbers {
+                let serialNumber = accessory.serialNumber
+                configuration.aidForAccessorySerialNumber.removeValue(forKey: serialNumber)
+            }
         }
         // write configuration data to persist updated aid's
         updatedConfiguration()
