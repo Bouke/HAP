@@ -275,7 +275,8 @@ public class Device {
         server?.updateDiscoveryRecord()
     }
 
-    public func removeAccessories(_ unwantedAccessories: [Accessory], andForgetSerialNumbers: Bool = true) {
+    public func removeAccessories(_ unwantedAccessories: [Accessory],
+                                  andForgetSerialNumbers: Bool = false) {
         if unwantedAccessories.isEmpty {
             return
         }
