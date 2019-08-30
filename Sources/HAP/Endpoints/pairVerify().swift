@@ -17,16 +17,18 @@ func pairVerify(device: Device) -> Responder {
     let rwQueue = DispatchQueue(label: "HAP-PairVerify-\(device.identifier)-lock", attributes: .concurrent)
 
     func getSession(for context: RequestContext) -> Session? {
+        let channel = context.channel
         var session: Session?
         rwQueue.sync { // Concurrent read
-            session = threadUnsafeSessions[ObjectIdentifier(context.channel)]
+            session = threadUnsafeSessions[ObjectIdentifier(channel)]
         }
         return session
     }
 
     func setSession(for context: RequestContext, to session: Session?) {
+        let channel = context.channel
         rwQueue.async(flags: .barrier) {
-            threadUnsafeSessions[ObjectIdentifier(context.channel)] = session
+            threadUnsafeSessions[ObjectIdentifier(channel)] = session
         }
     }
     return { context, request in
