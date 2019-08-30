@@ -76,6 +76,26 @@ class MyDeviceDelegate: DeviceDelegate {
             + "of accessory \(accessory.info.name.value ?? "") "
             + "lost a subscriber")
     }
+    
+    func didChangePairingState(from: PairingState, to: PairingState) {
+        if to == .notPaired {
+            printPairingInstructions()
+        }
+    }
+    
+    func printPairingInstructions() {
+        if device.isPaired {
+            print()
+            print("The device is paired, either unpair using your iPhone or remove the configuration file `configuration.json`.")
+            print()
+        } else {
+            print()
+            print("Scan the following QR code using your iPhone to pair this device:")
+            print()
+            print(device.setupQRCode.asText)
+            print()
+        }
+    }
 }
 
 var delegate = MyDeviceDelegate()
@@ -103,11 +123,7 @@ timer.setEventHandler(handler: {
 })
 timer.resume()
 
-print()
-print("Scan the following QR code using your iPhone to pair this device:")
-print()
-print(device.setupQRCode.asText)
-print()
+delegate.printPairingInstructions()
 
 withExtendedLifetime([delegate]) {
     if CommandLine.arguments.contains("--test") {
