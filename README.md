@@ -14,7 +14,7 @@ The goal of this package is to provide a complete implementation of the Homekit 
 * Extensibility through custom services and characteristics.
 * Runs on Linux / Raspbian (Raspberry Pi).
 
-## How to build
+## First run
 
 ### MacOS
 
@@ -22,9 +22,9 @@ Install libsodium (used for Curve25519 and Ed25519):
 
     brew install libsodium
 
-And then build the project itself:
+And then build and run the project itself:
 
-    swift build -c release
+    swift run hap-server -c release
 
 ### Linux
 
@@ -44,7 +44,7 @@ Make sure you have libsodium 1.0.9 or above. Ubuntu 16.10 or later suffices. Oth
 
 And then build the project itself:
 
-    swift build -c release
+    swift run hap-server -c release
 
 ## Raspberry Pi (Raspbian Stretch)
 
@@ -55,9 +55,9 @@ There are currently no official binaries from swift.org targetting ARM / Raspbia
 
 ## Usage
 
-Run ``swift build`` to compile and ``.build/debug/hap-server`` to run. Modify ``Sources/hap-server/main.swift`` to include your own accessories.
+Modify ``Sources/hap-server/main.swift`` to include your own accessories, or import the _HAP_ library into your own project.
 
-On Mac OS, you can debug using XCode by running the command ``swift package generate-xcodeproj`` and the opening the resulting ``HAP.xcodeproj`` project. Select the ``hap-server`` target to execute.
+On Mac OS, you can debug using XCode by running the command ``swift package generate-xcodeproj`` and the opening the resulting ``HAP.xcodeproj`` project. Select and run the ``hap-server`` target.
 
 ## Extensibility
 
@@ -129,8 +129,7 @@ followed for ease of understanding.
 
 ### Running tests
 
-Certain tests involve crypto, which can be a bit slow in debug builds. Best to
-run the tests with a release build, like this:
+Certain tests involve crypto, which can be a bit slow in debug builds. Best to run the tests with a release build, like this:
 
     swift test -c release -Xswiftc -enable-testing
 
