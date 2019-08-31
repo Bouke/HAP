@@ -9,7 +9,6 @@ let package = Package(
         .executable(name: "hap-server", targets: ["hap-server"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/Bouke/CLibSodium.git", from: "2.0.0"),
         .package(url: "https://github.com/Bouke/SRP.git", from: "3.1.0"),
         .package(url: "https://github.com/Bouke/HKDF.git", from: "3.1.0"),
         .package(url: "https://github.com/Bouke/Evergreen.git", from: "2.0.0"),
@@ -18,10 +17,16 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-nio.git", from: "1.11.0"),
     ],
     targets: [
+        .systemLibrary(name: "CLibSodium",
+                       pkgConfig: "libsodium",
+                       providers: [
+                           .brew(["libsodium"]),
+                           .apt(["libsodium-dev"])
+                       ]),
         .target(name: "CQRCode"),
         .target(name: "COperatingSystem"),
         .target(name: "HTTP", dependencies: ["NIO", "NIOHTTP1", "NIOFoundationCompat", "COperatingSystem"]),
-        .target(name: "HAP", dependencies: ["SRP", "Cryptor", "Evergreen", "HKDF", "Regex", "CQRCode", "HTTP"]),
+        .target(name: "HAP", dependencies: ["SRP", "Cryptor", "Evergreen", "HKDF", "Regex", "CQRCode", "HTTP", "CLibSodium"]),
         .target(name: "hap-server", dependencies: ["HAP", "Evergreen"]),
         .testTarget(name: "HAPTests", dependencies: ["HAP"]),
     ]
