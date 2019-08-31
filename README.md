@@ -4,6 +4,7 @@ Homekit Accessory Protocol, implemented in Swift
 The goal of this package is to provide a complete implementation of the Homekit Accessory Protocol, enabling you to build your DIY accessories, and connect your non-HAP devices.
 
 [![Build Status](https://travis-ci.org/Bouke/HAP.svg?branch=master)](https://travis-ci.org/Bouke/HAP)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Bouke_HAP&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=Bouke_HAP)
 
 ## Features
 
