@@ -17,15 +17,17 @@
 - Characteristic bounds no longer trap when out of bound values are set
   programmatically, but will clip the value instead. This resolves an issue
   where setting a value to the minimum value would trap in some situations.
-- Swift 4.1 and below dropped.
 
 ### Fixed
 - Allow bridges with spaces in name.
 
+### Removed
+- Swift 4 support.
+
 ## 0.5.0 - 2017-11-19
 
 ### Added
-- Swift 4.
+- Swift 4 support.
 - Improved HAP specification conformity (notification coalescence, multiple
   status return codes).
 - Additional builtin accessory and service types.
