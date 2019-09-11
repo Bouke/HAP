@@ -52,7 +52,7 @@ And then build the project itself:
 There are currently no official binaries from swift.org targetting ARM / Raspbian, however there's an active community working on Swift on ARM. You can [install binaries from their repository][1]:
 
     curl -s https://packagecloud.io/install/repositories/swift-arm/release/script.deb.sh | sudo bash
-    sudo apt install swift4
+    sudo apt install swift5
 
 ## Usage
 
