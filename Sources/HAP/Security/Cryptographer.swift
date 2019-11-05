@@ -1,9 +1,13 @@
-import Evergreen
+import Logging
 import Foundation
 import HKDF
 import NIO
 
-fileprivate let logger = getLogger("hap.encryption")
+fileprivate let logger: Logger = {
+    var _logger = Logger(label: "hap.encryption")
+    _logger.logLevel = .warning
+    return _logger
+}()
 
 // 5.5.2 Session Security
 // (...)

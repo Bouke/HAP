@@ -1,10 +1,11 @@
 // swiftlint:disable file_length
 import Cryptor
 import Foundation
-import func Evergreen.getLogger
+import Logging
+import Logging
 import NIO
 
-fileprivate let logger = getLogger("hap.device")
+fileprivate let logger = Logger(label: "hap")
 
 // MARK: Pairing State
 

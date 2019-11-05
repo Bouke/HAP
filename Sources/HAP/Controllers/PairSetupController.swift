@@ -1,9 +1,9 @@
-import func Evergreen.getLogger
+import Logging
 import Foundation
 import HKDF
 import SRP
 
-fileprivate let logger = getLogger("hap.controllers.pair-setup")
+fileprivate let logger = Logger(label: "hap.controllers.pair-setup")
 
 class PairSetupController {
     struct Session {

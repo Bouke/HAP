@@ -1,8 +1,9 @@
 import Foundation
 import func Evergreen.getLogger
+import Logging
 import HAP
 
-fileprivate let logger = getLogger("demo")
+fileprivate let logger = Logger(label: "bridge")
 
 #if os(macOS)
     import Darwin
@@ -11,12 +12,9 @@ fileprivate let logger = getLogger("demo")
     import Glibc
 #endif
 
-getLogger("hap").logLevel = .debug
-getLogger("hap.encryption").logLevel = .warning
-
 let storage = FileStorage(filename: "configuration.json")
 if CommandLine.arguments.contains("--recreate") {
-    logger.info("Dropping all pairings, keys")
+    logger.warning("Dropping all pairings, keys")
     try storage.write(Data())
 }
 
@@ -45,36 +43,26 @@ let device = Device(
 
 class MyDeviceDelegate: DeviceDelegate {
     func didRequestIdentificationOf(_ accessory: Accessory) {
-        logger.info("Requested identification "
-            + "of accessory \(String(describing: accessory.info.name.value ?? ""))")
+        logger.info("Requested identification of accessory \(String(describing: accessory.info.name.value ?? ""))")
     }
 
     func characteristic<T>(_ characteristic: GenericCharacteristic<T>,
                            ofService service: Service,
                            ofAccessory accessory: Accessory,
                            didChangeValue newValue: T?) {
-        logger.info("Characteristic \(characteristic) "
-            + "in service \(service.type) "
-            + "of accessory \(accessory.info.name.value ?? "") "
-            + "did change: \(String(describing: newValue))")
+        logger.info("Characteristic \(characteristic) in service \(service.type) of accessory \(accessory.info.name.value ?? "") did change: \(String(describing: newValue))")
     }
 
     func characteristicListenerDidSubscribe(_ accessory: Accessory,
                                             service: Service,
                                             characteristic: AnyCharacteristic) {
-        logger.info("Characteristic \(characteristic) "
-            + "in service \(service.type) "
-            + "of accessory \(accessory.info.name.value ?? "") "
-            + "got a subscriber")
+        logger.info("Characteristic \(characteristic) in service \(service.type) of accessory \(accessory.info.name.value ?? "") got a subscriber")
     }
 
     func characteristicListenerDidUnsubscribe(_ accessory: Accessory,
                                               service: Service,
                                               characteristic: AnyCharacteristic) {
-        logger.info("Characteristic \(characteristic) "
-            + "in service \(service.type) "
-            + "of accessory \(accessory.info.name.value ?? "") "
-            + "lost a subscriber")
+        logger.info("Characteristic \(characteristic) in service \(service.type) of accessory \(accessory.info.name.value ?? "") lost a subscriber")
     }
     
     func didChangePairingState(from: PairingState, to: PairingState) {
@@ -113,7 +101,7 @@ func stop() {
 signal(SIGINT) { _ in stop() }
 signal(SIGTERM) { _ in stop() }
 
-print("Initializing the server...")
+logger.info("Initializing the server...")
 
 // Switch the lights every 5 seconds.
 let timer = DispatchSource.makeTimerSource()
@@ -127,7 +115,7 @@ delegate.printPairingInstructions()
 
 withExtendedLifetime([delegate]) {
     if CommandLine.arguments.contains("--test") {
-        print("Running runloop for 10 seconds...")
+        logger.warning("Running runloop for 10 seconds...")
         RunLoop.main.run(until: Date(timeIntervalSinceNow: 10))
     } else {
         while keepRunning {

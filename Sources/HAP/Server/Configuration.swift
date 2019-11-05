@@ -1,8 +1,8 @@
 import Cryptor
 import Foundation
-import func Evergreen.getLogger
+import Logging
 
-fileprivate let logger = getLogger("hap.device")
+fileprivate let logger = Logger(label: "hap.device")
 
 typealias PrivateKey = Data
 

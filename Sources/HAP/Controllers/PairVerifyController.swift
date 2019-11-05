@@ -1,11 +1,11 @@
 import CLibSodium
 import Cryptor
-import func Evergreen.getLogger
+import Logging
 import Foundation
 import HKDF
 import SRP
 
-fileprivate let logger = getLogger("hap.controllers.pair-verify")
+fileprivate let logger = Logger(label: "hap.controllers.pair-verify")
 
 class PairVerifyController {
     struct Session {

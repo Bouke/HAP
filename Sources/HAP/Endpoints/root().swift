@@ -1,8 +1,8 @@
 import Foundation
 import HTTP
 
-import func Evergreen.getLogger
-fileprivate let logger = getLogger("hap.endpoints")
+import Logging
+fileprivate let logger = Logger(label: "hap.endpoints")
 
 typealias Route = (path: String, application: Responder)
 

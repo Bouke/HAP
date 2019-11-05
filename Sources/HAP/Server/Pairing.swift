@@ -1,5 +1,5 @@
 import Foundation
-import func Evergreen.getLogger
+import Logging
 
 typealias PairingIdentifier = Data
 typealias PublicKey = Data

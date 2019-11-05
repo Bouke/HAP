@@ -1,9 +1,9 @@
 import Foundation
 import HKDF
-import func Evergreen.getLogger
+import Logging
 import HTTP
 
-fileprivate let logger = getLogger("hap.endpoints.characteristics")
+fileprivate let logger = Logger(label: "hap.endpoints.characteristics")
 
 // swiftlint:disable:next cyclomatic_complexity
 func characteristics(device: Device) -> Responder {
@@ -68,9 +68,7 @@ func characteristics(device: Device, channel: Channel, request: HTTPRequest) -> 
                 case let _value as String: value = .string(_value)
                 default:
                     value = nil
-                    logger.error(
-                        "Characteristic \(characteristic.description) has unsupported type: " +
-                        "\(type(of: characteristic))")
+                    logger.error("Characteristic \(characteristic.description ?? "") has unsupported type: \(type(of: characteristic))")
                 }
 
                 var response = Protocol.Characteristic(aid: path.aid, iid: path.iid, value: value)
@@ -122,7 +120,7 @@ func characteristics(device: Device, channel: Channel, request: HTTPRequest) -> 
                                     ]),
                                     body: json)
             } catch {
-                logger.error("Could not serialize object", error: error)
+                logger.error("Could not serialize object: \(error)")
                 return .internalServerError
             }
 
@@ -227,7 +225,7 @@ func characteristics(device: Device, channel: Channel, request: HTTPRequest) -> 
                                         ]),
                                         body: json)
                 } catch {
-                    logger.error("Could not serialize object", error: error)
+                    logger.error("Could not serialize object: \(error)")
                     return .internalServerError
                 }
             }

@@ -1,10 +1,10 @@
 import Cryptor
-import func Evergreen.getLogger
+import Logging
 import Foundation
 import HTTP
 import SRP
 
-fileprivate let logger = getLogger("hap.pairSetup")
+fileprivate let logger = Logger(label: "hap.pairSetup")
 fileprivate typealias Session = PairSetupController.Session
 fileprivate let SESSION_KEY = "hap.pair-setup.session"
 fileprivate enum Error: Swift.Error {
@@ -87,7 +87,7 @@ func pairSetup(device: Device) -> Responder {
                 throw PairSetupController.Error.invalidParameters
             }
         } catch {
-            logger.warning(error)
+            logger.warning("Could not complete pair setup: \(error)")
 
             setSession(for:context, to: nil)
 

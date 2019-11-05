@@ -1,5 +1,5 @@
 import Foundation
-import func Evergreen.getLogger
+import Logging
 import HTTP
 import NIO
 import NIOHTTP1
@@ -9,7 +9,7 @@ import NIOHTTP1
     import NetService
 #endif
 
-fileprivate let logger = getLogger("hap.http")
+fileprivate let logger = Logger(label: "hap.http")
 
 enum ServerError: Error {
     case couldNotBindToPort(Error)

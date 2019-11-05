@@ -1,9 +1,9 @@
-import func Evergreen.getLogger
+import Logging
 import Foundation
 import HKDF
 import HTTP
 
-fileprivate let logger = getLogger("hap.endpoints.accessories")
+fileprivate let logger = Logger(label: "hap.endpoints.accessories")
 
 func accessories(device: Device) -> Responder {
     return { context, request in
@@ -21,7 +21,7 @@ func accessories(device: Device) -> Responder {
                 ]),
                 body: json)
         } catch {
-            logger.error("Could not serialize object", error: error)
+            logger.error("Could not serialize object: \(error)")
             return .internalServerError
         }
     }

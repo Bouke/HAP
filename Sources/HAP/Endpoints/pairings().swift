@@ -1,8 +1,8 @@
 import Foundation
-import func Evergreen.getLogger
+import Logging
 import HTTP
 
-fileprivate let logger = getLogger("hap.endpoints.pairings")
+fileprivate let logger = Logger(label: "hap.endpoints.pairings")
 
 func pairings(device: Device) -> Responder {
     let controller = PairingsController(device: device)

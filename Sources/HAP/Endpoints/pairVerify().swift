@@ -1,8 +1,8 @@
-import func Evergreen.getLogger
+import Logging
 import Foundation
 import HTTP
 
-fileprivate let logger = getLogger("hap.endpoints.pair-verify")
+fileprivate let logger = Logger(label: "hap.endpoints.pair-verify")
 fileprivate typealias Session = PairVerifyController.Session
 fileprivate let SESSION_KEY = "hap.pair-verify.session"
 fileprivate enum Error: Swift.Error {
@@ -72,7 +72,7 @@ func pairVerify(device: Device) -> Responder {
                 return .badRequest
             }
         } catch {
-            logger.warning(error)
+            logger.warning("Could not verify pairing: \(error)")
             return .badRequest
         }
     }

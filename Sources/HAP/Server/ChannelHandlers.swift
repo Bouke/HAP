@@ -1,11 +1,11 @@
-import func Evergreen.getLogger
+import Logging
 import Dispatch
 import Foundation
 import HTTP
 import NIO
 import NIOHTTP1
 
-fileprivate let logger = getLogger("hap.nio")
+fileprivate let logger = Logger(label: "hap.nio")
 
 enum CryptographyEvent {
     case sharedKey(Data)
