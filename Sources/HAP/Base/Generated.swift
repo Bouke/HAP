@@ -1792,7 +1792,7 @@ extension Service {
 }
 
 public extension AnyCharacteristic {
-	public static func accessoryFlags(
+	static func accessoryFlags(
 		_ value: UInt32 = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Accessory Flags",
@@ -1816,7 +1816,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func active(
+	static func active(
 		_ value: Enums.Active = .active,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Active",
@@ -1840,7 +1840,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func activeIdentifier(
+	static func activeIdentifier(
 		_ value: UInt32 = 0,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Active Identifier",
@@ -1864,7 +1864,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func administratorOnlyAccess(
+	static func administratorOnlyAccess(
 		_ value: Bool = false,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Administrator Only Access",
@@ -1888,7 +1888,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func applicationMatchingIdentifier(
+	static func applicationMatchingIdentifier(
 		_ value: Data = Data(),
 		permissions: [CharacteristicPermission] = [.read],
 		description: String? = "Application Matching Identifier",
@@ -1912,7 +1912,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func audioFeedback(
+	static func audioFeedback(
 		_ value: Bool = false,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Audio Feedback",
@@ -1936,7 +1936,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func batteryLevel(
+	static func batteryLevel(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Battery Level",
@@ -1960,7 +1960,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func brightness(
+	static func brightness(
 		_ value: Int = 0,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Brightness",
@@ -1984,7 +1984,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func carbonDioxideDetected(
+	static func carbonDioxideDetected(
 		_ value: Enums.CarbonDioxideDetected = .normal,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Carbon dioxide Detected",
@@ -2008,7 +2008,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func carbonDioxideLevel(
+	static func carbonDioxideLevel(
 		_ value: Float = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Carbon dioxide Level",
@@ -2032,7 +2032,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func carbonDioxidePeakLevel(
+	static func carbonDioxidePeakLevel(
 		_ value: Float = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Carbon dioxide Peak Level",
@@ -2056,7 +2056,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func carbonMonoxideDetected(
+	static func carbonMonoxideDetected(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Carbon monoxide Detected",
@@ -2080,7 +2080,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func carbonMonoxideLevel(
+	static func carbonMonoxideLevel(
 		_ value: Float = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Carbon monoxide Level",
@@ -2104,7 +2104,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func carbonMonoxidePeakLevel(
+	static func carbonMonoxidePeakLevel(
 		_ value: Float = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Carbon monoxide Peak Level",
@@ -2128,7 +2128,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func chargingState(
+	static func chargingState(
 		_ value: Enums.ChargingState = .notChargeable,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Charging State",
@@ -2152,7 +2152,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func closedCaptions(
+	static func closedCaptions(
 		_ value: Enums.ClosedCaptions = .enabled,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Closed Captions",
@@ -2176,7 +2176,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func colorTemperature(
+	static func colorTemperature(
 		_ value: Int = 140,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Color Temperature",
@@ -2200,7 +2200,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func configuredName(
+	static func configuredName(
 		_ value: String = "",
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Configured Name",
@@ -2224,7 +2224,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func contactSensorState(
+	static func contactSensorState(
 		_ value: Enums.ContactSensorState = .detected,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Contact Sensor State",
@@ -2248,7 +2248,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func coolingThresholdTemperature(
+	static func coolingThresholdTemperature(
 		_ value: Float = 10,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Cooling Threshold Temperature",
@@ -2272,7 +2272,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func currentAirPurifierState(
+	static func currentAirPurifierState(
 		_ value: Enums.CurrentAirPurifierState = .auto,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Air Purifier State",
@@ -2296,7 +2296,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func currentAirQuality(
+	static func currentAirQuality(
 		_ value: Enums.CurrentAirQuality = .good,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Air Quality",
@@ -2320,7 +2320,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func currentDoorState(
+	static func currentDoorState(
 		_ value: Enums.CurrentDoorState = .open,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Door State",
@@ -2344,7 +2344,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func currentFanState(
+	static func currentFanState(
 		_ value: Enums.CurrentFanState = .auto,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Fan State",
@@ -2368,7 +2368,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func currentHeaterCoolerState(
+	static func currentHeaterCoolerState(
 		_ value: Enums.CurrentHeaterCoolerState = .auto,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Heater-Cooler State",
@@ -2392,7 +2392,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func currentHeatingCoolingState(
+	static func currentHeatingCoolingState(
 		_ value: Enums.CurrentHeatingCoolingState = .cool,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Heating Cooling State",
@@ -2416,7 +2416,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func currentHorizontalTiltAngle(
+	static func currentHorizontalTiltAngle(
 		_ value: Int = -90,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Horizontal Tilt Angle",
@@ -2440,7 +2440,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func currentHumidifierDehumidifierState(
+	static func currentHumidifierDehumidifierState(
 		_ value: Enums.CurrentHumidifierDehumidifierState = .auto,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Humidifier-Dehumidifier State",
@@ -2464,7 +2464,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func currentLightLevel(
+	static func currentLightLevel(
 		_ value: Float = 0.0001,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Light Level",
@@ -2488,7 +2488,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func currentMediaState(
+	static func currentMediaState(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Media State",
@@ -2512,7 +2512,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func currentPosition(
+	static func currentPosition(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Position",
@@ -2536,7 +2536,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func currentRelativeHumidity(
+	static func currentRelativeHumidity(
 		_ value: Float = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Relative Humidity",
@@ -2560,7 +2560,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func currentSlatState(
+	static func currentSlatState(
 		_ value: Enums.CurrentSlatState = .auto,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Slat State",
@@ -2584,7 +2584,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func currentTemperature(
+	static func currentTemperature(
 		_ value: Float = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Temperature",
@@ -2608,7 +2608,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func currentTiltAngle(
+	static func currentTiltAngle(
 		_ value: Int = -90,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Tilt Angle",
@@ -2632,7 +2632,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func currentVerticalTiltAngle(
+	static func currentVerticalTiltAngle(
 		_ value: Int = -90,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Vertical Tilt Angle",
@@ -2656,7 +2656,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func currentVisibilityState(
+	static func currentVisibilityState(
 		_ value: Enums.CurrentVisibilityState = .shown,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Visibility State",
@@ -2680,7 +2680,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func currentWaterLevel(
+	static func currentWaterLevel(
 		_ value: Float = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Water Level",
@@ -2704,7 +2704,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func displayOrder(
+	static func displayOrder(
 		_ value: Data = Data(),
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Display Order",
@@ -2728,7 +2728,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func filterChangeIndication(
+	static func filterChangeIndication(
 		_ value: Enums.FilterChangeIndication = .noChange,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Filter Change indication",
@@ -2752,7 +2752,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func filterLifeLevel(
+	static func filterLifeLevel(
 		_ value: Float = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Filter Life Level",
@@ -2776,7 +2776,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func filterResetChangeIndication(
+	static func filterResetChangeIndication(
 		_ value: UInt8? = nil,
 		permissions: [CharacteristicPermission] = [.write],
 		description: String? = "Filter Reset Change Indication",
@@ -2800,7 +2800,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func firmwareRevision(
+	static func firmwareRevision(
 		_ value: String = "",
 		permissions: [CharacteristicPermission] = [.read],
 		description: String? = "Firmware Revision",
@@ -2824,7 +2824,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func hardwareRevision(
+	static func hardwareRevision(
 		_ value: String = "",
 		permissions: [CharacteristicPermission] = [.read],
 		description: String? = "Hardware Revision",
@@ -2848,7 +2848,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func heatingThresholdTemperature(
+	static func heatingThresholdTemperature(
 		_ value: Float = 0,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Heating Threshold Temperature",
@@ -2872,7 +2872,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func holdPosition(
+	static func holdPosition(
 		_ value: Bool? = nil,
 		permissions: [CharacteristicPermission] = [.write],
 		description: String? = "Hold Position",
@@ -2896,7 +2896,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func hue(
+	static func hue(
 		_ value: Float = 0,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Hue",
@@ -2920,7 +2920,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func identifier(
+	static func identifier(
 		_ value: UInt32 = 0,
 		permissions: [CharacteristicPermission] = [.read],
 		description: String? = "Identifier",
@@ -2944,7 +2944,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func identify(
+	static func identify(
 		_ value: Bool? = nil,
 		permissions: [CharacteristicPermission] = [.write],
 		description: String? = "Identify",
@@ -2968,7 +2968,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func inUse(
+	static func inUse(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "In Use",
@@ -2992,7 +2992,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func inputDeviceType(
+	static func inputDeviceType(
 		_ value: Enums.InputDeviceType = .audiosystem,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Input Device Type",
@@ -3016,7 +3016,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func inputSourceType(
+	static func inputSourceType(
 		_ value: Enums.InputSourceType = .svideo,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Input Source Type",
@@ -3040,7 +3040,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func isConfigured(
+	static func isConfigured(
 		_ value: Enums.IsConfigured = .notconfigured,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Is Configured",
@@ -3064,7 +3064,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func labelIndex(
+	static func labelIndex(
 		_ value: UInt8 = 1,
 		permissions: [CharacteristicPermission] = [.read],
 		description: String? = "Label Index",
@@ -3088,7 +3088,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func labelNamespace(
+	static func labelNamespace(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read],
 		description: String? = "Label Namespace",
@@ -3112,7 +3112,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func leakDetected(
+	static func leakDetected(
 		_ value: Enums.LeakDetected = .leakNotDetected,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Leak Detected",
@@ -3136,7 +3136,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func lockControlPoint(
+	static func lockControlPoint(
 		_ value: Data? = nil,
 		permissions: [CharacteristicPermission] = [.write],
 		description: String? = "Lock Control Point",
@@ -3160,7 +3160,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func lockCurrentState(
+	static func lockCurrentState(
 		_ value: Enums.LockCurrentState = .unsecured,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Lock Current State",
@@ -3184,7 +3184,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func lockLastKnownAction(
+	static func lockLastKnownAction(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Lock Last Known Action",
@@ -3208,7 +3208,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func lockManagementAutoSecurityTimeout(
+	static func lockManagementAutoSecurityTimeout(
 		_ value: UInt32 = 0,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Lock Management Auto Security Timeout",
@@ -3232,7 +3232,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func lockPhysicalControls(
+	static func lockPhysicalControls(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Lock Physical Controls",
@@ -3256,7 +3256,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func lockTargetState(
+	static func lockTargetState(
 		_ value: Enums.LockTargetState = .unsecured,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Lock Target State",
@@ -3280,7 +3280,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func logs(
+	static func logs(
 		_ value: Data = Data(),
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Logs",
@@ -3304,7 +3304,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func manufacturer(
+	static func manufacturer(
 		_ value: String = "",
 		permissions: [CharacteristicPermission] = [.read],
 		description: String? = "Manufacturer",
@@ -3328,7 +3328,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func model(
+	static func model(
 		_ value: String = "",
 		permissions: [CharacteristicPermission] = [.read],
 		description: String? = "Model",
@@ -3352,7 +3352,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func motionDetected(
+	static func motionDetected(
 		_ value: Bool = false,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Motion Detected",
@@ -3376,7 +3376,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func mute(
+	static func mute(
 		_ value: Bool = false,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Mute",
@@ -3400,7 +3400,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func name(
+	static func name(
 		_ value: String = "",
 		permissions: [CharacteristicPermission] = [.read],
 		description: String? = "Name",
@@ -3424,7 +3424,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func nitrogenDioxideDensity(
+	static func nitrogenDioxideDensity(
 		_ value: Float = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Nitrogen dioxide Density",
@@ -3448,7 +3448,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func obstructionDetected(
+	static func obstructionDetected(
 		_ value: Bool = false,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Obstruction Detected",
@@ -3472,7 +3472,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func occupancyDetected(
+	static func occupancyDetected(
 		_ value: Enums.OccupancyDetected = .occupancyDetected,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Occupancy Detected",
@@ -3496,7 +3496,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func outletInUse(
+	static func outletInUse(
 		_ value: Bool = false,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Outlet In Use",
@@ -3520,7 +3520,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func ozoneDensity(
+	static func ozoneDensity(
 		_ value: Float = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Ozone Density",
@@ -3544,7 +3544,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func pm10Density(
+	static func pm10Density(
 		_ value: Float = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "PM10 Density",
@@ -3568,7 +3568,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func pm2_5Density(
+	static func pm2_5Density(
 		_ value: Float = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "PM2.5 Density",
@@ -3592,7 +3592,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func pictureMode(
+	static func pictureMode(
 		_ value: Enums.PictureMode = .game,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Picture Mode",
@@ -3616,7 +3616,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func positionState(
+	static func positionState(
 		_ value: Enums.PositionState = .increasing,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Position State",
@@ -3640,7 +3640,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func powerModeSelection(
+	static func powerModeSelection(
 		_ value: Enums.PowerModeSelection? = nil,
 		permissions: [CharacteristicPermission] = [.write],
 		description: String? = "Power Mode Selection",
@@ -3664,7 +3664,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func powerState(
+	static func powerState(
 		_ value: Bool = false,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Power State",
@@ -3688,7 +3688,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func productData(
+	static func productData(
 		_ value: Data = Data(),
 		permissions: [CharacteristicPermission] = [.read],
 		description: String? = "Product Data",
@@ -3712,7 +3712,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func programMode(
+	static func programMode(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Program Mode",
@@ -3736,7 +3736,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func programmableSwitchEvent(
+	static func programmableSwitchEvent(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Programmable Switch Event",
@@ -3760,7 +3760,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func programmableSwitchOutputState(
+	static func programmableSwitchOutputState(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Programmable Switch Output State",
@@ -3784,7 +3784,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func relativeHumidityDehumidifierThreshold(
+	static func relativeHumidityDehumidifierThreshold(
 		_ value: Float = 0,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Relative Humidity Dehumidifier Threshold",
@@ -3808,7 +3808,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func relativeHumidityHumidifierThreshold(
+	static func relativeHumidityHumidifierThreshold(
 		_ value: Float = 0,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Relative Humidity Humidifier Threshold",
@@ -3832,7 +3832,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func remainingDuration(
+	static func remainingDuration(
 		_ value: UInt32 = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Remaining Duration",
@@ -3856,7 +3856,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func remoteKey(
+	static func remoteKey(
 		_ value: Enums.RemoteKey? = nil,
 		permissions: [CharacteristicPermission] = [.write],
 		description: String? = "Remote Key",
@@ -3880,7 +3880,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func rotationDirection(
+	static func rotationDirection(
 		_ value: Enums.RotationDirection = .counterclockwise,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Rotation Direction",
@@ -3904,7 +3904,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func rotationSpeed(
+	static func rotationSpeed(
 		_ value: Float = 0,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Rotation Speed",
@@ -3928,7 +3928,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func saturation(
+	static func saturation(
 		_ value: Float = 0,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Saturation",
@@ -3952,7 +3952,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func securitySystemAlarmType(
+	static func securitySystemAlarmType(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Security System Alarm Type",
@@ -3976,7 +3976,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func securitySystemCurrentState(
+	static func securitySystemCurrentState(
 		_ value: Enums.SecuritySystemCurrentState = .disarm,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Security System Current State",
@@ -4000,7 +4000,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func securitySystemTargetState(
+	static func securitySystemTargetState(
 		_ value: Enums.SecuritySystemTargetState = .disarm,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Security System Target State",
@@ -4024,7 +4024,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func serialNumber(
+	static func serialNumber(
 		_ value: String = "",
 		permissions: [CharacteristicPermission] = [.read],
 		description: String? = "Serial Number",
@@ -4048,7 +4048,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func setDuration(
+	static func setDuration(
 		_ value: UInt32 = 0,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Set Duration",
@@ -4072,7 +4072,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func setupTransferTransport(
+	static func setupTransferTransport(
 		_ value: Data? = nil,
 		permissions: [CharacteristicPermission] = [.write],
 		description: String? = "Setup Transfer Transport",
@@ -4096,7 +4096,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func slatType(
+	static func slatType(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read],
 		description: String? = "Slat Type",
@@ -4120,7 +4120,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func sleepDiscoveryMode(
+	static func sleepDiscoveryMode(
 		_ value: Enums.SleepDiscoveryMode = .notdiscoverable,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Sleep Discovery Mode",
@@ -4144,7 +4144,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func smokeDetected(
+	static func smokeDetected(
 		_ value: Enums.SmokeDetected = .smokedetected,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Smoke Detected",
@@ -4168,7 +4168,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func softwareRevision(
+	static func softwareRevision(
 		_ value: String = "",
 		permissions: [CharacteristicPermission] = [.read],
 		description: String? = "Software Revision",
@@ -4192,7 +4192,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func statusActive(
+	static func statusActive(
 		_ value: Bool = false,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Status Active",
@@ -4216,7 +4216,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func statusFault(
+	static func statusFault(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Status Fault",
@@ -4240,7 +4240,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func statusLowBattery(
+	static func statusLowBattery(
 		_ value: Enums.StatusLowBattery = .batteryNormal,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Status Low Battery",
@@ -4264,7 +4264,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func statusTampered(
+	static func statusTampered(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Status Tampered",
@@ -4288,7 +4288,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func sulphurDioxideDensity(
+	static func sulphurDioxideDensity(
 		_ value: Float = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Sulphur dioxide Density",
@@ -4312,7 +4312,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func supportedTransferTransportConfiguration(
+	static func supportedTransferTransportConfiguration(
 		_ value: Data = Data(),
 		permissions: [CharacteristicPermission] = [.read],
 		description: String? = "Supported Transfer Transport Configuration",
@@ -4336,7 +4336,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func swingMode(
+	static func swingMode(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Swing Mode",
@@ -4360,7 +4360,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func targetAirPurifierState(
+	static func targetAirPurifierState(
 		_ value: Enums.TargetAirPurifierState = .inactive,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Air Purifier State",
@@ -4384,7 +4384,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func targetDoorState(
+	static func targetDoorState(
 		_ value: Enums.TargetDoorState = .open,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Door State",
@@ -4408,7 +4408,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func targetFanState(
+	static func targetFanState(
 		_ value: Enums.TargetFanState = .inactive,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Fan State",
@@ -4432,7 +4432,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func targetHeaterCoolerState(
+	static func targetHeaterCoolerState(
 		_ value: Enums.TargetHeaterCoolerState = .heating,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Heater-Cooler State",
@@ -4456,7 +4456,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func targetHeatingCoolingState(
+	static func targetHeatingCoolingState(
 		_ value: Enums.TargetHeatingCoolingState = .cool,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Heating Cooling State",
@@ -4480,7 +4480,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func targetHorizontalTiltAngle(
+	static func targetHorizontalTiltAngle(
 		_ value: Int = -90,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Horizontal Tilt Angle",
@@ -4504,7 +4504,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func targetHumidifierDehumidifierState(
+	static func targetHumidifierDehumidifierState(
 		_ value: Enums.TargetHumidifierDehumidifierState = .inactive,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Humidifier-Dehumidifier State",
@@ -4528,7 +4528,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func targetMediaState(
+	static func targetMediaState(
 		_ value: Enums.TargetMediaState = .pause,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Media State",
@@ -4552,7 +4552,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func targetPosition(
+	static func targetPosition(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Position",
@@ -4576,7 +4576,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func targetRelativeHumidity(
+	static func targetRelativeHumidity(
 		_ value: Float = 0,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Relative Humidity",
@@ -4600,7 +4600,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func targetTemperature(
+	static func targetTemperature(
 		_ value: Float = 10,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Temperature",
@@ -4624,7 +4624,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func targetTiltAngle(
+	static func targetTiltAngle(
 		_ value: Int = -90,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Tilt Angle",
@@ -4648,7 +4648,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func targetVerticalTiltAngle(
+	static func targetVerticalTiltAngle(
 		_ value: Int = -90,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Vertical Tilt Angle",
@@ -4672,7 +4672,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func targetVisibilityState(
+	static func targetVisibilityState(
 		_ value: Enums.TargetVisibilityState = .shown,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Visibility State",
@@ -4696,7 +4696,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func temperatureDisplayUnits(
+	static func temperatureDisplayUnits(
 		_ value: Enums.TemperatureDisplayUnits = .celcius,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Temperature Display Units",
@@ -4720,7 +4720,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func valveType(
+	static func valveType(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Valve Type",
@@ -4744,7 +4744,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func version(
+	static func version(
 		_ value: String = "",
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Version",
@@ -4768,7 +4768,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func volatileOrganicCompoundDensity(
+	static func volatileOrganicCompoundDensity(
 		_ value: Float = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Volatile Organic Compound Density",
@@ -4792,7 +4792,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func volume(
+	static func volume(
 		_ value: Int = 0,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Volume",
@@ -4816,7 +4816,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func volumeControlType(
+	static func volumeControlType(
 		_ value: Enums.VolumeControlType = .relativewithcurrent,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Volume Control Type",
@@ -4840,7 +4840,7 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
-	public static func volumeSelector(
+	static func volumeSelector(
 		_ value: Enums.VolumeSelector? = nil,
 		permissions: [CharacteristicPermission] = [.write],
 		description: String? = "Volume Selector",

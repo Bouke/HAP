@@ -772,7 +772,7 @@ public class Inspector {
         """)
 
         for characteristic in characteristicInfo.sorted(by: { $0.title < $1.title }) {
-            write("\tpublic static func \(serviceName(characteristic.title, uuid: characteristic.id))(")
+            write("\tstatic func \(serviceName(characteristic.title, uuid: characteristic.id))(")
             writeFactoryArgumentsWithDefaults(characteristic)
             write("\t) -> AnyCharacteristic {")
             write("\t\treturn AnyCharacteristic(")
