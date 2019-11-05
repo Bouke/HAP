@@ -2,7 +2,6 @@ import Foundation
 
 var sourceURL: URL
 
-print("Args: \(CommandLine.argc)")
 if CommandLine.argc > 1 {
     let arg = CommandLine.arguments[1]
     sourceURL = URL(fileURLWithPath: arg)

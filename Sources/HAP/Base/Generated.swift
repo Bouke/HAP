@@ -2,9 +2,9 @@
 // framework definitions. Don't make changes to this file directly.
 // Update this file using the `hap-update` tool.
 //
-// Generated on:              30 March 2019
-// HomeKit framework version: 725
-// macOS:                     Version 10.14.4 (Build 18E226)
+// Generated on:              5 November 2019
+// HomeKit framework version: 827
+// macOS:                     Version 10.15.1 (Build 19B88)
 
 import Foundation
 
@@ -40,6 +40,7 @@ public enum AccessoryType: String, Codable {
 	case showerHead = "30"
 	case television = "31"
 	case targetController = "32"
+	case wiFiRouter = "33"
 }
 
 public extension ServiceType {
@@ -82,6 +83,7 @@ public extension ServiceType {
 	static let television = ServiceType(0x00D8)
 	static let temperatureSensor = ServiceType(0x008A)
 	static let thermostat = ServiceType(0x004A)
+	static let transferTransportManagement = ServiceType(0x0203)
 	static let valve = ServiceType(0x00D0)
 	static let window = ServiceType(0x008B)
 	static let windowCovering = ServiceType(0x008C)
@@ -168,6 +170,7 @@ public extension CharacteristicType {
 	static let positionState = CharacteristicType(0x0072)
 	static let powerModeSelection = CharacteristicType(0x00DF)
 	static let powerState = CharacteristicType(0x0025)
+	static let productData = CharacteristicType(0x0220)
 	static let programMode = CharacteristicType(0x00D1)
 	static let programmableSwitchEvent = CharacteristicType(0x0073)
 	static let programmableSwitchOutputState = CharacteristicType(0x0074)
@@ -183,6 +186,7 @@ public extension CharacteristicType {
 	static let securitySystemTargetState = CharacteristicType(0x0067)
 	static let serialNumber = CharacteristicType(0x0030)
 	static let setDuration = CharacteristicType(0x00D3)
+	static let setupTransferTransport = CharacteristicType(0x0201)
 	static let slatType = CharacteristicType(0x00C0)
 	static let sleepDiscoveryMode = CharacteristicType(0x00E8)
 	static let smokeDetected = CharacteristicType(0x0076)
@@ -192,6 +196,7 @@ public extension CharacteristicType {
 	static let statusLowBattery = CharacteristicType(0x0079)
 	static let statusTampered = CharacteristicType(0x007A)
 	static let sulphurDioxideDensity = CharacteristicType(0x00C5)
+	static let supportedTransferTransportConfiguration = CharacteristicType(0x0202)
 	static let swingMode = CharacteristicType(0x00B6)
 	static let targetAirPurifierState = CharacteristicType(0x00A8)
 	static let targetDoorState = CharacteristicType(0x0032)
@@ -1007,9 +1012,11 @@ extension Service {
 		// Optional Characteristics
 		public let accessoryFlags: GenericCharacteristic<UInt32>?
 		public let applicationMatchingIdentifier: GenericCharacteristic<Data>?
+		public let configuredName: GenericCharacteristic<String>?
 		public let firmwareRevision: GenericCharacteristic<String>?
 		public let hardwareRevision: GenericCharacteristic<String>?
 		public let softwareRevision: GenericCharacteristic<String>?
+		public let productData: GenericCharacteristic<Data>?
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
@@ -1035,9 +1042,11 @@ extension Service {
 				generator: { PredefinedCharacteristic.serialNumber() })
 			accessoryFlags = get(type: .accessoryFlags, characteristics: unwrapped)
 			applicationMatchingIdentifier = get(type: .applicationMatchingIdentifier, characteristics: unwrapped)
+			configuredName = get(type: .configuredName, characteristics: unwrapped)
 			firmwareRevision = get(type: .firmwareRevision, characteristics: unwrapped)
 			hardwareRevision = get(type: .hardwareRevision, characteristics: unwrapped)
 			softwareRevision = get(type: .softwareRevision, characteristics: unwrapped)
+			productData = get(type: .productData, characteristics: unwrapped)
 			super.init(type: .info, characteristics: unwrapped)
 		}
 	}
@@ -1341,10 +1350,10 @@ extension Service {
 	open class OutletBase: Service {
 		// Required Characteristics
 		public let powerState: GenericCharacteristic<Bool>
-		public let outletInUse: GenericCharacteristic<Bool>
 
 		// Optional Characteristics
 		public let name: GenericCharacteristic<String>?
+		public let outletInUse: GenericCharacteristic<Bool>?
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
@@ -1352,11 +1361,8 @@ extension Service {
 				type: .powerState,
 				characteristics: &unwrapped,
 				generator: { PredefinedCharacteristic.powerState() })
-			outletInUse = getOrCreateAppend(
-				type: .outletInUse,
-				characteristics: &unwrapped,
-				generator: { PredefinedCharacteristic.outletInUse() })
 			name = get(type: .name, characteristics: unwrapped)
+			outletInUse = get(type: .outletInUse, characteristics: unwrapped)
 			super.init(type: .outlet, characteristics: unwrapped)
 		}
 	}
@@ -1535,6 +1541,7 @@ extension Service {
 		public let active: GenericCharacteristic<Enums.Active>
 		public let activeIdentifier: GenericCharacteristic<UInt32>
 		public let configuredName: GenericCharacteristic<String>
+		public let remoteKey: GenericCharacteristic<Enums.RemoteKey?>
 		public let sleepDiscoveryMode: GenericCharacteristic<Enums.SleepDiscoveryMode>
 
 		// Optional Characteristics
@@ -1545,7 +1552,6 @@ extension Service {
 		public let targetMediaState: GenericCharacteristic<Enums.TargetMediaState>?
 		public let pictureMode: GenericCharacteristic<Enums.PictureMode>?
 		public let powerModeSelection: GenericCharacteristic<Enums.PowerModeSelection?>?
-		public let remoteKey: GenericCharacteristic<Enums.RemoteKey?>?
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
@@ -1561,6 +1567,10 @@ extension Service {
 				type: .configuredName,
 				characteristics: &unwrapped,
 				generator: { PredefinedCharacteristic.configuredName() })
+			remoteKey = getOrCreateAppend(
+				type: .remoteKey,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.remoteKey() })
 			sleepDiscoveryMode = getOrCreateAppend(
 				type: .sleepDiscoveryMode,
 				characteristics: &unwrapped,
@@ -1572,7 +1582,6 @@ extension Service {
 			targetMediaState = get(type: .targetMediaState, characteristics: unwrapped)
 			pictureMode = get(type: .pictureMode, characteristics: unwrapped)
 			powerModeSelection = get(type: .powerModeSelection, characteristics: unwrapped)
-			remoteKey = get(type: .remoteKey, characteristics: unwrapped)
 			super.init(type: .television, characteristics: unwrapped)
 		}
 	}
@@ -1646,6 +1655,27 @@ extension Service {
 			coolingThresholdTemperature = get(type: .coolingThresholdTemperature, characteristics: unwrapped)
 			heatingThresholdTemperature = get(type: .heatingThresholdTemperature, characteristics: unwrapped)
 			super.init(type: .thermostat, characteristics: unwrapped)
+		}
+	}
+
+	open class TransferTransportManagementBase: Service {
+		// Required Characteristics
+		public let supportedTransferTransportConfiguration: GenericCharacteristic<Data>
+		public let setupTransferTransport: GenericCharacteristic<Data?>
+
+		// Optional Characteristics
+
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			supportedTransferTransportConfiguration = getOrCreateAppend(
+				type: .supportedTransferTransportConfiguration,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.supportedTransferTransportConfiguration() })
+			setupTransferTransport = getOrCreateAppend(
+				type: .setupTransferTransport,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.setupTransferTransport() })
+			super.init(type: .transferTransportManagement, characteristics: unwrapped)
 		}
 	}
 
@@ -2099,7 +2129,7 @@ public extension AnyCharacteristic {
 	}
 
 	public static func chargingState(
-		_ value: Enums.ChargingState = .notCharging,
+		_ value: Enums.ChargingState = .notChargeable,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Charging State",
 		format: CharacteristicFormat? = .uint8,
@@ -2243,7 +2273,7 @@ public extension AnyCharacteristic {
 	}
 
 	public static func currentAirPurifierState(
-		_ value: Enums.CurrentAirPurifierState = .manual,
+		_ value: Enums.CurrentAirPurifierState = .auto,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Air Purifier State",
 		format: CharacteristicFormat? = .uint8,
@@ -2267,7 +2297,7 @@ public extension AnyCharacteristic {
 	}
 
 	public static func currentAirQuality(
-		_ value: Enums.CurrentAirQuality = .inferior,
+		_ value: Enums.CurrentAirQuality = .good,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Air Quality",
 		format: CharacteristicFormat? = .uint8,
@@ -2315,7 +2345,7 @@ public extension AnyCharacteristic {
 	}
 
 	public static func currentFanState(
-		_ value: Enums.CurrentFanState = .manual,
+		_ value: Enums.CurrentFanState = .auto,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Fan State",
 		format: CharacteristicFormat? = .uint8,
@@ -2339,7 +2369,7 @@ public extension AnyCharacteristic {
 	}
 
 	public static func currentHeaterCoolerState(
-		_ value: Enums.CurrentHeaterCoolerState = .coolAuto,
+		_ value: Enums.CurrentHeaterCoolerState = .auto,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Heater-Cooler State",
 		format: CharacteristicFormat? = .uint8,
@@ -2531,7 +2561,7 @@ public extension AnyCharacteristic {
 	}
 
 	public static func currentSlatState(
-		_ value: Enums.CurrentSlatState = .manual,
+		_ value: Enums.CurrentSlatState = .auto,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Slat State",
 		format: CharacteristicFormat? = .uint8,
@@ -2699,7 +2729,7 @@ public extension AnyCharacteristic {
 	}
 
 	public static func filterChangeIndication(
-		_ value: Enums.FilterChangeIndication = .change,
+		_ value: Enums.FilterChangeIndication = .noChange,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Filter Change indication",
 		format: CharacteristicFormat? = .uint8,
@@ -3566,7 +3596,7 @@ public extension AnyCharacteristic {
 		_ value: Enums.PictureMode = .game,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Picture Mode",
-		format: CharacteristicFormat? = .uint16,
+		format: CharacteristicFormat? = .uint8,
 		unit: CharacteristicUnit? = nil,
 		maxLength: Int? = nil,
 		maxValue: Double? = 13,
@@ -3647,6 +3677,30 @@ public extension AnyCharacteristic {
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.powerState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
+	}
+
+	public static func productData(
+		_ value: Data = Data(),
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Product Data",
+		format: CharacteristicFormat? = .data,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.productData(
 			value,
 			permissions: permissions,
 			description: description,
@@ -3827,7 +3881,7 @@ public extension AnyCharacteristic {
 	}
 
 	public static func rotationDirection(
-		_ value: Enums.RotationDirection = .clockwise,
+		_ value: Enums.RotationDirection = .counterclockwise,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Rotation Direction",
 		format: CharacteristicFormat? = .int,
@@ -4018,6 +4072,30 @@ public extension AnyCharacteristic {
 			minStep: minStep) as Characteristic)
 	}
 
+	public static func setupTransferTransport(
+		_ value: Data? = nil,
+		permissions: [CharacteristicPermission] = [.write],
+		description: String? = "Setup Transfer Transport",
+		format: CharacteristicFormat? = .tlv8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.setupTransferTransport(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
+	}
+
 	public static func slatType(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read],
@@ -4163,7 +4241,7 @@ public extension AnyCharacteristic {
 	}
 
 	public static func statusLowBattery(
-		_ value: Enums.StatusLowBattery = .batteryLow,
+		_ value: Enums.StatusLowBattery = .batteryNormal,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Status Low Battery",
 		format: CharacteristicFormat? = .uint8,
@@ -4223,6 +4301,30 @@ public extension AnyCharacteristic {
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.sulphurDioxideDensity(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep) as Characteristic)
+	}
+
+	public static func supportedTransferTransportConfiguration(
+		_ value: Data = Data(),
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Supported Transfer Transport Configuration",
+		format: CharacteristicFormat? = .tlv8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.supportedTransferTransportConfiguration(
 			value,
 			permissions: permissions,
 			description: description,
@@ -5102,7 +5204,7 @@ public class PredefinedCharacteristic {
 	}
 
 	static func chargingState(
-		_ value: Enums.ChargingState = .notCharging,
+		_ value: Enums.ChargingState = .notChargeable,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Charging State",
 		format: CharacteristicFormat? = .uint8,
@@ -5246,7 +5348,7 @@ public class PredefinedCharacteristic {
 	}
 
 	static func currentAirPurifierState(
-		_ value: Enums.CurrentAirPurifierState = .manual,
+		_ value: Enums.CurrentAirPurifierState = .auto,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Air Purifier State",
 		format: CharacteristicFormat? = .uint8,
@@ -5270,7 +5372,7 @@ public class PredefinedCharacteristic {
 	}
 
 	static func currentAirQuality(
-		_ value: Enums.CurrentAirQuality = .inferior,
+		_ value: Enums.CurrentAirQuality = .good,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Air Quality",
 		format: CharacteristicFormat? = .uint8,
@@ -5318,7 +5420,7 @@ public class PredefinedCharacteristic {
 	}
 
 	static func currentFanState(
-		_ value: Enums.CurrentFanState = .manual,
+		_ value: Enums.CurrentFanState = .auto,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Fan State",
 		format: CharacteristicFormat? = .uint8,
@@ -5342,7 +5444,7 @@ public class PredefinedCharacteristic {
 	}
 
 	static func currentHeaterCoolerState(
-		_ value: Enums.CurrentHeaterCoolerState = .coolAuto,
+		_ value: Enums.CurrentHeaterCoolerState = .auto,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Heater-Cooler State",
 		format: CharacteristicFormat? = .uint8,
@@ -5534,7 +5636,7 @@ public class PredefinedCharacteristic {
 	}
 
 	static func currentSlatState(
-		_ value: Enums.CurrentSlatState = .manual,
+		_ value: Enums.CurrentSlatState = .auto,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Slat State",
 		format: CharacteristicFormat? = .uint8,
@@ -5702,7 +5804,7 @@ public class PredefinedCharacteristic {
 	}
 
 	static func filterChangeIndication(
-		_ value: Enums.FilterChangeIndication = .change,
+		_ value: Enums.FilterChangeIndication = .noChange,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Filter Change indication",
 		format: CharacteristicFormat? = .uint8,
@@ -6569,7 +6671,7 @@ public class PredefinedCharacteristic {
 		_ value: Enums.PictureMode = .game,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Picture Mode",
-		format: CharacteristicFormat? = .uint16,
+		format: CharacteristicFormat? = .uint8,
 		unit: CharacteristicUnit? = nil,
 		maxLength: Int? = nil,
 		maxValue: Double? = 13,
@@ -6650,6 +6752,30 @@ public class PredefinedCharacteristic {
 	) -> GenericCharacteristic<Bool> {
 		return GenericCharacteristic<Bool>(
 			type: .powerState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
+	}
+
+	static func productData(
+		_ value: Data = Data(),
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Product Data",
+		format: CharacteristicFormat? = .data,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil
+	) -> GenericCharacteristic<Data> {
+		return GenericCharacteristic<Data>(
+			type: .productData,
 			value: value,
 			permissions: permissions,
 			description: description,
@@ -6830,7 +6956,7 @@ public class PredefinedCharacteristic {
 	}
 
 	static func rotationDirection(
-		_ value: Enums.RotationDirection = .clockwise,
+		_ value: Enums.RotationDirection = .counterclockwise,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Rotation Direction",
 		format: CharacteristicFormat? = .int,
@@ -7021,6 +7147,30 @@ public class PredefinedCharacteristic {
 			minStep: minStep)
 	}
 
+	static func setupTransferTransport(
+		_ value: Data? = nil,
+		permissions: [CharacteristicPermission] = [.write],
+		description: String? = "Setup Transfer Transport",
+		format: CharacteristicFormat? = .tlv8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil
+	) -> GenericCharacteristic<Data?> {
+		return GenericCharacteristic<Data?>(
+			type: .setupTransferTransport,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
+	}
+
 	static func slatType(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read],
@@ -7166,7 +7316,7 @@ public class PredefinedCharacteristic {
 	}
 
 	static func statusLowBattery(
-		_ value: Enums.StatusLowBattery = .batteryLow,
+		_ value: Enums.StatusLowBattery = .batteryNormal,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Status Low Battery",
 		format: CharacteristicFormat? = .uint8,
@@ -7226,6 +7376,30 @@ public class PredefinedCharacteristic {
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .sulphurDioxideDensity,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep)
+	}
+
+	static func supportedTransferTransportConfiguration(
+		_ value: Data = Data(),
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Supported Transfer Transport Configuration",
+		format: CharacteristicFormat? = .tlv8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil
+	) -> GenericCharacteristic<Data> {
+		return GenericCharacteristic<Data>(
+			type: .supportedTransferTransportConfiguration,
 			value: value,
 			permissions: permissions,
 			description: description,
