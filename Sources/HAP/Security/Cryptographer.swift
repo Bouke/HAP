@@ -54,8 +54,8 @@ class Cryptographer {
     func encrypt(length: Int, plaintext: inout ByteBuffer, cipher: inout ByteBuffer) throws {
         logger.info("Encrypt message #\(self.encryptCount), length: \(length)")
         defer { encryptCount += 1 }
-        cipher.write(integer: Int16(length), endianness: Endianness.little, as: Int16.self)
-        let additional = cipher.viewBytes(at: 0, length: 2)
+        cipher.writeInteger(Int16(length), endianness: Endianness.little, as: Int16.self)
+        let additional = cipher.viewBytes(at: 0, length: 2)!
         let nonce = encryptCount.bigEndian.bytes
         try ChaCha20Poly1305.encrypt(message: &plaintext, additional: additional, nonce: nonce, key: encryptKey, cipher: &cipher)
     }

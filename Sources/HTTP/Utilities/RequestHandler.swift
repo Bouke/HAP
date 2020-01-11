@@ -1,4 +1,5 @@
 // swiftlint:disable all
+import Foundation
 
 public class RequestHandler: ChannelDuplexHandler {
     public typealias InboundIn = HTTPServerRequestPart
@@ -11,7 +12,7 @@ public class RequestHandler: ChannelDuplexHandler {
 
     public init() { }
 
-    public func channelRead(ctx: ChannelHandlerContext, data: NIOAny) {
+    public func channelRead(context: ChannelHandlerContext, data: NIOAny) {
         switch unwrapInboundIn(data) {
         case .head(let head):
             switch state {
@@ -24,11 +25,11 @@ public class RequestHandler: ChannelDuplexHandler {
             case .ready: assertionFailure("Unexpected state: \(state)")
             case .awaitingBody(let head):
                 state = .collectingBody(head, nil)
-                channelRead(ctx: ctx, data: data)
+                channelRead(context: context, data: data)
             case .collectingBody(let head, let existingBody):
                 let body: ByteBuffer
                 if var existing = existingBody {
-                    existing.write(buffer: &chunk)
+                    existing.writeBuffer(&chunk)
                     body = existing
                 } else {
                     body = chunk
@@ -42,29 +43,29 @@ public class RequestHandler: ChannelDuplexHandler {
             case .ready: assertionFailure("Unexpected state: \(state)")
             case .awaitingBody(let head):
                 state = .waitingResponse(head)
-                respond(to: head, body: .empty, ctx: ctx)
+                respond(to: head, body: .empty, context: context)
             case .collectingBody(let head, let body):
                 state = .waitingResponse(head)
                 let body: HTTPBody = body.flatMap(HTTPBody.init(buffer:)) ?? .empty
-                respond(to: head, body: body, ctx: ctx)
+                respond(to: head, body: body, context: context)
             case .waitingResponse: assertionFailure("Unexpected state: \(state)")
             }
         }
     }
 
-    private func respond(to head: HTTPRequestHead, body: HTTPBody, ctx: ChannelHandlerContext) {
-        let req = HTTPRequest(head: head, body: body, channel: ctx.channel)
-        ctx.fireChannelRead(wrapInboundOut(req))
+    private func respond(to head: HTTPRequestHead, body: HTTPBody, context: ChannelHandlerContext) {
+        let req = HTTPRequest(head: head, body: body, channel: context.channel)
+        context.fireChannelRead(wrapInboundOut(req))
     }
 
-    public func write(ctx: ChannelHandlerContext, data: NIOAny, promise: EventLoopPromise<Void>?) {
+    public func write(context: ChannelHandlerContext, data: NIOAny, promise: EventLoopPromise<Void>?) {
         guard case let .waitingResponse(request) = state else { preconditionFailure("Unexpected state: \(state)") }
         let response = unwrapOutboundIn(data)
-        serialize(response, for: request, ctx: ctx, promise: promise)
+        serialize(response, for: request, context: context, promise: promise)
         state = .ready
     }
 
-    private func serialize(_ res: HTTPResponse, for reqhead: HTTPRequestHead, ctx: ChannelHandlerContext, promise: EventLoopPromise<Void>?) {
+    private func serialize(_ res: HTTPResponse, for reqhead: HTTPRequestHead, context: ChannelHandlerContext, promise: EventLoopPromise<Void>?) {
         // add a RFC1123 timestamp to the Date header to make this
         // a valid request
         var reshead = res.head
@@ -79,46 +80,46 @@ public class RequestHandler: ChannelDuplexHandler {
         }
 
         // begin serializing
-        ctx.write(wrapOutboundOut(.head(reshead)), promise: nil)
+        context.write(wrapOutboundOut(.head(reshead)), promise: nil)
         if reqhead.method == .HEAD || res.status == .noContent {
             // skip sending the body for HEAD requests
             // also don't send bodies for 204 (no content) requests
-            ctx.writeAndFlush(self.wrapOutboundOut(.end(nil)), promise: promise)
+            context.writeAndFlush(self.wrapOutboundOut(.end(nil)), promise: promise)
         } else {
             switch res.body.storage {
-            case .none: ctx.writeAndFlush(wrapOutboundOut(.end(nil)), promise: promise)
-            case .buffer(let buffer): writeAndflush(buffer: buffer, ctx: ctx, shouldClose: !reqhead.isKeepAlive, promise: promise)
+            case .none: context.writeAndFlush(wrapOutboundOut(.end(nil)), promise: promise)
+            case .buffer(let buffer): writeAndflush(buffer: buffer, context: context, shouldClose: !reqhead.isKeepAlive, promise: promise)
             case .string(let string):
-                var buffer = ctx.channel.allocator.buffer(capacity: string.count)
-                buffer.write(string: string)
-                writeAndflush(buffer: buffer, ctx: ctx, shouldClose: !reqhead.isKeepAlive, promise: promise)
+                var buffer = context.channel.allocator.buffer(capacity: string.count)
+                buffer.writeString(string)
+                writeAndflush(buffer: buffer, context: context, shouldClose: !reqhead.isKeepAlive, promise: promise)
             case .staticString(let string):
-                var buffer = ctx.channel.allocator.buffer(capacity: string.count)
-                buffer.write(staticString: string)
-                writeAndflush(buffer: buffer, ctx: ctx, shouldClose: !reqhead.isKeepAlive, promise: promise)
+                var buffer = context.channel.allocator.buffer(capacity: string.utf8CodeUnitCount)
+                buffer.writeStaticString(string)
+                writeAndflush(buffer: buffer, context: context, shouldClose: !reqhead.isKeepAlive, promise: promise)
             case .data(let data):
-                var buffer = ctx.channel.allocator.buffer(capacity: data.count)
-                buffer.write(bytes: data)
-                writeAndflush(buffer: buffer, ctx: ctx, shouldClose: !reqhead.isKeepAlive, promise: promise)
+                var buffer = context.channel.allocator.buffer(capacity: data.count)
+                buffer.writeBytes(data)
+                writeAndflush(buffer: buffer, context: context, shouldClose: !reqhead.isKeepAlive, promise: promise)
             case .dispatchData(let data):
-                var buffer = ctx.channel.allocator.buffer(capacity: data.count)
-                buffer.write(bytes: data)
-                writeAndflush(buffer: buffer, ctx: ctx, shouldClose: !reqhead.isKeepAlive, promise: promise)
+                var buffer = context.channel.allocator.buffer(capacity: data.count)
+                buffer.writeBytes(data)
+                writeAndflush(buffer: buffer, context: context, shouldClose: !reqhead.isKeepAlive, promise: promise)
             }
         }
     }
 
-    /// Writes a `ByteBuffer` to the ctx.
-    private func writeAndflush(buffer: ByteBuffer, ctx: ChannelHandlerContext, shouldClose: Bool, promise: EventLoopPromise<Void>?) {
+    /// Writes a `ByteBuffer` to the context.
+    private func writeAndflush(buffer: ByteBuffer, context: ChannelHandlerContext, shouldClose: Bool, promise: EventLoopPromise<Void>?) {
         if buffer.readableBytes > 0 {
-            _ = ctx.write(wrapOutboundOut(.body(.byteBuffer(buffer))))
+            _ = context.write(wrapOutboundOut(.body(.byteBuffer(buffer))))
         }
-        _ = ctx.writeAndFlush(wrapOutboundOut(.end(nil))).map {
+        _ = context.writeAndFlush(wrapOutboundOut(.end(nil))).map {
             if shouldClose {
                 // close connection now
-                ctx.close(promise: promise)
+                context.close(promise: promise)
             } else {
-                promise?.succeed(result: ())
+                promise?.succeed(())
             }
         }
     }

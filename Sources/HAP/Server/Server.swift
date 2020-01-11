@@ -47,15 +47,15 @@ public class Server: NSObject, NetServiceDelegate {
 
             // Set the handlers that are applied to the accepted child `Channel`s.
             .childChannelInitializer { channel in
-                channel.pipeline.add(handler: CryptographerHandler()).then {
-                    channel.pipeline.add(handler: EventHandler()).then {
-                        channel.pipeline.configureHTTPServerPipeline(withErrorHandling: true).then {
+                channel.pipeline.addHandler(CryptographerHandler()).flatMap {
+                    channel.pipeline.addHandler(EventHandler()).flatMap {
+                        channel.pipeline.configureHTTPServerPipeline(withErrorHandling: true).flatMap {
                             // It's important we use the same handler for all accepted channels.
                             // The ControllerHandler is thread-safe!
-                            channel.pipeline.add(handler: device.controllerHandler!).then {
-                                channel.pipeline.add(handler: RequestHandler()).then {
-                                    channel.pipeline.add(handler: UpgradeEventHandler()).then {
-                                        channel.pipeline.add(handler: applicationHandler)
+                            channel.pipeline.addHandler(device.controllerHandler!).flatMap {
+                                channel.pipeline.addHandler(RequestHandler()).flatMap {
+                                    channel.pipeline.addHandler(UpgradeEventHandler()).flatMap {
+                                        channel.pipeline.addHandler(applicationHandler)
                                     }
                                 }
                             }
@@ -72,7 +72,7 @@ public class Server: NSObject, NetServiceDelegate {
 
         logger.debug("binding listening port...")
         do {
-            channel = try bootstrap.bind(to: SocketAddress(ipAddress: "::", port: UInt16(requestedPort))).wait()
+            channel = try bootstrap.bind(to: SocketAddress(ipAddress: "::", port: requestedPort)).wait()
         } catch {
             throw ServerError.couldNotBindToPort(error)
         }

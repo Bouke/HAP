@@ -20,25 +20,25 @@ class CryptographerHandler: ChannelDuplexHandler {
     var cryptographer: Cryptographer?
     var cumulationBuffer: ByteBuffer?
 
-    func triggerUserOutboundEvent(ctx: ChannelHandlerContext, event: Any, promise: EventLoopPromise<Void>?) {
+    func triggerUserOutboundEvent(context: ChannelHandlerContext, event: Any, promise: EventLoopPromise<Void>?) {
         if case let CryptographyEvent.sharedKey(sharedKey) = event {
             cryptographer = Cryptographer(sharedKey: sharedKey)
-            promise?.succeed(result: ())
+            promise?.succeed(())
         } else {
-            ctx.triggerUserOutboundEvent(event, promise: promise)
+            context.triggerUserOutboundEvent(event, promise: promise)
         }
     }
 
-    func channelRead(ctx: ChannelHandlerContext, data: NIOAny) {
+    func channelRead(context: ChannelHandlerContext, data: NIOAny) {
         guard cryptographer != nil else {
-            return ctx.fireChannelRead(data)
+            return context.fireChannelRead(data)
         }
 
         var buffer = unwrapInboundIn(data)
         if cumulationBuffer == nil {
             cumulationBuffer = buffer
         } else {
-            cumulationBuffer!.write(buffer: &buffer)
+            cumulationBuffer!.writeBuffer(&buffer)
         }
 
         repeat {
@@ -47,58 +47,58 @@ class CryptographerHandler: ChannelDuplexHandler {
             cumulationBuffer!.moveReaderIndex(to: startIndex)
             guard 2 + length + 16 <= cumulationBuffer!.readableBytes else { return }
 
-            readOneFrame(ctx: ctx, length: Int(length))
+            readOneFrame(context: context, length: Int(length))
         } while cumulationBuffer != nil
     }
 
-    func readOneFrame(ctx: ChannelHandlerContext, length: Int) {
+    func readOneFrame(context: ChannelHandlerContext, length: Int) {
         var cipher = cumulationBuffer!.readSlice(length: 2 + length + 16)!
-        var message = ctx.channel.allocator.buffer(capacity: length)
+        var message = context.channel.allocator.buffer(capacity: length)
         do {
             try cryptographer!.decrypt(length: length, cipher: &cipher, message: &message)
         } catch {
             // swiftlint:disable:next line_length
-            logger.warning("Could not decrypt message from \(ctx.remoteAddress?.description ?? "???"): \(error), closing connection.")
+            logger.warning("Could not decrypt message from \(context.remoteAddress?.description ?? "???"): \(error), closing connection.")
             cumulationBuffer!.clear()
-            ctx.close(promise: nil)
+            context.close(promise: nil)
             return
         }
-        ctx.fireChannelRead(wrapInboundOut(message))
+        context.fireChannelRead(wrapInboundOut(message))
 
         if cumulationBuffer!.readableBytes == 0 {
             cumulationBuffer = nil
         }
     }
 
-    func write(ctx: ChannelHandlerContext, data: NIOAny, promise: EventLoopPromise<Void>?) {
+    func write(context: ChannelHandlerContext, data: NIOAny, promise: EventLoopPromise<Void>?) {
         guard cryptographer != nil else {
-            return ctx.write(data, promise: promise)
+            return context.write(data, promise: promise)
         }
 
         var buffer = unwrapOutboundIn(data)
         while (buffer.readableBytes > 0) {
-            writeOneFrame(ctx: ctx, buffer: &buffer, promise: promise)
+            writeOneFrame(context: context, buffer: &buffer, promise: promise)
         }
     }
 
-    func writeOneFrame(ctx: ChannelHandlerContext, buffer: inout ByteBuffer, promise: EventLoopPromise<Void>?) {
+    func writeOneFrame(context: ChannelHandlerContext, buffer: inout ByteBuffer, promise: EventLoopPromise<Void>?) {
         let length = min(1024, buffer.readableBytes)
         var frame = buffer.readSlice(length: length)!
-        var cipher = ctx.channel.allocator.buffer(capacity: 0)
+        var cipher = context.channel.allocator.buffer(capacity: 0)
         do {
             try cryptographer!.encrypt(length: length, plaintext: &frame, cipher: &cipher)
         } catch {
             // swiftlint:disable:next line_length
-            logger.warning("Could not decrypt message from \(ctx.remoteAddress?.description ?? "???"): \(error), closing connection.")
+            logger.warning("Could not decrypt message from \(context.remoteAddress?.description ?? "???"): \(error), closing connection.")
             buffer.clear()
-            ctx.close(promise: nil)
+            context.close(promise: nil)
             return
         }
 
         if (buffer.readableBytes > 0) {
-            ctx.write(wrapOutboundOut(cipher), promise: nil)
+            context.write(wrapOutboundOut(cipher), promise: nil)
         } else {
-            ctx.write(wrapOutboundOut(cipher), promise: promise)
+            context.write(wrapOutboundOut(cipher), promise: promise)
         }
     }
 }
@@ -111,7 +111,7 @@ class EventHandler: ChannelOutboundHandler {
     var pendingPromises: [EventLoopPromise<Void>] = []
     var nextAllowableNotificationTime = Date()
 
-    func triggerUserOutboundEvent(ctx: ChannelHandlerContext, event: Any, promise: EventLoopPromise<Void>?) {
+    func triggerUserOutboundEvent(context: ChannelHandlerContext, event: Any, promise: EventLoopPromise<Void>?) {
         if case let CharacteristicEvent.changed(characteristic) = event {
             pendingNotifications.append(characteristic)
             if let promise = promise {
@@ -121,15 +121,15 @@ class EventHandler: ChannelOutboundHandler {
             // We don't send notifications immediately to allow a small window
             // to receive additional events, otherwise those events would have
             // to wait for the next opportunity.
-            _ = ctx.eventLoop.scheduleTask(in: TimeAmount.milliseconds(5)) {
-                self.writePendingNotifications(ctx: ctx)
+            _ = context.eventLoop.scheduleTask(in: TimeAmount.milliseconds(5)) {
+                self.writePendingNotifications(context: context)
             }
         } else {
-            ctx.triggerUserOutboundEvent(event, promise: promise)
+            context.triggerUserOutboundEvent(event, promise: promise)
         }
     }
 
-    func writePendingNotifications(ctx: ChannelHandlerContext) {
+    func writePendingNotifications(context: ChannelHandlerContext) {
         /* HAP Specification 5.8 (excerpts)
          Network-based notifications must be coalesced
          by the accessory using a delay of no less than 1 second.
@@ -142,28 +142,28 @@ class EventHandler: ChannelOutboundHandler {
         }
 
         if nextAllowableNotificationTime > Date() {
-            let waitms = TimeAmount.Value(nextAllowableNotificationTime.timeIntervalSinceNow * 1000)
-            _ = ctx.eventLoop.scheduleTask(in: TimeAmount.milliseconds(waitms)) {
-                self.writePendingNotifications(ctx: ctx)
+            let waitms = nextAllowableNotificationTime.timeIntervalSinceNow * 1000
+            _ = context.eventLoop.scheduleTask(in: TimeAmount.milliseconds(Int64(waitms))) {
+                self.writePendingNotifications(context: context)
             }
             return
         }
 
         // swiftlint:disable:next line_length
-        logger.debug("Writing \(self.pendingNotifications.count) notification to \(ctx.remoteAddress?.description ?? "N/A")")
+        logger.debug("Writing \(self.pendingNotifications.count) notification to \(context.remoteAddress?.description ?? "N/A")")
 
         guard let event = try? Event(valueChangedOfCharacteristics: pendingNotifications) else {
             // swiftlint:disable:next line_length
-            logger.warning("Could not serialize events for \(ctx.remoteAddress?.description ?? "N/A"), closing connection.")
+            logger.warning("Could not serialize events for \(context.remoteAddress?.description ?? "N/A"), closing connection.")
             return
         }
         let serialized = event.serialized()
-        var buffer = ctx.channel.allocator.buffer(capacity: serialized.count)
-        buffer.write(bytes: serialized)
-        ctx.writeAndFlush(wrapOutboundOut(buffer), promise: nil)
+        var buffer = context.channel.allocator.buffer(capacity: serialized.count)
+        buffer.writeBytes(serialized)
+        context.writeAndFlush(wrapOutboundOut(buffer), promise: nil)
 
         for promise in pendingPromises {
-            promise.succeed(result: ())
+            promise.succeed(())
         }
 
         pendingNotifications = []
@@ -191,19 +191,19 @@ class ControllerHandler: ChannelDuplexHandler {
     // TODO: tighter integration into Device.
     internal var removeSubscriptions: ((Channel) -> Void)?
 
-    func channelActive(ctx: ChannelHandlerContext) {
-        let channel = ctx.channel
+    func channelActive(context: ChannelHandlerContext) {
+        let channel = context.channel
         var channelsCount = 0
         channelsSyncQueue.sync {
             self.channels[ObjectIdentifier(channel)] = channel
             channelsCount = self.channels.count
         }
         logger.info("Controller \(channel.remoteAddress?.description ?? "N/A") connected, \(channelsCount) controllers total")
-        ctx.fireChannelActive()
+        context.fireChannelActive()
     }
 
-    func channelInactive(ctx: ChannelHandlerContext) {
-        let channel = ctx.channel
+    func channelInactive(context: ChannelHandlerContext) {
+        let channel = context.channel
         var channelsCount = 0
         channelsSyncQueue.sync {
             self.channels.removeValue(forKey: ObjectIdentifier(channel))
@@ -212,15 +212,15 @@ class ControllerHandler: ChannelDuplexHandler {
         }
         self.removeSubscriptions?(channel)
         logger.info("Controller \(channel.remoteAddress?.description ?? "N/A") disconnected, \(channelsCount) controllers total")
-        ctx.fireChannelInactive()
+        context.fireChannelInactive()
     }
 
-    func triggerUserOutboundEvent(ctx: ChannelHandlerContext, event: Any, promise: EventLoopPromise<Void>?) {
+    func triggerUserOutboundEvent(context: ChannelHandlerContext, event: Any, promise: EventLoopPromise<Void>?) {
         if case let PairingEvent.verified(pairing) = event {
-            let channel = ctx.channel
+            let channel = context.channel
             registerPairing(pairing, forChannel: channel)
         } else {
-            ctx.triggerUserOutboundEvent(event, promise: promise)
+            context.triggerUserOutboundEvent(event, promise: promise)
         }
     }
 
@@ -260,7 +260,7 @@ class ControllerHandler: ChannelDuplexHandler {
             channelsToClose = channelIdentifiers.compactMap( { channels[$0] } )
         }
         for channel in channelsToClose {
-            // This will trigger `channelInactive(ctx:)`.
+            // This will trigger `channelInactive(context:)`.
             channel.close(promise: nil)
         }
 
@@ -274,16 +274,16 @@ class UpgradeEventHandler: ChannelOutboundHandler {
     typealias OutboundIn = HTTPResponse
     typealias OutboundOut = HTTPResponse
 
-    func write(ctx: ChannelHandlerContext, data: NIOAny, promise: EventLoopPromise<Void>?) {
+    func write(context: ChannelHandlerContext, data: NIOAny, promise: EventLoopPromise<Void>?) {
         var response = unwrapOutboundIn(data)
         if let sharedKeyB64 = response.headers["x-shared-key"].first {
             let sharedKey = Data(base64Encoded: sharedKeyB64)!
             response.headers.remove(name: "x-shared-key")
-            ctx.write(wrapOutboundOut(response)).whenSuccess {
-                ctx.triggerUserOutboundEvent(CryptographyEvent.sharedKey(sharedKey), promise: nil)
+            context.write(wrapOutboundOut(response)).whenSuccess {
+                context.triggerUserOutboundEvent(CryptographyEvent.sharedKey(sharedKey), promise: nil)
             }
         } else {
-            ctx.write(wrapOutboundOut(response), promise: nil)
+            context.write(wrapOutboundOut(response), promise: nil)
         }
     }
 }
@@ -300,9 +300,9 @@ class ApplicationHandler: ChannelInboundHandler {
         self.responder = responder
     }
 
-    func channelRead(ctx: ChannelHandlerContext, data: NIOAny) {
+    func channelRead(context: ChannelHandlerContext, data: NIOAny) {
         let request = unwrapInboundIn(data)
-        ctx.write(wrapOutboundOut(responder(ctx, request)), promise: nil)
+        context.write(wrapOutboundOut(responder(context, request)), promise: nil)
     }
 }
 
