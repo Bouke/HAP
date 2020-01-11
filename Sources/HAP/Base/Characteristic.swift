@@ -155,8 +155,8 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
         return value
     }
 
-    public var hashValue: Int {
-        return iid.hashValue
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(iid)
     }
 
     public static func == (lhs: GenericCharacteristic, rhs: GenericCharacteristic) -> Bool {

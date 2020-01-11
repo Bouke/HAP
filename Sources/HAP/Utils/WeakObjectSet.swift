@@ -6,11 +6,9 @@ class WeakObject<T: AnyObject>: Equatable, Hashable {
         self.object = object
     }
 
-    var hashValue: Int {
+    func hash(into hasher: inout Hasher) {
         if let object = self.object {
-            return ObjectIdentifier(object).hashValue
-        } else {
-            return 0
+            hasher.combine(ObjectIdentifier(object))
         }
     }
 

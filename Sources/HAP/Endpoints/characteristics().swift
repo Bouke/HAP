@@ -132,7 +132,7 @@ func characteristics(device: Device, channel: Channel, request: HTTPRequest) -> 
                     logger.warning("Could not decode JSON")
                     return .badRequest
             }
-            logger.debug("PUT data: \(String(bytes: body, encoding: .utf8))")
+            logger.debug("PUT data: \(String(bytes: body, encoding: .utf8) ?? "n/a")")
             var statuses = [Protocol.Characteristic]()
             for item in decoded.characteristics {
                 var status = Protocol.Characteristic(aid: item.aid, iid: item.iid)

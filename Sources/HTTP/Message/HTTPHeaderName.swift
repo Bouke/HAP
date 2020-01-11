@@ -1,9 +1,6 @@
 // swiftlint:disable all
 /// Type used for the name of a HTTP header in the `HTTPHeaders` storage.
 public struct HTTPHeaderName: Codable, Hashable, CustomStringConvertible {
-    /// See `Hashable.hashValue`
-    public let hashValue: Int
-
     /// Lowercased-ASCII version of the header.
     internal let lowercased: String
 
@@ -11,7 +8,6 @@ public struct HTTPHeaderName: Codable, Hashable, CustomStringConvertible {
     public init(_ name: String) {
         let lowercased = name.lowercased()
         self.lowercased = lowercased
-        self.hashValue = lowercased.hashValue
     }
 
     /// See `ExpressibleByStringLiteral.init(stringLiteral:)`
@@ -37,6 +33,11 @@ public struct HTTPHeaderName: Codable, Hashable, CustomStringConvertible {
     /// See `Equatable.==`
     public static func ==(lhs: HTTPHeaderName, rhs: HTTPHeaderName) -> Bool {
         return lhs.lowercased == rhs.lowercased
+    }
+
+    /// See `Hashable.hash(into:)`
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(lowercased)
     }
 
     // https://www.iana.org/assignments/message-headers/message-headers.xhtml
