@@ -45,4 +45,5 @@ matrix:
       before_script: git fetch --unshallow --quiet
       script: sonar-scanner
   allow_failures:
+    - name: Code Quality Checks
     - name: SonarCloud scanner
