@@ -11,6 +11,10 @@ fileprivate let logger = Logger(label: "bridge")
     import Glibc
 #endif
 
+#if DEBUG
+    logger.warning("⚠️  It looks like you're running a debug build, which doesn't perform well. Specify `-c release` for good performance.")
+#endif
+
 let storage = FileStorage(filename: "configuration.json")
 if CommandLine.arguments.contains("--recreate") {
     logger.warning("Dropping all pairings, keys")

@@ -23,9 +23,9 @@ Install libsodium (used for Curve25519 and Ed25519):
 
     brew install libsodium
 
-And then build and run the project itself:
+And then build and run the project itself, specifying a release build for good performance:
 
-    swift run hap-server -c release
+    swift run -c release hap-server
 
 ### Linux
 
@@ -43,9 +43,9 @@ Make sure you have libsodium 1.0.9 or above. Ubuntu 16.10 or later suffices. Oth
     sudo make install
     sudo ldconfig
 
-And then build the project itself:
+And then build the project itself, specifying a release build for good performance:
 
-    swift run hap-server -c release
+    swift run -c release hap-server
 
 ## Raspberry Pi (Raspbian Stretch)
 
@@ -56,9 +56,9 @@ There are currently no official binaries from swift.org targetting ARM / Raspbia
 
 ## Usage
 
-Modify ``Sources/hap-server/main.swift`` to include your own accessories, or import the _HAP_ library into your own project.
+Modify `Sources/hap-server/main.swift` to include your own accessories, or import the _HAP_ library into your own project.
 
-On Mac OS, you can debug using XCode by running the command ``swift package generate-xcodeproj`` and the opening the resulting ``HAP.xcodeproj`` project. Select and run the ``hap-server`` target.
+On Mac OS, you can debug using XCode by running the command `swift package generate-xcodeproj` and the opening the resulting `HAP.xcodeproj` project. Select and run the `hap-server` target.
 
 ## Extensibility
 
@@ -136,7 +136,7 @@ Certain tests involve crypto, which can be a bit slow in debug builds. Best to r
 
 ### Implementation notes
 
-Currently ``GenericCharacteristic<T>`` is used, to allow for user-defined value types. As Swift requires homegenous arrays, a protocol ``AnyCharacteristic`` is introduced. I don't like the resulting implementation as the generics result in a cascade of workarounds (boxing + ``ObjectIdentifier()``).
+Currently `GenericCharacteristic<T>` is used, to allow for user-defined value types. As Swift requires homegenous arrays, a protocol `AnyCharacteristic` is introduced. I don't like the resulting implementation as the generics result in a cascade of workarounds (boxing + `ObjectIdentifier()`).
 
 ## Credits
 
