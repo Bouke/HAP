@@ -1,3 +1,13 @@
+## 0.7.0 - 2020-01-27
+
+### Added
+- HAP definitions from macOS Catalina.
+
+### Changed
+- Swift 5 required.
+- SwiftNIO upgraded to v2.
+- Logging through SwiftLog instead of Evergreen.
+
 ## 0.6.0 - 2019-08-31
 
 ### Added
