@@ -2442,7 +2442,7 @@ public extension AnyCharacteristic {
 	}
 
 	static func currentHumidifierDehumidifierState(
-		_ value: Enums.CurrentHumidifierDehumidifierState = .auto,
+        _ value: Enums.CurrentHumidifierDehumidifierState = .inactive,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Humidifier-Dehumidifier State",
 		format: CharacteristicFormat? = .uint8,
@@ -4506,7 +4506,7 @@ public extension AnyCharacteristic {
 	}
 
 	static func targetHumidifierDehumidifierState(
-		_ value: Enums.TargetHumidifierDehumidifierState = .inactive,
+        _ value: Enums.TargetHumidifierDehumidifierState = .automatic,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Humidifier-Dehumidifier State",
 		format: CharacteristicFormat? = .uint8,
@@ -5517,7 +5517,7 @@ public class PredefinedCharacteristic {
 	}
 
 	static func currentHumidifierDehumidifierState(
-		_ value: Enums.CurrentHumidifierDehumidifierState = .auto,
+        _ value: Enums.CurrentHumidifierDehumidifierState = .inactive,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Humidifier-Dehumidifier State",
 		format: CharacteristicFormat? = .uint8,
@@ -7581,7 +7581,7 @@ public class PredefinedCharacteristic {
 	}
 
 	static func targetHumidifierDehumidifierState(
-		_ value: Enums.TargetHumidifierDehumidifierState = .inactive,
+        _ value: Enums.TargetHumidifierDehumidifierState = .automatic,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Humidifier-Dehumidifier State",
 		format: CharacteristicFormat? = .uint8,
