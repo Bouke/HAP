@@ -311,9 +311,10 @@ public class Enums {
 	}
 
 	public enum CurrentHumidifierDehumidifierState: UInt8, CharacteristicValueType {
-		case auto = 0
-		case humidifyAuto = 1
-		case dehumidifyAuto = 2
+		case inactive = 0
+        case idle = 1
+        case humidifying = 2
+        case dehumidifying = 3
 	}
 
 	public enum CurrentSlatState: UInt8, CharacteristicValueType {
@@ -485,10 +486,10 @@ public class Enums {
 	}
 
 	public enum TargetHumidifierDehumidifierState: UInt8, CharacteristicValueType {
-		case inactive = 0
-		case idle = 1
-		case humidifying = 2
-	}
+        case automatic = 0
+        case humidify = 1
+        case dehumidify = 2
+    }
 
 	public enum TargetMediaState: UInt8, CharacteristicValueType {
 		case play = 0
