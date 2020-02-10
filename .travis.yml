@@ -7,15 +7,11 @@ matrix:
       os: osx
       osx_image: xcode10.3
       before_install:
-        - brew update
         - brew install libsodium
     - name: Swift 5.0
       os: linux
       dist: trusty
       before_install:
-        # workaround for https://travis-ci.community/t/then-sudo-apt-get-update-failed-public-key-is-not-available-no-pubkey-6b05f25d762e3157-in-ubuntu-xenial/1728
-        - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 762E3157
-        - sudo apt update
         - sudo apt install libavahi-compat-libdnssd-dev
         - wget https://swift.org/builds/swift-5.0-release/ubuntu1404/swift-5.0-RELEASE/swift-5.0-RELEASE-ubuntu14.04.tar.gz
         - tar xzf swift-5.0-RELEASE-ubuntu14.04.tar.gz
@@ -33,7 +29,6 @@ matrix:
       os: osx
       osx_image: xcode10.3
       install:
-        - brew update
         - brew upgrade swiftlint || true
       script: swiftlint
     - name: SonarCloud scanner
