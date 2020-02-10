@@ -15,7 +15,15 @@ The goal of this package is to provide a complete implementation of the Homekit 
 * Extensibility through custom services and characteristics.
 * Runs on Linux / Raspbian (Raspberry Pi).
 
-## First run
+## Communication
+
+Remember that this is not a commercial product, but the result of free labor.
+
+- If you need help using this library, open an issue here on GitHub. The more detail the better!
+- If you found a bug, open an issue here on GitHub. The more detail the better!
+- If you want to contribute, submit a pull request.
+
+## Getting Started
 
 ### MacOS
 
@@ -134,13 +142,9 @@ Certain tests involve crypto, which can be a bit slow in debug builds. Best to r
 
     swift test -c release -Xswiftc -enable-testing
 
-### Implementation notes
-
-Currently `GenericCharacteristic<T>` is used, to allow for user-defined value types. As Swift requires homegenous arrays, a protocol `AnyCharacteristic` is introduced. I don't like the resulting implementation as the generics result in a cascade of workarounds (boxing + `ObjectIdentifier()`).
-
 ## Credits
 
-This library was written by [Bouke Haarsma](https://twitter.com/BoukeHaarsma)
+This library was written by [Bouke Haarsma](https://github.com/Bouke)
 and [contributors][0].
 
 [0]: https://github.com/Bouke/HAP/graphs/contributors
