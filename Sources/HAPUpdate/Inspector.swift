@@ -589,10 +589,21 @@ public class Inspector {
             let rName = dict["Read"] as? String
             let wName = dict["Write"] as? String
             let rwName = dict["ReadWrite"] as? String
-            let rValues = dict["Values"] as? NSDictionary
-            let wValues = dict["OutValues"] as? NSDictionary
+            let wValues = dict["Values"] as? NSDictionary
+            let rValues = dict["OutValues"] as? NSDictionary
+
+            if rName != nil && wName != nil && rValues != nil && wValues != nil {
+                print("r:\(rName!) w:\(wName!)")
+            }
 
             if let rName = rName, let values = rValues,
+                let info = characteristicInfo.first(where: { $0.hkname == rName }) {
+
+                let enumName = info.title.parameterName().uppercasedFirstLetter()
+                let type = typeName(info.format)
+
+                enums.append((enumName: enumName, type: type, newValues: values, info: info))
+            } else if let rName = rName, let values = wValues,
                 let info = characteristicInfo.first(where: { $0.hkname == rName }) {
 
                 let enumName = info.title.parameterName().uppercasedFirstLetter()
@@ -608,17 +619,9 @@ public class Inspector {
                 let type = typeName(info.format)
 
                 enums.append((enumName: enumName, type: type, newValues: values, info: info))
-
-            } else if let wName = wName, let values = rValues,
-                let info = characteristicInfo.first(where: { $0.hkname == wName }) {
-
-                let enumName = info.title.parameterName().uppercasedFirstLetter()
-                let type = typeName(info.format)
-
-                enums.append((enumName: enumName, type: type, newValues: values, info: info))
             }
 
-            if let rwName = rwName, let values = rValues,
+            if let rwName = rwName, let values = wValues,
                 let info = characteristicInfo.first(where: { $0.hkname == rwName }) {
 
                 let enumName = info.title.parameterName().uppercasedFirstLetter()
@@ -634,6 +637,7 @@ public class Inspector {
             if let enumInfo = enums.first(where: { $0.info.hkname == defaultType.characteristic }) {
                 // Already defined
             } else if let info = characteristicInfo.first(where: { $0.hkname == defaultType.characteristic }) {
+                print("Using predefined enum for '\(defaultType.enumName)'")
                 var valuedict = NSMutableDictionary()
                 defaultType.values.map({ valuedict[$0.0] = $0.1 })
                 enums.append((enumName: defaultType.enumName, type: defaultType.baseType, newValues: valuedict, info: info))
@@ -648,13 +652,15 @@ public class Inspector {
             } else if let defaultType = Inspector.defaultTypes.first(where: { $0.characteristic == info.hkname }) {
                 // The HAP config definition couldn't be written, likely because both key and values are digits
                 // Fallback to a default definition if it exists
+                print("Use predefined enum cases for '\(enumName)'")
                 var valuedict = NSMutableDictionary()
                 defaultType.values.map({ valuedict[$0.0] = $0.1 })
                 writeEnumeration(enumName: defaultType.enumName, type: defaultType.baseType, values: valuedict, max: info.maxValue)
                 enumeratedCharacteristics.insert(info.hkname)
                 defaultEnumCase[info.hkname] = defaultType.values[0].0.parameterName()
+            } else {
+                print("Could not determine enum cases for '\(enumName)'")
             }
-
         }
         write("}")
 

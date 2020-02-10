@@ -2,9 +2,9 @@
 // framework definitions. Don't make changes to this file directly.
 // Update this file using the `hap-update` tool.
 //
-// Generated on:              5 November 2019
+// Generated on:              10 February 2020
 // HomeKit framework version: 827
-// macOS:                     Version 10.15.1 (Build 19B88)
+// macOS:                     Version 10.15.3 (Build 19D76)
 
 import Foundation
 
@@ -272,8 +272,9 @@ public class Enums {
 	}
 
 	public enum CurrentAirPurifierState: UInt8, CharacteristicValueType {
-		case manual = 0
-		case auto = 1
+		case inactive = 0
+		case idle = 1
+		case purifyingAir = 2
 	}
 
 	public enum CurrentAirQuality: UInt8, CharacteristicValueType {
@@ -294,14 +295,16 @@ public class Enums {
 	}
 
 	public enum CurrentFanState: UInt8, CharacteristicValueType {
-		case manual = 0
-		case auto = 1
+		case inactive = 0
+		case idle = 1
+		case blowing = 2
 	}
 
 	public enum CurrentHeaterCoolerState: UInt8, CharacteristicValueType {
-		case auto = 0
-		case heatAuto = 1
-		case coolAuto = 2
+		case inactive = 0
+		case idle = 1
+		case heating = 2
+		case cooling = 3
 	}
 
 	public enum CurrentHeatingCoolingState: UInt8, CharacteristicValueType {
@@ -311,14 +314,17 @@ public class Enums {
 	}
 
 	public enum CurrentHumidifierDehumidifierState: UInt8, CharacteristicValueType {
-		case auto = 0
-		case humidifyAuto = 1
-		case dehumidifyAuto = 2
+		case inactive = 0
+		case idle = 1
+		case humidifying = 2
+		case dehumidifying = 3
 	}
 
 	public enum CurrentSlatState: UInt8, CharacteristicValueType {
-		case manual = 0
-		case auto = 1
+		case inactive = 0
+		case fixed = 1
+		case swinging = 2
+		case jammed = 3
 	}
 
 	public enum CurrentVisibilityState: UInt8, CharacteristicValueType {
@@ -457,8 +463,8 @@ public class Enums {
 	}
 
 	public enum TargetAirPurifierState: UInt8, CharacteristicValueType {
-		case inactive = 0
-		case idle = 1
+		case manual = 0
+		case auto = 1
 	}
 
 	public enum TargetDoorState: UInt8, CharacteristicValueType {
@@ -467,14 +473,14 @@ public class Enums {
 	}
 
 	public enum TargetFanState: UInt8, CharacteristicValueType {
-		case inactive = 0
-		case idle = 1
+		case manual = 0
+		case auto = 1
 	}
 
 	public enum TargetHeaterCoolerState: UInt8, CharacteristicValueType {
-		case inactive = 0
-		case idle = 1
-		case heating = 2
+		case auto = 0
+		case heatAuto = 1
+		case coolAuto = 2
 	}
 
 	public enum TargetHeatingCoolingState: UInt8, CharacteristicValueType {
@@ -485,9 +491,9 @@ public class Enums {
 	}
 
 	public enum TargetHumidifierDehumidifierState: UInt8, CharacteristicValueType {
-		case inactive = 0
-		case idle = 1
-		case humidifying = 2
+		case auto = 0
+		case humidifyAuto = 1
+		case dehumidifyAuto = 2
 	}
 
 	public enum TargetMediaState: UInt8, CharacteristicValueType {
@@ -2273,7 +2279,7 @@ public extension AnyCharacteristic {
 	}
 
 	static func currentAirPurifierState(
-		_ value: Enums.CurrentAirPurifierState = .auto,
+		_ value: Enums.CurrentAirPurifierState = .inactive,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Air Purifier State",
 		format: CharacteristicFormat? = .uint8,
@@ -2345,7 +2351,7 @@ public extension AnyCharacteristic {
 	}
 
 	static func currentFanState(
-		_ value: Enums.CurrentFanState = .auto,
+		_ value: Enums.CurrentFanState = .inactive,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Fan State",
 		format: CharacteristicFormat? = .uint8,
@@ -2369,7 +2375,7 @@ public extension AnyCharacteristic {
 	}
 
 	static func currentHeaterCoolerState(
-		_ value: Enums.CurrentHeaterCoolerState = .auto,
+		_ value: Enums.CurrentHeaterCoolerState = .heating,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Heater-Cooler State",
 		format: CharacteristicFormat? = .uint8,
@@ -2441,7 +2447,7 @@ public extension AnyCharacteristic {
 	}
 
 	static func currentHumidifierDehumidifierState(
-		_ value: Enums.CurrentHumidifierDehumidifierState = .auto,
+		_ value: Enums.CurrentHumidifierDehumidifierState = .inactive,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Humidifier-Dehumidifier State",
 		format: CharacteristicFormat? = .uint8,
@@ -2561,7 +2567,7 @@ public extension AnyCharacteristic {
 	}
 
 	static func currentSlatState(
-		_ value: Enums.CurrentSlatState = .auto,
+		_ value: Enums.CurrentSlatState = .inactive,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Slat State",
 		format: CharacteristicFormat? = .uint8,
@@ -4361,7 +4367,7 @@ public extension AnyCharacteristic {
 	}
 
 	static func targetAirPurifierState(
-		_ value: Enums.TargetAirPurifierState = .inactive,
+		_ value: Enums.TargetAirPurifierState = .auto,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Air Purifier State",
 		format: CharacteristicFormat? = .uint8,
@@ -4409,7 +4415,7 @@ public extension AnyCharacteristic {
 	}
 
 	static func targetFanState(
-		_ value: Enums.TargetFanState = .inactive,
+		_ value: Enums.TargetFanState = .auto,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Fan State",
 		format: CharacteristicFormat? = .uint8,
@@ -4433,7 +4439,7 @@ public extension AnyCharacteristic {
 	}
 
 	static func targetHeaterCoolerState(
-		_ value: Enums.TargetHeaterCoolerState = .heating,
+		_ value: Enums.TargetHeaterCoolerState = .auto,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Heater-Cooler State",
 		format: CharacteristicFormat? = .uint8,
@@ -4505,7 +4511,7 @@ public extension AnyCharacteristic {
 	}
 
 	static func targetHumidifierDehumidifierState(
-		_ value: Enums.TargetHumidifierDehumidifierState = .inactive,
+		_ value: Enums.TargetHumidifierDehumidifierState = .auto,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Humidifier-Dehumidifier State",
 		format: CharacteristicFormat? = .uint8,
@@ -5348,7 +5354,7 @@ public class PredefinedCharacteristic {
 	}
 
 	static func currentAirPurifierState(
-		_ value: Enums.CurrentAirPurifierState = .auto,
+		_ value: Enums.CurrentAirPurifierState = .inactive,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Air Purifier State",
 		format: CharacteristicFormat? = .uint8,
@@ -5420,7 +5426,7 @@ public class PredefinedCharacteristic {
 	}
 
 	static func currentFanState(
-		_ value: Enums.CurrentFanState = .auto,
+		_ value: Enums.CurrentFanState = .inactive,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Fan State",
 		format: CharacteristicFormat? = .uint8,
@@ -5444,7 +5450,7 @@ public class PredefinedCharacteristic {
 	}
 
 	static func currentHeaterCoolerState(
-		_ value: Enums.CurrentHeaterCoolerState = .auto,
+		_ value: Enums.CurrentHeaterCoolerState = .heating,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Heater-Cooler State",
 		format: CharacteristicFormat? = .uint8,
@@ -5516,7 +5522,7 @@ public class PredefinedCharacteristic {
 	}
 
 	static func currentHumidifierDehumidifierState(
-		_ value: Enums.CurrentHumidifierDehumidifierState = .auto,
+		_ value: Enums.CurrentHumidifierDehumidifierState = .inactive,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Humidifier-Dehumidifier State",
 		format: CharacteristicFormat? = .uint8,
@@ -5636,7 +5642,7 @@ public class PredefinedCharacteristic {
 	}
 
 	static func currentSlatState(
-		_ value: Enums.CurrentSlatState = .auto,
+		_ value: Enums.CurrentSlatState = .inactive,
 		permissions: [CharacteristicPermission] = [.read, .events],
 		description: String? = "Current Slat State",
 		format: CharacteristicFormat? = .uint8,
@@ -7436,7 +7442,7 @@ public class PredefinedCharacteristic {
 	}
 
 	static func targetAirPurifierState(
-		_ value: Enums.TargetAirPurifierState = .inactive,
+		_ value: Enums.TargetAirPurifierState = .auto,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Air Purifier State",
 		format: CharacteristicFormat? = .uint8,
@@ -7484,7 +7490,7 @@ public class PredefinedCharacteristic {
 	}
 
 	static func targetFanState(
-		_ value: Enums.TargetFanState = .inactive,
+		_ value: Enums.TargetFanState = .auto,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Fan State",
 		format: CharacteristicFormat? = .uint8,
@@ -7508,7 +7514,7 @@ public class PredefinedCharacteristic {
 	}
 
 	static func targetHeaterCoolerState(
-		_ value: Enums.TargetHeaterCoolerState = .heating,
+		_ value: Enums.TargetHeaterCoolerState = .auto,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Heater-Cooler State",
 		format: CharacteristicFormat? = .uint8,
@@ -7580,7 +7586,7 @@ public class PredefinedCharacteristic {
 	}
 
 	static func targetHumidifierDehumidifierState(
-		_ value: Enums.TargetHumidifierDehumidifierState = .inactive,
+		_ value: Enums.TargetHumidifierDehumidifierState = .auto,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Target Humidifier-Dehumidifier State",
 		format: CharacteristicFormat? = .uint8,
