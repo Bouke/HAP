@@ -103,6 +103,8 @@ class PowerBankService: Service {
 }
 ```
 
+- See also: [My Home](https://github.com/Bouke/My-Home/tree/master/Sources)
+
 ## Object-Oriented Design
 
 A high-level overview of the objects involved are shown in the diagram below.
