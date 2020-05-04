@@ -29,7 +29,7 @@ public class Server: NSObject, NetServiceDelegate {
     public init(
         device: Device,
         listenPort requestedPort: Int = 0,
-        numberOfThreads: Int = System.coreCount
+        worker: EventLoopGroup? = nil
     ) throws {
         precondition(device.server == nil, "Device already assigned to other Server instance")
         self.device = device
@@ -38,8 +38,13 @@ public class Server: NSObject, NetServiceDelegate {
         device.controllerHandler!.removeSubscriptions = device.removeSubscriberForAllCharacteristics
 
         let applicationHandler = ApplicationHandler(responder: root(device: device))
-
-        group = MultiThreadedEventLoopGroup(numberOfThreads: numberOfThreads)
+        
+        if let worker = worker {
+            self.group = worker
+        } else {
+            self.group = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
+        }
+        
         bootstrap = ServerBootstrap(group: group)
             // Specify backlog and enable SO_REUSEADDR for the server itself
             .serverChannelOption(ChannelOptions.backlog, value: 256)
