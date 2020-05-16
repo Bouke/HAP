@@ -53,9 +53,13 @@ extension String: CharacteristicValueType {
 extension Int: CharacteristicValueType {
     public init?(value: Any) {
         if let value = value as? Int {
-             self = value
+            self = value
         } else if let value = value as? Bool {
             self = value ? 1 : 0
+        } else if let value = value as? Float {
+            self = Int(value)
+        } else if let value = value as? Double {
+            self = Int(value)
         } else {
             return nil
         }
