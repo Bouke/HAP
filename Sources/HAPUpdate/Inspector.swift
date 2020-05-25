@@ -768,7 +768,10 @@ public class Inspector {
             write("\t\tmaxLength: Int? = nil,")
             write("\t\tmaxValue: Double? = \(characteristic.maxValue?.stringValue ?? "nil"),")
             write("\t\tminValue: Double? = \(characteristic.minValue?.stringValue ?? "nil"),")
-            write("\t\tminStep: Double? = \(characteristic.stepValue?.stringValue ?? "nil")")
+            write("\t\tminStep: Double? = \(characteristic.stepValue?.stringValue ?? "nil"),")
+            write("\t\tvalidValues: [Double] = [],")
+            write("\t\tvalidValuesRange: Range<Double>? = nil")
+
         }
 
         write("""
@@ -791,7 +794,9 @@ public class Inspector {
             write("\t\t\tmaxLength: maxLength,")
             write("\t\t\tmaxValue: maxValue,")
             write("\t\t\tminValue: minValue,")
-            write("\t\t\tminStep: minStep) as Characteristic)")
+            write("\t\t\tminStep: minStep,")
+            write("\t\t\tvalidValues: validValues,")
+            write("\t\t\tvalidValuesRange: validValuesRange) as Characteristic)")
             write("\t}\n")
         }
 
@@ -815,7 +820,9 @@ public class Inspector {
             write("\t\t\tmaxLength: maxLength,")
             write("\t\t\tmaxValue: maxValue,")
             write("\t\t\tminValue: minValue,")
-            write("\t\t\tminStep: minStep)")
+            write("\t\t\tminStep: minStep,")
+            write("\t\t\tvalidValues: validValues,")
+            write("\t\t\tvalidValuesRange: validValuesRange)")
             write("\t}\n")
         }
 
