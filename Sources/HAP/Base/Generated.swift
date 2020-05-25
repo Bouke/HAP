@@ -2,9 +2,9 @@
 // framework definitions. Don't make changes to this file directly.
 // Update this file using the `hap-update` tool.
 //
-// Generated on:              10 February 2020
-// HomeKit framework version: 827
-// macOS:                     Version 10.15.3 (Build 19D76)
+// Generated on:              25 may 2020
+// HomeKit framework version: 838
+// macOS:                     Version 10.15.4 (Build 19E287)
 
 import Foundation
 
@@ -41,6 +41,7 @@ public enum AccessoryType: String, Codable {
 	case television = "31"
 	case targetController = "32"
 	case wiFiRouter = "33"
+	case audioReceiver = "34"
 }
 
 public extension ServiceType {
@@ -1807,7 +1808,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.accessoryFlags(
@@ -1819,7 +1822,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func active(
@@ -1831,7 +1836,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.active(
@@ -1843,7 +1850,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func activeIdentifier(
@@ -1855,7 +1864,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = 0,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.activeIdentifier(
@@ -1867,7 +1878,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func administratorOnlyAccess(
@@ -1879,7 +1892,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.administratorOnlyAccess(
@@ -1891,7 +1906,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func applicationMatchingIdentifier(
@@ -1903,7 +1920,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.applicationMatchingIdentifier(
@@ -1915,7 +1934,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func audioFeedback(
@@ -1927,7 +1948,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.audioFeedback(
@@ -1939,7 +1962,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func batteryLevel(
@@ -1951,7 +1976,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.batteryLevel(
@@ -1963,7 +1990,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func brightness(
@@ -1975,7 +2004,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.brightness(
@@ -1987,7 +2018,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func carbonDioxideDetected(
@@ -1999,7 +2032,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.carbonDioxideDetected(
@@ -2011,7 +2046,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func carbonDioxideLevel(
@@ -2023,7 +2060,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100000,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.carbonDioxideLevel(
@@ -2035,7 +2074,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func carbonDioxidePeakLevel(
@@ -2047,7 +2088,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100000,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.carbonDioxidePeakLevel(
@@ -2059,7 +2102,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func carbonMonoxideDetected(
@@ -2071,7 +2116,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.carbonMonoxideDetected(
@@ -2083,7 +2130,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func carbonMonoxideLevel(
@@ -2095,7 +2144,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.carbonMonoxideLevel(
@@ -2107,7 +2158,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func carbonMonoxidePeakLevel(
@@ -2119,7 +2172,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.carbonMonoxidePeakLevel(
@@ -2131,7 +2186,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func chargingState(
@@ -2143,7 +2200,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 2,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.chargingState(
@@ -2155,7 +2214,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func closedCaptions(
@@ -2167,7 +2228,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.closedCaptions(
@@ -2179,7 +2242,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func colorTemperature(
@@ -2191,7 +2256,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 500,
 		minValue: Double? = 140,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.colorTemperature(
@@ -2203,7 +2270,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func configuredName(
@@ -2215,7 +2284,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.configuredName(
@@ -2227,7 +2298,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func contactSensorState(
@@ -2239,7 +2312,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.contactSensorState(
@@ -2251,7 +2326,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func coolingThresholdTemperature(
@@ -2263,7 +2340,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 35,
 		minValue: Double? = 10,
-		minStep: Double? = 0.1
+		minStep: Double? = 0.1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.coolingThresholdTemperature(
@@ -2275,7 +2354,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func currentAirPurifierState(
@@ -2287,7 +2368,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 2,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.currentAirPurifierState(
@@ -2299,7 +2382,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func currentAirQuality(
@@ -2311,7 +2396,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 5,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.currentAirQuality(
@@ -2323,7 +2410,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func currentDoorState(
@@ -2335,7 +2424,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 4,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.currentDoorState(
@@ -2347,7 +2438,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func currentFanState(
@@ -2359,7 +2452,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 2,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.currentFanState(
@@ -2371,7 +2466,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func currentHeaterCoolerState(
@@ -2383,7 +2480,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 3,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.currentHeaterCoolerState(
@@ -2395,7 +2494,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func currentHeatingCoolingState(
@@ -2407,7 +2508,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 2,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.currentHeatingCoolingState(
@@ -2419,7 +2522,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func currentHorizontalTiltAngle(
@@ -2431,7 +2536,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 90,
 		minValue: Double? = -90,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.currentHorizontalTiltAngle(
@@ -2443,7 +2550,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func currentHumidifierDehumidifierState(
@@ -2455,7 +2564,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 3,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.currentHumidifierDehumidifierState(
@@ -2467,7 +2578,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func currentLightLevel(
@@ -2479,7 +2592,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100000,
 		minValue: Double? = 0.0001,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.currentLightLevel(
@@ -2491,7 +2606,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func currentMediaState(
@@ -2501,9 +2618,11 @@ public extension AnyCharacteristic {
 		format: CharacteristicFormat? = .uint8,
 		unit: CharacteristicUnit? = nil,
 		maxLength: Int? = nil,
-		maxValue: Double? = 3,
+		maxValue: Double? = 5,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.currentMediaState(
@@ -2515,7 +2634,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func currentPosition(
@@ -2527,7 +2648,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.currentPosition(
@@ -2539,7 +2662,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func currentRelativeHumidity(
@@ -2551,7 +2676,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.currentRelativeHumidity(
@@ -2563,7 +2690,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func currentSlatState(
@@ -2575,7 +2704,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 3,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.currentSlatState(
@@ -2587,7 +2718,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func currentTemperature(
@@ -2599,7 +2732,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 0.1
+		minStep: Double? = 0.1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.currentTemperature(
@@ -2611,7 +2746,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func currentTiltAngle(
@@ -2623,7 +2760,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 90,
 		minValue: Double? = -90,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.currentTiltAngle(
@@ -2635,7 +2774,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func currentVerticalTiltAngle(
@@ -2647,7 +2788,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 90,
 		minValue: Double? = -90,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.currentVerticalTiltAngle(
@@ -2659,7 +2802,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func currentVisibilityState(
@@ -2671,7 +2816,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 3,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.currentVisibilityState(
@@ -2683,7 +2830,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func currentWaterLevel(
@@ -2695,7 +2844,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.currentWaterLevel(
@@ -2707,7 +2858,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func displayOrder(
@@ -2719,7 +2872,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.displayOrder(
@@ -2731,7 +2886,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func filterChangeIndication(
@@ -2743,7 +2900,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.filterChangeIndication(
@@ -2755,7 +2914,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func filterLifeLevel(
@@ -2767,7 +2928,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.filterLifeLevel(
@@ -2779,7 +2942,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func filterResetChangeIndication(
@@ -2791,7 +2956,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 1,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.filterResetChangeIndication(
@@ -2803,7 +2970,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func firmwareRevision(
@@ -2815,7 +2984,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.firmwareRevision(
@@ -2827,7 +2998,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func hardwareRevision(
@@ -2839,7 +3012,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.hardwareRevision(
@@ -2851,7 +3026,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func heatingThresholdTemperature(
@@ -2863,7 +3040,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 25,
 		minValue: Double? = 0,
-		minStep: Double? = 0.1
+		minStep: Double? = 0.1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.heatingThresholdTemperature(
@@ -2875,7 +3054,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func holdPosition(
@@ -2887,7 +3068,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.holdPosition(
@@ -2899,7 +3082,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func hue(
@@ -2911,7 +3096,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 360,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.hue(
@@ -2923,7 +3110,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func identifier(
@@ -2935,7 +3124,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = 0,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.identifier(
@@ -2947,7 +3138,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func identify(
@@ -2959,7 +3152,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.identify(
@@ -2971,7 +3166,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func inUse(
@@ -2983,7 +3180,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.inUse(
@@ -2995,7 +3194,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func inputDeviceType(
@@ -3007,7 +3208,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 5,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.inputDeviceType(
@@ -3019,7 +3222,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func inputSourceType(
@@ -3031,7 +3236,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 10,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.inputSourceType(
@@ -3043,7 +3250,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func isConfigured(
@@ -3055,7 +3264,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.isConfigured(
@@ -3067,7 +3278,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func labelIndex(
@@ -3079,7 +3292,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 255,
 		minValue: Double? = 1,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.labelIndex(
@@ -3091,7 +3306,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func labelNamespace(
@@ -3103,7 +3320,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 4,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.labelNamespace(
@@ -3115,7 +3334,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func leakDetected(
@@ -3127,7 +3348,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.leakDetected(
@@ -3139,7 +3362,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func lockControlPoint(
@@ -3151,7 +3376,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.lockControlPoint(
@@ -3163,7 +3390,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func lockCurrentState(
@@ -3175,7 +3404,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 3,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.lockCurrentState(
@@ -3187,7 +3418,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func lockLastKnownAction(
@@ -3199,7 +3432,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 8,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.lockLastKnownAction(
@@ -3211,7 +3446,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func lockManagementAutoSecurityTimeout(
@@ -3223,7 +3460,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.lockManagementAutoSecurityTimeout(
@@ -3235,7 +3474,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func lockPhysicalControls(
@@ -3247,7 +3488,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.lockPhysicalControls(
@@ -3259,7 +3502,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func lockTargetState(
@@ -3271,7 +3516,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.lockTargetState(
@@ -3283,7 +3530,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func logs(
@@ -3295,7 +3544,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.logs(
@@ -3307,7 +3558,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func manufacturer(
@@ -3319,7 +3572,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.manufacturer(
@@ -3331,7 +3586,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func model(
@@ -3343,7 +3600,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.model(
@@ -3355,7 +3614,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func motionDetected(
@@ -3367,7 +3628,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.motionDetected(
@@ -3379,7 +3642,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func mute(
@@ -3391,7 +3656,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.mute(
@@ -3403,7 +3670,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func name(
@@ -3415,7 +3684,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.name(
@@ -3427,7 +3698,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func nitrogenDioxideDensity(
@@ -3439,7 +3712,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1000,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.nitrogenDioxideDensity(
@@ -3451,7 +3726,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func obstructionDetected(
@@ -3463,7 +3740,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.obstructionDetected(
@@ -3475,7 +3754,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func occupancyDetected(
@@ -3487,7 +3768,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.occupancyDetected(
@@ -3499,7 +3782,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func outletInUse(
@@ -3511,7 +3796,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.outletInUse(
@@ -3523,7 +3810,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func ozoneDensity(
@@ -3535,7 +3824,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1000,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.ozoneDensity(
@@ -3547,7 +3838,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func pm10Density(
@@ -3559,7 +3852,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1000,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.pm10Density(
@@ -3571,7 +3866,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func pm2_5Density(
@@ -3583,7 +3880,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1000,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.pm2_5Density(
@@ -3595,7 +3894,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func pictureMode(
@@ -3607,7 +3908,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 13,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.pictureMode(
@@ -3619,7 +3922,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func positionState(
@@ -3631,7 +3936,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 2,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.positionState(
@@ -3643,7 +3950,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func powerModeSelection(
@@ -3655,7 +3964,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.powerModeSelection(
@@ -3667,7 +3978,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func powerState(
@@ -3679,7 +3992,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.powerState(
@@ -3691,7 +4006,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func productData(
@@ -3703,7 +4020,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.productData(
@@ -3715,7 +4034,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func programMode(
@@ -3727,7 +4048,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 2,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.programMode(
@@ -3739,7 +4062,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func programmableSwitchEvent(
@@ -3751,7 +4076,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 2,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.programmableSwitchEvent(
@@ -3763,7 +4090,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func programmableSwitchOutputState(
@@ -3775,7 +4104,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.programmableSwitchOutputState(
@@ -3787,7 +4118,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func relativeHumidityDehumidifierThreshold(
@@ -3799,7 +4132,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.relativeHumidityDehumidifierThreshold(
@@ -3811,7 +4146,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func relativeHumidityHumidifierThreshold(
@@ -3823,7 +4160,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.relativeHumidityHumidifierThreshold(
@@ -3835,7 +4174,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func remainingDuration(
@@ -3847,7 +4188,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 3600,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.remainingDuration(
@@ -3859,7 +4202,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func remoteKey(
@@ -3871,7 +4216,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 16,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.remoteKey(
@@ -3883,7 +4230,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func rotationDirection(
@@ -3895,7 +4244,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.rotationDirection(
@@ -3907,7 +4258,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func rotationSpeed(
@@ -3919,7 +4272,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.rotationSpeed(
@@ -3931,7 +4286,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func saturation(
@@ -3943,7 +4300,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.saturation(
@@ -3955,7 +4314,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func securitySystemAlarmType(
@@ -3967,7 +4328,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.securitySystemAlarmType(
@@ -3979,7 +4342,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func securitySystemCurrentState(
@@ -3991,7 +4356,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 4,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.securitySystemCurrentState(
@@ -4003,7 +4370,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func securitySystemTargetState(
@@ -4015,7 +4384,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 3,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.securitySystemTargetState(
@@ -4027,7 +4398,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func serialNumber(
@@ -4039,7 +4412,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.serialNumber(
@@ -4051,7 +4426,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func setDuration(
@@ -4063,7 +4440,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 3600,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.setDuration(
@@ -4075,7 +4454,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func setupTransferTransport(
@@ -4087,7 +4468,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.setupTransferTransport(
@@ -4099,7 +4482,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func slatType(
@@ -4111,7 +4496,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.slatType(
@@ -4123,7 +4510,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func sleepDiscoveryMode(
@@ -4135,7 +4524,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.sleepDiscoveryMode(
@@ -4147,7 +4538,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func smokeDetected(
@@ -4159,7 +4552,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.smokeDetected(
@@ -4171,7 +4566,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func softwareRevision(
@@ -4183,7 +4580,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.softwareRevision(
@@ -4195,7 +4594,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func statusActive(
@@ -4207,7 +4608,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.statusActive(
@@ -4219,7 +4622,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func statusFault(
@@ -4231,7 +4636,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.statusFault(
@@ -4243,7 +4650,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func statusLowBattery(
@@ -4255,7 +4664,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.statusLowBattery(
@@ -4267,7 +4678,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func statusTampered(
@@ -4279,7 +4692,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.statusTampered(
@@ -4291,7 +4706,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func sulphurDioxideDensity(
@@ -4303,7 +4720,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1000,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.sulphurDioxideDensity(
@@ -4315,7 +4734,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func supportedTransferTransportConfiguration(
@@ -4327,7 +4748,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.supportedTransferTransportConfiguration(
@@ -4339,7 +4762,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func swingMode(
@@ -4351,7 +4776,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.swingMode(
@@ -4363,7 +4790,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func targetAirPurifierState(
@@ -4375,7 +4804,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.targetAirPurifierState(
@@ -4387,7 +4818,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func targetDoorState(
@@ -4399,7 +4832,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.targetDoorState(
@@ -4411,7 +4846,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func targetFanState(
@@ -4423,7 +4860,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.targetFanState(
@@ -4435,7 +4874,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func targetHeaterCoolerState(
@@ -4447,7 +4888,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 2,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.targetHeaterCoolerState(
@@ -4459,7 +4902,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func targetHeatingCoolingState(
@@ -4471,7 +4916,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 3,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.targetHeatingCoolingState(
@@ -4483,7 +4930,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func targetHorizontalTiltAngle(
@@ -4495,7 +4944,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 90,
 		minValue: Double? = -90,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.targetHorizontalTiltAngle(
@@ -4507,7 +4958,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func targetHumidifierDehumidifierState(
@@ -4519,7 +4972,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 2,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.targetHumidifierDehumidifierState(
@@ -4531,7 +4986,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func targetMediaState(
@@ -4543,7 +5000,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 2,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.targetMediaState(
@@ -4555,7 +5014,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func targetPosition(
@@ -4567,7 +5028,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.targetPosition(
@@ -4579,7 +5042,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func targetRelativeHumidity(
@@ -4591,7 +5056,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.targetRelativeHumidity(
@@ -4603,7 +5070,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func targetTemperature(
@@ -4615,7 +5084,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 38,
 		minValue: Double? = 10,
-		minStep: Double? = 0.1
+		minStep: Double? = 0.1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.targetTemperature(
@@ -4627,7 +5098,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func targetTiltAngle(
@@ -4639,7 +5112,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 90,
 		minValue: Double? = -90,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.targetTiltAngle(
@@ -4651,7 +5126,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func targetVerticalTiltAngle(
@@ -4663,7 +5140,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 90,
 		minValue: Double? = -90,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.targetVerticalTiltAngle(
@@ -4675,7 +5154,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func targetVisibilityState(
@@ -4687,7 +5168,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.targetVisibilityState(
@@ -4699,7 +5182,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func temperatureDisplayUnits(
@@ -4711,7 +5196,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.temperatureDisplayUnits(
@@ -4723,7 +5210,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func valveType(
@@ -4735,7 +5224,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 3,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.valveType(
@@ -4747,7 +5238,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func version(
@@ -4759,7 +5252,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.version(
@@ -4771,7 +5266,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func volatileOrganicCompoundDensity(
@@ -4783,7 +5280,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1000,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.volatileOrganicCompoundDensity(
@@ -4795,7 +5294,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func volume(
@@ -4807,7 +5308,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.volume(
@@ -4819,7 +5322,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func volumeControlType(
@@ -4831,7 +5336,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 3,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.volumeControlType(
@@ -4843,7 +5350,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 	static func volumeSelector(
@@ -4855,7 +5364,9 @@ public extension AnyCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.volumeSelector(
@@ -4867,7 +5378,9 @@ public extension AnyCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep) as Characteristic)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
 	}
 
 }
@@ -4882,7 +5395,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt32> {
 		return GenericCharacteristic<UInt32>(
 			type: .accessoryFlags,
@@ -4894,7 +5409,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func active(
@@ -4906,7 +5423,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.Active> {
 		return GenericCharacteristic<Enums.Active>(
 			type: .active,
@@ -4918,7 +5437,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func activeIdentifier(
@@ -4930,7 +5451,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = 0,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt32> {
 		return GenericCharacteristic<UInt32>(
 			type: .activeIdentifier,
@@ -4942,7 +5465,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func administratorOnlyAccess(
@@ -4954,7 +5479,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Bool> {
 		return GenericCharacteristic<Bool>(
 			type: .administratorOnlyAccess,
@@ -4966,7 +5493,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func applicationMatchingIdentifier(
@@ -4978,7 +5507,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Data> {
 		return GenericCharacteristic<Data>(
 			type: .applicationMatchingIdentifier,
@@ -4990,7 +5521,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func audioFeedback(
@@ -5002,7 +5535,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Bool> {
 		return GenericCharacteristic<Bool>(
 			type: .audioFeedback,
@@ -5014,7 +5549,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func batteryLevel(
@@ -5026,7 +5563,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt8> {
 		return GenericCharacteristic<UInt8>(
 			type: .batteryLevel,
@@ -5038,7 +5577,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func brightness(
@@ -5050,7 +5591,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Int> {
 		return GenericCharacteristic<Int>(
 			type: .brightness,
@@ -5062,7 +5605,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func carbonDioxideDetected(
@@ -5074,7 +5619,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.CarbonDioxideDetected> {
 		return GenericCharacteristic<Enums.CarbonDioxideDetected>(
 			type: .carbonDioxideDetected,
@@ -5086,7 +5633,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func carbonDioxideLevel(
@@ -5098,7 +5647,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100000,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .carbonDioxideLevel,
@@ -5110,7 +5661,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func carbonDioxidePeakLevel(
@@ -5122,7 +5675,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100000,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .carbonDioxidePeakLevel,
@@ -5134,7 +5689,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func carbonMonoxideDetected(
@@ -5146,7 +5703,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt8> {
 		return GenericCharacteristic<UInt8>(
 			type: .carbonMonoxideDetected,
@@ -5158,7 +5717,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func carbonMonoxideLevel(
@@ -5170,7 +5731,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .carbonMonoxideLevel,
@@ -5182,7 +5745,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func carbonMonoxidePeakLevel(
@@ -5194,7 +5759,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .carbonMonoxidePeakLevel,
@@ -5206,7 +5773,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func chargingState(
@@ -5218,7 +5787,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 2,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.ChargingState> {
 		return GenericCharacteristic<Enums.ChargingState>(
 			type: .chargingState,
@@ -5230,7 +5801,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func closedCaptions(
@@ -5242,7 +5815,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.ClosedCaptions> {
 		return GenericCharacteristic<Enums.ClosedCaptions>(
 			type: .closedCaptions,
@@ -5254,7 +5829,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func colorTemperature(
@@ -5266,7 +5843,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 500,
 		minValue: Double? = 140,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Int> {
 		return GenericCharacteristic<Int>(
 			type: .colorTemperature,
@@ -5278,7 +5857,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func configuredName(
@@ -5290,7 +5871,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<String> {
 		return GenericCharacteristic<String>(
 			type: .configuredName,
@@ -5302,7 +5885,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func contactSensorState(
@@ -5314,7 +5899,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.ContactSensorState> {
 		return GenericCharacteristic<Enums.ContactSensorState>(
 			type: .contactSensorState,
@@ -5326,7 +5913,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func coolingThresholdTemperature(
@@ -5338,7 +5927,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 35,
 		minValue: Double? = 10,
-		minStep: Double? = 0.1
+		minStep: Double? = 0.1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .coolingThresholdTemperature,
@@ -5350,7 +5941,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func currentAirPurifierState(
@@ -5362,7 +5955,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 2,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.CurrentAirPurifierState> {
 		return GenericCharacteristic<Enums.CurrentAirPurifierState>(
 			type: .currentAirPurifierState,
@@ -5374,7 +5969,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func currentAirQuality(
@@ -5386,7 +5983,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 5,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.CurrentAirQuality> {
 		return GenericCharacteristic<Enums.CurrentAirQuality>(
 			type: .currentAirQuality,
@@ -5398,7 +5997,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func currentDoorState(
@@ -5410,7 +6011,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 4,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.CurrentDoorState> {
 		return GenericCharacteristic<Enums.CurrentDoorState>(
 			type: .currentDoorState,
@@ -5422,7 +6025,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func currentFanState(
@@ -5434,7 +6039,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 2,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.CurrentFanState> {
 		return GenericCharacteristic<Enums.CurrentFanState>(
 			type: .currentFanState,
@@ -5446,7 +6053,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func currentHeaterCoolerState(
@@ -5458,7 +6067,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 3,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.CurrentHeaterCoolerState> {
 		return GenericCharacteristic<Enums.CurrentHeaterCoolerState>(
 			type: .currentHeaterCoolerState,
@@ -5470,7 +6081,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func currentHeatingCoolingState(
@@ -5482,7 +6095,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 2,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.CurrentHeatingCoolingState> {
 		return GenericCharacteristic<Enums.CurrentHeatingCoolingState>(
 			type: .currentHeatingCoolingState,
@@ -5494,7 +6109,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func currentHorizontalTiltAngle(
@@ -5506,7 +6123,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 90,
 		minValue: Double? = -90,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Int> {
 		return GenericCharacteristic<Int>(
 			type: .currentHorizontalTiltAngle,
@@ -5518,7 +6137,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func currentHumidifierDehumidifierState(
@@ -5530,7 +6151,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 3,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.CurrentHumidifierDehumidifierState> {
 		return GenericCharacteristic<Enums.CurrentHumidifierDehumidifierState>(
 			type: .currentHumidifierDehumidifierState,
@@ -5542,7 +6165,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func currentLightLevel(
@@ -5554,7 +6179,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100000,
 		minValue: Double? = 0.0001,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .currentLightLevel,
@@ -5566,7 +6193,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func currentMediaState(
@@ -5576,9 +6205,11 @@ public class PredefinedCharacteristic {
 		format: CharacteristicFormat? = .uint8,
 		unit: CharacteristicUnit? = nil,
 		maxLength: Int? = nil,
-		maxValue: Double? = 3,
+		maxValue: Double? = 5,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt8> {
 		return GenericCharacteristic<UInt8>(
 			type: .currentMediaState,
@@ -5590,7 +6221,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func currentPosition(
@@ -5602,7 +6235,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt8> {
 		return GenericCharacteristic<UInt8>(
 			type: .currentPosition,
@@ -5614,7 +6249,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func currentRelativeHumidity(
@@ -5626,7 +6263,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .currentRelativeHumidity,
@@ -5638,7 +6277,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func currentSlatState(
@@ -5650,7 +6291,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 3,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.CurrentSlatState> {
 		return GenericCharacteristic<Enums.CurrentSlatState>(
 			type: .currentSlatState,
@@ -5662,7 +6305,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func currentTemperature(
@@ -5674,7 +6319,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 0.1
+		minStep: Double? = 0.1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .currentTemperature,
@@ -5686,7 +6333,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func currentTiltAngle(
@@ -5698,7 +6347,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 90,
 		minValue: Double? = -90,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Int> {
 		return GenericCharacteristic<Int>(
 			type: .currentTiltAngle,
@@ -5710,7 +6361,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func currentVerticalTiltAngle(
@@ -5722,7 +6375,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 90,
 		minValue: Double? = -90,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Int> {
 		return GenericCharacteristic<Int>(
 			type: .currentVerticalTiltAngle,
@@ -5734,7 +6389,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func currentVisibilityState(
@@ -5746,7 +6403,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 3,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.CurrentVisibilityState> {
 		return GenericCharacteristic<Enums.CurrentVisibilityState>(
 			type: .currentVisibilityState,
@@ -5758,7 +6417,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func currentWaterLevel(
@@ -5770,7 +6431,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .currentWaterLevel,
@@ -5782,7 +6445,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func displayOrder(
@@ -5794,7 +6459,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Data> {
 		return GenericCharacteristic<Data>(
 			type: .displayOrder,
@@ -5806,7 +6473,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func filterChangeIndication(
@@ -5818,7 +6487,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.FilterChangeIndication> {
 		return GenericCharacteristic<Enums.FilterChangeIndication>(
 			type: .filterChangeIndication,
@@ -5830,7 +6501,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func filterLifeLevel(
@@ -5842,7 +6515,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .filterLifeLevel,
@@ -5854,7 +6529,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func filterResetChangeIndication(
@@ -5866,7 +6543,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 1,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt8?> {
 		return GenericCharacteristic<UInt8?>(
 			type: .filterResetChangeIndication,
@@ -5878,7 +6557,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func firmwareRevision(
@@ -5890,7 +6571,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<String> {
 		return GenericCharacteristic<String>(
 			type: .firmwareRevision,
@@ -5902,7 +6585,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func hardwareRevision(
@@ -5914,7 +6599,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<String> {
 		return GenericCharacteristic<String>(
 			type: .hardwareRevision,
@@ -5926,7 +6613,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func heatingThresholdTemperature(
@@ -5938,7 +6627,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 25,
 		minValue: Double? = 0,
-		minStep: Double? = 0.1
+		minStep: Double? = 0.1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .heatingThresholdTemperature,
@@ -5950,7 +6641,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func holdPosition(
@@ -5962,7 +6655,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Bool?> {
 		return GenericCharacteristic<Bool?>(
 			type: .holdPosition,
@@ -5974,7 +6669,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func hue(
@@ -5986,7 +6683,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 360,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .hue,
@@ -5998,7 +6697,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func identifier(
@@ -6010,7 +6711,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = 0,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt32> {
 		return GenericCharacteristic<UInt32>(
 			type: .identifier,
@@ -6022,7 +6725,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func identify(
@@ -6034,7 +6739,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Bool?> {
 		return GenericCharacteristic<Bool?>(
 			type: .identify,
@@ -6046,7 +6753,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func inUse(
@@ -6058,7 +6767,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt8> {
 		return GenericCharacteristic<UInt8>(
 			type: .inUse,
@@ -6070,7 +6781,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func inputDeviceType(
@@ -6082,7 +6795,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 5,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.InputDeviceType> {
 		return GenericCharacteristic<Enums.InputDeviceType>(
 			type: .inputDeviceType,
@@ -6094,7 +6809,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func inputSourceType(
@@ -6106,7 +6823,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 10,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.InputSourceType> {
 		return GenericCharacteristic<Enums.InputSourceType>(
 			type: .inputSourceType,
@@ -6118,7 +6837,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func isConfigured(
@@ -6130,7 +6851,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.IsConfigured> {
 		return GenericCharacteristic<Enums.IsConfigured>(
 			type: .isConfigured,
@@ -6142,7 +6865,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func labelIndex(
@@ -6154,7 +6879,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 255,
 		minValue: Double? = 1,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt8> {
 		return GenericCharacteristic<UInt8>(
 			type: .labelIndex,
@@ -6166,7 +6893,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func labelNamespace(
@@ -6178,7 +6907,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 4,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt8> {
 		return GenericCharacteristic<UInt8>(
 			type: .labelNamespace,
@@ -6190,7 +6921,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func leakDetected(
@@ -6202,7 +6935,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.LeakDetected> {
 		return GenericCharacteristic<Enums.LeakDetected>(
 			type: .leakDetected,
@@ -6214,7 +6949,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func lockControlPoint(
@@ -6226,7 +6963,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Data?> {
 		return GenericCharacteristic<Data?>(
 			type: .lockControlPoint,
@@ -6238,7 +6977,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func lockCurrentState(
@@ -6250,7 +6991,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 3,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.LockCurrentState> {
 		return GenericCharacteristic<Enums.LockCurrentState>(
 			type: .lockCurrentState,
@@ -6262,7 +7005,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func lockLastKnownAction(
@@ -6274,7 +7019,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 8,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt8> {
 		return GenericCharacteristic<UInt8>(
 			type: .lockLastKnownAction,
@@ -6286,7 +7033,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func lockManagementAutoSecurityTimeout(
@@ -6298,7 +7047,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt32> {
 		return GenericCharacteristic<UInt32>(
 			type: .lockManagementAutoSecurityTimeout,
@@ -6310,7 +7061,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func lockPhysicalControls(
@@ -6322,7 +7075,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt8> {
 		return GenericCharacteristic<UInt8>(
 			type: .lockPhysicalControls,
@@ -6334,7 +7089,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func lockTargetState(
@@ -6346,7 +7103,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.LockTargetState> {
 		return GenericCharacteristic<Enums.LockTargetState>(
 			type: .lockTargetState,
@@ -6358,7 +7117,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func logs(
@@ -6370,7 +7131,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Data> {
 		return GenericCharacteristic<Data>(
 			type: .logs,
@@ -6382,7 +7145,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func manufacturer(
@@ -6394,7 +7159,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<String> {
 		return GenericCharacteristic<String>(
 			type: .manufacturer,
@@ -6406,7 +7173,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func model(
@@ -6418,7 +7187,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<String> {
 		return GenericCharacteristic<String>(
 			type: .model,
@@ -6430,7 +7201,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func motionDetected(
@@ -6442,7 +7215,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Bool> {
 		return GenericCharacteristic<Bool>(
 			type: .motionDetected,
@@ -6454,7 +7229,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func mute(
@@ -6466,7 +7243,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Bool> {
 		return GenericCharacteristic<Bool>(
 			type: .mute,
@@ -6478,7 +7257,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func name(
@@ -6490,7 +7271,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<String> {
 		return GenericCharacteristic<String>(
 			type: .name,
@@ -6502,7 +7285,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func nitrogenDioxideDensity(
@@ -6514,7 +7299,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1000,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .nitrogenDioxideDensity,
@@ -6526,7 +7313,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func obstructionDetected(
@@ -6538,7 +7327,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Bool> {
 		return GenericCharacteristic<Bool>(
 			type: .obstructionDetected,
@@ -6550,7 +7341,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func occupancyDetected(
@@ -6562,7 +7355,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.OccupancyDetected> {
 		return GenericCharacteristic<Enums.OccupancyDetected>(
 			type: .occupancyDetected,
@@ -6574,7 +7369,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func outletInUse(
@@ -6586,7 +7383,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Bool> {
 		return GenericCharacteristic<Bool>(
 			type: .outletInUse,
@@ -6598,7 +7397,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func ozoneDensity(
@@ -6610,7 +7411,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1000,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .ozoneDensity,
@@ -6622,7 +7425,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func pm10Density(
@@ -6634,7 +7439,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1000,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .pm10Density,
@@ -6646,7 +7453,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func pm2_5Density(
@@ -6658,7 +7467,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1000,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .pm2_5Density,
@@ -6670,7 +7481,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func pictureMode(
@@ -6682,7 +7495,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 13,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.PictureMode> {
 		return GenericCharacteristic<Enums.PictureMode>(
 			type: .pictureMode,
@@ -6694,7 +7509,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func positionState(
@@ -6706,7 +7523,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 2,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.PositionState> {
 		return GenericCharacteristic<Enums.PositionState>(
 			type: .positionState,
@@ -6718,7 +7537,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func powerModeSelection(
@@ -6730,7 +7551,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.PowerModeSelection?> {
 		return GenericCharacteristic<Enums.PowerModeSelection?>(
 			type: .powerModeSelection,
@@ -6742,7 +7565,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func powerState(
@@ -6754,7 +7579,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Bool> {
 		return GenericCharacteristic<Bool>(
 			type: .powerState,
@@ -6766,7 +7593,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func productData(
@@ -6778,7 +7607,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Data> {
 		return GenericCharacteristic<Data>(
 			type: .productData,
@@ -6790,7 +7621,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func programMode(
@@ -6802,7 +7635,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 2,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt8> {
 		return GenericCharacteristic<UInt8>(
 			type: .programMode,
@@ -6814,7 +7649,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func programmableSwitchEvent(
@@ -6826,7 +7663,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 2,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt8> {
 		return GenericCharacteristic<UInt8>(
 			type: .programmableSwitchEvent,
@@ -6838,7 +7677,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func programmableSwitchOutputState(
@@ -6850,7 +7691,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt8> {
 		return GenericCharacteristic<UInt8>(
 			type: .programmableSwitchOutputState,
@@ -6862,7 +7705,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func relativeHumidityDehumidifierThreshold(
@@ -6874,7 +7719,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .relativeHumidityDehumidifierThreshold,
@@ -6886,7 +7733,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func relativeHumidityHumidifierThreshold(
@@ -6898,7 +7747,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .relativeHumidityHumidifierThreshold,
@@ -6910,7 +7761,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func remainingDuration(
@@ -6922,7 +7775,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 3600,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt32> {
 		return GenericCharacteristic<UInt32>(
 			type: .remainingDuration,
@@ -6934,7 +7789,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func remoteKey(
@@ -6946,7 +7803,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 16,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.RemoteKey?> {
 		return GenericCharacteristic<Enums.RemoteKey?>(
 			type: .remoteKey,
@@ -6958,7 +7817,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func rotationDirection(
@@ -6970,7 +7831,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.RotationDirection> {
 		return GenericCharacteristic<Enums.RotationDirection>(
 			type: .rotationDirection,
@@ -6982,7 +7845,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func rotationSpeed(
@@ -6994,7 +7859,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .rotationSpeed,
@@ -7006,7 +7873,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func saturation(
@@ -7018,7 +7887,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .saturation,
@@ -7030,7 +7901,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func securitySystemAlarmType(
@@ -7042,7 +7915,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt8> {
 		return GenericCharacteristic<UInt8>(
 			type: .securitySystemAlarmType,
@@ -7054,7 +7929,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func securitySystemCurrentState(
@@ -7066,7 +7943,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 4,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.SecuritySystemCurrentState> {
 		return GenericCharacteristic<Enums.SecuritySystemCurrentState>(
 			type: .securitySystemCurrentState,
@@ -7078,7 +7957,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func securitySystemTargetState(
@@ -7090,7 +7971,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 3,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.SecuritySystemTargetState> {
 		return GenericCharacteristic<Enums.SecuritySystemTargetState>(
 			type: .securitySystemTargetState,
@@ -7102,7 +7985,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func serialNumber(
@@ -7114,7 +7999,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<String> {
 		return GenericCharacteristic<String>(
 			type: .serialNumber,
@@ -7126,7 +8013,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func setDuration(
@@ -7138,7 +8027,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 3600,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt32> {
 		return GenericCharacteristic<UInt32>(
 			type: .setDuration,
@@ -7150,7 +8041,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func setupTransferTransport(
@@ -7162,7 +8055,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Data?> {
 		return GenericCharacteristic<Data?>(
 			type: .setupTransferTransport,
@@ -7174,7 +8069,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func slatType(
@@ -7186,7 +8083,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt8> {
 		return GenericCharacteristic<UInt8>(
 			type: .slatType,
@@ -7198,7 +8097,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func sleepDiscoveryMode(
@@ -7210,7 +8111,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.SleepDiscoveryMode> {
 		return GenericCharacteristic<Enums.SleepDiscoveryMode>(
 			type: .sleepDiscoveryMode,
@@ -7222,7 +8125,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func smokeDetected(
@@ -7234,7 +8139,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.SmokeDetected> {
 		return GenericCharacteristic<Enums.SmokeDetected>(
 			type: .smokeDetected,
@@ -7246,7 +8153,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func softwareRevision(
@@ -7258,7 +8167,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<String> {
 		return GenericCharacteristic<String>(
 			type: .softwareRevision,
@@ -7270,7 +8181,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func statusActive(
@@ -7282,7 +8195,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Bool> {
 		return GenericCharacteristic<Bool>(
 			type: .statusActive,
@@ -7294,7 +8209,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func statusFault(
@@ -7306,7 +8223,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt8> {
 		return GenericCharacteristic<UInt8>(
 			type: .statusFault,
@@ -7318,7 +8237,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func statusLowBattery(
@@ -7330,7 +8251,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.StatusLowBattery> {
 		return GenericCharacteristic<Enums.StatusLowBattery>(
 			type: .statusLowBattery,
@@ -7342,7 +8265,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func statusTampered(
@@ -7354,7 +8279,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt8> {
 		return GenericCharacteristic<UInt8>(
 			type: .statusTampered,
@@ -7366,7 +8293,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func sulphurDioxideDensity(
@@ -7378,7 +8307,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1000,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .sulphurDioxideDensity,
@@ -7390,7 +8321,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func supportedTransferTransportConfiguration(
@@ -7402,7 +8335,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Data> {
 		return GenericCharacteristic<Data>(
 			type: .supportedTransferTransportConfiguration,
@@ -7414,7 +8349,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func swingMode(
@@ -7426,7 +8363,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt8> {
 		return GenericCharacteristic<UInt8>(
 			type: .swingMode,
@@ -7438,7 +8377,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func targetAirPurifierState(
@@ -7450,7 +8391,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.TargetAirPurifierState> {
 		return GenericCharacteristic<Enums.TargetAirPurifierState>(
 			type: .targetAirPurifierState,
@@ -7462,7 +8405,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func targetDoorState(
@@ -7474,7 +8419,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.TargetDoorState> {
 		return GenericCharacteristic<Enums.TargetDoorState>(
 			type: .targetDoorState,
@@ -7486,7 +8433,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func targetFanState(
@@ -7498,7 +8447,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.TargetFanState> {
 		return GenericCharacteristic<Enums.TargetFanState>(
 			type: .targetFanState,
@@ -7510,7 +8461,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func targetHeaterCoolerState(
@@ -7522,7 +8475,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 2,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.TargetHeaterCoolerState> {
 		return GenericCharacteristic<Enums.TargetHeaterCoolerState>(
 			type: .targetHeaterCoolerState,
@@ -7534,7 +8489,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func targetHeatingCoolingState(
@@ -7546,7 +8503,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 3,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.TargetHeatingCoolingState> {
 		return GenericCharacteristic<Enums.TargetHeatingCoolingState>(
 			type: .targetHeatingCoolingState,
@@ -7558,7 +8517,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func targetHorizontalTiltAngle(
@@ -7570,7 +8531,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 90,
 		minValue: Double? = -90,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Int> {
 		return GenericCharacteristic<Int>(
 			type: .targetHorizontalTiltAngle,
@@ -7582,7 +8545,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func targetHumidifierDehumidifierState(
@@ -7594,7 +8559,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 2,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.TargetHumidifierDehumidifierState> {
 		return GenericCharacteristic<Enums.TargetHumidifierDehumidifierState>(
 			type: .targetHumidifierDehumidifierState,
@@ -7606,7 +8573,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func targetMediaState(
@@ -7618,7 +8587,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 2,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.TargetMediaState> {
 		return GenericCharacteristic<Enums.TargetMediaState>(
 			type: .targetMediaState,
@@ -7630,7 +8601,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func targetPosition(
@@ -7642,7 +8615,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt8> {
 		return GenericCharacteristic<UInt8>(
 			type: .targetPosition,
@@ -7654,7 +8629,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func targetRelativeHumidity(
@@ -7666,7 +8643,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .targetRelativeHumidity,
@@ -7678,7 +8657,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func targetTemperature(
@@ -7690,7 +8671,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 38,
 		minValue: Double? = 10,
-		minStep: Double? = 0.1
+		minStep: Double? = 0.1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .targetTemperature,
@@ -7702,7 +8685,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func targetTiltAngle(
@@ -7714,7 +8699,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 90,
 		minValue: Double? = -90,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Int> {
 		return GenericCharacteristic<Int>(
 			type: .targetTiltAngle,
@@ -7726,7 +8713,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func targetVerticalTiltAngle(
@@ -7738,7 +8727,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 90,
 		minValue: Double? = -90,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Int> {
 		return GenericCharacteristic<Int>(
 			type: .targetVerticalTiltAngle,
@@ -7750,7 +8741,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func targetVisibilityState(
@@ -7762,7 +8755,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.TargetVisibilityState> {
 		return GenericCharacteristic<Enums.TargetVisibilityState>(
 			type: .targetVisibilityState,
@@ -7774,7 +8769,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func temperatureDisplayUnits(
@@ -7786,7 +8783,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.TemperatureDisplayUnits> {
 		return GenericCharacteristic<Enums.TemperatureDisplayUnits>(
 			type: .temperatureDisplayUnits,
@@ -7798,7 +8797,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func valveType(
@@ -7810,7 +8811,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 3,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<UInt8> {
 		return GenericCharacteristic<UInt8>(
 			type: .valveType,
@@ -7822,7 +8825,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func version(
@@ -7834,7 +8839,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = nil,
 		minValue: Double? = nil,
-		minStep: Double? = nil
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<String> {
 		return GenericCharacteristic<String>(
 			type: .version,
@@ -7846,7 +8853,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func volatileOrganicCompoundDensity(
@@ -7858,7 +8867,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1000,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .volatileOrganicCompoundDensity,
@@ -7870,7 +8881,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func volume(
@@ -7882,7 +8895,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Int> {
 		return GenericCharacteristic<Int>(
 			type: .volume,
@@ -7894,7 +8909,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func volumeControlType(
@@ -7906,7 +8923,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 3,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.VolumeControlType> {
 		return GenericCharacteristic<Enums.VolumeControlType>(
 			type: .volumeControlType,
@@ -7918,7 +8937,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 	static func volumeSelector(
@@ -7930,7 +8951,9 @@ public class PredefinedCharacteristic {
 		maxLength: Int? = nil,
 		maxValue: Double? = 1,
 		minValue: Double? = 0,
-		minStep: Double? = 1
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
 	) -> GenericCharacteristic<Enums.VolumeSelector?> {
 		return GenericCharacteristic<Enums.VolumeSelector?>(
 			type: .volumeSelector,
@@ -7942,7 +8965,9 @@ public class PredefinedCharacteristic {
 			maxLength: maxLength,
 			maxValue: maxValue,
 			minValue: minValue,
-			minStep: minStep)
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
 	}
 
 }

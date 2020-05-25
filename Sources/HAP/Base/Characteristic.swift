@@ -27,6 +27,8 @@ protocol Characteristic: class, JSONSerializable {
     var maxValue: Double? { get }
     var minValue: Double? { get }
     var minStep: Double? { get }
+    var validValues: [Double] { get }
+    var validValuesRange: Range<Double>? { get }
 }
 
 extension Characteristic {
@@ -50,6 +52,11 @@ extension Characteristic {
         if let maxValue = maxValue { serialized["maxValue"] = maxValue }
         if let minValue = minValue { serialized["minValue"] = minValue }
         if let minStep = minStep { serialized["minStep"] = minStep }
+        if let validValuesRange = validValuesRange {
+            serialized["valid-values-range"] = [validValuesRange.lowerBound, validValuesRange.upperBound]
+        } else if !validValues.isEmpty {
+            serialized["valid-values"] = validValues
+        }
 
         return serialized
     }
@@ -112,6 +119,8 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
     public var maxValue: Double?
     public var minValue: Double?
     public var minStep: Double?
+    public var validValues: [Double]
+    public var validValuesRange: Range<Double>?
 
     public init(type: CharacteristicType,
                 value: T? = nil,
@@ -122,7 +131,9 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
                 maxLength: Int? = nil,
                 maxValue: Double? = nil,
                 minValue: Double? = nil,
-                minStep: Double? = nil) {
+                minStep: Double? = nil,
+                validValues: [Double] = [],
+                validValuesRange: Range<Double>? = nil) {
         precondition(
             !permissions.contains(.read) || value != nil,
             "Readable characteristics should have non nil value")
@@ -139,6 +150,8 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
         self.maxValue = maxValue
         self.minValue = minValue
         self.minStep = minStep
+        self.validValues = validValues
+        self.validValuesRange = validValuesRange
 
         self._value = clip(value: value)
     }
