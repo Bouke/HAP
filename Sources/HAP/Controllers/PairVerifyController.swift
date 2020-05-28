@@ -127,7 +127,7 @@ class PairVerifyController {
             throw Error.invalidSignature
         }
 
-        logger.info("Pair verify completed")
+        logger.debug("Pair verify completed")
         let result: PairTagTLV8 = [
             (.state, Data(bytes: [PairVerifyStep.finishResponse.rawValue]))
         ]
