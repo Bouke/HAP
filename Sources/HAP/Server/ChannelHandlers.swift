@@ -198,7 +198,7 @@ class ControllerHandler: ChannelDuplexHandler {
             self.channels[ObjectIdentifier(channel)] = channel
             channelsCount = self.channels.count
         }
-        logger.info("Controller \(channel.remoteAddress?.description ?? "N/A") connected, \(channelsCount) controllers total")
+        logger.debug("Controller \(channel.remoteAddress?.description ?? "N/A") connected, \(channelsCount) controllers total")
         context.fireChannelActive()
     }
 
@@ -211,7 +211,7 @@ class ControllerHandler: ChannelDuplexHandler {
             channelsCount = self.channels.count
         }
         self.removeSubscriptions?(channel)
-        logger.info("Controller \(channel.remoteAddress?.description ?? "N/A") disconnected, \(channelsCount) controllers total")
+        logger.debug("Controller \(channel.remoteAddress?.description ?? "N/A") disconnected, \(channelsCount) controllers total")
         context.fireChannelInactive()
     }
 
