@@ -6,6 +6,12 @@ clean: true
 github_url: https://github.com/Bouke/HAP
 dash_url: http://boukehaarsma.nl/HAP/HAP.xml
 custom_categories:
+  - name: Server
+    children:
+      - Device
+      - DeviceDelegate
+      - Server
+      - QRCode
   - name: Accessory
     children:
       - Accessory
@@ -25,29 +31,8 @@ custom_categories:
       - CharacteristicValueType
   - name: Characteristic Enums
     children:
-      - AirQuality
-      - ChargingState
-      - ContactSensorState
-      - CurrentDoorState
-      - CurrentHeatingCoolingState
-      - DiscoverBridgedAccessories
-      - LockCurrentState
-      - LockTargetState
-      - OccupancyDetected
-      - PositionState
-      - SecuritySystemCurrentState
-      - SecuritySystemTargetState
-      - SmokeDetected
-      - StatusLowBattery
-      - TargetDoorState
-      - TargetHeatingCoolingState
-      - TemperatureDisplayUnits
-  - name: Server
-    children:
-      - Device
-      - Server
-      - QRCode
-  - name: Storage
+      - Enums
+  - name: Config Storage
     children:
       - Storage
       - FileStorage
