@@ -16,5 +16,6 @@ class StorageTests: XCTestCase {
         try! storage.write(expected)
         let actual = try! storage.read()
         XCTAssertEqual(expected, actual)
+        try? FileManager.default.removeItem(atPath: "test.tmp")
     }
 }
