@@ -26,6 +26,11 @@ public class Server: NSObject, NetServiceDelegate {
 
     let channel: Channel
 
+    /// Boot a new Server for the given Device and start advertising.
+    /// - Parameters:
+    ///   - device: the device to advertise
+    ///   - listenPort: (optional) the port to listen on, if 0 a random port will be chosen (default: 0)
+    ///   - worker: (optional) by default a new `MultiThreadedEventLoopGroup` loop is created having the same `numberOfThreads` as the `System.coreCount`, provide your own `EventLoopGroup` for more control
     public init(
         device: Device,
         listenPort requestedPort: Int = 0,
@@ -39,11 +44,7 @@ public class Server: NSObject, NetServiceDelegate {
 
         let applicationHandler = ApplicationHandler(responder: root(device: device))
         
-        if let worker = worker {
-            self.group = worker
-        } else {
-            self.group = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
-        }
+        self.group = worker ?? MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
         
         bootstrap = ServerBootstrap(group: group)
             // Specify backlog and enable SO_REUSEADDR for the server itself
@@ -100,7 +101,9 @@ public class Server: NSObject, NetServiceDelegate {
         service.publish(options: NetService.Options(rawValue: 0))
     }
 
+    /// Stop advertising
     public func stop() throws {
+        service.stop()
         channel.close(promise: nil)
         do {
             try group.syncShutdownGracefully()
@@ -109,7 +112,7 @@ public class Server: NSObject, NetServiceDelegate {
         }
     }
 
-    /// Publish the Accessory configuration on the Bonjour service
+    /// Update the Accessory configuration on the Bonjour service
     func updateDiscoveryRecord() {
         let record = device.config.dictionary(key: { $0.key }, value: { $0.value.data(using: .utf8)! })
         service.setTXTRecord(NetService.data(fromTXTRecord: record))
