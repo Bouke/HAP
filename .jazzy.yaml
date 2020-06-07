@@ -2,15 +2,30 @@ module: HAP
 author: Bouke Haarsma
 author_url: https://boukehaarsma.nl
 theme: fullwidth
-clean: true
+output: .docs
+clean: yes
 github_url: https://github.com/Bouke/HAP
 github_file_prefix: https://github.com/Bouke/HAP/tree/master
 dash_url: http://boukehaarsma.nl/HAP/HAP.xml
+documentation: docs/*.md
+abstract: docs/api/*.md
+swift_build_tool: spm
+hide_documentation_coverage: yes
+hide_unlisted_documentation: yes
 custom_categories:
+  - name: Documentation
+    children:
+      - Getting Started
+      - Usage
+      - Create an Accessory
+      - Design
+      - Development
   - name: Server
     children:
       - Device
       - DeviceDelegate
+      - PairingState
+      - PairingStateError
       - Server
       - QRCode
   - name: Accessory
@@ -30,6 +45,7 @@ custom_categories:
       - CharacteristicType
       - CharacteristicUnit
       - CharacteristicValueType
+      - PredefinedCharacteristic
   - name: Characteristic Enums
     children:
       - Enums

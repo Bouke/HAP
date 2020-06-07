@@ -1,0 +1,1 @@
+Use the `Device` instance to manage the setup code, accessories and controller pairings. You can assign a delegate to be notified of certain events. The `Server` manages IP connectivity and network discovery advertisements.
