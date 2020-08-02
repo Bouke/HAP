@@ -12,4 +12,4 @@ jobs:
       - name: Publish Jazzy Docs
         uses: Steven0351/publish-jazzy-docs@v1.1.2
         with:
-          personal_access_token: ${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}
+          personal_access_token: ${{ secrets.PAT }}
