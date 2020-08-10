@@ -1,4 +1,4 @@
-// swiftlint:disable force_try
+// swiftlint:disable force_try function_body_length
 @testable import HAP
 import HKDF
 import SRP
@@ -19,11 +19,9 @@ class PairSetupControllerTests: XCTestCase {
                                                                   password: password,
                                                                   group: .N3072,
                                                                   algorithm: .sha512)
-        let session = PairSetupController.Session(server: SRP.Server(username: "Pair-Setup",
-                                                                     salt: salt,
-                                                                     verificationKey: verificationKey,
-                                                                     group: .N3072,
-                                                                     algorithm: .sha512))
+        let session = Authenticator(username: "Pair-Setup",
+                                    salt: salt,
+                                    verificationKey: verificationKey)
         let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00080"),
                             setupCode: .override(password),
                             storage: MemoryStorage(),
@@ -60,11 +58,11 @@ class PairSetupControllerTests: XCTestCase {
 
         do {
             // Client -> Server: encrypted[username, publicKey, signature]
-            let hashIn = deriveKey(algorithm: .sha512,
-                                   seed: session.server.sessionKey!,
-                                   info: "Pair-Setup-Controller-Sign-Info".data(using: .utf8),
-                                   salt: "Pair-Setup-Controller-Sign-Salt".data(using: .utf8),
-                                   count: 32) +
+            let hashIn = HKDF.deriveKey(algorithm: .sha512,
+                                        seed: session.server.sessionKey!,
+                                        info: "Pair-Setup-Controller-Sign-Info".data(using: .utf8),
+                                        salt: "Pair-Setup-Controller-Sign-Salt".data(using: .utf8),
+                                        count: 32) +
                 clientIdentifier +
                 keys.publicKey
             let request: PairTagTLV8 = [
@@ -72,11 +70,11 @@ class PairSetupControllerTests: XCTestCase {
                 (.identifier, clientIdentifier),
                 (.signature, try! Ed25519.sign(privateKey: keys.privateKey, message: hashIn))
             ]
-            let encryptionKey = deriveKey(algorithm: .sha512,
-                                          seed: session.server.sessionKey!,
-                                          info: "Pair-Setup-Encrypt-Info".data(using: .utf8),
-                                          salt: "Pair-Setup-Encrypt-Salt".data(using: .utf8),
-                                          count: 32)
+            let encryptionKey = HKDF.deriveKey(algorithm: .sha512,
+                                               seed: session.server.sessionKey!,
+                                               info: "Pair-Setup-Encrypt-Info".data(using: .utf8),
+                                               salt: "Pair-Setup-Encrypt-Salt".data(using: .utf8),
+                                               count: 32)
             let requestEncrypted: PairTagTLV8 = [
                 (.encryptedData, try! ChaCha20Poly1305.encrypt(message: encode(request),
                                                                nonce: "PS-Msg05".data(using: .utf8)!,
@@ -89,11 +87,11 @@ class PairSetupControllerTests: XCTestCase {
                                                           nonce: "PS-Msg06".data(using: .utf8)!,
                                                           key: encryptionKey)
             let response: PairTagTLV8 = try! decode(plaintext)
-            let hashOut = deriveKey(algorithm: .sha512,
-                                    seed: session.server.sessionKey!,
-                                    info: "Pair-Setup-Accessory-Sign-Info".data(using: .utf8),
-                                    salt: "Pair-Setup-Accessory-Sign-Salt".data(using: .utf8),
-                                    count: 32) +
+            let hashOut = HKDF.deriveKey(algorithm: .sha512,
+                                         seed: session.server.sessionKey!,
+                                         info: "Pair-Setup-Accessory-Sign-Info".data(using: .utf8),
+                                         salt: "Pair-Setup-Accessory-Sign-Salt".data(using: .utf8),
+                                         count: 32) +
                 response[.identifier]! +
                 response[.publicKey]!
             try! Ed25519.verify(publicKey: response[.publicKey]!, message: hashOut, signature: response[.signature]!)

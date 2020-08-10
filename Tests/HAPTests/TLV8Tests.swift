@@ -1,7 +1,5 @@
 // swiftlint:disable force_try
 @testable import HAP
-import HKDF
-import SRP
 import XCTest
 
 class TLV8Tests: XCTestCase {

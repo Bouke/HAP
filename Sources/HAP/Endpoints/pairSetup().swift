@@ -1,33 +1,26 @@
-import Cryptor
-import Logging
 import Foundation
 import HTTP
-import SRP
+import Logging
 
 fileprivate let logger = Logger(label: "hap.pairSetup")
-fileprivate typealias Session = PairSetupController.Session
-fileprivate let SESSION_KEY = "hap.pair-setup.session"
+fileprivate typealias Session = Authenticator
 fileprivate enum Error: Swift.Error {
     case noSession
 }
 
 // swiftlint:disable:next cyclomatic_complexity
 func pairSetup(device: Device) -> Responder {
-    let group = Group.N3072
-    let algorithm = Digest.Algorithm.sha512
 
     let username = "Pair-Setup"
-    let (salt, verificationKey) = createSaltedVerificationKey(username: username,
-                                                              password: device.setupCode,
-                                                              group: group,
-                                                              algorithm: algorithm)
+    let (salt, verificationKey) =
+        Session.createSaltedVerificationKey(username: username,
+                                            password: device.setupCode)
+
     let controller = PairSetupController(device: device)
     func createSession() -> Session {
-        return Session(server: SRP.Server(username: username,
-                                          salt: salt,
-                                          verificationKey: verificationKey,
-                                          group: group,
-                                          algorithm: algorithm))
+        return Session(username: username,
+                       salt: salt,
+                       verificationKey: verificationKey)
     }
 
     // TODO: this memory is not freed
@@ -66,18 +59,18 @@ func pairSetup(device: Device) -> Responder {
             case .startRequest:
                 let session = createSession()
                 response = try controller.startRequest(data, session)
-                setSession(for:context, to: session)
+                setSession(for: context, to: session)
 
             // M3: iOS Device -> Accessory -- `SRP Verify Request'
             case .verifyRequest:
-                guard let session = getSession(for:context) else {
+                guard let session = getSession(for: context) else {
                     throw PairSetupController.Error.invalidSetupState
                 }
                 response = try controller.verifyRequest(data, session)
 
             // M5: iOS Device -> Accessory -- `Exchange Request'
             case .keyExchangeRequest:
-                guard let session = getSession(for:context) else {
+                guard let session = getSession(for: context) else {
                     throw PairSetupController.Error.invalidSetupState
                 }
                 response = try controller.keyExchangeRequest(data, session)
@@ -89,7 +82,7 @@ func pairSetup(device: Device) -> Responder {
         } catch {
             logger.warning("Could not complete pair setup: \(error)")
 
-            setSession(for:context, to: nil)
+            setSession(for: context, to: nil)
 
             try? device.changePairingState(.notPaired)
 

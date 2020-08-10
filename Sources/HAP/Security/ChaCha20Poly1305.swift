@@ -1,5 +1,4 @@
-// swiftlint:disable identifier_name line_length
-import CLibSodium
+// swiftlint:disable identifier_name line_length no_grouping_extension force_cast
 import Foundation
 import NIO
 
@@ -15,8 +14,79 @@ class ChaCha20Poly1305 {
         default: abort()
         }
     }
+}
 
-    static func encrypt(message: Data, additional: Data = Data(), nonce: Data, key: Data) throws -> Data {
+#if canImport(CryptoKit)
+import CryptoKit
+#endif
+
+extension ChaCha20Poly1305 {
+
+    @inlinable static func encrypt(message: Data, additional: Data = Data(), nonce: Data, key: HAPSymmetricKey) throws -> Data {
+        if #available(macOS 10.15, iOS 13, *) {
+            return try CK_encrypt(message: message, nonce: nonce, key: symmetricKey(key))
+        }
+        #if os(macOS) && arch(arm64)
+        assertionFailure("libsodium unavailable")
+        return Data()
+        #else
+        return try SD_encrypt(message: message, additional: additional, nonce: nonce, key: key as! Data)
+        #endif
+    }
+
+    @inlinable static func decrypt(cipher: Data, additional: Data = Data(), nonce: Data, key: HAPSymmetricKey) throws -> Data {
+        if #available(macOS 10.15, iOS 13, *) {
+            return try CK_decrypt(cipher: cipher, nonce: nonce, key: symmetricKey(key))
+        }
+        #if os(macOS) && arch(arm64)
+        assertionFailure("libsodium unavailable")
+        return Data()
+        #else
+        return try SD_decrypt(cipher: cipher, additional: additional, nonce: nonce, key: key as! Data)
+        #endif
+    }
+
+    static func encrypt(message: inout ByteBuffer, additional: ByteBufferView, nonce: Data, key: HAPSymmetricKey, cipher: inout ByteBuffer) throws {
+        if #available(macOS 10.15, iOS 13, *) {
+            try CK_encrypt(message: &message, additional: additional, nonce: nonce, key: symmetricKey(key), cipher: &cipher)
+            return
+        }
+        #if os(macOS) && arch(arm64)
+            assertionFailure("libsodium unavailable")
+        #else
+        try SD_encrypt(message: &message, additional: additional, nonce: nonce, key: key as! Data, cipher: &cipher)
+        #endif
+    }
+
+    static func decrypt(cipher: inout ByteBuffer, additional: inout ByteBuffer, nonce: Data, key: HAPSymmetricKey, message: inout ByteBuffer) throws {
+
+        if #available(macOS 10.15, iOS 13, *) {
+            try CK_decrypt(cipher: &cipher, additional: &additional, nonce: nonce, key: symmetricKey(key), message: &message)
+            return
+        }
+        #if os(macOS) && arch(arm64)
+            assertionFailure("libsodium unavailable")
+        #else
+        try SD_decrypt(cipher: &cipher, additional: &additional, nonce: nonce, key: key as! Data, message: &message)
+        #endif
+    }
+
+    @available(macOS 10.15, iOS 13, *)
+    private static func symmetricKey(_ key: HAPSymmetricKey) -> SymmetricKey {
+        if let symmetricKey = key as? SymmetricKey {
+            return symmetricKey
+        } else {
+            return SymmetricKey(data: key as! Data)
+        }
+    }
+}
+
+#if !(os(macOS) && arch(arm64))
+import CLibSodium
+
+extension ChaCha20Poly1305 {
+
+    internal static func SD_encrypt(message: Data, additional: Data = Data(), nonce: Data, key: Data) throws -> Data {
         let nonce = upgradeNonce(nonce)
         var cipher = Data(count: message.count + Int(crypto_aead_chacha20poly1305_ABYTES))
         let result = cipher.withUnsafeMutableBytes { c in
@@ -36,7 +106,7 @@ class ChaCha20Poly1305 {
         return cipher
     }
 
-    static func encrypt(message: inout ByteBuffer, additional: ByteBufferView, nonce: Data, key: Data, cipher: inout ByteBuffer) throws {
+    internal static func SD_encrypt(message: inout ByteBuffer, additional: ByteBufferView, nonce: Data, key: Data, cipher: inout ByteBuffer) throws {
         let nonce = upgradeNonce(nonce)
         let messageLength = UInt64(message.readableBytes)
         cipher.reserveWritableCapacity(message.readableBytes + Int(crypto_aead_chacha20poly1305_ABYTES))
@@ -62,7 +132,7 @@ class ChaCha20Poly1305 {
         cipher.moveWriterIndex(forwardBy: Int(cipherLength.pointee))
     }
 
-    static func decrypt(cipher: Data, additional: Data = Data(), nonce: Data, key: Data) throws -> Data {
+    internal static func SD_decrypt(cipher: Data, additional: Data = Data(), nonce: Data, key: Data) throws -> Data {
         let nonce = upgradeNonce(nonce)
         var message = Data(count: cipher.count - Int(crypto_aead_chacha20poly1305_ietf_ABYTES))
         let result = message.withUnsafeMutableBytes { (m: UnsafeMutablePointer<UInt8>) -> Int32 in
@@ -82,7 +152,7 @@ class ChaCha20Poly1305 {
         return message
     }
 
-    static func decrypt(cipher: inout ByteBuffer, additional: inout ByteBuffer, nonce: Data, key: Data, message: inout ByteBuffer) throws {
+    internal static func SD_decrypt(cipher: inout ByteBuffer, additional: inout ByteBuffer, nonce: Data, key: Data, message: inout ByteBuffer) throws {
         let nonce = upgradeNonce(nonce)
         message.reserveWritableCapacity(cipher.readableBytes - Int(crypto_aead_chacha20poly1305_ietf_ABYTES))
         let cipherLength = UInt64(cipher.readableBytes)
@@ -106,5 +176,89 @@ class ChaCha20Poly1305 {
             throw Error.couldNotDecrypt
         }
         message.moveWriterIndex(forwardBy: Int(messageLength.pointee))
+    }
+}
+#else
+extension ChaCha20Poly1305 {
+
+    internal static func SD_encrypt(message: Data, additional: Data = Data(), nonce: Data, key: Data) throws -> Data {
+        assertionFailure("libsodium unavailable")
+        return Data()
+    }
+
+    internal static func SD_encrypt(message: inout ByteBuffer, additional: ByteBufferView, nonce: Data, key: Data, cipher: inout ByteBuffer) throws {
+        assertionFailure("libsodium unavailable")
+    }
+
+    internal static func SD_decrypt(cipher: Data, additional: Data = Data(), nonce: Data, key: Data) throws -> Data {
+        assertionFailure("libsodium unavailable")
+        return Data()
+    }
+
+    internal static func SD_decrypt(cipher: inout ByteBuffer, additional: inout ByteBuffer, nonce: Data, key: Data, message: inout ByteBuffer) throws {
+        assertionFailure("libsodium unavailable")
+    }
+}
+
+#endif
+
+@available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, macCatalyst 13, *)
+extension ChaCha20Poly1305 {
+    internal static func CK_encrypt(message: Data, additional: Data? = nil, nonce: Data, key: SymmetricKey) throws -> Data {
+        do {
+            let n = try ChaChaPoly.Nonce(data: upgradeNonce(nonce))
+            if let ad = additional {
+                let sealed = try ChaChaPoly.seal(message, using: key, nonce: n, authenticating: ad)
+                return sealed.ciphertext + sealed.tag
+            }
+            let sealed = try ChaChaPoly.seal(message, using: key, nonce: n)
+            return sealed.ciphertext + sealed.tag
+
+        } catch {
+            throw Error.couldNotEncrypt
+        }
+    }
+    internal static func CK_decrypt(cipher: Data, additional: Data? = nil, nonce: Data, key: SymmetricKey) throws -> Data {
+
+        do {
+            let n = try ChaChaPoly.Nonce(data: upgradeNonce(nonce))
+            let box = try ChaChaPoly.SealedBox(nonce: n, ciphertext: cipher.prefix(cipher.count - 16), tag: cipher.suffix(16))
+            if let ad = additional {
+                return try ChaChaPoly.open(box, using: key, authenticating: ad)
+            }
+
+            return try ChaChaPoly.open(box, using: key)
+
+        } catch {
+            throw Error.couldNotDecrypt
+        }
+    }
+
+    internal static func CK_encrypt(message: inout ByteBuffer, additional: ByteBufferView, nonce: Data, key: SymmetricKey, cipher: inout ByteBuffer) throws {
+        let nonce = upgradeNonce(nonce)
+        let messageLength = message.readableBytes
+        let ad = additional.withUnsafeBytes { Data($0) }
+        if let message = message.getData(at: message.readerIndex, length: messageLength) {
+            let data = try ChaCha20Poly1305.CK_encrypt(message: message, additional: ad, nonce: nonce, key: key)
+            cipher.writeBytes(data)
+            return
+        } else {
+            throw Error.couldNotEncrypt
+        }
+    }
+
+    internal static func CK_decrypt(cipher: inout ByteBuffer, additional: inout ByteBuffer, nonce: Data, key: SymmetricKey, message: inout ByteBuffer) throws {
+
+        let nonce = upgradeNonce(nonce)
+        let cipherLength = cipher.readableBytes
+        let additionalLength = additional.readableBytes
+        let ad = additional.getData(at: additional.readerIndex, length: additionalLength)
+        if let cipher = cipher.getData(at: cipher.readerIndex, length: cipherLength) {
+            let data = try ChaCha20Poly1305.CK_decrypt(cipher: cipher, additional: ad, nonce: nonce, key: key)
+            message.writeBytes(data)
+            return
+        } else {
+            throw Error.couldNotDecrypt
+        }
     }
 }

@@ -1,6 +1,9 @@
-// swiftlint:disable identifier_name
-import CLibSodium
+// swiftlint:disable identifier_name no_grouping_extension
 import Foundation
+
+#if canImport(CryptoKit)
+import CryptoKit
+#endif
 
 class Ed25519 {
     enum Error: Swift.Error {
@@ -9,6 +12,35 @@ class Ed25519 {
     }
 
     static func verify(publicKey: Data, message: Data, signature: Data) throws {
+        if #available(macOS 10.15, iOS 13, *) {
+            try CK_verify(publicKey: publicKey, message: message, signature: signature)
+        } else {
+            try SD_verify(publicKey: publicKey, message: message, signature: signature)
+        }
+    }
+
+    static func sign(privateKey: Data, message: Data) throws -> Data {
+        if #available(macOS 10.15, iOS 13, *) {
+            return try CK_sign(privateKey: privateKey, message: message)
+        } else {
+            return try SD_sign(privateKey: privateKey, message: message)
+        }
+    }
+
+    static func generateSignKeypair() -> (publicKey: Data, privateKey: Data) {
+        if #available(macOS 10.15, iOS 13, *) {
+            return CK_generateSignKeypair()
+        } else {
+            return SD_generateSignKeypair()
+        }
+    }
+}
+
+#if !(os(macOS) && arch(arm64))
+import CLibSodium
+
+extension Ed25519 {
+    static func SD_verify(publicKey: Data, message: Data, signature: Data) throws {
         guard signature.count == Int(crypto_sign_BYTES) else {
             throw Error.invalidSignature
         }
@@ -23,7 +55,7 @@ class Ed25519 {
         }
     }
 
-    static func sign(privateKey: Data, message: Data) throws -> Data {
+    static func SD_sign(privateKey: Data, message: Data) throws -> Data {
         var signature = Data(count: Int(crypto_sign_BYTES))
         guard signature.withUnsafeMutableBytes({ sig -> Int32 in
             message.withUnsafeBytes { m -> Int32 in
@@ -37,7 +69,7 @@ class Ed25519 {
         return signature
     }
 
-    static func generateSignKeypair() -> (publicKey: Data, privateKey: Data) {
+    static func SD_generateSignKeypair() -> (publicKey: Data, privateKey: Data) {
         var pk = Data(count: Int(crypto_sign_PUBLICKEYBYTES))
         var sk = Data(count: 64) // crypto_sign_SECRETKEYBYTES is not available
         precondition(pk.withUnsafeMutableBytes({ pk in
@@ -48,3 +80,53 @@ class Ed25519 {
         return (pk, sk)
     }
 }
+#else
+extension Ed25519 {
+    static func SD_verify(publicKey: Data, message: Data, signature: Data) throws {
+        assertionFailure("libsodium unavailable")
+    }
+
+    static func SD_sign(privateKey: Data, message: Data) throws -> Data {
+        assertionFailure("libsodium unavailable")
+        return Data()
+    }
+
+    static func SD_generateSignKeypair() -> (publicKey: Data, privateKey: Data) {
+        assertionFailure("libsodium unavailable")
+        return (Data(), Data())
+    }
+
+}
+#endif
+
+#if canImport(CryptoKit)
+
+@available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, macCatalyst 13, *)
+extension Ed25519 {
+    static func CK_verify(publicKey pkData: Data, message: Data, signature: Data) throws {
+        guard signature.count == 64,
+            let publicKey = try? Curve25519.Signing.PublicKey(rawRepresentation: pkData) else {
+            throw Error.invalidSignature
+        }
+
+        if !publicKey.isValidSignature(signature, for: message) {
+            throw Error.invalidSignature
+        }
+    }
+
+    static func CK_sign(privateKey pkData: Data, message: Data) throws -> Data {
+        do {
+            let privateKey = try Curve25519.Signing.PrivateKey(rawRepresentation: pkData)
+            return try privateKey.signature(for: message)
+        } catch {
+            throw Error.couldNotSign
+        }
+    }
+
+    static func CK_generateSignKeypair() -> (publicKey: Data, privateKey: Data) {
+        let privateKey = Curve25519.Signing.PrivateKey()
+        return(privateKey.publicKey.rawRepresentation, privateKey.rawRepresentation)
+    }
+
+}
+#endif

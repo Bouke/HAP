@@ -47,14 +47,14 @@ func pairVerify(device: Device) -> Responder {
 
             case .startRequest:
                 let (response, session) = try controller.startRequest(data)
-                setSession(for:context, to: session)
+                setSession(for: context, to: session)
                 return HTTPResponse(tags: response)
 
             case .finishRequest:
                 defer {
-                    setSession(for:context, to: nil)
+                    setSession(for: context, to: nil)
                 }
-                guard let session = getSession(for:context) else {
+                guard let session = getSession(for: context) else {
                     throw Error.noSession
                 }
 

@@ -1,14 +1,10 @@
-import Logging
 import Foundation
-import HKDF
-import SRP
+import Logging
 
 fileprivate let logger = Logger(label: "hap.controllers.pair-setup")
 
 class PairSetupController {
-    struct Session {
-        let server: SRP.Server
-    }
+
     enum Error: Swift.Error {
         case invalidParameters
         case invalidPairingMethod
@@ -27,7 +23,7 @@ class PairSetupController {
         self.device = device
     }
 
-    func startRequest(_ data: PairTagTLV8, _ session: Session) throws -> PairTagTLV8 {
+    func startRequest(_ data: PairTagTLV8, _ session: Authenticator) throws -> PairTagTLV8 {
         guard let method = data[.pairingMethod]?.first.flatMap({ PairingMethod(rawValue: $0) }) else {
             throw Error.invalidParameters
         }
@@ -58,7 +54,7 @@ class PairSetupController {
         // swiftlint:disable:next force_try
         try! device.changePairingState(.pairing)
 
-        let (salt, serverPublicKey) = session.server.getChallenge()
+        let (salt, serverPublicKey) = session.getChallenge()
 
         logger.info("Pair setup started")
         logger.debug("<-- s \(salt.hex)")
@@ -72,7 +68,7 @@ class PairSetupController {
         return result
     }
 
-    func verifyRequest(_ data: PairTagTLV8, _ session: Session) throws -> PairTagTLV8? {
+    func verifyRequest(_ data: PairTagTLV8, _ session: Authenticator) throws -> PairTagTLV8? {
         guard let clientPublicKey = data[.publicKey], let clientKeyProof = data[.proof] else {
             logger.warning("Invalid parameters")
             throw Error.invalidSetupState
@@ -81,8 +77,8 @@ class PairSetupController {
         logger.debug("--> A \(clientPublicKey.hex)")
         logger.debug("--> M \(clientKeyProof.hex)")
 
-        guard let serverKeyProof = try? session.server.verifySession(publicKey: clientPublicKey,
-                                                                     keyProof: clientKeyProof)
+        guard let serverKeyProof = try? session.verifySession(publicKey: clientPublicKey,
+                                                              keyProof: clientKeyProof)
             else {
                 logger.warning("Invalid PIN")
                 throw Error.authenticationFailed
@@ -97,20 +93,13 @@ class PairSetupController {
         return result
     }
 
-    func keyExchangeRequest(_ data: PairTagTLV8, _ session: Session) throws -> PairTagTLV8 {
+    func keyExchangeRequest(_ data: PairTagTLV8, _ session: Authenticator) throws -> PairTagTLV8 {
         guard let encryptedData = data[.encryptedData] else {
             throw Error.invalidParameters
         }
 
-        let encryptionKey = deriveKey(algorithm: .sha512,
-                                      seed: session.server.sessionKey!,
-                                      info: "Pair-Setup-Encrypt-Info".data(using: .utf8),
-                                      salt: "Pair-Setup-Encrypt-Salt".data(using: .utf8),
-                                      count: 32)
-
-        guard let plaintext = try? ChaCha20Poly1305.decrypt(cipher: encryptedData,
-                                                            nonce: "PS-Msg05".data(using: .utf8)!,
-                                                            key: encryptionKey) else {
+        guard let plaintext = session.decrypt(encryptedData: encryptedData,
+                                              nonce: "PS-Msg05") else {
             throw Error.couldNotDecryptMessage
         }
 
@@ -129,25 +118,10 @@ class PairSetupController {
         logger.debug("--> public key \(publicKey.hex)")
         logger.debug("--> signature \(signatureIn.hex)")
 
-        let hashIn = deriveKey(algorithm: .sha512,
-                               seed: session.server.sessionKey!,
-                               info: "Pair-Setup-Controller-Sign-Info".data(using: .utf8),
-                               salt: "Pair-Setup-Controller-Sign-Salt".data(using: .utf8),
-                               count: 32) +
-                     username +
-                     publicKey
-
-        try Ed25519.verify(publicKey: publicKey, message: hashIn, signature: signatureIn)
-
-        let hashOut = deriveKey(algorithm: .sha512,
-                                seed: session.server.sessionKey!,
-                                info: "Pair-Setup-Accessory-Sign-Info".data(using: .utf8),
-                                salt: "Pair-Setup-Accessory-Sign-Salt".data(using: .utf8),
-                                count: 32) +
-            device.identifier.data(using: .utf8)! +
-            device.publicKey
-
-        guard let signatureOut = try? Ed25519.sign(privateKey: device.privateKey, message: hashOut) else {
+        guard let signatureOut = session.verifyID(username: username,
+                                                  publicKey: publicKey,
+                                                  signatureIn: signatureIn,
+                                                  device: device) else {
             throw Error.couldNotSign
         }
 
@@ -162,9 +136,8 @@ class PairSetupController {
         logger.debug("<-- signature \(signatureOut.hex)")
         logger.info("Pair setup completed")
 
-        guard let encryptedResultInner = try? ChaCha20Poly1305.encrypt(message: encode(resultInner),
-                                                                       nonce: "PS-Msg06".data(using: .utf8)!,
-                                                                       key: encryptionKey)
+        guard let encryptedResultInner = session.encrypt(message: encode(resultInner),
+                                                         nonce: "PS-Msg06")
             else {
                 throw Error.couldNotEncrypt
         }

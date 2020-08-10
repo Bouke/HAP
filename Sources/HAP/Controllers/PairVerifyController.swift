@@ -1,9 +1,6 @@
-import CLibSodium
 import Cryptor
-import Logging
 import Foundation
-import HKDF
-import SRP
+import Logging
 
 fileprivate let logger = Logger(label: "hap.controllers.pair-verify")
 
@@ -12,17 +9,13 @@ class PairVerifyController {
         let secretKey: Data
         let publicKey: Data
         let otherPublicKey: Data
-        let sharedSecret: Data
+        let sharedSecret: HAPSharedSecret
 
         init?(clientPublicKey otherPublicKey: Data) {
-            guard let secretKey = (try? Random.generate(byteCount: 32)).flatMap({ Data(bytes: $0) }),
-                let publicKey = crypto(crypto_scalarmult_curve25519_base,
-                                       Data(count: Int(crypto_scalarmult_curve25519_BYTES)),
-                                       secretKey),
-                let sharedSecret = crypto(crypto_scalarmult,
-                                          Data(count: Int(crypto_scalarmult_BYTES)),
-                                          secretKey,
-                                          otherPublicKey)
+            guard let secretKey = Keys.generateSecret(),
+                let publicKey = Keys.public(secretKey: secretKey),
+                let sharedSecret = Keys.sharedSecret(secretKey,
+                                                     otherPublicKey: otherPublicKey)
                 else {
                     return nil
             }
@@ -66,11 +59,10 @@ class PairVerifyController {
         ]
         logger.debug("startRequest result: \(resultInner)")
 
-        let encryptionKey = HKDF.deriveKey(algorithm: .sha512,
-                                           seed: session.sharedSecret,
-                                           info: "Pair-Verify-Encrypt-Info".data(using: .utf8),
-                                           salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8),
-                                           count: 32)
+        let encryptionKey = Keys.deriveSha512(seed: session.sharedSecret,
+                                              info: "Pair-Verify-Encrypt-Info".data(using: .utf8)!,
+                                              salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8)!,
+                                              count: 32)
 
         guard let encryptedResultInner = try? ChaCha20Poly1305.encrypt(message: encode(resultInner),
                                                                        nonce: "PV-Msg02".data(using: .utf8)!,
@@ -92,11 +84,10 @@ class PairVerifyController {
             throw Error.invalidParameters
         }
 
-        let encryptionKey = HKDF.deriveKey(algorithm: .sha512,
-                                           seed: session.sharedSecret,
-                                           info: "Pair-Verify-Encrypt-Info".data(using: .utf8),
-                                           salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8),
-                                           count: 32)
+        let encryptionKey = Keys.deriveSha512(seed: session.sharedSecret,
+                                              info: "Pair-Verify-Encrypt-Info".data(using: .utf8)!,
+                                              salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8)!,
+                                              count: 32)
 
         guard let plaintext = try? ChaCha20Poly1305.decrypt(cipher: encryptedData,
                                                             nonce: "PV-Msg03".data(using: .utf8)!,

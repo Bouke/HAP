@@ -1,6 +1,5 @@
 import Logging
 import Foundation
-import HKDF
 import HTTP
 
 fileprivate let logger = Logger(label: "hap.endpoints.accessories")
