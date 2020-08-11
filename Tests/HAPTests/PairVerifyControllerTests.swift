@@ -1,6 +1,4 @@
 // swiftlint:disable force_try force_cast function_body_length
-import CLibSodium
-import CryptoKit
 import Cryptor
 @testable import HAP
 import XCTest
@@ -24,10 +22,8 @@ class PairVerifyControllerTests: XCTestCase {
 
         let controller = PairVerifyController(device: device)
         // these are the client's keys for this verify session
-        let clientSecretKey = try! Data(Random.generate(byteCount: 32))
-        let clientPublicKey = crypto(crypto_scalarmult_curve25519_base,
-                                     Data(count: Int(crypto_scalarmult_curve25519_BYTES)),
-                                     clientSecretKey)!
+        let clientSecretKey = Keys.generateSecret()!
+        let clientPublicKey = Keys.public(secretKey: clientSecretKey)!
         let serverPublicKey: Data
         let encryptionKey: HAPSymmetricKey
         let session: PairVerifyController.Session
@@ -51,10 +47,7 @@ class PairVerifyControllerTests: XCTestCase {
                 let encryptedData = resultOuter[.encryptedData] else {
                 return XCTFail("Response is incomplete")
             }
-            guard let sharedSecret = crypto(crypto_scalarmult,
-                                            Data(count: Int(crypto_scalarmult_BYTES)),
-                                            clientSecretKey,
-                                            serverPublicKey_) else {
+            guard let sharedSecret = Keys.sharedSecret(clientSecretKey, otherPublicKey: serverPublicKey_) else {
                 return XCTFail("Couldn't generate shared secret")
             }
             XCTAssertEqual(sharedSecret.hex, session.sharedSecret.hex)
@@ -66,7 +59,7 @@ class PairVerifyControllerTests: XCTestCase {
 
             guard let plainText = try? ChaCha20Poly1305.decrypt(cipher: encryptedData,
                                                                 nonce: "PV-Msg02".data(using: .utf8)!,
-                                                                key: encryptionKey_ as! Data) else {
+                                                                key: encryptionKey_) else {
                 return XCTFail("Couldn't decrypt response")
             }
             guard let resultInner: PairTagTLV8 = try? decode(plainText),
@@ -97,7 +90,7 @@ class PairVerifyControllerTests: XCTestCase {
             ]
             guard let cipher = try? ChaCha20Poly1305.encrypt(message: encode(requestInner),
                                                              nonce: "PV-Msg03".data(using: .utf8)!,
-                                                             key: encryptionKey as! Data) else {
+                                                             key: encryptionKey) else {
                 return XCTFail("Couldn't encode")
             }
             let resultOuter: PairTagTLV8 = [
