@@ -1,16 +1,18 @@
 // swiftlint:disable identifier_name no_grouping_extension
 import Foundation
 
-#if canImport(CryptoKit)
-import CryptoKit
-#endif
-
 class Ed25519 {
     enum Error: Swift.Error {
         case invalidSignature
         case couldNotSign
     }
+}
+#if canImport(CryptoKit)
+import CryptoKit
 
+extension Ed25519 {
+
+    @inlinable
     static func verify(publicKey: Data, message: Data, signature: Data) throws {
         if #available(macOS 10.15, iOS 13, *) {
             try CK_verify(publicKey: publicKey, message: message, signature: signature)
@@ -19,6 +21,7 @@ class Ed25519 {
         }
     }
 
+    @inlinable
     static func sign(privateKey: Data, message: Data) throws -> Data {
         if #available(macOS 10.15, iOS 13, *) {
             return try CK_sign(privateKey: privateKey, message: message)
@@ -27,6 +30,7 @@ class Ed25519 {
         }
     }
 
+    @inlinable
     static func generateSignKeypair() -> (publicKey: Data, privateKey: Data) {
         if #available(macOS 10.15, iOS 13, *) {
             return CK_generateSignKeypair()
@@ -35,6 +39,25 @@ class Ed25519 {
         }
     }
 }
+#else // No CrytoKit
+extension Ed25519 {
+
+    @inlinable
+    static func verify(publicKey: Data, message: Data, signature: Data) throws {
+        try SD_verify(publicKey: publicKey, message: message, signature: signature)
+    }
+
+    @inlinable
+    static func sign(privateKey: Data, message: Data) throws -> Data {
+        return try SD_sign(privateKey: privateKey, message: message)
+    }
+
+    @inlinable
+    static func generateSignKeypair() -> (publicKey: Data, privateKey: Data) {
+        return SD_generateSignKeypair()
+    }
+}
+#endif
 
 #if !(os(macOS) && arch(arm64))
 import CLibSodium

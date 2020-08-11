@@ -4,10 +4,6 @@ import Cryptor
 import Foundation
 import func HKDF.deriveKey
 
-#if !(os(macOS) && arch(arm64))
-import CLibSodium
-#endif
-
 protocol HAPSharedSecret {
     func base64EncodedString() -> String
     var hex: String { get }
@@ -29,6 +25,9 @@ extension Data: HAPSharedSecret, HAPSymmetricKey {
     public var hex: String {
         return self.reduce("") { $0 + String(format: "%02x", $1) }
     }
+}
+
+enum Keys {
 }
 
 #if canImport(CryptoKit)
@@ -62,9 +61,8 @@ extension SymmetricKey: HAPSymmetricKey {
     }
 }
 
-#endif
-
-enum Keys {
+extension Keys {
+    @inlinable
     static func generateSecret() -> Data? {
         if #available(macOS 10.15, iOS 13, *) {
             return Curve25519.KeyAgreement.PrivateKey().rawRepresentation
@@ -72,20 +70,24 @@ enum Keys {
             return (try? Random.generate(byteCount: 32)).flatMap({ Data($0) })
         }
     }
+
+    @inlinable
     static func `public`(secretKey: Data) -> Data? {
         if #available(macOS 10.15, iOS 13, *) {
             return CK_public(secretKey: secretKey)
         }
         return SD_public(secretKey: secretKey)
     }
-    static func sharedSecret(_ secretKey: Data, otherPublicKey: Data) -> HAPSharedSecret? {
 
+    @inlinable
+    static func sharedSecret(_ secretKey: Data, otherPublicKey: Data) -> HAPSharedSecret? {
         if #available(macOS 10.15, iOS 13, *) {
             return CK_sharedSecret(secretKey, otherPublicKey: otherPublicKey)
         }
         return SD_sharedSecret(secretKey, otherPublicKey: otherPublicKey)
     }
 
+    @inlinable
     static func deriveSha512(
         seed: HAPSharedSecret,
         info: Data,
@@ -104,8 +106,38 @@ enum Keys {
         return deriveKey(algorithm: .sha512, seed: seed as! Data, info: info, salt: salt, count: count)
     }
 }
+#else // No CryptoKit
+extension Keys {
+    @inlinable
+    static func generateSecret() -> Data? {
+        return (try? Random.generate(byteCount: 32)).flatMap({ Data($0) })
+    }
+
+    @inlinable
+    static func `public`(secretKey: Data) -> Data? {
+        return SD_public(secretKey: secretKey)
+    }
+
+    @inlinable
+    static func sharedSecret(_ secretKey: Data, otherPublicKey: Data) -> HAPSharedSecret? {
+        return SD_sharedSecret(secretKey, otherPublicKey: otherPublicKey)
+    }
+
+    @inlinable
+    static func deriveSha512(
+        seed: HAPSharedSecret,
+        info: Data,
+        salt: Data,
+        count: Int) -> HAPSymmetricKey {
+        return deriveKey(algorithm: .sha512, seed: seed as! Data, info: info, salt: salt, count: count)
+    }
+}
+#endif
 
 #if !(os(macOS) && arch(arm64))
+
+import CLibSodium
+
 extension Keys {
     internal static func SD_public(secretKey: Data) -> Data? {
         return crypto(crypto_scalarmult_curve25519_base,
@@ -118,7 +150,6 @@ extension Keys {
                       secretKey,
                       otherPublicKey)
     }
-
 }
 #else
 extension Keys {
@@ -133,6 +164,8 @@ extension Keys {
 }
 
 #endif
+
+#if canImport(CryptoKit)
 
 @available(macOS 10.15, iOS 13, *)
 extension Keys {
@@ -154,3 +187,6 @@ extension Keys {
         }
     }
 }
+
+#endif
+

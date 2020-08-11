@@ -18,11 +18,11 @@ class ChaCha20Poly1305 {
 
 #if canImport(CryptoKit)
 import CryptoKit
-#endif
 
 extension ChaCha20Poly1305 {
 
-    @inlinable static func encrypt(message: Data, additional: Data = Data(), nonce: Data, key: HAPSymmetricKey) throws -> Data {
+    @inlinable
+    static func encrypt(message: Data, additional: Data = Data(), nonce: Data, key: HAPSymmetricKey) throws -> Data {
         if #available(macOS 10.15, iOS 13, *) {
             return try CK_encrypt(message: message, nonce: nonce, key: symmetricKey(key))
         }
@@ -34,7 +34,8 @@ extension ChaCha20Poly1305 {
         #endif
     }
 
-    @inlinable static func decrypt(cipher: Data, additional: Data = Data(), nonce: Data, key: HAPSymmetricKey) throws -> Data {
+    @inlinable
+    static func decrypt(cipher: Data, additional: Data = Data(), nonce: Data, key: HAPSymmetricKey) throws -> Data {
         if #available(macOS 10.15, iOS 13, *) {
             return try CK_decrypt(cipher: cipher, nonce: nonce, key: symmetricKey(key))
         }
@@ -46,6 +47,7 @@ extension ChaCha20Poly1305 {
         #endif
     }
 
+    @inlinable
     static func encrypt(message: inout ByteBuffer, additional: ByteBufferView, nonce: Data, key: HAPSymmetricKey, cipher: inout ByteBuffer) throws {
         if #available(macOS 10.15, iOS 13, *) {
             try CK_encrypt(message: &message, additional: additional, nonce: nonce, key: symmetricKey(key), cipher: &cipher)
@@ -58,6 +60,7 @@ extension ChaCha20Poly1305 {
         #endif
     }
 
+    @inlinable
     static func decrypt(cipher: inout ByteBuffer, additional: inout ByteBuffer, nonce: Data, key: HAPSymmetricKey, message: inout ByteBuffer) throws {
 
         if #available(macOS 10.15, iOS 13, *) {
@@ -80,6 +83,32 @@ extension ChaCha20Poly1305 {
         }
     }
 }
+
+#else  // No CryptoKit
+
+extension ChaCha20Poly1305 {
+
+    @inlinable
+    static func encrypt(message: Data, additional: Data = Data(), nonce: Data, key: HAPSymmetricKey) throws -> Data {
+        return try SD_encrypt(message: message, additional: additional, nonce: nonce, key: key as! Data)
+    }
+
+    @inlinable
+    static func decrypt(cipher: Data, additional: Data = Data(), nonce: Data, key: HAPSymmetricKey) throws -> Data {
+        return try SD_decrypt(cipher: cipher, additional: additional, nonce: nonce, key: key as! Data)
+    }
+
+    @inlinable
+    static func encrypt(message: inout ByteBuffer, additional: ByteBufferView, nonce: Data, key: HAPSymmetricKey, cipher: inout ByteBuffer) throws {
+        try SD_encrypt(message: &message, additional: additional, nonce: nonce, key: key as! Data, cipher: &cipher)
+    }
+
+    @inlinable
+    static func decrypt(cipher: inout ByteBuffer, additional: inout ByteBuffer, nonce: Data, key: HAPSymmetricKey, message: inout ByteBuffer) throws {
+        try SD_decrypt(cipher: &cipher, additional: &additional, nonce: nonce, key: key as! Data, message: &message)
+    }
+}
+#endif
 
 #if !(os(macOS) && arch(arm64))
 import CLibSodium
@@ -202,6 +231,7 @@ extension ChaCha20Poly1305 {
 
 #endif
 
+#if canImport(CryptoKit)
 @available(OSX 10.15, iOS 13, *)
 extension ChaCha20Poly1305 {
     internal static func CK_encrypt(message: Data, additional: Data? = nil, nonce: Data, key: SymmetricKey) throws -> Data {
@@ -262,3 +292,4 @@ extension ChaCha20Poly1305 {
         }
     }
 }
+#endif
