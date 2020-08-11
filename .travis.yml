@@ -8,6 +8,11 @@ matrix:
       osx_image: xcode10.3
       before_install:
         - brew install libsodium
+    - name: Swift 5.3
+      os: osx
+      osx_image: xcode12
+      before_install:
+        - brew install libsodium
     - name: Swift 5.0
       os: linux
       dist: trusty
