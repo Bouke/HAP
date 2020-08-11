@@ -20,7 +20,7 @@ extension Data: HAPSharedSecret, HAPSymmetricKey {
     }
 
     @inlinable func base64EncodedString() -> String {
-        self.base64EncodedString(options: [])
+        return self.base64EncodedString(options: [])
     }
     public var hex: String {
         return self.reduce("") { $0 + String(format: "%02x", $1) }
