@@ -34,7 +34,7 @@ class PairSetupControllerTests: XCTestCase {
         do {
             // Server -> Client: [salt, publicKey]
             let response = try! controller.startRequest([
-                (.pairingMethod, Data(bytes: [PairingMethod.default.rawValue]))
+                (.pairingMethod, Data([PairingMethod.default.rawValue]))
             ], session)
             XCTAssertEqual(response.pairSetupStep, PairSetupStep.startResponse)
             XCTAssertEqual(response[.publicKey], session.server.publicKey)

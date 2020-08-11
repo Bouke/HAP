@@ -70,9 +70,9 @@ func decode<Key>(_ data: Data) throws -> [(Key, Data)] where Key: RawRepresentab
                 result.append((currentType, currentValue))
             }
             currentType = type
-            currentValue = Data(bytes: Array(value))
+            currentValue = Data(Array(value))
         } else {
-            currentValue! += Data(bytes: Array(value))
+            currentValue! += Data(Array(value))
         }
 
         index = endIndex
@@ -86,7 +86,7 @@ func decode<Key>(_ data: Data) throws -> [(Key, Data)] where Key: RawRepresentab
 func encode<Key>(_ array: [(Key, Data)]) -> Data where Key: RawRepresentable, Key.RawValue == UInt8 {
     var result = Data()
     func append(type: UInt8, value: Data.SubSequence) {
-        result.append(Data(bytes: [type, UInt8(value.count)] + value))
+        result.append(Data([type, UInt8(value.count)] + value))
     }
 
     for (type, value) in array {

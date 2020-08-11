@@ -61,7 +61,7 @@ class PairSetupController {
         logger.debug("<-- B \(serverPublicKey.hex)")
 
         let result: PairTagTLV8 = [
-            (.state, Data(bytes: [PairSetupStep.startResponse.rawValue])),
+            (.state, Data([PairSetupStep.startResponse.rawValue])),
             (.publicKey, serverPublicKey),
             (.salt, salt)
         ]
@@ -87,7 +87,7 @@ class PairSetupController {
         logger.debug("<-- HAMK \(serverKeyProof.hex)")
 
         let result: PairTagTLV8 = [
-            (.state, Data(bytes: [PairSetupStep.verifyResponse.rawValue])),
+            (.state, Data([PairSetupStep.verifyResponse.rawValue])),
             (.proof, serverKeyProof)
         ]
         return result
@@ -146,7 +146,7 @@ class PairSetupController {
         device.add(pairing: Pairing(identifier: username, publicKey: publicKey, role: .admin))
 
         let resultOuter: PairTagTLV8 = [
-            (.state, Data(bytes: [PairSetupStep.keyExchangeResponse.rawValue])),
+            (.state, Data([PairSetupStep.keyExchangeResponse.rawValue])),
             (.encryptedData, encryptedResultInner)
         ]
         return resultOuter

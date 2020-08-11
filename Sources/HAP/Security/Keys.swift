@@ -69,7 +69,7 @@ enum Keys {
         if #available(macOS 10.15, iOS 13, *) {
             return Curve25519.KeyAgreement.PrivateKey().rawRepresentation
         } else {
-            return (try? Random.generate(byteCount: 32)).flatMap({ Data(bytes: $0) })
+            return (try? Random.generate(byteCount: 32)).flatMap({ Data($0) })
         }
     }
     static func `public`(secretKey: Data) -> Data? {

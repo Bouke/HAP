@@ -71,7 +71,7 @@ class PairVerifyController {
         }
 
         let resultOuter: PairTagTLV8 = [
-            (.state, Data(bytes: [PairVerifyStep.startResponse.rawValue])),
+            (.state, Data([PairVerifyStep.startResponse.rawValue])),
             (.publicKey, session.publicKey),
             (.encryptedData, encryptedResultInner)
         ]
@@ -120,7 +120,7 @@ class PairVerifyController {
 
         logger.info("Pair verify completed")
         let result: PairTagTLV8 = [
-            (.state, Data(bytes: [PairVerifyStep.finishResponse.rawValue]))
+            (.state, Data([PairVerifyStep.finishResponse.rawValue]))
         ]
         return (result, pairing)
     }

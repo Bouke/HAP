@@ -101,7 +101,7 @@ extension Ed25519 {
 
 #if canImport(CryptoKit)
 
-@available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, macCatalyst 13, *)
+@available(OSX 10.15, iOS 13, *)
 extension Ed25519 {
     static func CK_verify(publicKey pkData: Data, message: Data, signature: Data) throws {
         guard signature.count == 64,

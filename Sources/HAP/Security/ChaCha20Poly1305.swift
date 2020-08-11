@@ -202,7 +202,7 @@ extension ChaCha20Poly1305 {
 
 #endif
 
-@available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, macCatalyst 13, *)
+@available(OSX 10.15, iOS 13, *)
 extension ChaCha20Poly1305 {
     internal static func CK_encrypt(message: Data, additional: Data? = nil, nonce: Data, key: SymmetricKey) throws -> Data {
         do {

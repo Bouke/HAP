@@ -89,28 +89,28 @@ func pairSetup(device: Device) -> Responder {
             switch error {
             case PairSetupController.Error.invalidParameters:
                 response = [
-                    (.state, Data(bytes: [PairSetupStep.waiting.rawValue])),
-                    (.error, Data(bytes: [PairError.unknown.rawValue]))
+                    (.state, Data([PairSetupStep.waiting.rawValue])),
+                    (.error, Data([PairError.unknown.rawValue]))
                 ]
             case PairSetupController.Error.alreadyPaired:
                 response = [
-                    (.state, Data(bytes: [PairSetupStep.startResponse.rawValue])),
-                    (.error, Data(bytes: [PairError.unavailable.rawValue]))
+                    (.state, Data([PairSetupStep.startResponse.rawValue])),
+                    (.error, Data([PairError.unavailable.rawValue]))
                 ]
             case PairSetupController.Error.alreadyPairing:
                 response = [
-                    (.state, Data(bytes: [PairSetupStep.startResponse.rawValue])),
-                    (.error, Data(bytes: [PairError.busy.rawValue]))
+                    (.state, Data([PairSetupStep.startResponse.rawValue])),
+                    (.error, Data([PairError.busy.rawValue]))
                 ]
             case PairSetupController.Error.invalidSetupState:
                 response = [
-                    (.state, Data(bytes: [PairSetupStep.verifyResponse.rawValue])),
-                    (.error, Data(bytes: [PairError.unknown.rawValue]))
+                    (.state, Data([PairSetupStep.verifyResponse.rawValue])),
+                    (.error, Data([PairError.unknown.rawValue]))
                 ]
             case PairSetupController.Error.authenticationFailed:
                 response = [
-                    (.state, Data(bytes: [PairSetupStep.verifyResponse.rawValue])),
-                    (.error, Data(bytes: [PairError.authenticationFailed.rawValue]))
+                    (.state, Data([PairSetupStep.verifyResponse.rawValue])),
+                    (.error, Data([PairError.authenticationFailed.rawValue]))
                 ]
             default:
                 response = nil
