@@ -3,7 +3,7 @@
 import CryptoKit
 import Cryptor
 @testable import HAP
-import HKDF
+import func HKDF.deriveKey
 import SRP
 import XCTest
 
@@ -50,7 +50,7 @@ class CryptoKitTests: XCTestCase {
                                    salt: salt,
                                    count: 32)
 
-        let hkdf = HKDF.deriveKey(algorithm: .sha512, seed: sharedSecret, info: info, salt: salt, count: 32)
+        let hkdf = deriveKey(algorithm: .sha512, seed: sharedSecret, info: info, salt: salt, count: 32)
 
         XCTAssertEqual(ck.hex, hkdf.hex, "Encryption Key did not match")
     }
@@ -183,7 +183,7 @@ class CryptoKitTests: XCTestCase {
         let clientKeys = Ed25519.generateSignKeypair()
         let clientIdentifier = "H1:CC:AA:BB:00:88".data(using: .utf8)!
 
-        let hashInM5 = HKDF.deriveKey(algorithm: .sha512,
+        let hashInM5 = deriveKey(algorithm: .sha512,
                                       seed: session.server.sessionKey!,
                                       info: "Pair-Setup-Controller-Sign-Info".data(using: .utf8),
                                       salt: "Pair-Setup-Controller-Sign-Salt".data(using: .utf8),
@@ -199,7 +199,7 @@ class CryptoKitTests: XCTestCase {
             (.signature, signature)
         ]
 
-        let clientEncryptionKey = HKDF.deriveKey(algorithm: .sha512,
+        let clientEncryptionKey = deriveKey(algorithm: .sha512,
                                                  seed: session.server.sessionKey!,
                                                  info: "Pair-Setup-Encrypt-Info".data(using: .utf8),
                                                  salt: "Pair-Setup-Encrypt-Salt".data(using: .utf8),
@@ -260,7 +260,7 @@ class CryptoKitTests: XCTestCase {
                                                        nonce: "PS-Msg06".data(using: .utf8)!,
                                                        key: clientEncryptionKey)
         let response: PairTagTLV8 = try! decode(verifyText)
-        let hashVerify = HKDF.deriveKey(algorithm: .sha512,
+        let hashVerify = deriveKey(algorithm: .sha512,
                                         seed: session.server.sessionKey!,
                                         info: "Pair-Setup-Accessory-Sign-Info".data(using: .utf8),
                                         salt: "Pair-Setup-Accessory-Sign-Salt".data(using: .utf8),
@@ -283,7 +283,7 @@ class CryptoKitTests: XCTestCase {
         let clientKeys = Ed25519.generateSignKeypair()
         let clientIdentifier = "H1:CC:AA:BB:00:88".data(using: .utf8)!
 
-        let hashInM5 = HKDF.deriveKey(algorithm: .sha512,
+        let hashInM5 = deriveKey(algorithm: .sha512,
                                       seed: sessionKey,
                                       info: "Pair-Setup-Controller-Sign-Info".data(using: .utf8),
                                       salt: "Pair-Setup-Controller-Sign-Salt".data(using: .utf8),
@@ -299,7 +299,7 @@ class CryptoKitTests: XCTestCase {
             (.signature, signature)
         ]
 
-        let clientEncryptionKey = HKDF.deriveKey(algorithm: .sha512,
+        let clientEncryptionKey = deriveKey(algorithm: .sha512,
                                                  seed: sessionKey,
                                                  info: "Pair-Setup-Encrypt-Info".data(using: .utf8),
                                                  salt: "Pair-Setup-Encrypt-Salt".data(using: .utf8),
