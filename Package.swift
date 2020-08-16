@@ -4,6 +4,9 @@ import PackageDescription
 
 let package = Package(
     name: "HAP",
+    platforms: [
+        .macOS(.v10_15),
+    ],
     products: [
         .library(name: "HAP", targets: ["HAP"]),
         .executable(name: "hap-server", targets: ["hap-server"]),
