@@ -18,6 +18,7 @@ let package = Package(
         .package(url: "https://github.com/crossroadlabs/Regex.git", from: "1.1.0"),
         .package(url: "https://github.com/apple/swift-nio.git", from: "2.13.0"),
         .package(url: "https://github.com/apple/swift-log.git", Version("0.0.0") ..< Version("2.0.0")),
+        .package(url: "https://github.com/apple/swift-crypto.git", from: "1.0.2"),
     ],
     targets: [
         .systemLibrary(name: "CLibSodium",
@@ -29,7 +30,7 @@ let package = Package(
         .target(name: "CQRCode"),
         .target(name: "COperatingSystem"),
         .target(name: "HTTP", dependencies: ["NIO", "NIOHTTP1", "NIOFoundationCompat", "COperatingSystem"]),
-        .target(name: "HAP", dependencies: ["SRP", "Cryptor", "Logging", "HKDF", "Regex", "CQRCode", "HTTP", "CLibSodium"]),
+        .target(name: "HAP", dependencies: ["SRP", "Cryptor", "Logging", "HKDF", "Regex", "CQRCode", "HTTP", "CLibSodium", "Crypto"]),
         .target(name: "hap-server", dependencies: ["HAP", "Logging"]),
         .testTarget(name: "HAPTests", dependencies: ["HAP"]),
     ]
