@@ -1,3 +1,4 @@
+import Crypto
 import Logging
 import Foundation
 import HKDF
@@ -15,6 +16,7 @@ class PairSetupController {
         case couldNotDecryptMessage
         case couldNotDecodeMessage
         case couldNotSign
+        case couldNotVerify
         case couldNotEncrypt
         case alreadyPaired
         case alreadyPairing
@@ -137,7 +139,10 @@ class PairSetupController {
                      username +
                      publicKey
 
-        try Ed25519.verify(publicKey: publicKey, message: hashIn, signature: signatureIn)
+        let key = try Curve25519.Signing.PublicKey(rawRepresentation: publicKey)
+        guard key.isValidSignature(signatureIn, for: hashIn) else {
+            throw Error.couldNotVerify
+        }
 
         let hashOut = deriveKey(algorithm: .sha512,
                                 seed: session.server.sessionKey!,
@@ -147,7 +152,8 @@ class PairSetupController {
             device.identifier.data(using: .utf8)! +
             device.publicKey
 
-        guard let signatureOut = try? Ed25519.sign(privateKey: device.privateKey, message: hashOut) else {
+        let privateKey = try Curve25519.Signing.PrivateKey(rawRepresentation: device.privateKey)
+        guard let signatureOut = try? privateKey.signature(for: hashOut) else {
             throw Error.couldNotSign
         }
 

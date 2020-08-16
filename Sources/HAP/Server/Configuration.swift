@@ -1,6 +1,7 @@
 import Cryptor
 import Foundation
 import Logging
+import Crypto
 
 fileprivate let logger = Logger(label: "hap.device")
 
@@ -32,7 +33,11 @@ extension Device {
             identifier = Device.generateIdentifier()
             setupCode = SetupCode.generate()
             setupKey = SetupCode.generateSetupKey()
-            (publicKey, privateKey) = Ed25519.generateSignKeypair()
+
+            // todo: use `Curve25519.Signing.PrivateKey` throughout
+            let key = Curve25519.Signing.PrivateKey()
+            privateKey = key.rawRepresentation
+            publicKey = key.publicKey.rawRepresentation
         }
 
         // HAP Specification 5.4: Current configuration number.

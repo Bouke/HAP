@@ -4,6 +4,7 @@ import Logging
 import Foundation
 import HKDF
 import SRP
+import Crypto
 
 fileprivate let logger = Logger(label: "hap.controllers.pair-verify")
 
@@ -58,7 +59,8 @@ class PairVerifyController {
         }
 
         let material = session.publicKey + device.identifier.data(using: .utf8)! + clientPublicKey
-        let signature = try Ed25519.sign(privateKey: device.privateKey, message: material)
+        let key = try Curve25519.Signing.PrivateKey(rawRepresentation: device.privateKey)
+        let signature = try key.signature(for: material)
 
         let resultInner: PairTagTLV8 = [
             (.identifier, device.identifier.data(using: .utf8)!),
@@ -121,9 +123,9 @@ class PairVerifyController {
         logger.debug("--> public key \(pairing.publicKey.hex)")
 
         let material = session.otherPublicKey + username + session.publicKey
-        do {
-            try Ed25519.verify(publicKey: pairing.publicKey, message: material, signature: signatureIn)
-        } catch {
+        guard
+            let key = try? Curve25519.Signing.PublicKey(rawRepresentation: pairing.publicKey),
+            key.isValidSignature(signatureIn, for: material) else {
             throw Error.invalidSignature
         }
 
