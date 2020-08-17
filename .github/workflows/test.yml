@@ -21,6 +21,7 @@ jobs:
         run: swift test -c release -Xswiftc -enable-testing
   macOS:
     runs-on: macos-latest
+    continue-on-error: ${{ matrix.swift == '5.3' }}
     strategy:
       matrix:
         swift: ['5.1', '5.2', '5.3']
