@@ -3,6 +3,7 @@
 import HKDF
 import SRP
 import XCTest
+import Crypto
 
 class PairSetupControllerTests: XCTestCase {
     static var allTests: [(String, (PairSetupControllerTests) -> () throws -> Void)] {
@@ -30,7 +31,7 @@ class PairSetupControllerTests: XCTestCase {
                             accessories: [])
         let controller = PairSetupController(device: device)
         let client = SRP.Client(username: "Pair-Setup", password: password, group: .N3072, algorithm: .sha512)
-        let keys = Ed25519.generateSignKeypair()
+        let key = Curve25519.Signing.PrivateKey()
 
         let clientKeyProof: Data
         do {
@@ -66,11 +67,11 @@ class PairSetupControllerTests: XCTestCase {
                                    salt: "Pair-Setup-Controller-Sign-Salt".data(using: .utf8),
                                    count: 32) +
                 clientIdentifier +
-                keys.publicKey
+                key.publicKey.rawRepresentation
             let request: PairTagTLV8 = [
-                (.publicKey, keys.publicKey),
+                (.publicKey, key.publicKey.rawRepresentation),
                 (.identifier, clientIdentifier),
-                (.signature, try! Ed25519.sign(privateKey: keys.privateKey, message: hashIn))
+                (.signature, try! key.signature(for: hashIn))
             ]
             let encryptionKey = deriveKey(algorithm: .sha512,
                                           seed: session.server.sessionKey!,
@@ -96,10 +97,11 @@ class PairSetupControllerTests: XCTestCase {
                                     count: 32) +
                 response[.identifier]! +
                 response[.publicKey]!
-            try! Ed25519.verify(publicKey: response[.publicKey]!, message: hashOut, signature: response[.signature]!)
+            let publicKey = try! Curve25519.Signing.PublicKey(rawRepresentation: response[.publicKey]!)
+            XCTAssert(publicKey.isValidSignature(response[.signature]!, for: hashOut))
         }
 
-        XCTAssertEqual(device.get(pairingWithIdentifier: clientIdentifier)?.publicKey, keys.publicKey)
+        XCTAssertEqual(device.get(pairingWithIdentifier: clientIdentifier)?.publicKey, key.publicKey.rawRepresentation)
     }
 
     // from: https://oleb.net/blog/2017/03/keeping-xctest-in-sync/#appendix-code-generation-with-sourcery

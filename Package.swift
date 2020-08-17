@@ -4,9 +4,6 @@ import PackageDescription
 
 let package = Package(
     name: "HAP",
-    platforms: [
-        .macOS(.v10_15),
-    ],
     products: [
         .library(name: "HAP", targets: ["HAP"]),
         .executable(name: "hap-server", targets: ["hap-server"]),
@@ -18,7 +15,6 @@ let package = Package(
         .package(url: "https://github.com/crossroadlabs/Regex.git", from: "1.1.0"),
         .package(url: "https://github.com/apple/swift-nio.git", from: "2.13.0"),
         .package(url: "https://github.com/apple/swift-log.git", Version("0.0.0") ..< Version("2.0.0")),
-        .package(url: "https://github.com/apple/swift-crypto.git", from: "1.0.2"),
     ],
     targets: [
         .systemLibrary(name: "CLibSodium",
@@ -30,11 +26,19 @@ let package = Package(
         .target(name: "CQRCode"),
         .target(name: "COperatingSystem"),
         .target(name: "HTTP", dependencies: ["NIO", "NIOHTTP1", "NIOFoundationCompat", "COperatingSystem"]),
-        .target(name: "HAP", dependencies: ["SRP", "Cryptor", "Logging", "HKDF", "Regex", "CQRCode", "HTTP", "CLibSodium", "Crypto"]),
+        .target(name: "HAP", dependencies: ["SRP", "Cryptor", "Logging", "HKDF", "Regex", "CQRCode", "HTTP", "Crypto", "CLibSodium"]),
         .target(name: "hap-server", dependencies: ["HAP", "Logging"]),
-        .testTarget(name: "HAPTests", dependencies: ["HAP"]),
+        .testTarget(name: "HAPTests", dependencies: ["HAP", "Crypto"]),
     ]
 )
+
+#if canImport(CryptoKit)
+    package.dependencies.append(.package(url: "https://github.com/apple/swift-crypto.git", from: "1.0.2"))
+    package.platforms = [.macOS(.v10_15)]
+#else
+    package.targets.append(.target(name: "Crypto", dependencies: ["CLibSodium"]))
+    package.targets.append(.testTarget(name: "CryptoTests", dependencies: ["Crypto"]))
+#endif
 
 #if os(macOS)
     package.products.append(.executable(name: "hap-update", targets: ["HAPUpdate"]))

@@ -4,6 +4,7 @@ import Cryptor
 @testable import HAP
 import HKDF
 import XCTest
+import Crypto
 
 class PairVerifyControllerTests: XCTestCase {
     static var allTests: [(String, (PairVerifyControllerTests) -> () throws -> Void)] {
@@ -19,8 +20,8 @@ class PairVerifyControllerTests: XCTestCase {
                             storage: MemoryStorage(),
                             accessories: [])
         let username = "hubba hubba".data(using: .utf8)!
-        let keys = Ed25519.generateSignKeypair() // these are the client's keys
-        device.add(pairing: Pairing(identifier: username, publicKey: keys.publicKey, role: .admin))
+        let key = Curve25519.Signing.PrivateKey() // these are the client's keys
+        device.add(pairing: Pairing(identifier: username, publicKey: key.publicKey.rawRepresentation, role: .admin))
 
         let controller = PairVerifyController(device: device)
         // these are the client's keys for this verify session
@@ -76,7 +77,8 @@ class PairVerifyControllerTests: XCTestCase {
             }
             let material = serverPublicKey_ + username + clientPublicKey
             do {
-                try Ed25519.verify(publicKey: device.publicKey, message: material, signature: signature)
+                let publicKey = try Curve25519.Signing.PublicKey(rawRepresentation: device.publicKey)
+                XCTAssert(publicKey.isValidSignature(signature, for: material))
             } catch {
                 return XCTFail("Invalid signature")
             }
@@ -88,7 +90,7 @@ class PairVerifyControllerTests: XCTestCase {
         do {
             // Client -> Server: encrypted(username, signature)
             let material = clientPublicKey + username + serverPublicKey
-            guard let signature = try? Ed25519.sign(privateKey: keys.privateKey, message: material) else {
+            guard let signature = try? key.signature(for: material) else {
                 return XCTFail("Couldn't sign")
             }
             let requestInner: PairTagTLV8 = [
