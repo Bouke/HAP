@@ -58,7 +58,7 @@ class PairVerifyControllerTests: XCTestCase {
                                             serverPublicKey_) else {
                 return XCTFail("Couldn't generate shared secret")
             }
-            XCTAssertEqual(sharedSecret.hex, session.sharedSecret.hex)
+            XCTAssertEqual(sharedSecret.hex, session.sharedSecret.withUnsafeBytes({ Data($0) }).hex)
             // swiftlint:disable:next identifier_name
             encryptionKey = SymmetricKey(data: HKDF.deriveKey(algorithm: .sha512,
                                                               seed: sharedSecret,
