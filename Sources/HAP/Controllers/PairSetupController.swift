@@ -104,17 +104,16 @@ class PairSetupController {
             throw Error.invalidParameters
         }
 
-        let encryptionKey = deriveKey(algorithm: .sha512,
-                                      seed: session.server.sessionKey!,
-                                      info: "Pair-Setup-Encrypt-Info".data(using: .utf8),
-                                      salt: "Pair-Setup-Encrypt-Salt".data(using: .utf8),
-                                      count: 32)
+        let encryptionKey = SymmetricKey(data: deriveKey(algorithm: .sha512,
+                                                         seed: session.server.sessionKey!,
+                                                         info: "Pair-Setup-Encrypt-Info".data(using: .utf8),
+                                                         salt: "Pair-Setup-Encrypt-Salt".data(using: .utf8),
+                                                         count: 32))
 
-        guard let plaintext = try? ChaCha20Poly1305.decrypt(cipher: encryptedData,
-                                                            nonce: "PS-Msg05".data(using: .utf8)!,
-                                                            key: encryptionKey) else {
-            throw Error.couldNotDecryptMessage
-        }
+        let msg05 = try ChaChaPoly.Nonce(data: Data(count: 4) + "PS-Msg05".data(using: .utf8)!)
+        let box = try ChaChaPoly.SealedBox(nonce: msg05, ciphertext: encryptedData.dropLast(16), tag: encryptedData.suffix(16))
+
+        let plaintext = try ChaChaPoly.open(box, using: encryptionKey)
 
         guard let data: PairTagTLV8 = try? decode(plaintext) else {
             throw Error.couldNotDecodeMessage
@@ -168,12 +167,9 @@ class PairSetupController {
         logger.debug("<-- signature \(signatureOut.hex)")
         logger.info("Pair setup completed")
 
-        guard let encryptedResultInner = try? ChaCha20Poly1305.encrypt(message: encode(resultInner),
-                                                                       nonce: "PS-Msg06".data(using: .utf8)!,
-                                                                       key: encryptionKey)
-            else {
-                throw Error.couldNotEncrypt
-        }
+        let msg06 = try ChaChaPoly.Nonce(data: Data(count: 4) + "PS-Msg06".data(using: .utf8)!)
+        let sealed = try ChaChaPoly.seal(encode(resultInner), using: encryptionKey, nonce: msg06)
+        let encryptedResultInner = sealed.ciphertext + sealed.tag
 
         // At this point, the pairing has completed. The first controller is granted admin role.
         device.add(pairing: Pairing(identifier: username, publicKey: publicKey, role: .admin))

@@ -74,11 +74,10 @@ class PairVerifyController {
                                            salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8),
                                            count: 32)
 
-        guard let encryptedResultInner = try? ChaCha20Poly1305.encrypt(message: encode(resultInner),
-                                                                       nonce: "PV-Msg02".data(using: .utf8)!,
-                                                                       key: encryptionKey) else {
-            throw Error.couldNotEncrypt
-        }
+        let nonce = try ChaChaPoly.Nonce(data: Data(count: 4) + "PV-Msg02".data(using: .utf8)!)
+        let symmetricKey = SymmetricKey(data: encryptionKey)
+        let sealed = try ChaChaPoly.seal(encode(resultInner), using: symmetricKey, nonce: nonce)
+        let encryptedResultInner = sealed.ciphertext + sealed.tag
 
         let resultOuter: PairTagTLV8 = [
             (.state, Data(bytes: [PairVerifyStep.startResponse.rawValue])),
@@ -100,11 +99,10 @@ class PairVerifyController {
                                            salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8),
                                            count: 32)
 
-        guard let plaintext = try? ChaCha20Poly1305.decrypt(cipher: encryptedData,
-                                                            nonce: "PV-Msg03".data(using: .utf8)!,
-                                                            key: encryptionKey) else {
-            throw Error.couldNotDecrypt
-        }
+        let nonce = try ChaChaPoly.Nonce(data: Data(count: 4) + "PV-Msg03".data(using: .utf8)!)
+        let box = try ChaChaPoly.SealedBox(nonce: nonce, ciphertext: encryptedData.dropLast(16), tag: encryptedData.suffix(16))
+
+        let plaintext = try ChaChaPoly.open(box, using: SymmetricKey(data: encryptionKey))
 
         guard let data: PairTagTLV8 = try? decode(plaintext) else {
             throw Error.couldNotDecode

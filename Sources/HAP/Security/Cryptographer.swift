@@ -2,12 +2,19 @@ import Logging
 import Foundation
 import HKDF
 import NIO
+import Crypto
 
 fileprivate let logger: Logger = {
     var _logger = Logger(label: "hap.encryption")
     _logger.logLevel = .warning
     return _logger
 }()
+
+extension ByteBuffer : ContiguousBytes {
+    public func withUnsafeBytes<R>(_ body: (UnsafeRawBufferPointer) throws -> R) rethrows -> R {
+        return try self.withUnsafeReadableBytes(body)
+    }
+}
 
 // 5.5.2 Session Security
 // (...)
@@ -43,20 +50,27 @@ class Cryptographer {
         logger.debug("Encrypt key: \(self.encryptKey.hex)")
     }
 
-    func decrypt(length: Int, cipher: inout ByteBuffer, message: inout ByteBuffer) throws {
-        logger.info("Decrypt message #\(self.decryptCount), length: \(length)")
+    func decrypt<L: DataProtocol, C: DataProtocol, T: DataProtocol>(lengthBytes: L, ciphertext: C, tag: T) throws -> Data {
+        logger.info("Decrypt message #\(self.decryptCount)")
         defer { decryptCount += 1 }
-        var lengthBytes = cipher.readSlice(length: 2)!
-        let nonce = decryptCount.bigEndian.bytes
-        try ChaCha20Poly1305.decrypt(cipher: &cipher, additional: &lengthBytes, nonce: nonce, key: decryptKey, message: &message)
+
+        let nonce = try ChaChaPoly.Nonce(data: Data(count: 4) + decryptCount.bigEndian.bytes)
+        let box = try ChaChaPoly.SealedBox(nonce: nonce, ciphertext: ciphertext, tag: tag)
+        let key = SymmetricKey(data: decryptKey)
+
+        return try ChaChaPoly.open(box, using: key, authenticating: lengthBytes)
     }
 
-    func encrypt(length: Int, plaintext: inout ByteBuffer, cipher: inout ByteBuffer) throws {
-        logger.info("Encrypt message #\(self.encryptCount), length: \(length)")
+    func encrypt(plaintext: ByteBuffer) throws -> Data {
+        logger.info("Encrypt message #\(self.encryptCount)")
         defer { encryptCount += 1 }
-        cipher.writeInteger(Int16(length), endianness: Endianness.little, as: Int16.self)
-        let additional = cipher.viewBytes(at: 0, length: 2)!
-        let nonce = encryptCount.bigEndian.bytes
-        try ChaCha20Poly1305.encrypt(message: &plaintext, additional: additional, nonce: nonce, key: encryptKey, cipher: &cipher)
+
+        let nonce = try ChaChaPoly.Nonce(data: Data(count: 4) + encryptCount.bigEndian.bytes)
+        let key = SymmetricKey(data: encryptKey)
+        let authenticationData = UInt16(plaintext.readableBytes).bigEndian.bytes
+
+        let box = try ChaChaPoly.seal(plaintext.readableBytesView, using: key, nonce: nonce, authenticating: authenticationData)
+
+        return authenticationData + box.ciphertext + box.tag
     }
 }

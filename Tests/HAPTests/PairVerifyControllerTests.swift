@@ -30,7 +30,7 @@ class PairVerifyControllerTests: XCTestCase {
                                      Data(count: Int(crypto_scalarmult_curve25519_BYTES)),
                                      clientSecretKey)!
         let serverPublicKey: Data
-        let encryptionKey: Data
+        let encryptionKey: SymmetricKey
         let session: PairVerifyController.Session
 
         do {
@@ -60,17 +60,15 @@ class PairVerifyControllerTests: XCTestCase {
             }
             XCTAssertEqual(sharedSecret.hex, session.sharedSecret.hex)
             // swiftlint:disable:next identifier_name
-            let encryptionKey_ = HKDF.deriveKey(algorithm: .sha512,
-                                                seed: sharedSecret,
-                                                info: "Pair-Verify-Encrypt-Info".data(using: .utf8),
-                                                salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8),
-                                                count: 32)
-            guard let plainText = try? ChaCha20Poly1305.decrypt(cipher: encryptedData,
-                                                                nonce: "PV-Msg02".data(using: .utf8)!,
-                                                                key: encryptionKey_) else {
-                return XCTFail("Couldn't decrypt response")
-            }
-            guard let resultInner: PairTagTLV8 = try? decode(plainText),
+            encryptionKey = SymmetricKey(data: HKDF.deriveKey(algorithm: .sha512,
+                                                              seed: sharedSecret,
+                                                              info: "Pair-Verify-Encrypt-Info".data(using: .utf8),
+                                                              salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8),
+                                                              count: 32))
+            let plaintext = try! ChaChaPoly.open(ChaChaPoly.SealedBox(combined: Data(count: 4) + "PV-Msg02".data(using: .utf8)! + encryptedData),
+                                                 using: encryptionKey)
+
+            guard let resultInner: PairTagTLV8 = try? decode(plaintext),
                 let username = resultInner[.identifier],
                 let signature = resultInner[.signature] else {
                 return XCTFail("Couldn't decode response")
@@ -84,7 +82,6 @@ class PairVerifyControllerTests: XCTestCase {
             }
             XCTAssertEqual(device.identifier, String(data: username, encoding: .utf8))
             serverPublicKey = serverPublicKey_
-            encryptionKey = encryptionKey_
         }
 
         do {
@@ -97,13 +94,12 @@ class PairVerifyControllerTests: XCTestCase {
                 (.identifier, username),
                 (.signature, signature)
             ]
-            guard let cipher = try? ChaCha20Poly1305.encrypt(message: encode(requestInner),
-                                                             nonce: "PV-Msg03".data(using: .utf8)!,
-                                                             key: encryptionKey) else {
-                return XCTFail("Couldn't encode")
-            }
+
+            let msg03 = try! ChaChaPoly.Nonce(data: Data(count: 4) + "PV-Msg03".data(using: .utf8)!)
+            let requestInnerSealed = try! ChaChaPoly.seal(encode(requestInner), using: encryptionKey, nonce: msg03)
+
             let resultOuter: PairTagTLV8 = [
-                (.encryptedData, cipher)
+                (.encryptedData, requestInnerSealed.ciphertext + requestInnerSealed.tag)
             ]
             do {
                 _ = try controller.finishRequest(resultOuter, session)

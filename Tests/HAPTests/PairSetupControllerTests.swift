@@ -73,22 +73,27 @@ class PairSetupControllerTests: XCTestCase {
                 (.identifier, clientIdentifier),
                 (.signature, try! key.signature(for: hashIn))
             ]
-            let encryptionKey = deriveKey(algorithm: .sha512,
-                                          seed: session.server.sessionKey!,
-                                          info: "Pair-Setup-Encrypt-Info".data(using: .utf8),
-                                          salt: "Pair-Setup-Encrypt-Salt".data(using: .utf8),
-                                          count: 32)
+            let encryptionKey = SymmetricKey(data: deriveKey(algorithm: .sha512,
+                                                             seed: session.server.sessionKey!,
+                                                             info: "Pair-Setup-Encrypt-Info".data(using: .utf8),
+                                                             salt: "Pair-Setup-Encrypt-Salt".data(using: .utf8),
+                                                             count: 32))
+            let msg05 = try! ChaChaPoly.Nonce(data: Data(count: 4) + "PS-Msg05".data(using: .utf8)!)
+            let sealedRequest = try! ChaChaPoly.seal(encode(request),
+                                                     using: encryptionKey,
+                                                     nonce: msg05)
+
             let requestEncrypted: PairTagTLV8 = [
-                (.encryptedData, try! ChaCha20Poly1305.encrypt(message: encode(request),
-                                                               nonce: "PS-Msg05".data(using: .utf8)!,
-                                                               key: encryptionKey))
+                (.encryptedData, sealedRequest.ciphertext + sealedRequest.tag)
             ]
             let responseEncrypted = try! controller.keyExchangeRequest(requestEncrypted, session)
 
             // Server -> Client: encrypted[username, publicKey, signature]
-            let plaintext = try! ChaCha20Poly1305.decrypt(cipher: responseEncrypted[.encryptedData]!,
-                                                          nonce: "PS-Msg06".data(using: .utf8)!,
-                                                          key: encryptionKey)
+            let msg06 = try! ChaChaPoly.Nonce(data: Data(count: 4) + "PS-Msg06".data(using: .utf8)!)
+            let plaintext = try! ChaChaPoly.open(ChaChaPoly.SealedBox(nonce: msg06,
+                                                                      ciphertext: responseEncrypted[.encryptedData]!.dropLast(16),
+                                                                      tag: responseEncrypted[.encryptedData]!.suffix(16)),
+                                                 using: encryptionKey)
             let response: PairTagTLV8 = try! decode(plaintext)
             let hashOut = deriveKey(algorithm: .sha512,
                                     seed: session.server.sessionKey!,
