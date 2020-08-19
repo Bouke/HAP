@@ -9,5 +9,3 @@ matrix:
     - name: Swift 5.1 on macOS 10.14
       os: osx
       osx_image: xcode11.3
-      before_install:
-        - brew install libsodium
