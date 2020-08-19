@@ -4,29 +4,27 @@ import PackageDescription
 
 let package = Package(
     name: "HAP",
+    // todo: drop 10.15 requirement from crypto fork
+    platforms: [
+        .macOS(.v10_15)
+    ],
     products: [
         .library(name: "HAP", targets: ["HAP"]),
         .executable(name: "hap-demo", targets: ["hap-demo"]),
     ],
     dependencies: [
         .package(url: "https://github.com/Bouke/SRP.git", from: "3.1.0"),
-        .package(url: "https://github.com/Bouke/HKDF.git", from: "3.1.0"),
         .package(url: "https://github.com/IBM-Swift/BlueCryptor.git", from: "1.0.21"),
         .package(url: "https://github.com/crossroadlabs/Regex.git", from: "1.1.0"),
         .package(url: "https://github.com/apple/swift-nio.git", from: "2.13.0"),
         .package(url: "https://github.com/apple/swift-log.git", Version("0.0.0") ..< Version("2.0.0")),
+        .package(url: "https://github.com/Bouke/swift-crypto.git", from: "1.0.2"),
     ],
     targets: [
-        .systemLibrary(name: "CLibSodium",
-                       pkgConfig: "libsodium",
-                       providers: [
-                           .brew(["libsodium"]),
-                           .apt(["libsodium-dev"])
-                       ]),
         .target(name: "CQRCode"),
         .target(name: "COperatingSystem"),
         .target(name: "HTTP", dependencies: ["NIO", "NIOHTTP1", "NIOFoundationCompat", "COperatingSystem"]),
-        .target(name: "HAP", dependencies: ["SRP", "Cryptor", "Logging", "HKDF", "Regex", "CQRCode", "HTTP", "CLibSodium"]),
+        .target(name: "HAP", dependencies: ["SRP", "Cryptor", "Logging", "Regex", "CQRCode", "HTTP", "Crypto"]),
         .target(name: "hap-demo", dependencies: ["HAP", "Logging"]),
         .testTarget(name: "HAPTests", dependencies: ["HAP"]),
     ]

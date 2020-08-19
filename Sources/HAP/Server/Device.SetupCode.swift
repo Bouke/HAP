@@ -1,4 +1,3 @@
-import Cryptor
 import Foundation
 #if os(Linux)
     import Glibc
@@ -37,16 +36,16 @@ extension Device {
             var setupCode = ""
             repeat {
                 setupCode = String(format: "%03ld-%02ld-%03ld",
-                                   arc4random_uniform(1000),
-                                   arc4random_uniform(100),
-                                   arc4random_uniform(1000))
+                                   Int.random(in: 1...999),
+                                   Int.random(in: 1...99),
+                                   Int.random(in: 1...999))
             } while !SetupCode.isValid(setupCode)
             return setupCode
         }
 
         /// Generate a random four character setup key, used in setupURI and setupHash
         static internal func generateSetupKey() -> String {
-            String(arc4random_uniform(1679616), radix: 36, uppercase: true)
+            return String(Int.random(in: 1..<1679616), radix: 36, uppercase: true)
                     .padLeft(toLength: 4, withPad: "0")
         }
     }

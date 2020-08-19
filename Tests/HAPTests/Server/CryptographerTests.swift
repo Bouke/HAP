@@ -2,6 +2,7 @@
 @testable import HAP
 import NIO
 import XCTest
+import Crypto
 
 private final class ReadRecorder: ChannelInboundHandler {
     typealias InboundIn = ByteBuffer
@@ -48,7 +49,7 @@ class CryptographerTests: XCTestCase {
         readRecorder = ReadRecorder()
         writeRecorder = WriteRecorder()
         handler = CryptographerHandler()
-        handler.cryptographer = Cryptographer(sharedKey: sharedKey)
+        handler.cryptographer = Cryptographer(sharedSecret: SymmetricKey(data: sharedKey))
 
         XCTAssertNoThrow(try channel.pipeline.addHandler(writeRecorder).wait())
         XCTAssertNoThrow(try channel.pipeline.addHandler(handler).wait())

@@ -1,6 +1,6 @@
-import Cryptor
 import Foundation
 import Logging
+import Crypto
 
 fileprivate let logger = Logger(label: "hap.device")
 
@@ -9,13 +9,9 @@ typealias PrivateKey = Data
 extension Device {
 
     static internal func generateIdentifier() -> String {
-        do {
-            return Data(try Random.generate(byteCount: 6))
-                .map { String($0, radix: 16, uppercase: true) }
-                .joined(separator: ":")
-        } catch {
-            fatalError("Could not generate identifier: \(error)")
-        }
+        return (0..<6).map { _ in UInt8.random(in: 0...255) }
+            .map { String($0, radix: 16, uppercase: true).padLeft(toLength: 2, withPad: "0") }
+            .joined(separator: ":")
     }
 
     // The device maitains a configuration number during its life time, which
@@ -32,7 +28,11 @@ extension Device {
             identifier = Device.generateIdentifier()
             setupCode = SetupCode.generate()
             setupKey = SetupCode.generateSetupKey()
-            (publicKey, privateKey) = Ed25519.generateSignKeypair()
+
+            // todo: use `Curve25519.Signing.PrivateKey` throughout
+            let key = Curve25519.Signing.PrivateKey()
+            privateKey = key.rawRepresentation
+            publicKey = key.publicKey.rawRepresentation
         }
 
         // HAP Specification 5.4: Current configuration number.

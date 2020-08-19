@@ -1,5 +1,5 @@
 // swiftlint:disable file_length
-import Cryptor
+import Crypto
 import Foundation
 import Logging
 import NIO
@@ -490,12 +490,8 @@ public class Device {
     // Both those parameters must persit across restarts
     var setupHash: String {
         let setupHashMaterial = configuration.setupKey + configuration.identifier
-
-        if let sha512 = Digest(using: .sha512).update(string: setupHashMaterial) {
-            return Data(sha512.final()[0..<4]).base64EncodedString()
-        } else {
-            return ""
-        }
+        let digest = SHA512.hash(data: setupHashMaterial.data(using: .utf8)!)
+        return Data(digest.prefix(4)).base64EncodedString()
     }
 
     /// QRCode for easy pairing of controllers with this device.

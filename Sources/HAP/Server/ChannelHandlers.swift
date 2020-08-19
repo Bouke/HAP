@@ -4,6 +4,7 @@ import HTTP
 import Logging
 import NIO
 import NIOHTTP1
+import Crypto
 
 fileprivate let logger = Logger(label: "hap.nio")
 
@@ -22,7 +23,7 @@ class CryptographerHandler: ChannelDuplexHandler {
 
     func triggerUserOutboundEvent(context: ChannelHandlerContext, event: Any, promise: EventLoopPromise<Void>?) {
         if case let CryptographyEvent.sharedKey(sharedKey) = event {
-            cryptographer = Cryptographer(sharedKey: sharedKey)
+            cryptographer = Cryptographer(sharedSecret: SymmetricKey(data: sharedKey))
             promise?.succeed(())
         } else {
             context.triggerUserOutboundEvent(event, promise: promise)
@@ -44,21 +45,26 @@ class CryptographerHandler: ChannelDuplexHandler {
         repeat {
             let startIndex = cumulationBuffer!.readerIndex
             guard let length = cumulationBuffer!.readInteger(endianness: Endianness.little, as: Int16.self) else {
-                return
+                return // not enough bytes available
             }
             cumulationBuffer!.moveReaderIndex(to: startIndex)
             guard 2 + length + 16 <= cumulationBuffer!.readableBytes else {
-                return
+                return // not enough bytes available
             }
             readOneFrame(context: context, length: Int(length))
         } while cumulationBuffer != nil
     }
 
     func readOneFrame(context: ChannelHandlerContext, length: Int) {
-        var cipher = cumulationBuffer!.readSlice(length: 2 + length + 16)!
-        var message = context.channel.allocator.buffer(capacity: length)
+        let lengthBytes = cumulationBuffer!.readSlice(length: 2)!
+        let cyphertext = cumulationBuffer!.readSlice(length: length)!
+        let tag = cumulationBuffer!.readSlice(length: 16)!
+
+        var message: Data
         do {
-            try cryptographer!.decrypt(length: length, cipher: &cipher, message: &message)
+            message = try cryptographer!.decrypt(lengthBytes: lengthBytes.readableBytesView,
+                                                 ciphertext: cyphertext.readableBytesView,
+                                                 tag: tag.readableBytesView)
         } catch {
             // swiftlint:disable:next line_length
             logger.warning("Could not decrypt message from \(context.remoteAddress?.description ?? "???"): \(error), closing connection.")
@@ -66,7 +72,8 @@ class CryptographerHandler: ChannelDuplexHandler {
             context.close(promise: nil)
             return
         }
-        context.fireChannelRead(wrapInboundOut(message))
+
+        context.fireChannelRead(wrapInboundOut(ByteBuffer(data: message)))
 
         if cumulationBuffer!.readableBytes == 0 {
             cumulationBuffer = nil
@@ -86,10 +93,12 @@ class CryptographerHandler: ChannelDuplexHandler {
 
     func writeOneFrame(context: ChannelHandlerContext, buffer: inout ByteBuffer, promise: EventLoopPromise<Void>?) {
         let length = min(1024, buffer.readableBytes)
-        var frame = buffer.readSlice(length: length)!
-        var cipher = context.channel.allocator.buffer(capacity: 0)
+
+        let frame = buffer.readSlice(length: length)!
+
+        var cipher: Data
         do {
-            try cryptographer!.encrypt(length: length, plaintext: &frame, cipher: &cipher)
+            cipher = try cryptographer!.encrypt(plaintext: frame)
         } catch {
             // swiftlint:disable:next line_length
             logger.warning("Could not decrypt message from \(context.remoteAddress?.description ?? "???"): \(error), closing connection.")
@@ -99,9 +108,9 @@ class CryptographerHandler: ChannelDuplexHandler {
         }
 
         if buffer.readableBytes > 0 {
-            context.write(wrapOutboundOut(cipher), promise: nil)
+            context.write(wrapOutboundOut(ByteBuffer(data: cipher)), promise: nil)
         } else {
-            context.write(wrapOutboundOut(cipher), promise: promise)
+            context.write(wrapOutboundOut(ByteBuffer(data: cipher)), promise: promise)
         }
     }
 }

@@ -61,9 +61,10 @@ func pairVerify(device: Device) -> Responder {
                 let (result, pairing) = try controller.finishRequest(data, session)
                 context.triggerUserOutboundEvent(PairingEvent.verified(pairing), promise: nil)
 
+                let sharedKey = session.sharedSecret.withUnsafeBytes({ Data($0) })
                 return HTTPResponse(
                     headers: HTTPHeaders([
-                        ("x-shared-key", session.sharedSecret.base64EncodedString()),
+                        ("x-shared-key", sharedKey.base64EncodedString()),
                         ("Content-Type", "application/pairing+tlv8")
                     ]),
                     body: encode(result))
