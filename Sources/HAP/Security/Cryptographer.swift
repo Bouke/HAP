@@ -1,7 +1,7 @@
 import Logging
 import Foundation
-import HKDF
 import NIO
+import Crypto
 
 fileprivate let logger: Logger = {
     var _logger = Logger(label: "hap.encryption")
@@ -24,39 +24,47 @@ class Cryptographer {
 
     var encryptCount: UInt64 = 0
     var decryptCount: UInt64 = 0
-    let decryptKey: Data
-    let encryptKey: Data
+    let decryptKey: SymmetricKey
+    let encryptKey: SymmetricKey
 
-    init(sharedKey: Data) {
-        logger.debug("Shared key: \(sharedKey.hex)")
-        decryptKey = HKDF.deriveKey(algorithm: .sha512,
-                                    seed: sharedKey,
-                                    info: "Control-Write-Encryption-Key".data(using: .utf8),
-                                    salt: "Control-Salt".data(using: .utf8),
-                                    count: 32)
-        encryptKey = HKDF.deriveKey(algorithm: .sha512,
-                                    seed: sharedKey,
-                                    info: "Control-Read-Encryption-Key".data(using: .utf8),
-                                    salt: "Control-Salt".data(using: .utf8),
-                                    count: 32)
-        logger.debug("Decrypt key: \(self.decryptKey.hex)")
-        logger.debug("Encrypt key: \(self.encryptKey.hex)")
+    init(sharedSecret: SymmetricKey) {
+        decryptKey = Cryptographer.deriveDecryptionKey(sharedSecret: sharedSecret)
+        encryptKey = Cryptographer.deriveEncryptionKey(sharedSecret: sharedSecret)
     }
 
-    func decrypt(length: Int, cipher: inout ByteBuffer, message: inout ByteBuffer) throws {
-        logger.info("Decrypt message #\(self.decryptCount), length: \(length)")
+    static func deriveDecryptionKey(sharedSecret: SymmetricKey) -> SymmetricKey {
+        return HKDF<SHA512>.deriveKey(inputKeyMaterial: sharedSecret,
+                                      salt: "Control-Salt".data(using: .utf8)!,
+                                      info: "Control-Write-Encryption-Key".data(using: .utf8)!,
+                                      outputByteCount: 32)
+    }
+
+    static func deriveEncryptionKey(sharedSecret: SymmetricKey) -> SymmetricKey {
+        return HKDF<SHA512>.deriveKey(inputKeyMaterial: sharedSecret,
+                                      salt: "Control-Salt".data(using: .utf8)!,
+                                      info: "Control-Read-Encryption-Key".data(using: .utf8)!,
+                                      outputByteCount: 32)
+    }
+
+    func decrypt<L: DataProtocol, C: DataProtocol, T: DataProtocol>(lengthBytes: L, ciphertext: C, tag: T) throws -> Data {
+        logger.info("Decrypt message #\(self.decryptCount)")
         defer { decryptCount += 1 }
-        var lengthBytes = cipher.readSlice(length: 2)!
-        let nonce = decryptCount.bigEndian.bytes
-        try ChaCha20Poly1305.decrypt(cipher: &cipher, additional: &lengthBytes, nonce: nonce, key: decryptKey, message: &message)
+
+        let nonce = try ChaChaPoly.Nonce(data: Data(count: 4) + decryptCount.bigEndian.bytes)
+        let box = try ChaChaPoly.SealedBox(nonce: nonce, ciphertext: ciphertext, tag: tag)
+
+        return try ChaChaPoly.open(box, using: decryptKey, authenticating: lengthBytes)
     }
 
-    func encrypt(length: Int, plaintext: inout ByteBuffer, cipher: inout ByteBuffer) throws {
-        logger.info("Encrypt message #\(self.encryptCount), length: \(length)")
+    func encrypt(plaintext: ByteBuffer) throws -> Data {
+        logger.info("Encrypt message #\(self.encryptCount)")
         defer { encryptCount += 1 }
-        cipher.writeInteger(Int16(length), endianness: Endianness.little, as: Int16.self)
-        let additional = cipher.viewBytes(at: 0, length: 2)!
-        let nonce = encryptCount.bigEndian.bytes
-        try ChaCha20Poly1305.encrypt(message: &plaintext, additional: additional, nonce: nonce, key: encryptKey, cipher: &cipher)
+
+        let nonce = try ChaChaPoly.Nonce(data: Data(count: 4) + encryptCount.bigEndian.bytes)
+        let authenticationData = UInt16(plaintext.readableBytes).bigEndian.bytes
+
+        let box = try ChaChaPoly.seal(plaintext.readableBytesView, using: encryptKey, nonce: nonce, authenticating: authenticationData)
+
+        return authenticationData + box.ciphertext + box.tag
     }
 }
