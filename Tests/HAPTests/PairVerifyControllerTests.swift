@@ -1,5 +1,4 @@
 // swiftlint:disable force_try
-import Cryptor
 @testable import HAP
 import XCTest
 import Crypto

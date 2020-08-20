@@ -7,7 +7,7 @@ fileprivate let logger = Logger(label: "hap.controllers.pair-setup")
 
 class PairSetupController {
     struct Session {
-        let server: SRP.Server
+        let server: SRP.Server<SHA512>
     }
     enum Error: Swift.Error {
         case invalidParameters
