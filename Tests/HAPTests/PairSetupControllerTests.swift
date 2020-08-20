@@ -15,21 +15,20 @@ class PairSetupControllerTests: XCTestCase {
     func test() {
         let clientIdentifier = "hubba hubba".data(using: .utf8)!
         let password = "123-44-321"
-        let (salt, verificationKey) = createSaltedVerificationKey(username: "Pair-Setup",
-                                                                  password: password,
+        let (salt, verificationKey) = createSaltedVerificationKey(using: SHA512.self,
                                                                   group: .N3072,
-                                                                  algorithm: .sha512)
-        let session = PairSetupController.Session(server: SRP.Server(username: "Pair-Setup",
-                                                                     salt: salt,
-                                                                     verificationKey: verificationKey,
-                                                                     group: .N3072,
-                                                                     algorithm: .sha512))
+                                                                  username: "Pair-Setup",
+                                                                  password: password)
+        let session = PairSetupController.Session(server: SRP.Server<SHA512>(username: "Pair-Setup",
+                                                                             salt: salt,
+                                                                             verificationKey: verificationKey,
+                                                                             group: .N3072))
         let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00080"),
                             setupCode: .override(password),
                             storage: MemoryStorage(),
                             accessories: [])
         let controller = PairSetupController(device: device)
-        let client = SRP.Client(username: "Pair-Setup", password: password, group: .N3072, algorithm: .sha512)
+        let client = SRP.Client<SHA512>(username: "Pair-Setup", password: password, group: .N3072)
         let clientPrivateKey = Curve25519.Signing.PrivateKey()
 
         let clientKeyProof: Data

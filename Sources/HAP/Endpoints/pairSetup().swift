@@ -1,4 +1,4 @@
-import Cryptor
+import Crypto
 import Logging
 import Foundation
 import HTTP
@@ -14,20 +14,18 @@ fileprivate enum Error: Swift.Error {
 // swiftlint:disable:next cyclomatic_complexity
 func pairSetup(device: Device) -> Responder {
     let group = Group.N3072
-    let algorithm = Digest.Algorithm.sha512
 
     let username = "Pair-Setup"
-    let (salt, verificationKey) = createSaltedVerificationKey(username: username,
-                                                              password: device.setupCode,
+    let (salt, verificationKey) = createSaltedVerificationKey(using: SHA512.self,
                                                               group: group,
-                                                              algorithm: algorithm)
+                                                              username: username,
+                                                              password: device.setupCode)
     let controller = PairSetupController(device: device)
     func createSession() -> Session {
-        return Session(server: SRP.Server(username: username,
-                                          salt: salt,
-                                          verificationKey: verificationKey,
-                                          group: group,
-                                          algorithm: algorithm))
+        return Session(server: SRP.Server<SHA512>(username: username,
+                                                  salt: salt,
+                                                  verificationKey: verificationKey,
+                                                  group: group))
     }
 
     // TODO: this memory is not freed
