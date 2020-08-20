@@ -24,6 +24,9 @@ class PairVerifyController {
             self.otherPublicKey = otherPublicKey
             self.sharedSecret = sharedSecret
         }
+        func stringEncodedSharedSecret() -> String {
+            return (secretKey + otherPublicKey).base64EncodedString()
+        }
     }
 
     enum Error: Swift.Error {

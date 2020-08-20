@@ -49,6 +49,15 @@ enum HAPCrypto: HAPCryptoProtocol {
         default: abort()
         }
     }
+
+    @inlinable
+    static func sharedSecret(stringEncoded: String) -> HAPSharedSecret? {
+        let data = Data(base64Encoded: stringEncoded)
+        let secretKey = data!.prefix(32)
+        let otherPublicKey = data!.suffix(32)
+        return Keys.sharedSecret(secretKey, otherPublicKey: otherPublicKey)
+    }
+
 }
 
 #if canImport(CryptoKit)

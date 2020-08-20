@@ -27,7 +27,7 @@ class Cryptographer {
     let decryptKey: HAPSymmetricKey
     let encryptKey: HAPSymmetricKey
 
-    init(sharedKey: Data) {
+    init(sharedKey: HAPSharedSecret) {
         logger.debug("Shared key: \(sharedKey.hex)")
         decryptKey = Keys.deriveSha512(
                                     seed: sharedKey,

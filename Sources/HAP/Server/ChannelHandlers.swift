@@ -8,7 +8,7 @@ import NIOHTTP1
 fileprivate let logger = Logger(label: "hap.nio")
 
 enum CryptographyEvent {
-    case sharedKey(Data)
+    case sharedKey(HAPSharedSecret)
 }
 
 class CryptographerHandler: ChannelDuplexHandler {
@@ -277,7 +277,7 @@ class UpgradeEventHandler: ChannelOutboundHandler {
     func write(context: ChannelHandlerContext, data: NIOAny, promise: EventLoopPromise<Void>?) {
         var response = unwrapOutboundIn(data)
         if let sharedKeyB64 = response.headers["x-shared-key"].first {
-            let sharedKey = Data(base64Encoded: sharedKeyB64)!
+            let sharedKey = Keys.sharedSecret(stringEncoded: sharedKeyB64)!
             response.headers.remove(name: "x-shared-key")
             context.write(wrapOutboundOut(response)).whenSuccess {
                 context.triggerUserOutboundEvent(CryptographyEvent.sharedKey(sharedKey), promise: nil)
