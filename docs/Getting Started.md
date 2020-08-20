@@ -4,29 +4,15 @@ Getting Started
 ## Installing dependencies
 
 ### macOS
-On macOS this package depends on libsodium to provide certain crypto algorithms. Install it using homebrew:
-```
-brew install libsodium
-```
+No dependencies needed, besides the packages SwiftPM will download.
 
 ### Linux
 On Debian based Linux distributions you need a few packages. Install them using apt:
 ```
-sudo apt install openssl libssl-dev libsodium-dev libcurl4-openssl-dev libavahi-compat-libdnssd-dev
+sudo apt install openssl libssl-dev libcurl4-openssl-dev libavahi-compat-libdnssd-dev
 ```
 
-If your package manager doesn't provide libsodium 1.0.9 or higher, install it from source:
-```
-wget https://download.libsodium.org/libsodium/releases/libsodium-1.0.12.tar.gz
-tar xzf libsodium-1.0.12.tar.gz
-cd libsodium-1.0.12
-./configure
-make && make check
-sudo make install
-sudo ldconfig
-```
-
-### Linux ARM / Raspberry Pi (Raspbian Stretch)
+#### Linux ARM / Raspberry Pi (Raspbian Stretch)
 There are currently no official binaries from swift.org targetting ARM / Raspbian, however there's an active community working on Swift on ARM. You can [install binaries from their repository][1]:
 
 ```
