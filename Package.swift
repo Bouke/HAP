@@ -4,10 +4,6 @@ import PackageDescription
 
 let package = Package(
     name: "HAP",
-    // todo: drop 10.15 requirement from crypto fork
-    platforms: [
-        .macOS(.v10_15)
-    ],
     products: [
         .library(name: "HAP", targets: ["HAP"]),
         .executable(name: "hap-demo", targets: ["hap-demo"]),
@@ -18,7 +14,7 @@ let package = Package(
         .package(url: "https://github.com/crossroadlabs/Regex.git", from: "1.1.0"),
         .package(url: "https://github.com/apple/swift-nio.git", from: "2.13.0"),
         .package(url: "https://github.com/apple/swift-log.git", Version("0.0.0") ..< Version("2.0.0")),
-        .package(url: "https://github.com/Bouke/swift-crypto.git", from: "1.0.2"),
+        .package(url: "https://github.com/Bouke/swift-crypto.git", .exact("1.1.0-rc.2-patched")),
     ],
     targets: [
         .target(name: "CQRCode"),
