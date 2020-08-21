@@ -44,8 +44,7 @@ class PairVerifyController {
             try Curve25519.KeyAgreement.PublicKey(rawRepresentation: clientPublicKey))
 
         let material = session.publicKey.rawRepresentation + device.identifier.data(using: .utf8)! + clientPublicKey
-        let key = try Curve25519.Signing.PrivateKey(rawRepresentation: device.privateKey)
-        let signature = try key.signature(for: material)
+        let signature = try device.privateKey.signature(for: material)
 
         let resultInner: PairTagTLV8 = [
             (.identifier, device.identifier.data(using: .utf8)!),

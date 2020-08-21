@@ -147,21 +147,20 @@ class PairSetupController {
                                                 salt: "Pair-Setup-Accessory-Sign-Salt".data(using: .utf8)!,
                                                 info: "Pair-Setup-Accessory-Sign-Info".data(using: .utf8)!,
                                                 outputByteCount: 32).withUnsafeBytes({ Data($0) })
-        let hashOut = hashOutKey + device.identifier.data(using: .utf8)! + device.publicKey
+        let hashOut = hashOutKey + device.identifier.data(using: .utf8)! + device.publicKey.rawRepresentation
 
-        let privateKey = try Curve25519.Signing.PrivateKey(rawRepresentation: device.privateKey)
-        guard let signatureOut = try? privateKey.signature(for: hashOut) else {
+        guard let signatureOut = try? device.privateKey.signature(for: hashOut) else {
             throw Error.couldNotSign
         }
 
         let resultInner: PairTagTLV8 = [
             (.identifier, device.identifier.data(using: .utf8)!),
-            (.publicKey, device.publicKey),
+            (.publicKey, device.publicKey.rawRepresentation),
             (.signature, signatureOut)
         ]
 
         logger.debug("<-- identifier \(self.device.identifier)")
-        logger.debug("<-- public key \(self.device.publicKey.hex)")
+        logger.debug("<-- public key \(self.device.publicKey.rawRepresentation.hex)")
         logger.debug("<-- signature \(signatureOut.hex)")
         logger.info("Pair setup completed")
 

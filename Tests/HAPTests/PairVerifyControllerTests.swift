@@ -19,7 +19,9 @@ class PairVerifyControllerTests: XCTestCase {
 
         let username = "hubba hubba".data(using: .utf8)!
         let pairingPrivateKey = Curve25519.Signing.PrivateKey()
-        device.add(pairing: Pairing(identifier: username, publicKey: pairingPrivateKey.publicKey.rawRepresentation, role: .admin))
+        device.add(pairing: Pairing(identifier: username,
+                                    publicKey: pairingPrivateKey.publicKey.rawRepresentation,
+                                    role: .admin))
 
         let controller = PairVerifyController(device: device)
         // these are the client's keys for this verify session
@@ -49,19 +51,23 @@ class PairVerifyControllerTests: XCTestCase {
                 return XCTFail("Response is incomplete")
             }
 
-            let sharedSecret = try! clientPrivateKey.sharedSecretFromKeyAgreement(with: .init(rawRepresentation: serverPublicKey_))
+            let sharedSecret = try! clientPrivateKey.sharedSecretFromKeyAgreement(
+                with: .init(rawRepresentation: serverPublicKey_))
 
             XCTAssertEqual(sharedSecret, session.sharedSecret)
 
-            // swiftlint:disable:next identifier_name
-            encryptionKey = sharedSecret.hkdfDerivedSymmetricKey(using: SHA512.self,
-                                                                 salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8)!,
-                                                                 sharedInfo: "Pair-Verify-Encrypt-Info".data(using: .utf8)!,
-                                                                 outputByteCount: 32)
+            encryptionKey = sharedSecret.hkdfDerivedSymmetricKey(
+                using: SHA512.self,
+                salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8)!,
+                sharedInfo: "Pair-Verify-Encrypt-Info".data(using: .utf8)!,
+                outputByteCount: 32)
 
             let msg02 = try! ChaChaPoly.Nonce(data: Data(count: 4) + "PV-Msg02".data(using: .utf8)!)
-            let plaintext = try! ChaChaPoly.open(ChaChaPoly.SealedBox(nonce: msg02, ciphertext: encryptedData.dropLast(16), tag: encryptedData.suffix(16)),
-                                                 using: encryptionKey)
+            let plaintext = try! ChaChaPoly.open(
+                ChaChaPoly.SealedBox(nonce: msg02,
+                                     ciphertext: encryptedData.dropLast(16),
+                                     tag: encryptedData.suffix(16)),
+                using: encryptionKey)
 
             guard let resultInner: PairTagTLV8 = try? decode(plaintext),
                 let username = resultInner[.identifier],
@@ -69,8 +75,7 @@ class PairVerifyControllerTests: XCTestCase {
                 return XCTFail("Couldn't decode response")
             }
             let material = serverPublicKey_ + username + clientPrivateKey.publicKey.rawRepresentation
-            let devicePublicKey = try! Curve25519.Signing.PublicKey(rawRepresentation: device.publicKey)
-            if !devicePublicKey.isValidSignature(signature, for: material) {
+            if !device.publicKey.isValidSignature(signature, for: material) {
                 return XCTFail("Invalid signature")
             }
 
