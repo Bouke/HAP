@@ -40,7 +40,8 @@ class PairVerifyController {
             throw Error.invalidParameters
         }
 
-        let session = try Session(clientPublicKey: try Curve25519.KeyAgreement.PublicKey(rawRepresentation: clientPublicKey))
+        let session = try Session(clientPublicKey:
+            try Curve25519.KeyAgreement.PublicKey(rawRepresentation: clientPublicKey))
 
         let material = session.publicKey.rawRepresentation + device.identifier.data(using: .utf8)! + clientPublicKey
         let key = try Curve25519.Signing.PrivateKey(rawRepresentation: device.privateKey)
@@ -52,10 +53,11 @@ class PairVerifyController {
         ]
         logger.debug("startRequest result: \(resultInner)")
 
-        let encryptionKey = session.sharedSecret.hkdfDerivedSymmetricKey(using: SHA512.self,
-                                                                         salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8)!,
-                                                                         sharedInfo: "Pair-Verify-Encrypt-Info".data(using: .utf8)!,
-                                                                         outputByteCount: 32)
+        let encryptionKey = session.sharedSecret.hkdfDerivedSymmetricKey(
+            using: SHA512.self,
+            salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8)!,
+            sharedInfo: "Pair-Verify-Encrypt-Info".data(using: .utf8)!,
+            outputByteCount: 32)
 
         let nonce = try ChaChaPoly.Nonce(data: Data(count: 4) + "PV-Msg02".data(using: .utf8)!)
         let sealed = try ChaChaPoly.seal(encode(resultInner), using: encryptionKey, nonce: nonce)
@@ -75,13 +77,16 @@ class PairVerifyController {
             throw Error.invalidParameters
         }
 
-        let encryptionKey = session.sharedSecret.hkdfDerivedSymmetricKey(using: SHA512.self,
-                                                                         salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8)!,
-                                                                         sharedInfo: "Pair-Verify-Encrypt-Info".data(using: .utf8)!,
-                                                                         outputByteCount: 32)
+        let encryptionKey = session.sharedSecret.hkdfDerivedSymmetricKey(
+            using: SHA512.self,
+            salt: "Pair-Verify-Encrypt-Salt".data(using: .utf8)!,
+            sharedInfo: "Pair-Verify-Encrypt-Info".data(using: .utf8)!,
+            outputByteCount: 32)
 
         let nonce = try ChaChaPoly.Nonce(data: Data(count: 4) + "PV-Msg03".data(using: .utf8)!)
-        let box = try ChaChaPoly.SealedBox(nonce: nonce, ciphertext: encryptedData.dropLast(16), tag: encryptedData.suffix(16))
+        let box = try ChaChaPoly.SealedBox(nonce: nonce,
+                                           ciphertext: encryptedData.dropLast(16),
+                                           tag: encryptedData.suffix(16))
 
         let plaintext = try ChaChaPoly.open(box, using: encryptionKey)
 

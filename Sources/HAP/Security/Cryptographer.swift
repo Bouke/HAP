@@ -2,8 +2,6 @@ import Crypto
 import Foundation
 import NIO
 
-fileprivate let logger = Logger(label: "hap.encryption")
-
 // 5.5.2 Session Security
 // (...)
 // Each HTTP message is split into frames no larger than 1024 bytes. Each frame has the following format:
@@ -28,21 +26,22 @@ class Cryptographer {
     }
 
     static func deriveDecryptionKey(sharedSecret: SymmetricKey) -> SymmetricKey {
-        return HKDF<SHA512>.deriveKey(inputKeyMaterial: sharedSecret,
-                                      salt: "Control-Salt".data(using: .utf8)!,
-                                      info: "Control-Write-Encryption-Key".data(using: .utf8)!,
-                                      outputByteCount: 32)
+        HKDF<SHA512>.deriveKey(inputKeyMaterial: sharedSecret,
+                               salt: "Control-Salt".data(using: .utf8)!,
+                               info: "Control-Write-Encryption-Key".data(using: .utf8)!,
+                               outputByteCount: 32)
     }
 
     static func deriveEncryptionKey(sharedSecret: SymmetricKey) -> SymmetricKey {
-        return HKDF<SHA512>.deriveKey(inputKeyMaterial: sharedSecret,
-                                      salt: "Control-Salt".data(using: .utf8)!,
-                                      info: "Control-Read-Encryption-Key".data(using: .utf8)!,
-                                      outputByteCount: 32)
+        HKDF<SHA512>.deriveKey(inputKeyMaterial: sharedSecret,
+                               salt: "Control-Salt".data(using: .utf8)!,
+                               info: "Control-Read-Encryption-Key".data(using: .utf8)!,
+                               outputByteCount: 32)
     }
 
-    func decrypt<L: DataProtocol, C: DataProtocol, T: DataProtocol>(lengthBytes: L, ciphertext: C, tag: T) throws -> Data {
-        logger.info("Decrypt message #\(self.decryptCount)")
+    func decrypt<L: DataProtocol, C: DataProtocol, T: DataProtocol>(lengthBytes: L,
+                                                                    ciphertext: C,
+                                                                    tag: T) throws -> Data {
         defer { decryptCount += 1 }
 
         let nonce = try ChaChaPoly.Nonce(data: Data(count: 4) + decryptCount.bigEndian.bytes)
@@ -52,13 +51,15 @@ class Cryptographer {
     }
 
     func encrypt(plaintext: ByteBuffer) throws -> Data {
-        logger.info("Encrypt message #\(self.encryptCount)")
         defer { encryptCount += 1 }
 
         let nonce = try ChaChaPoly.Nonce(data: Data(count: 4) + encryptCount.bigEndian.bytes)
         let authenticationData = UInt16(plaintext.readableBytes).bigEndian.bytes
 
-        let box = try ChaChaPoly.seal(plaintext.readableBytesView, using: encryptKey, nonce: nonce, authenticating: authenticationData)
+        let box = try ChaChaPoly.seal(plaintext.readableBytesView,
+                                      using: encryptKey,
+                                      nonce: nonce,
+                                      authenticating: authenticationData)
 
         return authenticationData + box.ciphertext + box.tag
     }

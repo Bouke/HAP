@@ -9,7 +9,7 @@ typealias PrivateKey = Data
 extension Device {
 
     static internal func generateIdentifier() -> String {
-        return (0..<6).map { _ in UInt8.random(in: 0...255) }
+        (0..<6).map { _ in UInt8.random(in: 0...255) }
             .map { String($0, radix: 16, uppercase: true).padLeft(toLength: 2, withPad: "0") }
             .joined(separator: ":")
     }
