@@ -1,3 +1,6 @@
+branches:
+  only:
+  - master
 language: generic
 sudo: required
 script: swift test -c release -Xswiftc -enable-testing
