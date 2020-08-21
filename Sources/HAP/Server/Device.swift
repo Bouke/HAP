@@ -503,12 +503,12 @@ public class Device {
         configuration.identifier
     }
 
-    var publicKey: PublicKey {
-        configuration.publicKey
+    var publicKey: Curve25519.Signing.PublicKey {
+        return configuration.publicKey
     }
 
-    var privateKey: PrivateKey {
-        configuration.privateKey
+    var privateKey: Curve25519.Signing.PrivateKey {
+        return configuration.privateKey
     }
 
     var config: [String: String] {

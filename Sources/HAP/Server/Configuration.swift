@@ -20,19 +20,18 @@ extension Device {
         let identifier: String
         var setupCode: String
         let setupKey: String
-        let publicKey: PublicKey
-        let privateKey: PrivateKey
+
+        let privateKey: Curve25519.Signing.PrivateKey
+        var publicKey: Curve25519.Signing.PublicKey {
+            privateKey.publicKey
+        }
 
         /// Initializes a new configuration
         init() {
             identifier = Device.generateIdentifier()
             setupCode = SetupCode.generate()
             setupKey = SetupCode.generateSetupKey()
-
-            // todo: use `Curve25519.Signing.PrivateKey` throughout
-            let key = Curve25519.Signing.PrivateKey()
-            privateKey = key.rawRepresentation
-            publicKey = key.publicKey.rawRepresentation
+            privateKey = Curve25519.Signing.PrivateKey()
         }
 
         // HAP Specification 5.4: Current configuration number.
@@ -66,6 +65,47 @@ extension Device {
         }
 
         internal var pairings: [PairingIdentifier: Pairing] = [:]
+
+        // MARK:- Encodable
+
+        enum CodingKeys: String, CodingKey {
+            case aidForAccessorySerialNumber
+            case aidGenerator
+            case identifier
+            case number
+            case pairings
+            case privateKey
+            case setupCode
+            case setupKey
+            case stableHash
+        }
+
+        init(from decoder: Decoder) throws {
+            let values = try decoder.container(keyedBy: CodingKeys.self)
+            aidForAccessorySerialNumber = try values.decode([String: InstanceID].self, forKey: .aidForAccessorySerialNumber)
+            aidGenerator = try values.decode(AIDGenerator.self, forKey: .aidGenerator)
+            identifier = try values.decode(String.self, forKey: .identifier)
+            number = try values.decode(UInt32.self, forKey: .number)
+            pairings = try values.decode([PairingIdentifier: Pairing].self, forKey: .pairings)
+            let privateKeyBytes = try values.decode(Data.self, forKey: .privateKey)
+            privateKey = try Curve25519.Signing.PrivateKey(rawRepresentation: privateKeyBytes)
+            setupCode = try values.decode(String.self, forKey: .setupCode)
+            setupKey = try values.decode(String.self, forKey: .setupKey)
+            stableHash = try values.decode(Int.self, forKey: .stableHash)
+        }
+
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(aidForAccessorySerialNumber, forKey: .aidForAccessorySerialNumber)
+            try container.encode(aidGenerator, forKey: .aidGenerator)
+            try container.encode(identifier, forKey: .identifier)
+            try container.encode(number, forKey: .number)
+            try container.encode(pairings, forKey: .pairings)
+            try container.encode(privateKey.rawRepresentation, forKey: .privateKey)
+            try container.encode(setupCode, forKey: .setupCode)
+            try container.encode(setupKey, forKey: .setupKey)
+            try container.encode(stableHash, forKey: .stableHash)
+        }
     }
 
 }
