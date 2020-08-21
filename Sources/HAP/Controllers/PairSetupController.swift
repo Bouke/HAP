@@ -111,7 +111,9 @@ class PairSetupController {
                                                    outputByteCount: 32)
 
         let msg05 = try ChaChaPoly.Nonce(data: Data(count: 4) + "PS-Msg05".data(using: .utf8)!)
-        let box = try ChaChaPoly.SealedBox(nonce: msg05, ciphertext: encryptedData.dropLast(16), tag: encryptedData.suffix(16))
+        let box = try ChaChaPoly.SealedBox(nonce: msg05,
+                                           ciphertext: encryptedData.dropLast(16),
+                                           tag: encryptedData.suffix(16))
 
         let plaintext = try ChaChaPoly.open(box, using: encryptionKey)
 
@@ -133,8 +135,8 @@ class PairSetupController {
         let hashInKey = HKDF<SHA512>.deriveKey(inputKeyMaterial: sessionKey,
                                                salt: "Pair-Setup-Controller-Sign-Salt".data(using: .utf8)!,
                                                info: "Pair-Setup-Controller-Sign-Info".data(using: .utf8)!,
-                                               outputByteCount: 32)
-        let hashIn = hashInKey.withUnsafeBytes({ Data($0) }) + username + publicKey
+                                               outputByteCount: 32).withUnsafeBytes({ Data($0) })
+        let hashIn = hashInKey + username + publicKey
 
         let key = try Curve25519.Signing.PublicKey(rawRepresentation: publicKey)
         guard key.isValidSignature(signatureIn, for: hashIn) else {
@@ -144,8 +146,8 @@ class PairSetupController {
         let hashOutKey = HKDF<SHA512>.deriveKey(inputKeyMaterial: sessionKey,
                                                 salt: "Pair-Setup-Accessory-Sign-Salt".data(using: .utf8)!,
                                                 info: "Pair-Setup-Accessory-Sign-Info".data(using: .utf8)!,
-                                                outputByteCount: 32)
-        let hashOut = hashOutKey.withUnsafeBytes({ Data($0) }) + device.identifier.data(using: .utf8)! + device.publicKey
+                                                outputByteCount: 32).withUnsafeBytes({ Data($0) })
+        let hashOut = hashOutKey + device.identifier.data(using: .utf8)! + device.publicKey
 
         let privateKey = try Curve25519.Signing.PrivateKey(rawRepresentation: device.privateKey)
         guard let signatureOut = try? privateKey.signature(for: hashOut) else {
