@@ -3,52 +3,8 @@ sudo: required
 script: swift test -c release -Xswiftc -enable-testing
 matrix:
   include:
-    - name: Swift 5.1
+    - name: Swift 5.1 on macOS 10.14
       os: osx
-      osx_image: xcode11
+      osx_image: xcode11.3
       before_install:
         - brew install libsodium
-    - name: Swift 5.2
-      os: osx
-      osx_image: xcode11.4
-      before_install:
-        - brew install libsodium
-    - name: Swift 5.3
-      os: osx
-      osx_image: xcode12
-      before_install:
-        - brew install libsodium
-    - name: Swift 5.1
-      os: linux
-      dist: trusty
-      before_install:
-        - sudo apt install libavahi-compat-libdnssd-dev
-        - wget https://swift.org/builds/swift-5.1-release/ubuntu1404/swift-5.1-RELEASE/swift-5.1-RELEASE-ubuntu14.04.tar.gz
-        - tar xzf swift-5.1-RELEASE-ubuntu14.04.tar.gz
-        - export PATH=`pwd`/swift-5.1-RELEASE-ubuntu14.04/usr/bin:"${PATH}"
-        - sudo apt-get install -y libssl-dev
-        - wget https://download.libsodium.org/libsodium/releases/libsodium-1.0.18.tar.gz
-        - tar xzf libsodium-1.0.18.tar.gz
-        - cd libsodium-1.0.18
-        - ./configure
-        - make && make check
-        - sudo make install
-        - cd ..
-        - sudo ldconfig
-    - name: Code Quality Checks
-      os: osx
-      osx_image: xcode11
-      install:
-        - brew upgrade swiftlint || true
-      script: swiftlint
-    - name: SonarCloud scanner
-      os: osx
-      osx_image: xcode11
-      addons:
-        sonarcloud:
-          organization: bouke-github
-      before_script: git fetch --unshallow --quiet
-      script: sonar-scanner
-  allow_failures:
-    - name: Code Quality Checks
-    - name: SonarCloud scanner
