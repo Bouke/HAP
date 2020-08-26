@@ -9,7 +9,7 @@ let package = Package(
         .executable(name: "hap-server", targets: ["hap-server"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/Bouke/SRP.git", .branch("swift-crypto")),
+        .package(url: "https://github.com/Bouke/SRP.git", .branch("master")),
         .package(url: "https://github.com/crossroadlabs/Regex.git", from: "1.1.0"),
         .package(url: "https://github.com/apple/swift-nio.git", from: "2.13.0"),
         .package(url: "https://github.com/apple/swift-log.git", Version("0.0.0") ..< Version("2.0.0")),
