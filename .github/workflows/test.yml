@@ -14,9 +14,11 @@ jobs:
       - name: Setup Swift ${{ matrix.swift }}
         run: |
           sudo apt install libavahi-compat-libdnssd-dev libsodium-dev libssl-dev
-          wget https://swift.org/builds/swift-${{ matrix.swift }}-release/ubuntu1804/swift-${{ matrix.swift }}-RELEASE/swift-${{ matrix.swift }}-RELEASE-ubuntu18.04.tar.gz
+          wget --no-verbose https://swift.org/builds/swift-${{ matrix.swift }}-release/ubuntu1804/swift-${{ matrix.swift }}-RELEASE/swift-${{ matrix.swift }}-RELEASE-ubuntu18.04.tar.gz
           tar xzf swift-${{ matrix.swift }}-RELEASE-ubuntu18.04.tar.gz
-          export PATH=`pwd`/swift-${{ matrix.swift }}-RELEASE-ubuntu18.04/usr/bin:"${PATH}"
+          echo `pwd`/swift-${{ matrix.swift }}-RELEASE-ubuntu18.04/usr/bin >> $GITHUB_PATH
+      - name: Verify Swift version
+        run: swift -version | grep ${{ matrix.swift }}
       - name: Run Tests
         run: swift test -c release -Xswiftc -enable-testing
   macOS:
