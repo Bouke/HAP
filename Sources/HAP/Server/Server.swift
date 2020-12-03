@@ -53,21 +53,25 @@ public class Server: NSObject, NetServiceDelegate {
 
             // Set the handlers that are applied to the accepted child `Channel`s.
             .childChannelInitializer { channel in
-                channel.pipeline.addHandler(CryptographerHandler()).flatMap {
-                    channel.pipeline.addHandler(EventHandler()).flatMap {
-                        channel.pipeline.configureHTTPServerPipeline(withErrorHandling: true).flatMap {
-                            // It's important we use the same handler for all accepted channels.
-                            // The ControllerHandler is thread-safe!
-                            channel.pipeline.addHandler(device.controllerHandler!).flatMap {
-                                channel.pipeline.addHandler(RequestHandler()).flatMap {
-                                    channel.pipeline.addHandler(UpgradeEventHandler()).flatMap {
-                                        channel.pipeline.addHandler(applicationHandler)
-                                    }
-                                }
-                            }
-                        }
+                channel.pipeline.addHandlers(
+                    [
+                        CryptographerHandler(),
+                        EventHandler()
+                    ])
+                    .flatMap {
+                        channel.pipeline.configureHTTPServerPipeline(withErrorHandling: true)
                     }
-                }
+                    .flatMap {
+                        // It's important we use the same handler for all accepted channels.
+                        // The ControllerHandler is thread-safe!
+                        channel.pipeline.addHandlers(
+                            [
+                                device.controllerHandler!,
+                                RequestHandler(),
+                                UpgradeEventHandler(),
+                                applicationHandler
+                            ])
+                    }
             }
 
             // Enable TCP_NODELAY and SO_REUSEADDR for the accepted Channels
