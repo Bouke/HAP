@@ -750,7 +750,7 @@ public class Inspector {
                     case "Bool": return "false"
                     case "Data": return "Data()"
                     case "String": return "\"\""
-                    case "Float", "Int", "UInt8", "UInt32": return characteristic.minValue?.stringValue ?? "0"
+                    case "Float", "Int", "UInt8", "UInt16", "UInt32": return characteristic.minValue?.stringValue ?? "0"
                     default: preconditionFailure("No default value for value type \(valueType(characteristic))")
                     }
                 }

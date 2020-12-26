@@ -19,7 +19,9 @@ if CommandLine.argc > 1 {
 }
 do {
     print("Generating from \(sourceURL)")
-    try Inspector.inspect(source: sourceURL, target: "Sources/HAP/Base/Generated.swift")
+    let target = FileManager.default.fileExists(atPath: "Sources/HAP/Base") ?
+        "Sources/HAP/Base/Generated.swift" : "./Generated.swift"
+    try Inspector.inspect(source: sourceURL, target: target)
 } catch {
     print("Couldn't update: \(error)")
 }

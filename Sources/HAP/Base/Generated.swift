@@ -2,9 +2,9 @@
 // framework definitions. Don't make changes to this file directly.
 // Update this file using the `hap-update` tool.
 //
-// Generated on:              25 may 2020
-// HomeKit framework version: 838
-// macOS:                     Version 10.15.4 (Build 19E287)
+// Generated on:              26 December 2020
+// HomeKit framework version: 858
+// macOS:                     Version 11.1 (Build 20C69)
 
 import Foundation
 
@@ -42,15 +42,19 @@ public enum AccessoryType: String, Codable {
 	case targetController = "32"
 	case wiFiRouter = "33"
 	case audioReceiver = "34"
+	case televisionSetTopBox = "35"
+	case televisionStreamingStick = "36"
 }
 
 public extension ServiceType {
+	static let accessoryRuntimeInformation = ServiceType(0x0239)
 	static let airPurifier = ServiceType(0x00BB)
 	static let airQualitySensor = ServiceType(0x008D)
 	static let battery = ServiceType(0x0096)
 	static let carbonDioxideSensor = ServiceType(0x0097)
 	static let carbonMonoxideSensor = ServiceType(0x007F)
 	static let contactSensor = ServiceType(0x0080)
+	static let diagnostics = ServiceType(0x0237)
 	static let door = ServiceType(0x0081)
 	static let doorbell = ServiceType(0x0121)
 	static let fan = ServiceType(0x0040)
@@ -84,8 +88,10 @@ public extension ServiceType {
 	static let television = ServiceType(0x00D8)
 	static let temperatureSensor = ServiceType(0x008A)
 	static let thermostat = ServiceType(0x004A)
+	static let threadTransport = ServiceType(0x0701)
 	static let transferTransportManagement = ServiceType(0x0203)
 	static let valve = ServiceType(0x00D0)
+	static let wiFiTransport = ServiceType(0x022A)
 	static let window = ServiceType(0x008B)
 	static let windowCovering = ServiceType(0x008C)
 }
@@ -100,12 +106,16 @@ public extension CharacteristicType {
 	static let audioFeedback = CharacteristicType(0x0005)
 	static let batteryLevel = CharacteristicType(0x0068)
 	static let brightness = CharacteristicType(0x0008)
+	static let ccaEnergyDetectThreshold = CharacteristicType(0x0246)
+	static let ccaSignalDetectThreshold = CharacteristicType(0x0245)
 	static let carbonDioxideDetected = CharacteristicType(0x0092)
 	static let carbonDioxideLevel = CharacteristicType(0x0093)
 	static let carbonDioxidePeakLevel = CharacteristicType(0x0094)
 	static let carbonMonoxideDetected = CharacteristicType(0x0069)
 	static let carbonMonoxideLevel = CharacteristicType(0x0090)
 	static let carbonMonoxidePeakLevel = CharacteristicType(0x0091)
+	static let characteristicValueActiveTransitionCount = CharacteristicType(0x024B)
+	static let characteristicValueTransitionControl = CharacteristicType(0x0143)
 	static let chargingState = CharacteristicType(0x008F)
 	static let closedCaptions = CharacteristicType(0x00DD)
 	static let colorTemperature = CharacteristicType(0x00CE)
@@ -127,15 +137,19 @@ public extension CharacteristicType {
 	static let currentSlatState = CharacteristicType(0x00AA)
 	static let currentTemperature = CharacteristicType(0x0011)
 	static let currentTiltAngle = CharacteristicType(0x00C1)
+	static let currentTransport = CharacteristicType(0x022B)
 	static let currentVerticalTiltAngle = CharacteristicType(0x006E)
 	static let currentVisibilityState = CharacteristicType(0x0135)
 	static let currentWaterLevel = CharacteristicType(0x00B5)
 	static let displayOrder = CharacteristicType(0x0136)
+	static let eventRetransmissionMaximum = CharacteristicType(0x023D)
+	static let eventTransmissionCounters = CharacteristicType(0x023E)
 	static let filterChangeIndication = CharacteristicType(0x00AC)
 	static let filterLifeLevel = CharacteristicType(0x00AB)
 	static let filterResetChangeIndication = CharacteristicType(0x00AD)
 	static let firmwareRevision = CharacteristicType(0x0052)
 	static let hardwareRevision = CharacteristicType(0x0053)
+	static let heartBeat = CharacteristicType(0x024A)
 	static let heatingThresholdTemperature = CharacteristicType(0x0012)
 	static let holdPosition = CharacteristicType(0x006F)
 	static let hue = CharacteristicType(0x0013)
@@ -155,7 +169,10 @@ public extension CharacteristicType {
 	static let lockPhysicalControls = CharacteristicType(0x00A7)
 	static let lockTargetState = CharacteristicType(0x001E)
 	static let logs = CharacteristicType(0x001F)
+	static let macRetransmissionMaximum = CharacteristicType(0x0247)
+	static let macTransmissionCounters = CharacteristicType(0x0248)
 	static let manufacturer = CharacteristicType(0x0020)
+	static let maximumTransmitPower = CharacteristicType(0x0243)
 	static let model = CharacteristicType(0x0021)
 	static let motionDetected = CharacteristicType(0x0022)
 	static let mute = CharacteristicType(0x011A)
@@ -163,11 +180,13 @@ public extension CharacteristicType {
 	static let nitrogenDioxideDensity = CharacteristicType(0x00C4)
 	static let obstructionDetected = CharacteristicType(0x0024)
 	static let occupancyDetected = CharacteristicType(0x0071)
+	static let operatingStateResponse = CharacteristicType(0x0232)
 	static let outletInUse = CharacteristicType(0x0026)
 	static let ozoneDensity = CharacteristicType(0x00C3)
 	static let pm10Density = CharacteristicType(0x00C7)
 	static let pm2_5Density = CharacteristicType(0x00C6)
 	static let pictureMode = CharacteristicType(0x00E2)
+	static let ping = CharacteristicType(0x023C)
 	static let positionState = CharacteristicType(0x0072)
 	static let powerModeSelection = CharacteristicType(0x00DF)
 	static let powerState = CharacteristicType(0x0025)
@@ -175,6 +194,8 @@ public extension CharacteristicType {
 	static let programMode = CharacteristicType(0x00D1)
 	static let programmableSwitchEvent = CharacteristicType(0x0073)
 	static let programmableSwitchOutputState = CharacteristicType(0x0074)
+	static let receivedSignalStrengthIndication = CharacteristicType(0x023F)
+	static let receiverSensitivity = CharacteristicType(0x0244)
 	static let relativeHumidityDehumidifierThreshold = CharacteristicType(0x00C9)
 	static let relativeHumidityHumidifierThreshold = CharacteristicType(0x00CA)
 	static let remainingDuration = CharacteristicType(0x00D4)
@@ -188,8 +209,10 @@ public extension CharacteristicType {
 	static let serialNumber = CharacteristicType(0x0030)
 	static let setDuration = CharacteristicType(0x00D3)
 	static let setupTransferTransport = CharacteristicType(0x0201)
+	static let signalToNoiseRatio = CharacteristicType(0x0241)
 	static let slatType = CharacteristicType(0x00C0)
 	static let sleepDiscoveryMode = CharacteristicType(0x00E8)
+	static let sleepInterval = CharacteristicType(0x023A)
 	static let smokeDetected = CharacteristicType(0x0076)
 	static let softwareRevision = CharacteristicType(0x0054)
 	static let statusActive = CharacteristicType(0x0075)
@@ -197,6 +220,8 @@ public extension CharacteristicType {
 	static let statusLowBattery = CharacteristicType(0x0079)
 	static let statusTampered = CharacteristicType(0x007A)
 	static let sulphurDioxideDensity = CharacteristicType(0x00C5)
+	static let supportedCharacteristicValueTransitionConfiguration = CharacteristicType(0x0144)
+	static let supportedDiagnosticsSnapshot = CharacteristicType(0x0238)
 	static let supportedTransferTransportConfiguration = CharacteristicType(0x0202)
 	static let swingMode = CharacteristicType(0x00B6)
 	static let targetAirPurifierState = CharacteristicType(0x00A8)
@@ -214,12 +239,19 @@ public extension CharacteristicType {
 	static let targetVerticalTiltAngle = CharacteristicType(0x007D)
 	static let targetVisibilityState = CharacteristicType(0x0134)
 	static let temperatureDisplayUnits = CharacteristicType(0x0036)
+	static let threadControlPoint = CharacteristicType(0x0704)
+	static let threadNodeCapabilities = CharacteristicType(0x0702)
+	static let threadOpenthreadVersion = CharacteristicType(0x0706)
+	static let threadStatus = CharacteristicType(0x0703)
+	static let transmitPower = CharacteristicType(0x0242)
 	static let valveType = CharacteristicType(0x00D5)
 	static let version = CharacteristicType(0x0037)
 	static let volatileOrganicCompoundDensity = CharacteristicType(0x00C8)
 	static let volume = CharacteristicType(0x0119)
 	static let volumeControlType = CharacteristicType(0x00E9)
 	static let volumeSelector = CharacteristicType(0x00EA)
+	static let wiFiCapabilities = CharacteristicType(0x022C)
+	static let wiFiConfigurationControl = CharacteristicType(0x022D)
 }
 
 public enum CharacteristicFormat: String, Codable {
@@ -528,6 +560,26 @@ public class Enums {
 }
 
 extension Service {
+	open class AccessoryRuntimeInformationBase: Service {
+		// Required Characteristics
+		public let ping: GenericCharacteristic<Data>
+
+		// Optional Characteristics
+		public let heartBeat: GenericCharacteristic<UInt32>?
+		public let sleepInterval: GenericCharacteristic<UInt32>?
+
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			ping = getOrCreateAppend(
+				type: .ping,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.ping() })
+			heartBeat = get(type: .heartBeat, characteristics: unwrapped)
+			sleepInterval = get(type: .sleepInterval, characteristics: unwrapped)
+			super.init(type: .accessoryRuntimeInformation, characteristics: unwrapped)
+		}
+	}
+
 	open class AirPurifierBase: Service {
 		// Required Characteristics
 		public let active: GenericCharacteristic<Enums.Active>
@@ -602,27 +654,21 @@ extension Service {
 
 	open class BatteryBase: Service {
 		// Required Characteristics
-		public let batteryLevel: GenericCharacteristic<UInt8>
-		public let chargingState: GenericCharacteristic<Enums.ChargingState>
 		public let statusLowBattery: GenericCharacteristic<Enums.StatusLowBattery>
 
 		// Optional Characteristics
+		public let batteryLevel: GenericCharacteristic<UInt8>?
+		public let chargingState: GenericCharacteristic<Enums.ChargingState>?
 		public let name: GenericCharacteristic<String>?
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
-			batteryLevel = getOrCreateAppend(
-				type: .batteryLevel,
-				characteristics: &unwrapped,
-				generator: { PredefinedCharacteristic.batteryLevel() })
-			chargingState = getOrCreateAppend(
-				type: .chargingState,
-				characteristics: &unwrapped,
-				generator: { PredefinedCharacteristic.chargingState() })
 			statusLowBattery = getOrCreateAppend(
 				type: .statusLowBattery,
 				characteristics: &unwrapped,
 				generator: { PredefinedCharacteristic.statusLowBattery() })
+			batteryLevel = get(type: .batteryLevel, characteristics: unwrapped)
+			chargingState = get(type: .chargingState, characteristics: unwrapped)
 			name = get(type: .name, characteristics: unwrapped)
 			super.init(type: .battery, characteristics: unwrapped)
 		}
@@ -714,6 +760,22 @@ extension Service {
 		}
 	}
 
+	open class DiagnosticsBase: Service {
+		// Required Characteristics
+		public let supportedDiagnosticsSnapshot: GenericCharacteristic<Data>
+
+		// Optional Characteristics
+
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			supportedDiagnosticsSnapshot = getOrCreateAppend(
+				type: .supportedDiagnosticsSnapshot,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.supportedDiagnosticsSnapshot() })
+			super.init(type: .diagnostics, characteristics: unwrapped)
+		}
+	}
+
 	open class DoorBase: Service {
 		// Required Characteristics
 		public let currentPosition: GenericCharacteristic<UInt8>
@@ -752,7 +814,10 @@ extension Service {
 
 		// Optional Characteristics
 		public let brightness: GenericCharacteristic<Int>?
-		public let volume: GenericCharacteristic<Int>?
+		public let mute: GenericCharacteristic<Bool>?
+		public let name: GenericCharacteristic<String>?
+		public let operatingStateResponse: GenericCharacteristic<Data>?
+		public let volume: GenericCharacteristic<UInt8>?
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
@@ -761,6 +826,9 @@ extension Service {
 				characteristics: &unwrapped,
 				generator: { PredefinedCharacteristic.programmableSwitchEvent() })
 			brightness = get(type: .brightness, characteristics: unwrapped)
+			mute = get(type: .mute, characteristics: unwrapped)
+			name = get(type: .name, characteristics: unwrapped)
+			operatingStateResponse = get(type: .operatingStateResponse, characteristics: unwrapped)
 			volume = get(type: .volume, characteristics: unwrapped)
 			super.init(type: .doorbell, characteristics: unwrapped)
 		}
@@ -1206,10 +1274,13 @@ extension Service {
 
 		// Optional Characteristics
 		public let brightness: GenericCharacteristic<Int>?
+		public let characteristicValueActiveTransitionCount: GenericCharacteristic<UInt8>?
+		public let characteristicValueTransitionControl: GenericCharacteristic<Data>?
 		public let colorTemperature: GenericCharacteristic<Int>?
 		public let hue: GenericCharacteristic<Float>?
 		public let name: GenericCharacteristic<String>?
 		public let saturation: GenericCharacteristic<Float>?
+		public let supportedCharacteristicValueTransitionConfiguration: GenericCharacteristic<Data>?
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
@@ -1218,10 +1289,13 @@ extension Service {
 				characteristics: &unwrapped,
 				generator: { PredefinedCharacteristic.powerState() })
 			brightness = get(type: .brightness, characteristics: unwrapped)
+			characteristicValueActiveTransitionCount = get(type: .characteristicValueActiveTransitionCount, characteristics: unwrapped)
+			characteristicValueTransitionControl = get(type: .characteristicValueTransitionControl, characteristics: unwrapped)
 			colorTemperature = get(type: .colorTemperature, characteristics: unwrapped)
 			hue = get(type: .hue, characteristics: unwrapped)
 			name = get(type: .name, characteristics: unwrapped)
 			saturation = get(type: .saturation, characteristics: unwrapped)
+			supportedCharacteristicValueTransitionConfiguration = get(type: .supportedCharacteristicValueTransitionConfiguration, characteristics: unwrapped)
 			super.init(type: .lightbulb, characteristics: unwrapped)
 		}
 	}
@@ -1289,7 +1363,7 @@ extension Service {
 		public let mute: GenericCharacteristic<Bool>
 
 		// Optional Characteristics
-		public let volume: GenericCharacteristic<Int>?
+		public let volume: GenericCharacteristic<UInt8>?
 
 		public init(characteristics: [AnyCharacteristic] = []) {
 			var unwrapped = characteristics.map { $0.wrapped }
@@ -1464,7 +1538,7 @@ extension Service {
 
 		// Optional Characteristics
 		public let active: GenericCharacteristic<Enums.Active>?
-		public let volume: GenericCharacteristic<Int>?
+		public let volume: GenericCharacteristic<UInt8>?
 		public let volumeControlType: GenericCharacteristic<Enums.VolumeControlType>?
 		public let volumeSelector: GenericCharacteristic<Enums.VolumeSelector?>?
 
@@ -1557,6 +1631,7 @@ extension Service {
 		public let displayOrder: GenericCharacteristic<Data>?
 		public let currentMediaState: GenericCharacteristic<UInt8>?
 		public let targetMediaState: GenericCharacteristic<Enums.TargetMediaState>?
+		public let name: GenericCharacteristic<String>?
 		public let pictureMode: GenericCharacteristic<Enums.PictureMode>?
 		public let powerModeSelection: GenericCharacteristic<Enums.PowerModeSelection?>?
 
@@ -1587,6 +1662,7 @@ extension Service {
 			displayOrder = get(type: .displayOrder, characteristics: unwrapped)
 			currentMediaState = get(type: .currentMediaState, characteristics: unwrapped)
 			targetMediaState = get(type: .targetMediaState, characteristics: unwrapped)
+			name = get(type: .name, characteristics: unwrapped)
 			pictureMode = get(type: .pictureMode, characteristics: unwrapped)
 			powerModeSelection = get(type: .powerModeSelection, characteristics: unwrapped)
 			super.init(type: .television, characteristics: unwrapped)
@@ -1665,6 +1741,61 @@ extension Service {
 		}
 	}
 
+	open class ThreadTransportBase: Service {
+		// Required Characteristics
+		public let currentTransport: GenericCharacteristic<Bool>
+		public let threadControlPoint: GenericCharacteristic<Data?>
+		public let threadNodeCapabilities: GenericCharacteristic<UInt16>
+		public let threadStatus: GenericCharacteristic<UInt16>
+
+		// Optional Characteristics
+		public let ccaEnergyDetectThreshold: GenericCharacteristic<Int>?
+		public let ccaSignalDetectThreshold: GenericCharacteristic<Int>?
+		public let eventRetransmissionMaximum: GenericCharacteristic<UInt8>?
+		public let eventTransmissionCounters: GenericCharacteristic<UInt32>?
+		public let macRetransmissionMaximum: GenericCharacteristic<UInt8>?
+		public let macTransmissionCounters: GenericCharacteristic<Data>?
+		public let receiverSensitivity: GenericCharacteristic<Int>?
+		public let receivedSignalStrengthIndication: GenericCharacteristic<Int>?
+		public let signalToNoiseRatio: GenericCharacteristic<Int>?
+		public let threadOpenthreadVersion: GenericCharacteristic<String>?
+		public let transmitPower: GenericCharacteristic<Int>?
+		public let maximumTransmitPower: GenericCharacteristic<Int>?
+
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			currentTransport = getOrCreateAppend(
+				type: .currentTransport,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.currentTransport() })
+			threadControlPoint = getOrCreateAppend(
+				type: .threadControlPoint,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.threadControlPoint() })
+			threadNodeCapabilities = getOrCreateAppend(
+				type: .threadNodeCapabilities,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.threadNodeCapabilities() })
+			threadStatus = getOrCreateAppend(
+				type: .threadStatus,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.threadStatus() })
+			ccaEnergyDetectThreshold = get(type: .ccaEnergyDetectThreshold, characteristics: unwrapped)
+			ccaSignalDetectThreshold = get(type: .ccaSignalDetectThreshold, characteristics: unwrapped)
+			eventRetransmissionMaximum = get(type: .eventRetransmissionMaximum, characteristics: unwrapped)
+			eventTransmissionCounters = get(type: .eventTransmissionCounters, characteristics: unwrapped)
+			macRetransmissionMaximum = get(type: .macRetransmissionMaximum, characteristics: unwrapped)
+			macTransmissionCounters = get(type: .macTransmissionCounters, characteristics: unwrapped)
+			receiverSensitivity = get(type: .receiverSensitivity, characteristics: unwrapped)
+			receivedSignalStrengthIndication = get(type: .receivedSignalStrengthIndication, characteristics: unwrapped)
+			signalToNoiseRatio = get(type: .signalToNoiseRatio, characteristics: unwrapped)
+			threadOpenthreadVersion = get(type: .threadOpenthreadVersion, characteristics: unwrapped)
+			transmitPower = get(type: .transmitPower, characteristics: unwrapped)
+			maximumTransmitPower = get(type: .maximumTransmitPower, characteristics: unwrapped)
+			super.init(type: .threadTransport, characteristics: unwrapped)
+		}
+	}
+
 	open class TransferTransportManagementBase: Service {
 		// Required Characteristics
 		public let supportedTransferTransportConfiguration: GenericCharacteristic<Data>
@@ -1721,6 +1852,29 @@ extension Service {
 			setDuration = get(type: .setDuration, characteristics: unwrapped)
 			statusFault = get(type: .statusFault, characteristics: unwrapped)
 			super.init(type: .valve, characteristics: unwrapped)
+		}
+	}
+
+	open class WiFiTransportBase: Service {
+		// Required Characteristics
+		public let currentTransport: GenericCharacteristic<Bool>
+		public let wiFiCapabilities: GenericCharacteristic<UInt32>
+
+		// Optional Characteristics
+		public let wiFiConfigurationControl: GenericCharacteristic<Data>?
+
+		public init(characteristics: [AnyCharacteristic] = []) {
+			var unwrapped = characteristics.map { $0.wrapped }
+			currentTransport = getOrCreateAppend(
+				type: .currentTransport,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.currentTransport() })
+			wiFiCapabilities = getOrCreateAppend(
+				type: .wiFiCapabilities,
+				characteristics: &unwrapped,
+				generator: { PredefinedCharacteristic.wiFiCapabilities() })
+			wiFiConfigurationControl = get(type: .wiFiConfigurationControl, characteristics: unwrapped)
+			super.init(type: .wiFiTransport, characteristics: unwrapped)
 		}
 	}
 
@@ -2023,6 +2177,62 @@ public extension AnyCharacteristic {
 			validValuesRange: validValuesRange) as Characteristic)
 	}
 
+	static func ccaEnergyDetectThreshold(
+		_ value: Int = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "CCA Energy Detect Threshold",
+		format: CharacteristicFormat? = .int,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.ccaEnergyDetectThreshold(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
+	static func ccaSignalDetectThreshold(
+		_ value: Int = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "CCA Signal Detect Threshold",
+		format: CharacteristicFormat? = .int,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.ccaSignalDetectThreshold(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
 	static func carbonDioxideDetected(
 		_ value: Enums.CarbonDioxideDetected = .normal,
 		permissions: [CharacteristicPermission] = [.read, .events],
@@ -2178,6 +2388,62 @@ public extension AnyCharacteristic {
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.carbonMonoxidePeakLevel(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
+	static func characteristicValueActiveTransitionCount(
+		_ value: UInt8 = 0,
+		permissions: [CharacteristicPermission] = [.read, .events],
+		description: String? = "Characteristic Value Active Transition Count",
+		format: CharacteristicFormat? = .uint8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.characteristicValueActiveTransitionCount(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
+	static func characteristicValueTransitionControl(
+		_ value: Data = Data(),
+		permissions: [CharacteristicPermission] = [.read, .write],
+		description: String? = "Characteristic Value Transition Control",
+		format: CharacteristicFormat? = .tlv8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.characteristicValueTransitionControl(
 			value,
 			permissions: permissions,
 			description: description,
@@ -2779,6 +3045,34 @@ public extension AnyCharacteristic {
 			validValuesRange: validValuesRange) as Characteristic)
 	}
 
+	static func currentTransport(
+		_ value: Bool = false,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Current Transport",
+		format: CharacteristicFormat? = .bool,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.currentTransport(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
 	static func currentVerticalTiltAngle(
 		_ value: Int = -90,
 		permissions: [CharacteristicPermission] = [.read, .events],
@@ -2878,6 +3172,62 @@ public extension AnyCharacteristic {
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.displayOrder(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
+	static func eventRetransmissionMaximum(
+		_ value: UInt8 = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Event Retransmission Maximum",
+		format: CharacteristicFormat? = .uint8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.eventRetransmissionMaximum(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
+	static func eventTransmissionCounters(
+		_ value: UInt32 = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Event Transmission Counters",
+		format: CharacteristicFormat? = .uint32,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.eventTransmissionCounters(
 			value,
 			permissions: permissions,
 			description: description,
@@ -3018,6 +3368,34 @@ public extension AnyCharacteristic {
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.hardwareRevision(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
+	static func heartBeat(
+		_ value: UInt32 = 0,
+		permissions: [CharacteristicPermission] = [.read, .events],
+		description: String? = "Heart Beat",
+		format: CharacteristicFormat? = .uint32,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.heartBeat(
 			value,
 			permissions: permissions,
 			description: description,
@@ -3206,7 +3584,7 @@ public extension AnyCharacteristic {
 		format: CharacteristicFormat? = .uint8,
 		unit: CharacteristicUnit? = nil,
 		maxLength: Int? = nil,
-		maxValue: Double? = 5,
+		maxValue: Double? = 6,
 		minValue: Double? = 0,
 		minStep: Double? = 1,
 		validValues: [Double] = [],
@@ -3563,6 +3941,62 @@ public extension AnyCharacteristic {
 			validValuesRange: validValuesRange) as Characteristic)
 	}
 
+	static func macRetransmissionMaximum(
+		_ value: UInt8 = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "MAC Retransmission Maximum",
+		format: CharacteristicFormat? = .uint8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.macRetransmissionMaximum(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
+	static func macTransmissionCounters(
+		_ value: Data = Data(),
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "MAC Transmission Counters",
+		format: CharacteristicFormat? = .data,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.macTransmissionCounters(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
 	static func manufacturer(
 		_ value: String = "",
 		permissions: [CharacteristicPermission] = [.read],
@@ -3578,6 +4012,34 @@ public extension AnyCharacteristic {
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.manufacturer(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
+	static func maximumTransmitPower(
+		_ value: Int = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Maximum Transmit Power",
+		format: CharacteristicFormat? = .int,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.maximumTransmitPower(
 			value,
 			permissions: permissions,
 			description: description,
@@ -3787,6 +4249,34 @@ public extension AnyCharacteristic {
 			validValuesRange: validValuesRange) as Characteristic)
 	}
 
+	static func operatingStateResponse(
+		_ value: Data = Data(),
+		permissions: [CharacteristicPermission] = [.read, .events],
+		description: String? = "Operating State Response",
+		format: CharacteristicFormat? = .tlv8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.operatingStateResponse(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
 	static func outletInUse(
 		_ value: Bool = false,
 		permissions: [CharacteristicPermission] = [.read, .events],
@@ -3914,6 +4404,34 @@ public extension AnyCharacteristic {
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.pictureMode(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
+	static func ping(
+		_ value: Data = Data(),
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Ping",
+		format: CharacteristicFormat? = .data,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.ping(
 			value,
 			permissions: permissions,
 			description: description,
@@ -4110,6 +4628,62 @@ public extension AnyCharacteristic {
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.programmableSwitchOutputState(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
+	static func receivedSignalStrengthIndication(
+		_ value: Int = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Received Signal Strength Indication",
+		format: CharacteristicFormat? = .int,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.receivedSignalStrengthIndication(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
+	static func receiverSensitivity(
+		_ value: Int = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Receiver Sensitivity",
+		format: CharacteristicFormat? = .int,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.receiverSensitivity(
 			value,
 			permissions: permissions,
 			description: description,
@@ -4487,6 +5061,34 @@ public extension AnyCharacteristic {
 			validValuesRange: validValuesRange) as Characteristic)
 	}
 
+	static func signalToNoiseRatio(
+		_ value: Int = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Signal-to-noise Ratio",
+		format: CharacteristicFormat? = .int,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.signalToNoiseRatio(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
 	static func slatType(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read],
@@ -4530,6 +5132,34 @@ public extension AnyCharacteristic {
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.sleepDiscoveryMode(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
+	static func sleepInterval(
+		_ value: UInt32 = 0,
+		permissions: [CharacteristicPermission] = [.read, .events],
+		description: String? = "Sleep Interval",
+		format: CharacteristicFormat? = .uint32,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = 0,
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.sleepInterval(
 			value,
 			permissions: permissions,
 			description: description,
@@ -4726,6 +5356,62 @@ public extension AnyCharacteristic {
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.sulphurDioxideDensity(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
+	static func supportedCharacteristicValueTransitionConfiguration(
+		_ value: Data = Data(),
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Supported Characteristic Value Transition Configuration",
+		format: CharacteristicFormat? = .tlv8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.supportedCharacteristicValueTransitionConfiguration(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
+	static func supportedDiagnosticsSnapshot(
+		_ value: Data = Data(),
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Supported Diagnostics Snapshot",
+		format: CharacteristicFormat? = .tlv8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.supportedDiagnosticsSnapshot(
 			value,
 			permissions: permissions,
 			description: description,
@@ -5215,6 +5901,146 @@ public extension AnyCharacteristic {
 			validValuesRange: validValuesRange) as Characteristic)
 	}
 
+	static func threadControlPoint(
+		_ value: Data? = nil,
+		permissions: [CharacteristicPermission] = [.write],
+		description: String? = "Thread Control Point",
+		format: CharacteristicFormat? = .tlv8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.threadControlPoint(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
+	static func threadNodeCapabilities(
+		_ value: UInt16 = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Thread Node Capabilities",
+		format: CharacteristicFormat? = .uint16,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = 31,
+		minValue: Double? = 0,
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.threadNodeCapabilities(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
+	static func threadOpenthreadVersion(
+		_ value: String = "",
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Thread OpenThread Version",
+		format: CharacteristicFormat? = .string,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.threadOpenthreadVersion(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
+	static func threadStatus(
+		_ value: UInt16 = 0,
+		permissions: [CharacteristicPermission] = [.read, .events],
+		description: String? = "Thread Status",
+		format: CharacteristicFormat? = .uint16,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = 6,
+		minValue: Double? = 0,
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.threadStatus(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
+	static func transmitPower(
+		_ value: Int = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Transmit Power",
+		format: CharacteristicFormat? = .int,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.transmitPower(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
 	static func valveType(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
@@ -5300,10 +6126,10 @@ public extension AnyCharacteristic {
 	}
 
 	static func volume(
-		_ value: Int = 0,
+		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Volume",
-		format: CharacteristicFormat? = .int,
+		format: CharacteristicFormat? = .uint8,
 		unit: CharacteristicUnit? = .percentage,
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
@@ -5370,6 +6196,62 @@ public extension AnyCharacteristic {
 	) -> AnyCharacteristic {
 		return AnyCharacteristic(
 			PredefinedCharacteristic.volumeSelector(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
+	static func wiFiCapabilities(
+		_ value: UInt32 = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Wi-Fi Capabilities",
+		format: CharacteristicFormat? = .uint32,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.wiFiCapabilities(
+			value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange) as Characteristic)
+	}
+
+	static func wiFiConfigurationControl(
+		_ value: Data = Data(),
+		permissions: [CharacteristicPermission] = [.read, .write, .events],
+		description: String? = "Wi-Fi Configuration Control",
+		format: CharacteristicFormat? = .tlv8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> AnyCharacteristic {
+		return AnyCharacteristic(
+			PredefinedCharacteristic.wiFiConfigurationControl(
 			value,
 			permissions: permissions,
 			description: description,
@@ -5610,6 +6492,62 @@ public class PredefinedCharacteristic {
 			validValuesRange: validValuesRange)
 	}
 
+	static func ccaEnergyDetectThreshold(
+		_ value: Int = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "CCA Energy Detect Threshold",
+		format: CharacteristicFormat? = .int,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<Int> {
+		return GenericCharacteristic<Int>(
+			type: .ccaEnergyDetectThreshold,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
+	static func ccaSignalDetectThreshold(
+		_ value: Int = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "CCA Signal Detect Threshold",
+		format: CharacteristicFormat? = .int,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<Int> {
+		return GenericCharacteristic<Int>(
+			type: .ccaSignalDetectThreshold,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
 	static func carbonDioxideDetected(
 		_ value: Enums.CarbonDioxideDetected = .normal,
 		permissions: [CharacteristicPermission] = [.read, .events],
@@ -5765,6 +6703,62 @@ public class PredefinedCharacteristic {
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .carbonMonoxidePeakLevel,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
+	static func characteristicValueActiveTransitionCount(
+		_ value: UInt8 = 0,
+		permissions: [CharacteristicPermission] = [.read, .events],
+		description: String? = "Characteristic Value Active Transition Count",
+		format: CharacteristicFormat? = .uint8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<UInt8> {
+		return GenericCharacteristic<UInt8>(
+			type: .characteristicValueActiveTransitionCount,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
+	static func characteristicValueTransitionControl(
+		_ value: Data = Data(),
+		permissions: [CharacteristicPermission] = [.read, .write],
+		description: String? = "Characteristic Value Transition Control",
+		format: CharacteristicFormat? = .tlv8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<Data> {
+		return GenericCharacteristic<Data>(
+			type: .characteristicValueTransitionControl,
 			value: value,
 			permissions: permissions,
 			description: description,
@@ -6366,6 +7360,34 @@ public class PredefinedCharacteristic {
 			validValuesRange: validValuesRange)
 	}
 
+	static func currentTransport(
+		_ value: Bool = false,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Current Transport",
+		format: CharacteristicFormat? = .bool,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<Bool> {
+		return GenericCharacteristic<Bool>(
+			type: .currentTransport,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
 	static func currentVerticalTiltAngle(
 		_ value: Int = -90,
 		permissions: [CharacteristicPermission] = [.read, .events],
@@ -6465,6 +7487,62 @@ public class PredefinedCharacteristic {
 	) -> GenericCharacteristic<Data> {
 		return GenericCharacteristic<Data>(
 			type: .displayOrder,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
+	static func eventRetransmissionMaximum(
+		_ value: UInt8 = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Event Retransmission Maximum",
+		format: CharacteristicFormat? = .uint8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<UInt8> {
+		return GenericCharacteristic<UInt8>(
+			type: .eventRetransmissionMaximum,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
+	static func eventTransmissionCounters(
+		_ value: UInt32 = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Event Transmission Counters",
+		format: CharacteristicFormat? = .uint32,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<UInt32> {
+		return GenericCharacteristic<UInt32>(
+			type: .eventTransmissionCounters,
 			value: value,
 			permissions: permissions,
 			description: description,
@@ -6605,6 +7683,34 @@ public class PredefinedCharacteristic {
 	) -> GenericCharacteristic<String> {
 		return GenericCharacteristic<String>(
 			type: .hardwareRevision,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
+	static func heartBeat(
+		_ value: UInt32 = 0,
+		permissions: [CharacteristicPermission] = [.read, .events],
+		description: String? = "Heart Beat",
+		format: CharacteristicFormat? = .uint32,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<UInt32> {
+		return GenericCharacteristic<UInt32>(
+			type: .heartBeat,
 			value: value,
 			permissions: permissions,
 			description: description,
@@ -6793,7 +7899,7 @@ public class PredefinedCharacteristic {
 		format: CharacteristicFormat? = .uint8,
 		unit: CharacteristicUnit? = nil,
 		maxLength: Int? = nil,
-		maxValue: Double? = 5,
+		maxValue: Double? = 6,
 		minValue: Double? = 0,
 		minStep: Double? = 1,
 		validValues: [Double] = [],
@@ -7150,6 +8256,62 @@ public class PredefinedCharacteristic {
 			validValuesRange: validValuesRange)
 	}
 
+	static func macRetransmissionMaximum(
+		_ value: UInt8 = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "MAC Retransmission Maximum",
+		format: CharacteristicFormat? = .uint8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<UInt8> {
+		return GenericCharacteristic<UInt8>(
+			type: .macRetransmissionMaximum,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
+	static func macTransmissionCounters(
+		_ value: Data = Data(),
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "MAC Transmission Counters",
+		format: CharacteristicFormat? = .data,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<Data> {
+		return GenericCharacteristic<Data>(
+			type: .macTransmissionCounters,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
 	static func manufacturer(
 		_ value: String = "",
 		permissions: [CharacteristicPermission] = [.read],
@@ -7165,6 +8327,34 @@ public class PredefinedCharacteristic {
 	) -> GenericCharacteristic<String> {
 		return GenericCharacteristic<String>(
 			type: .manufacturer,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
+	static func maximumTransmitPower(
+		_ value: Int = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Maximum Transmit Power",
+		format: CharacteristicFormat? = .int,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<Int> {
+		return GenericCharacteristic<Int>(
+			type: .maximumTransmitPower,
 			value: value,
 			permissions: permissions,
 			description: description,
@@ -7374,6 +8564,34 @@ public class PredefinedCharacteristic {
 			validValuesRange: validValuesRange)
 	}
 
+	static func operatingStateResponse(
+		_ value: Data = Data(),
+		permissions: [CharacteristicPermission] = [.read, .events],
+		description: String? = "Operating State Response",
+		format: CharacteristicFormat? = .tlv8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<Data> {
+		return GenericCharacteristic<Data>(
+			type: .operatingStateResponse,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
 	static func outletInUse(
 		_ value: Bool = false,
 		permissions: [CharacteristicPermission] = [.read, .events],
@@ -7501,6 +8719,34 @@ public class PredefinedCharacteristic {
 	) -> GenericCharacteristic<Enums.PictureMode> {
 		return GenericCharacteristic<Enums.PictureMode>(
 			type: .pictureMode,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
+	static func ping(
+		_ value: Data = Data(),
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Ping",
+		format: CharacteristicFormat? = .data,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<Data> {
+		return GenericCharacteristic<Data>(
+			type: .ping,
 			value: value,
 			permissions: permissions,
 			description: description,
@@ -7697,6 +8943,62 @@ public class PredefinedCharacteristic {
 	) -> GenericCharacteristic<UInt8> {
 		return GenericCharacteristic<UInt8>(
 			type: .programmableSwitchOutputState,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
+	static func receivedSignalStrengthIndication(
+		_ value: Int = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Received Signal Strength Indication",
+		format: CharacteristicFormat? = .int,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<Int> {
+		return GenericCharacteristic<Int>(
+			type: .receivedSignalStrengthIndication,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
+	static func receiverSensitivity(
+		_ value: Int = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Receiver Sensitivity",
+		format: CharacteristicFormat? = .int,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<Int> {
+		return GenericCharacteristic<Int>(
+			type: .receiverSensitivity,
 			value: value,
 			permissions: permissions,
 			description: description,
@@ -8074,6 +9376,34 @@ public class PredefinedCharacteristic {
 			validValuesRange: validValuesRange)
 	}
 
+	static func signalToNoiseRatio(
+		_ value: Int = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Signal-to-noise Ratio",
+		format: CharacteristicFormat? = .int,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<Int> {
+		return GenericCharacteristic<Int>(
+			type: .signalToNoiseRatio,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
 	static func slatType(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read],
@@ -8117,6 +9447,34 @@ public class PredefinedCharacteristic {
 	) -> GenericCharacteristic<Enums.SleepDiscoveryMode> {
 		return GenericCharacteristic<Enums.SleepDiscoveryMode>(
 			type: .sleepDiscoveryMode,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
+	static func sleepInterval(
+		_ value: UInt32 = 0,
+		permissions: [CharacteristicPermission] = [.read, .events],
+		description: String? = "Sleep Interval",
+		format: CharacteristicFormat? = .uint32,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = 0,
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<UInt32> {
+		return GenericCharacteristic<UInt32>(
+			type: .sleepInterval,
 			value: value,
 			permissions: permissions,
 			description: description,
@@ -8313,6 +9671,62 @@ public class PredefinedCharacteristic {
 	) -> GenericCharacteristic<Float> {
 		return GenericCharacteristic<Float>(
 			type: .sulphurDioxideDensity,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
+	static func supportedCharacteristicValueTransitionConfiguration(
+		_ value: Data = Data(),
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Supported Characteristic Value Transition Configuration",
+		format: CharacteristicFormat? = .tlv8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<Data> {
+		return GenericCharacteristic<Data>(
+			type: .supportedCharacteristicValueTransitionConfiguration,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
+	static func supportedDiagnosticsSnapshot(
+		_ value: Data = Data(),
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Supported Diagnostics Snapshot",
+		format: CharacteristicFormat? = .tlv8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<Data> {
+		return GenericCharacteristic<Data>(
+			type: .supportedDiagnosticsSnapshot,
 			value: value,
 			permissions: permissions,
 			description: description,
@@ -8802,6 +10216,146 @@ public class PredefinedCharacteristic {
 			validValuesRange: validValuesRange)
 	}
 
+	static func threadControlPoint(
+		_ value: Data? = nil,
+		permissions: [CharacteristicPermission] = [.write],
+		description: String? = "Thread Control Point",
+		format: CharacteristicFormat? = .tlv8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<Data?> {
+		return GenericCharacteristic<Data?>(
+			type: .threadControlPoint,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
+	static func threadNodeCapabilities(
+		_ value: UInt16 = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Thread Node Capabilities",
+		format: CharacteristicFormat? = .uint16,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = 31,
+		minValue: Double? = 0,
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<UInt16> {
+		return GenericCharacteristic<UInt16>(
+			type: .threadNodeCapabilities,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
+	static func threadOpenthreadVersion(
+		_ value: String = "",
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Thread OpenThread Version",
+		format: CharacteristicFormat? = .string,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<String> {
+		return GenericCharacteristic<String>(
+			type: .threadOpenthreadVersion,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
+	static func threadStatus(
+		_ value: UInt16 = 0,
+		permissions: [CharacteristicPermission] = [.read, .events],
+		description: String? = "Thread Status",
+		format: CharacteristicFormat? = .uint16,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = 6,
+		minValue: Double? = 0,
+		minStep: Double? = 1,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<UInt16> {
+		return GenericCharacteristic<UInt16>(
+			type: .threadStatus,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
+	static func transmitPower(
+		_ value: Int = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Transmit Power",
+		format: CharacteristicFormat? = .int,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<Int> {
+		return GenericCharacteristic<Int>(
+			type: .transmitPower,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
 	static func valveType(
 		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .events],
@@ -8887,10 +10441,10 @@ public class PredefinedCharacteristic {
 	}
 
 	static func volume(
-		_ value: Int = 0,
+		_ value: UInt8 = 0,
 		permissions: [CharacteristicPermission] = [.read, .write, .events],
 		description: String? = "Volume",
-		format: CharacteristicFormat? = .int,
+		format: CharacteristicFormat? = .uint8,
 		unit: CharacteristicUnit? = .percentage,
 		maxLength: Int? = nil,
 		maxValue: Double? = 100,
@@ -8898,8 +10452,8 @@ public class PredefinedCharacteristic {
 		minStep: Double? = 1,
 		validValues: [Double] = [],
 		validValuesRange: Range<Double>? = nil
-	) -> GenericCharacteristic<Int> {
-		return GenericCharacteristic<Int>(
+	) -> GenericCharacteristic<UInt8> {
+		return GenericCharacteristic<UInt8>(
 			type: .volume,
 			value: value,
 			permissions: permissions,
@@ -8957,6 +10511,62 @@ public class PredefinedCharacteristic {
 	) -> GenericCharacteristic<Enums.VolumeSelector?> {
 		return GenericCharacteristic<Enums.VolumeSelector?>(
 			type: .volumeSelector,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
+	static func wiFiCapabilities(
+		_ value: UInt32 = 0,
+		permissions: [CharacteristicPermission] = [.read],
+		description: String? = "Wi-Fi Capabilities",
+		format: CharacteristicFormat? = .uint32,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<UInt32> {
+		return GenericCharacteristic<UInt32>(
+			type: .wiFiCapabilities,
+			value: value,
+			permissions: permissions,
+			description: description,
+			format: format,
+			unit: unit,
+			maxLength: maxLength,
+			maxValue: maxValue,
+			minValue: minValue,
+			minStep: minStep,
+			validValues: validValues,
+			validValuesRange: validValuesRange)
+	}
+
+	static func wiFiConfigurationControl(
+		_ value: Data = Data(),
+		permissions: [CharacteristicPermission] = [.read, .write, .events],
+		description: String? = "Wi-Fi Configuration Control",
+		format: CharacteristicFormat? = .tlv8,
+		unit: CharacteristicUnit? = nil,
+		maxLength: Int? = nil,
+		maxValue: Double? = nil,
+		minValue: Double? = nil,
+		minStep: Double? = nil,
+		validValues: [Double] = [],
+		validValuesRange: Range<Double>? = nil
+	) -> GenericCharacteristic<Data> {
+		return GenericCharacteristic<Data>(
+			type: .wiFiConfigurationControl,
 			value: value,
 			permissions: permissions,
 			description: description,
