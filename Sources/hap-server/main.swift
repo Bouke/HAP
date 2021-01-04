@@ -11,6 +11,26 @@ fileprivate let logger = Logger(label: "bridge")
     import Glibc
 #endif
 
+func createLogHandler(label: String) -> LogHandler {
+    var handler = StreamLogHandler.standardOutput(label: label)
+    #if DEBUG
+        print("DEBUG")
+        switch label {
+        case "hap.encryption":
+            handler.logLevel = .info
+        case _ where label.starts(with: "hap"):
+            handler.logLevel = .debug
+        default:
+            handler.logLevel = .info
+        }
+    #else
+        // No logging
+        handler.logLevel = .critical
+    #endif
+    return handler
+}
+LoggingSystem.bootstrap(createLogHandler)
+
 #if DEBUG
     logger.warning("⚠️  It looks like you're running a debug build, which doesn't perform well. Specify `-c release` for good performance.")
 #endif

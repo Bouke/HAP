@@ -361,12 +361,25 @@ public class Inspector {
         }
 
         write("""
-        public enum AccessoryType: String, Codable {
+        public enum AccessoryType: String, Codable, CustomStringConvertible {
         """)
         for category in categoryInfo.sorted(by: { $0.id < $1.id }) {
             write("\tcase \(categoryName(category.name)) = \"\(category.id)\"")
         }
-        write("}")
+        write("""
+
+            public var description: String {
+                let descriptions = [
+        """)
+        for category in categoryInfo.sorted(by: { $0.id < $1.id }) {
+            write("\t\t\t\"\(category.id)\": \"\(category.name)\",")
+        }
+        write("""
+                ]
+                return descriptions[self.rawValue] ?? ""
+            }
+        }
+        """)
 
         struct ServiceInfo {
             let name: String
@@ -415,7 +428,25 @@ public class Inspector {
         for service in serviceInfo.sorted(by: { $0.className < $1.className }) {
             write("\tstatic let \(serviceName(service.title, uuid: service.id)) = ServiceType(0x\(service.id.suffix(4)))")
         }
-        write("}")
+        write("""
+        }
+
+        extension ServiceType: CustomStringConvertible {
+            public var description: String {
+                let descriptions = [
+        """)
+        for service in serviceInfo.sorted(by: { $0.className < $1.className }) {
+            if let id = Int(service.id, radix: 16) {
+                let idhex = String(id, radix:16, uppercase: true)
+                write("\t\t\t\"\(idhex)\": \"\(service.title)\",")
+            }
+        }
+        write("""
+                ]
+                return descriptions[self.rawValue.uppercased()] ?? ""
+            }
+        }
+        """)
 
         // Characteristic types
 
@@ -481,7 +512,33 @@ public class Inspector {
         for characteristic in characteristicInfo.sorted(by: { $0.title < $1.title }) {
             write("\tstatic let \(serviceName(characteristic.title, uuid: characteristic.id)) = CharacteristicType(0x\(characteristic.id.suffix(4)))")
         }
-        write("}")
+        write("""
+        }
+
+        extension CharacteristicType: CustomStringConvertible {
+            public var description: String {
+                let descriptions = [
+        """)
+
+        for characteristic in characteristicInfo.sorted(by: { $0.title < $1.title }) {
+            if let id = Int(characteristic.id, radix: 16) {
+                let idhex = String(id, radix:16, uppercase: true)
+                write("\t\t\t\"\(idhex)\": \"\(characteristic.title)\",")
+            }
+        }
+
+        for service in serviceInfo.sorted(by: { $0.className < $1.className }) {
+            if let id = Int(service.id, radix: 16) {
+                let idhex = String(id, radix:16, uppercase: true)
+                write("\t\t\t\"\(idhex)\": \"\(service.title)\",")
+            }
+        }
+        write("""
+                ]
+                return descriptions[self.rawValue.uppercased()] ?? ""
+            }
+        }
+        """)
 
         // Characteristic Formats
 
