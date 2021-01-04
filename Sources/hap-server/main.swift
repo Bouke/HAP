@@ -24,13 +24,22 @@ if CommandLine.arguments.contains("--recreate") {
 let livingRoomLightbulb = Accessory.Lightbulb(info: Service.Info(name: "Living Room", serialNumber: "00002"))
 let bedroomNightStand = Accessory.Lightbulb(info: Service.Info(name: "Bedroom", serialNumber: "00003"))
 
+// Security system with multiple zones and statuses fault and tampered.
+let securitySystem = Accessory(info: .init(name: "Multi-Zone", serialNumber: "A1803"),
+                               type: .securitySystem,
+                               services: [
+                                Service.SecuritySystemBase(characteristics: [.name("Zone A"), .statusFault(), .statusTampered()]),
+                                Service.SecuritySystemBase(characteristics: [.name("Zone B"), .statusFault(), .statusTampered()])
+                               ])
+
 let device = Device(
     bridgeInfo: Service.Info(name: "Bridge", serialNumber: "00001"),
     setupCode: "123-44-321",
     storage: storage,
     accessories: [
         livingRoomLightbulb,
-        bedroomNightStand
+        bedroomNightStand,
+        securitySystem,
 //        Accessory.Door(info: Service.Info(name: "Front Door", serialNumber: "00005")),
 //        Accessory.Switch(info: Service.Info(name: "Garden Lights", serialNumber: "00006")),
 //        Accessory.Thermostat(info: Service.Info(name: "Living Room Thermostat", serialNumber: "00007")),
