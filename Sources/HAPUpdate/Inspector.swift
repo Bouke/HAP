@@ -361,13 +361,15 @@ public class Inspector {
         }
 
         write("""
-        public enum AccessoryType: String, Codable, CustomStringConvertible {
+        public enum AccessoryType: String, Codable {
         """)
         for category in categoryInfo.sorted(by: { $0.id < $1.id }) {
             write("\tcase \(categoryName(category.name)) = \"\(category.id)\"")
         }
         write("""
+        }
 
+        extension AccessoryType: CustomStringConvertible {
             public var description: String {
                 let descriptions = [
         """)
@@ -443,7 +445,13 @@ public class Inspector {
         }
         write("""
                 ]
-                return descriptions[self.rawValue.uppercased()] ?? ""
+                switch self {
+                case let .appleDefined(typeCode):
+                    let hex = String(typeCode, radix: 16).uppercased()
+                    return descriptions[hex] ?? "(\\(hex))"
+                case let .custom(uuid):
+                    return "\\(uuid)"
+                }
             }
         }
         """)
@@ -535,7 +543,13 @@ public class Inspector {
         }
         write("""
                 ]
-                return descriptions[self.rawValue.uppercased()] ?? ""
+                switch self {
+                case let .appleDefined(typeCode):
+                    let hex = String(typeCode, radix: 16).uppercased()
+                    return descriptions[hex] ?? "(\\(hex))"
+                case let .custom(uuid):
+                    return "\\(uuid)"
+                }
             }
         }
         """)

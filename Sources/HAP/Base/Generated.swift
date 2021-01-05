@@ -2,13 +2,13 @@
 // framework definitions. Don't make changes to this file directly.
 // Update this file using the `hap-update` tool.
 //
-// Generated on:              3 January 2021
+// Generated on:              5 January 2021
 // HomeKit framework version: 858
 // macOS:                     Version 11.1 (Build 20C69)
 
 import Foundation
 
-public enum AccessoryType: String, Codable, CustomStringConvertible {
+public enum AccessoryType: String, Codable {
 	case other = "1"
 	case bridge = "2"
 	case fan = "3"
@@ -44,7 +44,9 @@ public enum AccessoryType: String, Codable, CustomStringConvertible {
 	case audioReceiver = "34"
 	case televisionSetTopBox = "35"
 	case televisionStreamingStick = "36"
+}
 
+extension AccessoryType: CustomStringConvertible {
     public var description: String {
         let descriptions = [
 			"1": "Other",
@@ -188,7 +190,13 @@ extension ServiceType: CustomStringConvertible {
 			"8B": "Window",
 			"8C": "Window Covering",
         ]
-        return descriptions[self.rawValue.uppercased()] ?? ""
+        switch self {
+        case let .appleDefined(typeCode):
+            let hex = String(typeCode, radix: 16).uppercased()
+            return descriptions[hex] ?? "(\(hex))"
+        case let .custom(uuid):
+            return "\(uuid)"
+        }
     }
 }
 
@@ -555,7 +563,13 @@ extension CharacteristicType: CustomStringConvertible {
 			"8B": "Window",
 			"8C": "Window Covering",
         ]
-        return descriptions[self.rawValue.uppercased()] ?? ""
+        switch self {
+        case let .appleDefined(typeCode):
+            let hex = String(typeCode, radix: 16).uppercased()
+            return descriptions[hex] ?? "(\(hex))"
+        case let .custom(uuid):
+            return "\(uuid)"
+        }
     }
 }
 
