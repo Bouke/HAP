@@ -2,7 +2,7 @@
 // framework definitions. Don't make changes to this file directly.
 // Update this file using the `hap-update` tool.
 //
-// Generated on:              5 January 2021
+// Generated on:              6 January 2021
 // HomeKit framework version: 858
 // macOS:                     Version 11.1 (Build 20C69)
 
@@ -48,44 +48,78 @@ public enum AccessoryType: String, Codable {
 
 extension AccessoryType: CustomStringConvertible {
     public var description: String {
-        let descriptions = [
-			"1": "Other",
-			"2": "Bridge",
-			"3": "Fan",
-			"4": "Garage Door Opener",
-			"5": "Lightbulb",
-			"6": "Door Lock",
-			"7": "Outlet",
-			"8": "Switch",
-			"9": "Thermostat",
-			"10": "Sensor",
-			"11": "Security System",
-			"12": "Door",
-			"13": "Window",
-			"14": "Window Covering",
-			"15": "Programmable Switch",
-			"16": "Range Extender",
-			"17": "IP Camera",
-			"18": "Video Doorbell",
-			"19": "Air Purifier",
-			"20": "Air Heater",
-			"21": "Air Conditioner",
-			"22": "Air Humidifier",
-			"23": "Air Dehumidifier",
-			"24": "Apple TV",
-			"26": "Speaker",
-			"27": "AirPort",
-			"28": "Sprinkler",
-			"29": "Faucet",
-			"30": "Shower Head",
-			"31": "Television",
-			"32": "Target Controller",
-			"33": "Wi-Fi Router",
-			"34": "Audio Receiver",
-			"35": "Television Set Top Box",
-			"36": "Television Streaming Stick",
-        ]
-        return descriptions[self.rawValue] ?? ""
+        switch self {
+		case .other:
+			return "Other"
+		case .bridge:
+			return "Bridge"
+		case .fan:
+			return "Fan"
+		case .garageDoorOpener:
+			return "Garage Door Opener"
+		case .lightbulb:
+			return "Lightbulb"
+		case .doorLock:
+			return "Door Lock"
+		case .outlet:
+			return "Outlet"
+		case .`switch`:
+			return "Switch"
+		case .thermostat:
+			return "Thermostat"
+		case .sensor:
+			return "Sensor"
+		case .securitySystem:
+			return "Security System"
+		case .door:
+			return "Door"
+		case .window:
+			return "Window"
+		case .windowCovering:
+			return "Window Covering"
+		case .programmableSwitch:
+			return "Programmable Switch"
+		case .rangeExtender:
+			return "Range Extender"
+		case .ipCamera:
+			return "IP Camera"
+		case .videoDoorbell:
+			return "Video Doorbell"
+		case .airPurifier:
+			return "Air Purifier"
+		case .airHeater:
+			return "Air Heater"
+		case .airConditioner:
+			return "Air Conditioner"
+		case .airHumidifier:
+			return "Air Humidifier"
+		case .airDehumidifier:
+			return "Air Dehumidifier"
+		case .appleTV:
+			return "Apple TV"
+		case .speaker:
+			return "Speaker"
+		case .airport:
+			return "AirPort"
+		case .sprinkler:
+			return "Sprinkler"
+		case .faucet:
+			return "Faucet"
+		case .showerHead:
+			return "Shower Head"
+		case .television:
+			return "Television"
+		case .targetController:
+			return "Target Controller"
+		case .wiFiRouter:
+			return "Wi-Fi Router"
+		case .audioReceiver:
+			return "Audio Receiver"
+		case .televisionSetTopBox:
+			return "Television Set Top Box"
+		case .televisionStreamingStick:
+			return "Television Streaming Stick"
+        }
     }
 }
 

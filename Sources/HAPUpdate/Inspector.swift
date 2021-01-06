@@ -371,14 +371,14 @@ public class Inspector {
 
         extension AccessoryType: CustomStringConvertible {
             public var description: String {
-                let descriptions = [
+                switch self {
         """)
         for category in categoryInfo.sorted(by: { $0.id < $1.id }) {
-            write("\t\t\t\"\(category.id)\": \"\(category.name)\",")
+            write("\t\tcase .\(categoryName(category.name)):")
+            write("\t\t\treturn \"\(category.name)\"")
         }
         write("""
-                ]
-                return descriptions[self.rawValue] ?? ""
+                }
             }
         }
         """)
