@@ -175,59 +175,107 @@ public extension ServiceType {
 
 extension ServiceType: CustomStringConvertible {
     public var description: String {
-        let descriptions = [
-			"239": "Accessory Runtime Information",
-			"BB": "Air Purifier",
-			"8D": "Air Quality Sensor",
-			"96": "Battery",
-			"97": "Carbon dioxide Sensor",
-			"7F": "Carbon monoxide Sensor",
-			"80": "Contact Sensor",
-			"237": "Diagnostics",
-			"81": "Door",
-			"121": "Doorbell",
-			"40": "Fan",
-			"B7": "Fan",
-			"D7": "Faucet",
-			"BA": "Filter Maintenance",
-			"41": "Garage Door Opener",
-			"BC": "Heater-Cooler",
-			"BD": "Humidifier-Dehumidifier",
-			"82": "Humidity Sensor",
-			"3E": "Accessory Information Service",
-			"D9": "Input Source",
-			"CF": "Irrigation-System",
-			"CC": "Label",
-			"83": "Leak Sensor",
-			"84": "Light Sensor",
-			"43": "Lightbulb",
-			"44": "Lock Management",
-			"45": "Lock Mechanism",
-			"112": "Microphone",
-			"85": "Motion Sensor",
-			"86": "Occupancy Sensor",
-			"47": "Outlet",
-			"7E": "Security System",
-			"B9": "Slats",
-			"87": "Smoke Sensor",
-			"113": "Speaker",
-			"88": "Stateful Programmable Switch",
-			"89": "Stateless Programmable Switch",
-			"49": "Switch",
-			"D8": "Television",
-			"8A": "Temperature Sensor",
-			"4A": "Thermostat",
-			"701": "Thread Transport",
-			"203": "Transfer Transport Management",
-			"D0": "Valve",
-			"22A": "Wi-Fi Transport",
-			"8B": "Window",
-			"8C": "Window Covering",
-        ]
         switch self {
         case let .appleDefined(typeCode):
             let hex = String(typeCode, radix: 16).uppercased()
-            return descriptions[hex] ?? "(\(hex))"
+            switch hex {
+			case "239":
+				return "Accessory Runtime Information"
+			case "BB":
+				return "Air Purifier"
+			case "8D":
+				return "Air Quality Sensor"
+			case "96":
+				return "Battery"
+			case "97":
+				return "Carbon dioxide Sensor"
+			case "7F":
+				return "Carbon monoxide Sensor"
+			case "80":
+				return "Contact Sensor"
+			case "237":
+				return "Diagnostics"
+			case "81":
+				return "Door"
+			case "121":
+				return "Doorbell"
+			case "40":
+				return "Fan"
+			case "B7":
+				return "Fan"
+			case "D7":
+				return "Faucet"
+			case "BA":
+				return "Filter Maintenance"
+			case "41":
+				return "Garage Door Opener"
+			case "BC":
+				return "Heater-Cooler"
+			case "BD":
+				return "Humidifier-Dehumidifier"
+			case "82":
+				return "Humidity Sensor"
+			case "3E":
+				return "Accessory Information Service"
+			case "D9":
+				return "Input Source"
+			case "CF":
+				return "Irrigation-System"
+			case "CC":
+				return "Label"
+			case "83":
+				return "Leak Sensor"
+			case "84":
+				return "Light Sensor"
+			case "43":
+				return "Lightbulb"
+			case "44":
+				return "Lock Management"
+			case "45":
+				return "Lock Mechanism"
+			case "112":
+				return "Microphone"
+			case "85":
+				return "Motion Sensor"
+			case "86":
+				return "Occupancy Sensor"
+			case "47":
+				return "Outlet"
+			case "7E":
+				return "Security System"
+			case "B9":
+				return "Slats"
+			case "87":
+				return "Smoke Sensor"
+			case "113":
+				return "Speaker"
+			case "88":
+				return "Stateful Programmable Switch"
+			case "89":
+				return "Stateless Programmable Switch"
+			case "49":
+				return "Switch"
+			case "D8":
+				return "Television"
+			case "8A":
+				return "Temperature Sensor"
+			case "4A":
+				return "Thermostat"
+			case "701":
+				return "Thread Transport"
+			case "203":
+				return "Transfer Transport Management"
+			case "D0":
+				return "Valve"
+			case "22A":
+				return "Wi-Fi Transport"
+			case "8B":
+				return "Window"
+			case "8C":
+				return "Window Covering"
+            default:
+                return "Apple Defined (\(hex))"
+            }
         case let .custom(uuid):
             return "\(uuid)"
         }
@@ -394,213 +442,321 @@ public extension CharacteristicType {
 
 extension CharacteristicType: CustomStringConvertible {
     public var description: String {
-        let descriptions = [
-			"A6": "Accessory Flags",
-			"B0": "Active",
-			"E7": "Active Identifier",
-			"1": "Administrator Only Access",
-			"A4": "Application Matching Identifier",
-			"5": "Audio Feedback",
-			"68": "Battery Level",
-			"8": "Brightness",
-			"246": "CCA Energy Detect Threshold",
-			"245": "CCA Signal Detect Threshold",
-			"92": "Carbon dioxide Detected",
-			"93": "Carbon dioxide Level",
-			"94": "Carbon dioxide Peak Level",
-			"69": "Carbon monoxide Detected",
-			"90": "Carbon monoxide Level",
-			"91": "Carbon monoxide Peak Level",
-			"24B": "Characteristic Value Active Transition Count",
-			"143": "Characteristic Value Transition Control",
-			"8F": "Charging State",
-			"DD": "Closed Captions",
-			"CE": "Color Temperature",
-			"E3": "Configured Name",
-			"6A": "Contact Sensor State",
-			"D": "Cooling Threshold Temperature",
-			"A9": "Current Air Purifier State",
-			"95": "Current Air Quality",
-			"E": "Current Door State",
-			"AF": "Current Fan State",
-			"B1": "Current Heater-Cooler State",
-			"F": "Current Heating Cooling State",
-			"6C": "Current Horizontal Tilt Angle",
-			"B3": "Current Humidifier-Dehumidifier State",
-			"6B": "Current Light Level",
-			"E0": "Current Media State",
-			"6D": "Current Position",
-			"10": "Current Relative Humidity",
-			"AA": "Current Slat State",
-			"11": "Current Temperature",
-			"C1": "Current Tilt Angle",
-			"22B": "Current Transport",
-			"6E": "Current Vertical Tilt Angle",
-			"135": "Current Visibility State",
-			"B5": "Current Water Level",
-			"136": "Display Order",
-			"23D": "Event Retransmission Maximum",
-			"23E": "Event Transmission Counters",
-			"AC": "Filter Change indication",
-			"AB": "Filter Life Level",
-			"AD": "Filter Reset Change Indication",
-			"52": "Firmware Revision",
-			"53": "Hardware Revision",
-			"24A": "Heart Beat",
-			"12": "Heating Threshold Temperature",
-			"6F": "Hold Position",
-			"13": "Hue",
-			"E6": "Identifier",
-			"14": "Identify",
-			"D2": "In Use",
-			"DC": "Input Device Type",
-			"DB": "Input Source Type",
-			"D6": "Is Configured",
-			"CB": "Label Index",
-			"CD": "Label Namespace",
-			"70": "Leak Detected",
-			"19": "Lock Control Point",
-			"1D": "Lock Current State",
-			"1C": "Lock Last Known Action",
-			"1A": "Lock Management Auto Security Timeout",
-			"A7": "Lock Physical Controls",
-			"1E": "Lock Target State",
-			"1F": "Logs",
-			"247": "MAC Retransmission Maximum",
-			"248": "MAC Transmission Counters",
-			"20": "Manufacturer",
-			"243": "Maximum Transmit Power",
-			"21": "Model",
-			"22": "Motion Detected",
-			"11A": "Mute",
-			"23": "Name",
-			"C4": "Nitrogen dioxide Density",
-			"24": "Obstruction Detected",
-			"71": "Occupancy Detected",
-			"232": "Operating State Response",
-			"26": "Outlet In Use",
-			"C3": "Ozone Density",
-			"C7": "PM10 Density",
-			"C6": "PM2.5 Density",
-			"E2": "Picture Mode",
-			"23C": "Ping",
-			"72": "Position State",
-			"DF": "Power Mode Selection",
-			"25": "Power State",
-			"220": "Product Data",
-			"D1": "Program Mode",
-			"73": "Programmable Switch Event",
-			"74": "Programmable Switch Output State",
-			"23F": "Received Signal Strength Indication",
-			"244": "Receiver Sensitivity",
-			"C9": "Relative Humidity Dehumidifier Threshold",
-			"CA": "Relative Humidity Humidifier Threshold",
-			"D4": "Remaining Duration",
-			"E1": "Remote Key",
-			"28": "Rotation Direction",
-			"29": "Rotation Speed",
-			"2F": "Saturation",
-			"8E": "Security System Alarm Type",
-			"66": "Security System Current State",
-			"67": "Security System Target State",
-			"30": "Serial Number",
-			"D3": "Set Duration",
-			"201": "Setup Transfer Transport",
-			"241": "Signal-to-noise Ratio",
-			"C0": "Slat Type",
-			"E8": "Sleep Discovery Mode",
-			"23A": "Sleep Interval",
-			"76": "Smoke Detected",
-			"54": "Software Revision",
-			"75": "Status Active",
-			"77": "Status Fault",
-			"79": "Status Low Battery",
-			"7A": "Status Tampered",
-			"C5": "Sulphur dioxide Density",
-			"144": "Supported Characteristic Value Transition Configuration",
-			"238": "Supported Diagnostics Snapshot",
-			"202": "Supported Transfer Transport Configuration",
-			"B6": "Swing Mode",
-			"A8": "Target Air Purifier State",
-			"32": "Target Door State",
-			"BF": "Target Fan State",
-			"B2": "Target Heater-Cooler State",
-			"33": "Target Heating Cooling State",
-			"7B": "Target Horizontal Tilt Angle",
-			"B4": "Target Humidifier-Dehumidifier State",
-			"137": "Target Media State",
-			"7C": "Target Position",
-			"34": "Target Relative Humidity",
-			"35": "Target Temperature",
-			"C2": "Target Tilt Angle",
-			"7D": "Target Vertical Tilt Angle",
-			"134": "Target Visibility State",
-			"36": "Temperature Display Units",
-			"704": "Thread Control Point",
-			"702": "Thread Node Capabilities",
-			"706": "Thread OpenThread Version",
-			"703": "Thread Status",
-			"242": "Transmit Power",
-			"D5": "Valve Type",
-			"37": "Version",
-			"C8": "Volatile Organic Compound Density",
-			"119": "Volume",
-			"E9": "Volume Control Type",
-			"EA": "Volume Selector",
-			"22C": "Wi-Fi Capabilities",
-			"22D": "Wi-Fi Configuration Control",
-			"239": "Accessory Runtime Information",
-			"BB": "Air Purifier",
-			"8D": "Air Quality Sensor",
-			"96": "Battery",
-			"97": "Carbon dioxide Sensor",
-			"7F": "Carbon monoxide Sensor",
-			"80": "Contact Sensor",
-			"237": "Diagnostics",
-			"81": "Door",
-			"121": "Doorbell",
-			"40": "Fan",
-			"B7": "Fan",
-			"D7": "Faucet",
-			"BA": "Filter Maintenance",
-			"41": "Garage Door Opener",
-			"BC": "Heater-Cooler",
-			"BD": "Humidifier-Dehumidifier",
-			"82": "Humidity Sensor",
-			"3E": "Accessory Information Service",
-			"D9": "Input Source",
-			"CF": "Irrigation-System",
-			"CC": "Label",
-			"83": "Leak Sensor",
-			"84": "Light Sensor",
-			"43": "Lightbulb",
-			"44": "Lock Management",
-			"45": "Lock Mechanism",
-			"112": "Microphone",
-			"85": "Motion Sensor",
-			"86": "Occupancy Sensor",
-			"47": "Outlet",
-			"7E": "Security System",
-			"B9": "Slats",
-			"87": "Smoke Sensor",
-			"113": "Speaker",
-			"88": "Stateful Programmable Switch",
-			"89": "Stateless Programmable Switch",
-			"49": "Switch",
-			"D8": "Television",
-			"8A": "Temperature Sensor",
-			"4A": "Thermostat",
-			"701": "Thread Transport",
-			"203": "Transfer Transport Management",
-			"D0": "Valve",
-			"22A": "Wi-Fi Transport",
-			"8B": "Window",
-			"8C": "Window Covering",
-        ]
         switch self {
         case let .appleDefined(typeCode):
             let hex = String(typeCode, radix: 16).uppercased()
-            return descriptions[hex] ?? "(\(hex))"
+            switch hex {
+			case "A6":
+				return "Accessory Flags"
+			case "B0":
+				return "Active"
+			case "E7":
+				return "Active Identifier"
+			case "1":
+				return "Administrator Only Access"
+			case "A4":
+				return "Application Matching Identifier"
+			case "5":
+				return "Audio Feedback"
+			case "68":
+				return "Battery Level"
+			case "8":
+				return "Brightness"
+			case "246":
+				return "CCA Energy Detect Threshold"
+			case "245":
+				return "CCA Signal Detect Threshold"
+			case "92":
+				return "Carbon dioxide Detected"
+			case "93":
+				return "Carbon dioxide Level"
+			case "94":
+				return "Carbon dioxide Peak Level"
+			case "69":
+				return "Carbon monoxide Detected"
+			case "90":
+				return "Carbon monoxide Level"
+			case "91":
+				return "Carbon monoxide Peak Level"
+			case "24B":
+				return "Characteristic Value Active Transition Count"
+			case "143":
+				return "Characteristic Value Transition Control"
+			case "8F":
+				return "Charging State"
+			case "DD":
+				return "Closed Captions"
+			case "CE":
+				return "Color Temperature"
+			case "E3":
+				return "Configured Name"
+			case "6A":
+				return "Contact Sensor State"
+			case "D":
+				return "Cooling Threshold Temperature"
+			case "A9":
+				return "Current Air Purifier State"
+			case "95":
+				return "Current Air Quality"
+			case "E":
+				return "Current Door State"
+			case "AF":
+				return "Current Fan State"
+			case "B1":
+				return "Current Heater-Cooler State"
+			case "F":
+				return "Current Heating Cooling State"
+			case "6C":
+				return "Current Horizontal Tilt Angle"
+			case "B3":
+				return "Current Humidifier-Dehumidifier State"
+			case "6B":
+				return "Current Light Level"
+			case "E0":
+				return "Current Media State"
+			case "6D":
+				return "Current Position"
+			case "10":
+				return "Current Relative Humidity"
+			case "AA":
+				return "Current Slat State"
+			case "11":
+				return "Current Temperature"
+			case "C1":
+				return "Current Tilt Angle"
+			case "22B":
+				return "Current Transport"
+			case "6E":
+				return "Current Vertical Tilt Angle"
+			case "135":
+				return "Current Visibility State"
+			case "B5":
+				return "Current Water Level"
+			case "136":
+				return "Display Order"
+			case "23D":
+				return "Event Retransmission Maximum"
+			case "23E":
+				return "Event Transmission Counters"
+			case "AC":
+				return "Filter Change indication"
+			case "AB":
+				return "Filter Life Level"
+			case "AD":
+				return "Filter Reset Change Indication"
+			case "52":
+				return "Firmware Revision"
+			case "53":
+				return "Hardware Revision"
+			case "24A":
+				return "Heart Beat"
+			case "12":
+				return "Heating Threshold Temperature"
+			case "6F":
+				return "Hold Position"
+			case "13":
+				return "Hue"
+			case "E6":
+				return "Identifier"
+			case "14":
+				return "Identify"
+			case "D2":
+				return "In Use"
+			case "DC":
+				return "Input Device Type"
+			case "DB":
+				return "Input Source Type"
+			case "D6":
+				return "Is Configured"
+			case "CB":
+				return "Label Index"
+			case "CD":
+				return "Label Namespace"
+			case "70":
+				return "Leak Detected"
+			case "19":
+				return "Lock Control Point"
+			case "1D":
+				return "Lock Current State"
+			case "1C":
+				return "Lock Last Known Action"
+			case "1A":
+				return "Lock Management Auto Security Timeout"
+			case "A7":
+				return "Lock Physical Controls"
+			case "1E":
+				return "Lock Target State"
+			case "1F":
+				return "Logs"
+			case "247":
+				return "MAC Retransmission Maximum"
+			case "248":
+				return "MAC Transmission Counters"
+			case "20":
+				return "Manufacturer"
+			case "243":
+				return "Maximum Transmit Power"
+			case "21":
+				return "Model"
+			case "22":
+				return "Motion Detected"
+			case "11A":
+				return "Mute"
+			case "23":
+				return "Name"
+			case "C4":
+				return "Nitrogen dioxide Density"
+			case "24":
+				return "Obstruction Detected"
+			case "71":
+				return "Occupancy Detected"
+			case "232":
+				return "Operating State Response"
+			case "26":
+				return "Outlet In Use"
+			case "C3":
+				return "Ozone Density"
+			case "C7":
+				return "PM10 Density"
+			case "C6":
+				return "PM2.5 Density"
+			case "E2":
+				return "Picture Mode"
+			case "23C":
+				return "Ping"
+			case "72":
+				return "Position State"
+			case "DF":
+				return "Power Mode Selection"
+			case "25":
+				return "Power State"
+			case "220":
+				return "Product Data"
+			case "D1":
+				return "Program Mode"
+			case "73":
+				return "Programmable Switch Event"
+			case "74":
+				return "Programmable Switch Output State"
+			case "23F":
+				return "Received Signal Strength Indication"
+			case "244":
+				return "Receiver Sensitivity"
+			case "C9":
+				return "Relative Humidity Dehumidifier Threshold"
+			case "CA":
+				return "Relative Humidity Humidifier Threshold"
+			case "D4":
+				return "Remaining Duration"
+			case "E1":
+				return "Remote Key"
+			case "28":
+				return "Rotation Direction"
+			case "29":
+				return "Rotation Speed"
+			case "2F":
+				return "Saturation"
+			case "8E":
+				return "Security System Alarm Type"
+			case "66":
+				return "Security System Current State"
+			case "67":
+				return "Security System Target State"
+			case "30":
+				return "Serial Number"
+			case "D3":
+				return "Set Duration"
+			case "201":
+				return "Setup Transfer Transport"
+			case "241":
+				return "Signal-to-noise Ratio"
+			case "C0":
+				return "Slat Type"
+			case "E8":
+				return "Sleep Discovery Mode"
+			case "23A":
+				return "Sleep Interval"
+			case "76":
+				return "Smoke Detected"
+			case "54":
+				return "Software Revision"
+			case "75":
+				return "Status Active"
+			case "77":
+				return "Status Fault"
+			case "79":
+				return "Status Low Battery"
+			case "7A":
+				return "Status Tampered"
+			case "C5":
+				return "Sulphur dioxide Density"
+			case "144":
+				return "Supported Characteristic Value Transition Configuration"
+			case "238":
+				return "Supported Diagnostics Snapshot"
+			case "202":
+				return "Supported Transfer Transport Configuration"
+			case "B6":
+				return "Swing Mode"
+			case "A8":
+				return "Target Air Purifier State"
+			case "32":
+				return "Target Door State"
+			case "BF":
+				return "Target Fan State"
+			case "B2":
+				return "Target Heater-Cooler State"
+			case "33":
+				return "Target Heating Cooling State"
+			case "7B":
+				return "Target Horizontal Tilt Angle"
+			case "B4":
+				return "Target Humidifier-Dehumidifier State"
+			case "137":
+				return "Target Media State"
+			case "7C":
+				return "Target Position"
+			case "34":
+				return "Target Relative Humidity"
+			case "35":
+				return "Target Temperature"
+			case "C2":
+				return "Target Tilt Angle"
+			case "7D":
+				return "Target Vertical Tilt Angle"
+			case "134":
+				return "Target Visibility State"
+			case "36":
+				return "Temperature Display Units"
+			case "704":
+				return "Thread Control Point"
+			case "702":
+				return "Thread Node Capabilities"
+			case "706":
+				return "Thread OpenThread Version"
+			case "703":
+				return "Thread Status"
+			case "242":
+				return "Transmit Power"
+			case "D5":
+				return "Valve Type"
+			case "37":
+				return "Version"
+			case "C8":
+				return "Volatile Organic Compound Density"
+			case "119":
+				return "Volume"
+			case "E9":
+				return "Volume Control Type"
+			case "EA":
+				return "Volume Selector"
+			case "22C":
+				return "Wi-Fi Capabilities"
+			case "22D":
+				return "Wi-Fi Configuration Control"
+            default:
+                return "Apple Defined (\(hex))"
+            }
         case let .custom(uuid):
             return "\(uuid)"
         }

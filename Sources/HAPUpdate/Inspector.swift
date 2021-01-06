@@ -435,20 +435,22 @@ public class Inspector {
 
         extension ServiceType: CustomStringConvertible {
             public var description: String {
-                let descriptions = [
+                switch self {
+                case let .appleDefined(typeCode):
+                    let hex = String(typeCode, radix: 16).uppercased()
+                    switch hex {
         """)
         for service in serviceInfo.sorted(by: { $0.className < $1.className }) {
             if let id = Int(service.id, radix: 16) {
                 let idhex = String(id, radix:16, uppercase: true)
-                write("\t\t\t\"\(idhex)\": \"\(service.title)\",")
+                write("\t\t\tcase \"\(idhex)\":")
+                write("\t\t\t\treturn \"\(service.title)\"")
             }
         }
         write("""
-                ]
-                switch self {
-                case let .appleDefined(typeCode):
-                    let hex = String(typeCode, radix: 16).uppercased()
-                    return descriptions[hex] ?? "(\\(hex))"
+                    default:
+                        return "Apple Defined (\\(hex))"
+                    }
                 case let .custom(uuid):
                     return "\\(uuid)"
                 }
@@ -525,28 +527,24 @@ public class Inspector {
 
         extension CharacteristicType: CustomStringConvertible {
             public var description: String {
-                let descriptions = [
+                switch self {
+                case let .appleDefined(typeCode):
+                    let hex = String(typeCode, radix: 16).uppercased()
+                    switch hex {
         """)
 
         for characteristic in characteristicInfo.sorted(by: { $0.title < $1.title }) {
             if let id = Int(characteristic.id, radix: 16) {
                 let idhex = String(id, radix:16, uppercase: true)
-                write("\t\t\t\"\(idhex)\": \"\(characteristic.title)\",")
+                write("\t\t\tcase \"\(idhex)\":")
+                write("\t\t\t\treturn \"\(characteristic.title)\"")
             }
         }
 
-        for service in serviceInfo.sorted(by: { $0.className < $1.className }) {
-            if let id = Int(service.id, radix: 16) {
-                let idhex = String(id, radix:16, uppercase: true)
-                write("\t\t\t\"\(idhex)\": \"\(service.title)\",")
-            }
-        }
         write("""
-                ]
-                switch self {
-                case let .appleDefined(typeCode):
-                    let hex = String(typeCode, radix: 16).uppercased()
-                    return descriptions[hex] ?? "(\\(hex))"
+                    default:
+                        return "Apple Defined (\\(hex))"
+                    }
                 case let .custom(uuid):
                     return "\\(uuid)"
                 }
