@@ -2,14 +2,15 @@ import Foundation
 import Logging
 import HAP
 
-fileprivate let logger = Logger(label: "bridge")
-
 #if os(macOS)
     import Darwin
 #elseif os(Linux)
     import Dispatch
     import Glibc
 #endif
+
+fileprivate let logger = Logger(label: "bridge")
+LoggingSystem.bootstrap(createLogHandler)
 
 #if DEBUG
     logger.warning("⚠️  It looks like you're running a debug build, which doesn't perform well. Specify `-c release` for good performance.")
@@ -62,19 +63,19 @@ class MyDeviceDelegate: DeviceDelegate {
                            ofService service: Service,
                            ofAccessory accessory: Accessory,
                            didChangeValue newValue: T?) {
-        logger.info("Characteristic \(characteristic) in service \(service.type) of accessory \(accessory.info.name.value ?? "") did change: \(String(describing: newValue))")
+        logger.debug("Characteristic \(characteristic) in service \(service.type) of accessory \(accessory.info.name.value ?? "") did change: \(String(describing: newValue))")
     }
 
     func characteristicListenerDidSubscribe(_ accessory: Accessory,
                                             service: Service,
                                             characteristic: AnyCharacteristic) {
-        logger.info("Characteristic \(characteristic) in service \(service.type) of accessory \(accessory.info.name.value ?? "") got a subscriber")
+        logger.debug("Characteristic \(characteristic) in service \(service.type) of accessory \(accessory.info.name.value ?? "") got a subscriber")
     }
 
     func characteristicListenerDidUnsubscribe(_ accessory: Accessory,
                                               service: Service,
                                               characteristic: AnyCharacteristic) {
-        logger.info("Characteristic \(characteristic) in service \(service.type) of accessory \(accessory.info.name.value ?? "") lost a subscriber")
+        logger.debug("Characteristic \(characteristic) in service \(service.type) of accessory \(accessory.info.name.value ?? "") lost a subscriber")
     }
     
     func didChangePairingState(from: PairingState, to: PairingState) {
