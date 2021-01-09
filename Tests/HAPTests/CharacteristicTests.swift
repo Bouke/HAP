@@ -4,7 +4,7 @@ import XCTest
 
 class CharacteristicTests: XCTestCase {
     static var allTests: [(String, (CharacteristicTests) -> () throws -> Void)] {
-        return [
+        [
             ("testReadOptionalValueType", testReadOptionalValueType),
             ("testWriteOptionalValueType", testWriteOptionalValueType),
             ("testReadWriteOptionalValueType", testReadWriteOptionalValueType)

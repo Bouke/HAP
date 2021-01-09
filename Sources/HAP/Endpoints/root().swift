@@ -7,7 +7,7 @@ fileprivate let logger = Logger(label: "hap.endpoints")
 typealias Route = (path: String, application: Responder)
 
 func root(device: Device) -> Responder {
-    return logger(router([
+    logger(router([
         // Unauthenticated endpoints
         ("/", { _, _  in HTTPResponse(body: "Nothing to see here. Pair this Homekit Accessory with an iOS device.") }),
         ("/pair-setup", pairSetup(device: device)),
@@ -22,7 +22,7 @@ func root(device: Device) -> Responder {
 }
 
 func logger(_ application: @escaping Responder) -> Responder {
-    return { context, request in
+    { context, request in
         let response = application(context, request)
         // swiftlint:disable:next line_length
         logger.info("\(context.channel.remoteAddress?.description ?? "N/A") \(request.method) \(request.urlString) \(response.status.code) \(response.body.count ?? 0)")
@@ -32,7 +32,7 @@ func logger(_ application: @escaping Responder) -> Responder {
 }
 
 func router(_ routes: [Route]) -> Responder {
-    return { connection, request in
+    { connection, request in
         guard let route = routes.first(where: { $0.path == request.url.path }) else {
             return .notFound
         }
@@ -41,7 +41,7 @@ func router(_ routes: [Route]) -> Responder {
 }
 
 func protect(_ device: Device, _ application: @escaping Responder) -> Responder {
-    return { context, request in
+    { context, request in
         guard device.controllerHandler?.isChannelVerified(channel: context.channel) ?? false else {
             logger.warning("Unauthorized request to \(request.urlString)")
             return HTTPResponse(

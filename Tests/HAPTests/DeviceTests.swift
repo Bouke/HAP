@@ -4,7 +4,7 @@ import XCTest
 
 class DeviceTests: XCTestCase {
     static var allTests: [(String, (DeviceTests) -> () throws -> Void)] {
-        return [
+        [
             ("testInstanceIdentifiers", testInstanceIdentifiers),
             ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests)
         ]

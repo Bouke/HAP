@@ -31,7 +31,7 @@ public protocol HTTPMessage: CustomStringConvertible, CustomDebugStringConvertib
 extension HTTPMessage {
     /// See `CustomDebugStringConvertible`
     public var debugDescription: String {
-        return description
+        description
     }
 
     /// Updates transport headers for current body.

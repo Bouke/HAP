@@ -1,13 +1,12 @@
 import Foundation
 import HKDF
-import Logging
 import HTTP
+import Logging
 
 fileprivate let logger = Logger(label: "hap.endpoints.characteristics")
 
-// swiftlint:disable:next cyclomatic_complexity
 func characteristics(device: Device) -> Responder {
-    return { context, request in
+    { context, request in
         let channel = context.channel
         var response: HTTPResponse?
         DispatchQueue.main.sync {

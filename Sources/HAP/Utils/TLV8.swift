@@ -1,36 +1,37 @@
 import Foundation
+import HTTP
 
 typealias PairTagTLV8Tuple = (PairTag, Data)
 typealias PairTagTLV8 = [PairTagTLV8Tuple]
 
 extension Array where Element == PairTagTLV8Tuple {
     subscript(index: PairTag) -> Data? {
-        return self.first(where: { $0.0 == index })?.1
+        self.first(where: { $0.0 == index })?.1
     }
 
     var pairStep: PairStep? {
-        return self
+        self
             .first(where: { $0.0 == PairTag.state })?.1
             .first
             .flatMap({ PairStep(rawValue: $0) })
     }
 
     var pairSetupStep: PairSetupStep? {
-        return self
+        self
             .first(where: { $0.0 == PairTag.state })?.1
             .first
             .flatMap({ PairSetupStep(rawValue: $0) })
     }
 
     var error: PairError? {
-        return self
+        self
             .first(where: { $0.0 == PairTag.error })?.1
             .first
             .flatMap({ PairError(rawValue: $0) })
     }
 
     static func == (lhs: [PairTagTLV8Tuple], rhs: [PairTagTLV8Tuple]) -> Bool {
-        return lhs.elementsEqual(rhs, by: ==)
+        lhs.elementsEqual(rhs, by: ==)
     }
 }
 
@@ -70,9 +71,9 @@ func decode<Key>(_ data: Data) throws -> [(Key, Data)] where Key: RawRepresentab
                 result.append((currentType, currentValue))
             }
             currentType = type
-            currentValue = Data(bytes: Array(value))
+            currentValue = Data(Array(value))
         } else {
-            currentValue! += Data(bytes: Array(value))
+            currentValue! += Data(Array(value))
         }
 
         index = endIndex
@@ -86,7 +87,7 @@ func decode<Key>(_ data: Data) throws -> [(Key, Data)] where Key: RawRepresentab
 func encode<Key>(_ array: [(Key, Data)]) -> Data where Key: RawRepresentable, Key.RawValue == UInt8 {
     var result = Data()
     func append(type: UInt8, value: Data.SubSequence) {
-        result.append(Data(bytes: [type, UInt8(value.count)] + value))
+        result.append(Data([type, UInt8(value.count)] + value))
     }
 
     for (type, value) in array {
@@ -233,9 +234,6 @@ enum PairError: UInt8 {
     // Server is busy and cannot accept a pairing request at this time.
     case busy = 0x07
 }
-
-import Foundation
-import HTTP
 
 extension HTTPResponse {
     init(tags: PairTagTLV8) {

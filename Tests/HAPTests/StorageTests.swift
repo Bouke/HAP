@@ -5,7 +5,7 @@ import XCTest
 
 class StorageTests: XCTestCase {
     static var allTests: [(String, (StorageTests) -> () throws -> Void)] {
-        return [
+        [
             ("testFileStorage", testFileStorage)
         ]
     }

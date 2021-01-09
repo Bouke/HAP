@@ -2,7 +2,6 @@
 import Cryptor
 import Foundation
 import Logging
-import Logging
 import NIO
 
 fileprivate let logger = Logger(label: "hap")
@@ -31,7 +30,7 @@ public class Device {
     public let isBridge: Bool
 
     public var setupCode: String {
-         return configuration.setupCode
+         configuration.setupCode
     }
 
     public weak var delegate: DeviceDelegate?
@@ -284,7 +283,7 @@ public class Device {
         for accessory in unwantedAccessories {
             // Ensure the initial accessory is not removed, and that the accessory is in the list
             precondition(accessory.aid != 1, "Cannot remove the Bridge Accessory from a Device")
-            guard let index = accessories.index(where: { $0 === accessory }) else {
+            guard let index = accessories.firstIndex(where: { $0 === accessory }) else {
                 preconditionFailure("Removing a non-existant accessory from the Bridge")
             }
             accessories.remove(at: index)
@@ -341,7 +340,7 @@ public class Device {
     }
 
     public var isPaired: Bool {
-        return pairingState == .paired
+        pairingState == .paired
     }
 
     // Remove all the pairings made with this Device
@@ -372,7 +371,7 @@ public class Device {
 
             // If the last remaining admin controller pairing is removed, all
             // pairings on the accessory must be removed.
-            if configuration.pairings.values.first(where: { $0.role == .admin }) == nil {
+            if !configuration.pairings.values.contains(where: { $0.role == .admin }) {
                 logger.warning("Last remaining admin controller pairing is removed, removing all pairings")
                 let allPairingIdentifiers = configuration.pairings.keys
                 for identifier in allPairingIdentifiers {
@@ -390,7 +389,7 @@ public class Device {
     }
 
     func get(pairingWithIdentifier identifier: PairingIdentifier) -> Pairing? {
-        return configuration.pairings[identifier]
+        configuration.pairings[identifier]
     }
 
     // MARK: - Characteristic listeners
@@ -493,7 +492,7 @@ public class Device {
         let setupHashMaterial = configuration.setupKey + configuration.identifier
 
         if let sha512 = Digest(using: .sha512).update(string: setupHashMaterial) {
-            return Data(bytes: sha512.final()[0..<4]).base64EncodedString()
+            return Data(sha512.final()[0..<4]).base64EncodedString()
         } else {
             return ""
         }
@@ -501,19 +500,19 @@ public class Device {
 
     /// QRCode for easy pairing of controllers with this device.
     public var setupQRCode: QRCode {
-        return QRCode(from: setupURI)
+        QRCode(from: setupURI)
     }
 
     var identifier: String {
-        return configuration.identifier
+        configuration.identifier
     }
 
     var publicKey: PublicKey {
-        return configuration.publicKey
+        configuration.publicKey
     }
 
     var privateKey: PrivateKey {
-        return configuration.privateKey
+        configuration.privateKey
     }
 
     var config: [String: String] {

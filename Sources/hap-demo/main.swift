@@ -1,6 +1,6 @@
 import Foundation
-import Logging
 import HAP
+import Logging
 
 #if os(macOS)
     import Darwin
@@ -40,7 +40,7 @@ let device = Device(
     accessories: [
         livingRoomLightbulb,
         bedroomNightStand,
-        securitySystem,
+        securitySystem
 //        Accessory.Door(info: Service.Info(name: "Front Door", serialNumber: "00005")),
 //        Accessory.Switch(info: Service.Info(name: "Garden Lights", serialNumber: "00006")),
 //        Accessory.Thermostat(info: Service.Info(name: "Living Room Thermostat", serialNumber: "00007")),
@@ -77,13 +77,13 @@ class MyDeviceDelegate: DeviceDelegate {
                                               characteristic: AnyCharacteristic) {
         logger.debug("Characteristic \(characteristic) in service \(service.type) of accessory \(accessory.info.name.value ?? "") lost a subscriber")
     }
-    
+
     func didChangePairingState(from: PairingState, to: PairingState) {
         if to == .notPaired {
             printPairingInstructions()
         }
     }
-    
+
     func printPairingInstructions() {
         if device.isPaired {
             print()

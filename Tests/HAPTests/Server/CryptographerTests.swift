@@ -1,4 +1,4 @@
-// swiftlint:disable force_try line_length
+// swiftlint:disable line_length
 @testable import HAP
 import NIO
 import XCTest
@@ -27,7 +27,7 @@ private final class WriteRecorder: ChannelOutboundHandler {
 
 class CryptographerTests: XCTestCase {
     static var allTests: [(String, (CryptographerTests) -> () throws -> Void)] {
-        return [
+        [
             ("testReadSimpleFrame", testReadSimpleFrame),
             ("testReadMultipleFramesSingleRead", testReadMultipleFramesSingleRead),
             ("testReadPartialFramesMultipleReads", testReadPartialFramesMultipleReads),

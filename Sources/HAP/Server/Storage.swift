@@ -25,7 +25,7 @@ public class FileStorage: Storage {
         rewind(fd)
         var buffer = Data(count: size)
         _ = buffer.withUnsafeMutableBytes {
-            COperatingSystem.fread($0, size, 1, fd)
+            COperatingSystem.fread($0.bindMemory(to: UInt8.self).baseAddress!, size, 1, fd)
         }
         fclose(fd)
         return buffer
@@ -34,7 +34,7 @@ public class FileStorage: Storage {
     public func write(_ newValue: Data) throws {
         let fd = COperatingSystem.fopen(filename, "w")
         _ = newValue.withUnsafeBytes {
-            COperatingSystem.fwrite($0, newValue.count, 1, fd)
+            COperatingSystem.fwrite($0.bindMemory(to: UInt8.self).baseAddress!, newValue.count, 1, fd)
         }
         fclose(fd)
     }
@@ -44,7 +44,7 @@ public class MemoryStorage: Storage {
     var memory = Data()
 
     public func read() throws -> Data {
-        return memory
+        memory
     }
 
     public func write(_ newValue: Data) throws {

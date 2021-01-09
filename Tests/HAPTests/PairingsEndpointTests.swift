@@ -6,7 +6,7 @@ import XCTest
 
 class PairingsEndpointTests: XCTestCase {
     static var allTests: [(String, (PairingsEndpointTests) -> () throws -> Void)] {
-        return [
+        [
             ("testListPairingsNonAdmin", testListPairingsNonAdmin),
             ("testListPairingsAdmin", testListPairingsAdmin),
             ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests)
@@ -28,8 +28,8 @@ class PairingsEndpointTests: XCTestCase {
     func testListPairingsNonAdmin() {
         setupPairingWithRole(.regularUser)
         let request = [
-            (PairTag.state, Data(bytes: [PairStep.request.rawValue])),
-            (PairTag.pairingMethod, Data(bytes: [PairingMethod.listPairings.rawValue]))
+            (PairTag.state, Data([PairStep.request.rawValue])),
+            (PairTag.pairingMethod, Data([PairingMethod.listPairings.rawValue]))
         ]
         let (_, responseBody) = call(request)
         XCTAssertEqual(responseBody?.error, PairError.authenticationFailed)
@@ -38,8 +38,8 @@ class PairingsEndpointTests: XCTestCase {
     func testListPairingsAdmin() {
         setupPairingWithRole(.admin)
         let request = [
-            (PairTag.state, Data(bytes: [PairStep.request.rawValue])),
-            (PairTag.pairingMethod, Data(bytes: [PairingMethod.listPairings.rawValue]))
+            (PairTag.state, Data([PairStep.request.rawValue])),
+            (PairTag.pairingMethod, Data([PairingMethod.listPairings.rawValue]))
         ]
         let (_, responseBody) = call(request)
         XCTAssertEqual(responseBody?.pairStep, PairStep.response)

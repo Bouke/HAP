@@ -46,7 +46,7 @@ extension Device {
 
         /// Generate a random four character setup key, used in setupURI and setupHash
         static internal func generateSetupKey() -> String {
-            return String(arc4random_uniform(1679616), radix: 36, uppercase: true)
+            String(arc4random_uniform(1679616), radix: 36, uppercase: true)
                     .padLeft(toLength: 4, withPad: "0")
         }
     }

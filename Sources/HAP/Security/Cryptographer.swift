@@ -1,13 +1,9 @@
-import Logging
 import Foundation
 import HKDF
+import Logging
 import NIO
 
-fileprivate let logger: Logger = {
-    var _logger = Logger(label: "hap.encryption")
-    _logger.logLevel = .warning
-    return _logger
-}()
+fileprivate let logger = Logger(label: "hap.encryption")
 
 // 5.5.2 Session Security
 // (...)

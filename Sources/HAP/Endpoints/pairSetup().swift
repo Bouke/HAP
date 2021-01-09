@@ -1,7 +1,7 @@
 import Cryptor
-import Logging
 import Foundation
 import HTTP
+import Logging
 import SRP
 
 fileprivate let logger = Logger(label: "hap.pairSetup")
@@ -23,11 +23,11 @@ func pairSetup(device: Device) -> Responder {
                                                               algorithm: algorithm)
     let controller = PairSetupController(device: device)
     func createSession() -> Session {
-        return Session(server: SRP.Server(username: username,
-                                          salt: salt,
-                                          verificationKey: verificationKey,
-                                          group: group,
-                                          algorithm: algorithm))
+        Session(server: SRP.Server(username: username,
+                                   salt: salt,
+                                   verificationKey: verificationKey,
+                                   group: group,
+                                   algorithm: algorithm))
     }
 
     // TODO: this memory is not freed
@@ -66,18 +66,18 @@ func pairSetup(device: Device) -> Responder {
             case .startRequest:
                 let session = createSession()
                 response = try controller.startRequest(data, session)
-                setSession(for:context, to: session)
+                setSession(for: context, to: session)
 
             // M3: iOS Device -> Accessory -- `SRP Verify Request'
             case .verifyRequest:
-                guard let session = getSession(for:context) else {
+                guard let session = getSession(for: context) else {
                     throw PairSetupController.Error.invalidSetupState
                 }
                 response = try controller.verifyRequest(data, session)
 
             // M5: iOS Device -> Accessory -- `Exchange Request'
             case .keyExchangeRequest:
-                guard let session = getSession(for:context) else {
+                guard let session = getSession(for: context) else {
                     throw PairSetupController.Error.invalidSetupState
                 }
                 response = try controller.keyExchangeRequest(data, session)
@@ -89,35 +89,35 @@ func pairSetup(device: Device) -> Responder {
         } catch {
             logger.warning("Could not complete pair setup: \(error)")
 
-            setSession(for:context, to: nil)
+            setSession(for: context, to: nil)
 
             try? device.changePairingState(.notPaired)
 
             switch error {
             case PairSetupController.Error.invalidParameters:
                 response = [
-                    (.state, Data(bytes: [PairSetupStep.waiting.rawValue])),
-                    (.error, Data(bytes: [PairError.unknown.rawValue]))
+                    (.state, Data([PairSetupStep.waiting.rawValue])),
+                    (.error, Data([PairError.unknown.rawValue]))
                 ]
             case PairSetupController.Error.alreadyPaired:
                 response = [
-                    (.state, Data(bytes: [PairSetupStep.startResponse.rawValue])),
-                    (.error, Data(bytes: [PairError.unavailable.rawValue]))
+                    (.state, Data([PairSetupStep.startResponse.rawValue])),
+                    (.error, Data([PairError.unavailable.rawValue]))
                 ]
             case PairSetupController.Error.alreadyPairing:
                 response = [
-                    (.state, Data(bytes: [PairSetupStep.startResponse.rawValue])),
-                    (.error, Data(bytes: [PairError.busy.rawValue]))
+                    (.state, Data([PairSetupStep.startResponse.rawValue])),
+                    (.error, Data([PairError.busy.rawValue]))
                 ]
             case PairSetupController.Error.invalidSetupState:
                 response = [
-                    (.state, Data(bytes: [PairSetupStep.verifyResponse.rawValue])),
-                    (.error, Data(bytes: [PairError.unknown.rawValue]))
+                    (.state, Data([PairSetupStep.verifyResponse.rawValue])),
+                    (.error, Data([PairError.unknown.rawValue]))
                 ]
             case PairSetupController.Error.authenticationFailed:
                 response = [
-                    (.state, Data(bytes: [PairSetupStep.verifyResponse.rawValue])),
-                    (.error, Data(bytes: [PairError.authenticationFailed.rawValue]))
+                    (.state, Data([PairSetupStep.verifyResponse.rawValue])),
+                    (.error, Data([PairError.authenticationFailed.rawValue]))
                 ]
             default:
                 response = nil

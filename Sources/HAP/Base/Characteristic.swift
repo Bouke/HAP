@@ -75,7 +75,7 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
     internal var _value: T?
     public var value: T? {
         get {
-            return _value
+            _value
         }
         set {
             guard newValue != _value else {
@@ -93,7 +93,7 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
     }
 
     func getValue() -> JSONValueType? {
-        return value?.jsonValueType
+        value?.jsonValueType
     }
 
     func setValue(_ newValue: Any?, fromChannel channel: Channel?) throws {
@@ -173,10 +173,10 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
     }
 
     public static func == (lhs: GenericCharacteristic, rhs: GenericCharacteristic) -> Bool {
-        return lhs === rhs
+        lhs === rhs
     }
 
     internal var device: Device? {
-        return service?.accessory?.device
+        service?.accessory?.device
     }
 }

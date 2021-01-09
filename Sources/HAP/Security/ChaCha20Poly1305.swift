@@ -24,7 +24,15 @@ class ChaCha20Poly1305 {
                 additional.withUnsafeBytes { ad in
                     nonce.withUnsafeBytes { npub in
                         key.withUnsafeBytes { k in
-                            crypto_aead_chacha20poly1305_ietf_encrypt(c, nil, m, UInt64(message.count), ad, UInt64(additional.count), nil, npub, k)
+                            crypto_aead_chacha20poly1305_ietf_encrypt(c.bindMemory(to: UInt8.self).baseAddress!,
+                                                                      nil,
+                                                                      m.bindMemory(to: UInt8.self).baseAddress!,
+                                                                      UInt64(message.count),
+                                                                      ad.bindMemory(to: UInt8.self).baseAddress!,
+                                                                      UInt64(additional.count),
+                                                                      nil,
+                                                                      npub.bindMemory(to: UInt8.self).baseAddress!,
+                                                                      k.bindMemory(to: UInt8.self).baseAddress!)
                         }
                     }
                 }
@@ -42,15 +50,20 @@ class ChaCha20Poly1305 {
         cipher.reserveWritableCapacity(message.readableBytes + Int(crypto_aead_chacha20poly1305_ABYTES))
         let additionalLength = UInt64(additional.count)
         let cipherLength = UnsafeMutablePointer<UInt64>.allocate(capacity: 1)
-        let result = cipher.withUnsafeMutableWritableBytes { (cBuffer: UnsafeMutableRawBufferPointer) -> Int32 in
-            let cPointer = cBuffer.baseAddress!.bindMemory(to: UInt8.self, capacity: 1)
-            return message.withUnsafeMutableReadableBytes { (mBuffer: UnsafeMutableRawBufferPointer) -> Int32 in
-                let mPointer = UnsafePointer(mBuffer.baseAddress!.bindMemory(to: UInt8.self, capacity: 1))
-                return additional.withUnsafeBytes { (adBuffer: UnsafeRawBufferPointer) -> Int32 in
-                    let adPointer = adBuffer.baseAddress!.bindMemory(to: UInt8.self, capacity: 1)
-                    return nonce.withUnsafeBytes { (npub: UnsafePointer<UInt8>) -> Int32 in
-                        key.withUnsafeBytes { (k: UnsafePointer<UInt8>) -> Int32 in
-                            crypto_aead_chacha20poly1305_ietf_encrypt(cPointer, cipherLength, mPointer, messageLength, adPointer, additionalLength, nil, npub, k)
+        let result = cipher.withUnsafeMutableWritableBytes { c in
+            message.withUnsafeMutableReadableBytes { m in
+                additional.withUnsafeBytes { ad in
+                    nonce.withUnsafeBytes { npub in
+                        key.withUnsafeBytes { k in
+                            crypto_aead_chacha20poly1305_ietf_encrypt(c.bindMemory(to: UInt8.self).baseAddress!,
+                                                                      cipherLength,
+                                                                      m.bindMemory(to: UInt8.self).baseAddress!,
+                                                                      messageLength,
+                                                                      ad.bindMemory(to: UInt8.self).baseAddress!,
+                                                                      additionalLength,
+                                                                      nil,
+                                                                      npub.bindMemory(to: UInt8.self).baseAddress!,
+                                                                      k.bindMemory(to: UInt8.self).baseAddress!)
                         }
                     }
                 }
@@ -65,12 +78,20 @@ class ChaCha20Poly1305 {
     static func decrypt(cipher: Data, additional: Data = Data(), nonce: Data, key: Data) throws -> Data {
         let nonce = upgradeNonce(nonce)
         var message = Data(count: cipher.count - Int(crypto_aead_chacha20poly1305_ietf_ABYTES))
-        let result = message.withUnsafeMutableBytes { (m: UnsafeMutablePointer<UInt8>) -> Int32 in
-            cipher.withUnsafeBytes { (c: UnsafePointer<UInt8>) -> Int32 in
-                additional.withUnsafeBytes { (ad: UnsafePointer<UInt8>) -> Int32 in
-                    nonce.withUnsafeBytes { (npub: UnsafePointer<UInt8>) -> Int32 in
-                        key.withUnsafeBytes { (k: UnsafePointer<UInt8>) -> Int32 in
-                            crypto_aead_chacha20poly1305_ietf_decrypt(m, nil, nil, c, UInt64(cipher.count), ad, UInt64(additional.count), npub, k)
+        let result = message.withUnsafeMutableBytes { m in
+            cipher.withUnsafeBytes { c in
+                additional.withUnsafeBytes { ad in
+                    nonce.withUnsafeBytes { npub in
+                        key.withUnsafeBytes { k in
+                            crypto_aead_chacha20poly1305_ietf_decrypt(m.bindMemory(to: UInt8.self).baseAddress!,
+                                                                      nil,
+                                                                      nil,
+                                                                      c.bindMemory(to: UInt8.self).baseAddress!,
+                                                                      UInt64(cipher.count),
+                                                                      ad.bindMemory(to: UInt8.self).baseAddress!,
+                                                                      UInt64(additional.count),
+                                                                      npub.bindMemory(to: UInt8.self).baseAddress!,
+                                                                      k.bindMemory(to: UInt8.self).baseAddress!)
                         }
                     }
                 }
@@ -88,15 +109,20 @@ class ChaCha20Poly1305 {
         let cipherLength = UInt64(cipher.readableBytes)
         let additionalLength = UInt64(additional.readableBytes)
         let messageLength = UnsafeMutablePointer<UInt64>.allocate(capacity: 1)
-        let result = message.withUnsafeMutableWritableBytes { (mBuffer: UnsafeMutableRawBufferPointer) -> Int32 in
-            let mPointer = mBuffer.baseAddress!.bindMemory(to: UInt8.self, capacity: 1)
-            return cipher.withUnsafeMutableReadableBytes { (cBuffer: UnsafeMutableRawBufferPointer) -> Int32 in
-                let cPointer = UnsafePointer(cBuffer.baseAddress!.bindMemory(to: UInt8.self, capacity: 1))
-                return additional.withUnsafeMutableReadableBytes { (adBuffer: UnsafeMutableRawBufferPointer) -> Int32 in
-                    let adPointer = UnsafePointer(adBuffer.baseAddress!.bindMemory(to: UInt8.self, capacity: 1))
-                    return nonce.withUnsafeBytes { (npub: UnsafePointer<UInt8>) -> Int32 in
-                        key.withUnsafeBytes { (k: UnsafePointer<UInt8>) -> Int32 in
-                            crypto_aead_chacha20poly1305_ietf_decrypt(mPointer, messageLength, nil, cPointer, cipherLength, adPointer, additionalLength, npub, k)
+        let result = message.withUnsafeMutableWritableBytes { m in
+            cipher.withUnsafeMutableReadableBytes { c in
+                additional.withUnsafeMutableReadableBytes { ad in
+                    nonce.withUnsafeBytes { npub in
+                        key.withUnsafeBytes { k in
+                            crypto_aead_chacha20poly1305_ietf_decrypt(m.bindMemory(to: UInt8.self).baseAddress!,
+                                                                      messageLength,
+                                                                      nil,
+                                                                      c.bindMemory(to: UInt8.self).baseAddress!,
+                                                                      cipherLength,
+                                                                      ad.bindMemory(to: UInt8.self).baseAddress!,
+                                                                      additionalLength,
+                                                                      npub.bindMemory(to: UInt8.self).baseAddress!,
+                                                                      k.bindMemory(to: UInt8.self).baseAddress!)
                         }
                     }
                 }

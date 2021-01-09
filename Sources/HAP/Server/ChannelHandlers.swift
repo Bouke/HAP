@@ -1,7 +1,7 @@
-import Logging
 import Dispatch
 import Foundation
 import HTTP
+import Logging
 import NIO
 import NIOHTTP1
 
@@ -43,10 +43,13 @@ class CryptographerHandler: ChannelDuplexHandler {
 
         repeat {
             let startIndex = cumulationBuffer!.readerIndex
-            guard let length = cumulationBuffer!.readInteger(endianness: Endianness.little, as: Int16.self) else { return }
+            guard let length = cumulationBuffer!.readInteger(endianness: Endianness.little, as: Int16.self) else {
+                return
+            }
             cumulationBuffer!.moveReaderIndex(to: startIndex)
-            guard 2 + length + 16 <= cumulationBuffer!.readableBytes else { return }
-
+            guard 2 + length + 16 <= cumulationBuffer!.readableBytes else {
+                return
+            }
             readOneFrame(context: context, length: Int(length))
         } while cumulationBuffer != nil
     }
@@ -76,7 +79,7 @@ class CryptographerHandler: ChannelDuplexHandler {
         }
 
         var buffer = unwrapOutboundIn(data)
-        while (buffer.readableBytes > 0) {
+        while buffer.readableBytes > 0 {
             writeOneFrame(context: context, buffer: &buffer, promise: promise)
         }
     }
@@ -95,7 +98,7 @@ class CryptographerHandler: ChannelDuplexHandler {
             return
         }
 
-        if (buffer.readableBytes > 0) {
+        if buffer.readableBytes > 0 {
             context.write(wrapOutboundOut(cipher), promise: nil)
         } else {
             context.write(wrapOutboundOut(cipher), promise: promise)
@@ -225,7 +228,7 @@ class ControllerHandler: ChannelDuplexHandler {
     }
 
     func isChannelVerified(channel: Channel) -> Bool {
-        return channelsSyncQueue.sync {
+        channelsSyncQueue.sync {
             pairings.keys.contains(ObjectIdentifier(channel))
         }
     }
@@ -242,7 +245,7 @@ class ControllerHandler: ChannelDuplexHandler {
     }
 
     func getPairingForChannel(_ channel: Channel) -> Pairing? {
-        return channelsSyncQueue.sync {
+        channelsSyncQueue.sync {
             self.pairings[ObjectIdentifier(channel)]
         }
     }
@@ -257,7 +260,7 @@ class ControllerHandler: ChannelDuplexHandler {
         var channelsToClose = [Channel]()
         channelsSyncQueue.sync {
             let channelIdentifiers = pairings.filter { $0.value.identifier == pairing.identifier }.keys
-            channelsToClose = channelIdentifiers.compactMap( { channels[$0] } )
+            channelsToClose = channelIdentifiers.compactMap({ channels[$0] })
         }
         for channel in channelsToClose {
             // This will trigger `channelInactive(context:)`.
