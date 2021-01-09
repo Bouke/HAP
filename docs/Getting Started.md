@@ -35,7 +35,7 @@ sudo apt install swift5
 ```
 
 ## First run
-Now that you have all the dependencies installed, you should be able to build and run the project. For optimal performance, use a release build:
+Now that you have all the dependencies installed, you should be able to build and run the demo. For optimal performance, use a release build:
 ```
-swift run -c release hap-server
+swift run -c release hap-demo
 ```

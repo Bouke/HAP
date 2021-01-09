@@ -6,7 +6,7 @@ let package = Package(
     name: "HAP",
     products: [
         .library(name: "HAP", targets: ["HAP"]),
-        .executable(name: "hap-server", targets: ["hap-server"]),
+        .executable(name: "hap-demo", targets: ["hap-demo"]),
     ],
     dependencies: [
         .package(url: "https://github.com/Bouke/SRP.git", from: "3.1.0"),
@@ -27,7 +27,7 @@ let package = Package(
         .target(name: "COperatingSystem"),
         .target(name: "HTTP", dependencies: ["NIO", "NIOHTTP1", "NIOFoundationCompat", "COperatingSystem"]),
         .target(name: "HAP", dependencies: ["SRP", "Cryptor", "Logging", "HKDF", "Regex", "CQRCode", "HTTP", "CLibSodium"]),
-        .target(name: "hap-server", dependencies: ["HAP", "Logging"]),
+        .target(name: "hap-demo", dependencies: ["HAP", "Logging"]),
         .testTarget(name: "HAPTests", dependencies: ["HAP"]),
     ]
 )
