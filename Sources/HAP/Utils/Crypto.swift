@@ -7,7 +7,8 @@ func crypto(_ f: (UnsafeMutablePointer<UInt8>, UnsafePointer<UInt8>) -> Int32,
     var a = a()
     guard a.withUnsafeMutableBytes({ a in
         b.withUnsafeBytes { b in
-            f(a, b)
+            f(a.bindMemory(to: UInt8.self).baseAddress!,
+              b.bindMemory(to: UInt8.self).baseAddress!)
         }
     }) == 0 else {
         return nil
@@ -23,7 +24,9 @@ func crypto(_ f: (UnsafeMutablePointer<UInt8>, UnsafePointer<UInt8>, UnsafePoint
     guard a.withUnsafeMutableBytes({ a in
         b.withUnsafeBytes { b in
             c.withUnsafeBytes { c in
-                f(a, b, c)
+                f(a.bindMemory(to: UInt8.self).baseAddress!,
+                  b.bindMemory(to: UInt8.self).baseAddress!,
+                  c.bindMemory(to: UInt8.self).baseAddress!)
             }
         }
     }) == 0 else {
