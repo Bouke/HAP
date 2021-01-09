@@ -27,7 +27,7 @@ private final class WriteRecorder: ChannelOutboundHandler {
 
 class CryptographerTests: XCTestCase {
     static var allTests: [(String, (CryptographerTests) -> () throws -> Void)] {
-        return [
+        [
             ("testReadSimpleFrame", testReadSimpleFrame),
             ("testReadMultipleFramesSingleRead", testReadMultipleFramesSingleRead),
             ("testReadPartialFramesMultipleReads", testReadPartialFramesMultipleReads),

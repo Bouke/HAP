@@ -3,18 +3,18 @@ import HTTP
 
 extension HTTPResponse {
     static var noContent: HTTPResponse {
-        return HTTPResponse(status: .noContent)
+        HTTPResponse(status: .noContent)
     }
 
     static var badRequest: HTTPResponse {
-        return HTTPResponse(status: .badRequest)
+        HTTPResponse(status: .badRequest)
     }
 
     static var notFound: HTTPResponse {
-        return HTTPResponse(status: .notFound)
+        HTTPResponse(status: .notFound)
     }
 
     static var internalServerError: HTTPResponse {
-        return HTTPResponse(status: .internalServerError)
+        HTTPResponse(status: .internalServerError)
     }
 }

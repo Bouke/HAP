@@ -58,7 +58,7 @@ open class Accessory: JSONSerializable {
     //
     // This is used for persistance of HomeKit AID's.
     open var serialNumber: String {
-        return info.serialNumber.value!
+        info.serialNumber.value!
     }
 
     public init(info: Service.Info, type: AccessoryType, services: [Service]) {
@@ -110,7 +110,7 @@ open class Accessory: JSONSerializable {
     }
 
     public func serialized() -> [String: JSONValueType] {
-        return [
+        [
             "aid": aid,
             "services": services.map { $0.serialized() }
         ]

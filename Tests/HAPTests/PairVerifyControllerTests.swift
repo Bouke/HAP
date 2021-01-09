@@ -7,7 +7,7 @@ import XCTest
 
 class PairVerifyControllerTests: XCTestCase {
     static var allTests: [(String, (PairVerifyControllerTests) -> () throws -> Void)] {
-        return [
+        [
             ("test", test),
             ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests)
         ]

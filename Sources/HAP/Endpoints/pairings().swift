@@ -1,6 +1,6 @@
 import Foundation
-import Logging
 import HTTP
+import Logging
 
 fileprivate let logger = Logger(label: "hap.endpoints.pairings")
 

@@ -1,6 +1,6 @@
 import Foundation
-import Logging
 import HTTP
+import Logging
 import NIO
 import NIOHTTP1
 
@@ -45,9 +45,9 @@ public class Server: NSObject, NetServiceDelegate {
         device.controllerHandler!.removeSubscriptions = device.removeSubscriberForAllCharacteristics
 
         let applicationHandler = ApplicationHandler(responder: root(device: device))
-        
+
         self.group = worker ?? MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
-        
+
         bootstrap = ServerBootstrap(group: group)
             // Specify backlog and enable SO_REUSEADDR for the server itself
             .serverChannelOption(ChannelOptions.backlog, value: 256)

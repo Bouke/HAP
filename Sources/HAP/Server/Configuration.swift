@@ -62,7 +62,7 @@ extension Device {
 
         // The next aid - should be checked against existing devices to ensure it is unique
         internal mutating func nextAID() -> InstanceID {
-            return aidGenerator.next()!
+            aidGenerator.next()!
         }
 
         internal var pairings: [PairingIdentifier: Pairing] = [:]

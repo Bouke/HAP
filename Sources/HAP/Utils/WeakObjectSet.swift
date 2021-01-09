@@ -13,7 +13,7 @@ class WeakObject<T: AnyObject>: Equatable, Hashable {
     }
 
     static func == <T> (lhs: WeakObject<T>, rhs: WeakObject<T>) -> Bool {
-        return lhs.object === rhs.object
+        lhs.object === rhs.object
     }
 }
 
@@ -29,11 +29,11 @@ struct WeakObjectSet<T: AnyObject>: Sequence, ExpressibleByArrayLiteral where T:
     }
 
     var allObjects: [T] {
-        return objects.compactMap { $0.object }
+        objects.compactMap { $0.object }
     }
 
     func contains(object: T) -> Bool {
-        return self.objects.contains(WeakObject(object))
+        self.objects.contains(WeakObject(object))
     }
 
     mutating func addObject(object: T) {
@@ -57,12 +57,12 @@ struct WeakObjectSet<T: AnyObject>: Sequence, ExpressibleByArrayLiteral where T:
 
     /// Complexity: O(n)
     var isEmpty: Bool {
-        return allObjects.isEmpty
+        allObjects.isEmpty
     }
 
     // Sequence
     func makeIterator() -> IndexingIterator<[T]> {
-        return allObjects.makeIterator()
+        allObjects.makeIterator()
     }
 
     // ExpressibleByArrayLiteral

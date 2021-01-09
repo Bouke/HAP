@@ -1,6 +1,6 @@
-import Logging
 import Foundation
 import HKDF
+import Logging
 import NIO
 
 fileprivate let logger = Logger(label: "hap.encryption")

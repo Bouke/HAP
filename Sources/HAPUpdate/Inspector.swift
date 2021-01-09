@@ -3,7 +3,7 @@ import Foundation
 
 extension String {
     func lowercasedFirstLetter() -> String {
-        return prefix(1).lowercased() + dropFirst()
+        prefix(1).lowercased() + dropFirst()
     }
 
     mutating func lowercasedFirstLetter() {
@@ -20,7 +20,7 @@ extension String {
 
     // Make string into a legal swift instance variable name
     func parameterName() -> String {
-        return self
+        self
             .replacingOccurrences(of: "_", with: " ")
             .replacingOccurrences(of: "-", with: " ")
             .capitalized
@@ -223,7 +223,7 @@ public class Inspector {
     class func inspect(source plistPath: URL, target outputPath: String) throws {
         // Convert HAP unit names to swift instance variable name
         func unitName(_ name: String) -> String {
-            return name.lowercased()
+            name.lowercased()
                 .replacingOccurrences(of: "/", with: " per ")
                 .replacingOccurrences(of: "^3", with: " cubed ")
                 .parameterName()
@@ -438,7 +438,7 @@ public class Inspector {
         """)
         for service in serviceInfo.sorted(by: { $0.className < $1.className }) {
             if let id = Int(service.id, radix: 16) {
-                let idhex = String(id, radix:16, uppercase: true)
+                let idhex = String(id, radix: 16, uppercase: true)
                 write("        case .\(serviceName(service.title, uuid: service.id)): return \"\(service.title)\"")
             }
         }
@@ -479,7 +479,7 @@ public class Inspector {
                 return list
             }
             var isReadable: Bool {
-                return permissions.contains(.read)
+                permissions.contains(.read)
             }
         }
 
@@ -526,7 +526,7 @@ public class Inspector {
         """)
         for characteristic in characteristicInfo.sorted(by: { $0.title < $1.title }) {
             if let id = Int(characteristic.id, radix: 16) {
-                let idhex = String(id, radix:16, uppercase: true)
+                let idhex = String(id, radix: 16, uppercase: true)
                 write("        case .\(serviceName(characteristic.title, uuid: characteristic.id)): return \"\(characteristic.title)\"")
             }
         }
@@ -798,7 +798,7 @@ public class Inspector {
 
         func defaultValue(_ characteristic: CharacteristicInfo) -> String {
             if characteristic.isReadable {
-                if (enumeratedCharacteristics.contains(characteristic.hkname)) {
+                if enumeratedCharacteristics.contains(characteristic.hkname) {
                     guard let defaultCase = defaultEnumCase[characteristic.hkname] else {
                         preconditionFailure("No default enum case for enum \(characteristic.hkname)")
                     }
@@ -897,6 +897,6 @@ enum CharacteristicInfoPermission: String {
 
 extension Array where Element == CharacteristicInfoPermission {
     var arrayLiteral: String {
-        return "[" + self.map { ".\($0)" }.joined(separator: ", ") + "]"
+        "[" + self.map { ".\($0)" }.joined(separator: ", ") + "]"
     }
 }

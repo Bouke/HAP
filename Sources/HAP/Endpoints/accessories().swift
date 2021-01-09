@@ -1,12 +1,12 @@
-import Logging
 import Foundation
 import HKDF
 import HTTP
+import Logging
 
 fileprivate let logger = Logger(label: "hap.endpoints.accessories")
 
 func accessories(device: Device) -> Responder {
-    return { context, request in
+    { _, request in
         guard request.method == .GET else {
             return .badRequest
         }

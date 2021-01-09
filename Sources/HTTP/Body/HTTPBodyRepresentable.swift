@@ -10,7 +10,7 @@ public protocol LosslessHTTPBodyRepresentable {
 extension String: LosslessHTTPBodyRepresentable {
     /// See `LosslessHTTPBodyRepresentable`.
     public func convertToHTTPBody() -> HTTPBody {
-        return HTTPBody(string: self)
+        HTTPBody(string: self)
     }
 }
 
@@ -18,7 +18,7 @@ extension String: LosslessHTTPBodyRepresentable {
 extension Data: LosslessHTTPBodyRepresentable {
     /// See `LosslessHTTPBodyRepresentable`.
     public func convertToHTTPBody() -> HTTPBody {
-        return HTTPBody(data: self)
+        HTTPBody(data: self)
     }
 }
 
@@ -26,7 +26,7 @@ extension Data: LosslessHTTPBodyRepresentable {
 extension StaticString: LosslessHTTPBodyRepresentable {
     /// See `LosslessHTTPBodyRepresentable`.
     public func convertToHTTPBody() -> HTTPBody {
-        return HTTPBody(staticString: self)
+        HTTPBody(staticString: self)
     }
 }
 
@@ -34,6 +34,6 @@ extension StaticString: LosslessHTTPBodyRepresentable {
 extension ByteBuffer: LosslessHTTPBodyRepresentable {
     /// See `LosslessHTTPBodyRepresentable`.
     public func convertToHTTPBody() -> HTTPBody {
-        return HTTPBody(buffer: self)
+        HTTPBody(buffer: self)
     }
 }

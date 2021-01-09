@@ -147,5 +147,5 @@ func getOrCreateAppend<T>(type: CharacteristicType, characteristics: inout [Char
 }
 
 func get<T>(type: CharacteristicType, characteristics: [Characteristic]) -> GenericCharacteristic<T>? {
-    return characteristics.first { $0.type == type } as? GenericCharacteristic<T>
+    characteristics.first { $0.type == type } as? GenericCharacteristic<T>
 }

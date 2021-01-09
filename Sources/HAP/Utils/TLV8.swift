@@ -5,32 +5,32 @@ typealias PairTagTLV8 = [PairTagTLV8Tuple]
 
 extension Array where Element == PairTagTLV8Tuple {
     subscript(index: PairTag) -> Data? {
-        return self.first(where: { $0.0 == index })?.1
+        self.first(where: { $0.0 == index })?.1
     }
 
     var pairStep: PairStep? {
-        return self
+        self
             .first(where: { $0.0 == PairTag.state })?.1
             .first
             .flatMap({ PairStep(rawValue: $0) })
     }
 
     var pairSetupStep: PairSetupStep? {
-        return self
+        self
             .first(where: { $0.0 == PairTag.state })?.1
             .first
             .flatMap({ PairSetupStep(rawValue: $0) })
     }
 
     var error: PairError? {
-        return self
+        self
             .first(where: { $0.0 == PairTag.error })?.1
             .first
             .flatMap({ PairError(rawValue: $0) })
     }
 
     static func == (lhs: [PairTagTLV8Tuple], rhs: [PairTagTLV8Tuple]) -> Bool {
-        return lhs.elementsEqual(rhs, by: ==)
+        lhs.elementsEqual(rhs, by: ==)
     }
 }
 

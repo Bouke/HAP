@@ -16,7 +16,7 @@ public struct HTTPRequest: HTTPMessage {
     ///     httpReq.method = .GET
     ///
     public var method: HTTPMethod {
-        get { return head.method }
+        get { head.method }
         set { head.method = newValue }
     }
 
@@ -25,13 +25,13 @@ public struct HTTPRequest: HTTPMessage {
     ///     httpReq.urlString = "/welcome"
     ///
     public var urlString: String {
-        get { return head.uri }
+        get { head.uri }
         set { head.uri = newValue }
     }
 
     /// The version for this HTTP request.
     public var version: HTTPVersion {
-        get { return head.version }
+        get { head.version }
         set { head.version = newValue }
     }
 
@@ -39,7 +39,7 @@ public struct HTTPRequest: HTTPMessage {
     /// The `"Content-Length"` and `"Transfer-Encoding"` headers will be set automatically
     /// when the `body` property is mutated.
     public var headers: HTTPHeaders {
-        get { return head.headers }
+        get { head.headers }
         set { head.headers = newValue }
     }
 

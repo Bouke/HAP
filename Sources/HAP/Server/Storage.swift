@@ -44,7 +44,7 @@ public class MemoryStorage: Storage {
     var memory = Data()
 
     public func read() throws -> Data {
-        return memory
+        memory
     }
 
     public func write(_ newValue: Data) throws {

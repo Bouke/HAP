@@ -1,8 +1,8 @@
 import CLibSodium
 import Cryptor
-import Logging
 import Foundation
 import HKDF
+import Logging
 import SRP
 
 fileprivate let logger = Logger(label: "hap.controllers.pair-verify")

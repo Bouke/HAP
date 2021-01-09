@@ -8,7 +8,7 @@ extension RunLoop {
 
 extension RunLoopMode {
     static var `default`: RunLoopMode {
-        return RunLoopMode.defaultRunLoopMode
+        RunLoopMode.defaultRunLoopMode
     }
 }
 #endif

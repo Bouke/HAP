@@ -11,12 +11,12 @@ public struct HTTPBody: LosslessHTTPBodyRepresentable, CustomStringConvertible, 
 
     /// Returns the body's contents as `Data`. `nil` if the body is streaming.
     public var data: Data? {
-        return storage.data
+        storage.data
     }
 
     /// The size of the body's contents. `nil` if the body is streaming.
     public var count: Int? {
-        return storage.count
+        storage.count
     }
 
     /// See `CustomStringConvertible`.
@@ -78,7 +78,7 @@ public struct HTTPBody: LosslessHTTPBodyRepresentable, CustomStringConvertible, 
 
     /// See `LosslessHTTPBodyRepresentable`.
     public func convertToHTTPBody() -> HTTPBody {
-        return self
+        self
     }
 }
 

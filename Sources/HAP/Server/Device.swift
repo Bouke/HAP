@@ -31,7 +31,7 @@ public class Device {
     public let isBridge: Bool
 
     public var setupCode: String {
-         return configuration.setupCode
+         configuration.setupCode
     }
 
     public weak var delegate: DeviceDelegate?
@@ -341,7 +341,7 @@ public class Device {
     }
 
     public var isPaired: Bool {
-        return pairingState == .paired
+        pairingState == .paired
     }
 
     // Remove all the pairings made with this Device
@@ -390,7 +390,7 @@ public class Device {
     }
 
     func get(pairingWithIdentifier identifier: PairingIdentifier) -> Pairing? {
-        return configuration.pairings[identifier]
+        configuration.pairings[identifier]
     }
 
     // MARK: - Characteristic listeners
@@ -501,19 +501,19 @@ public class Device {
 
     /// QRCode for easy pairing of controllers with this device.
     public var setupQRCode: QRCode {
-        return QRCode(from: setupURI)
+        QRCode(from: setupURI)
     }
 
     var identifier: String {
-        return configuration.identifier
+        configuration.identifier
     }
 
     var publicKey: PublicKey {
-        return configuration.publicKey
+        configuration.publicKey
     }
 
     var privateKey: PrivateKey {
-        return configuration.privateKey
+        configuration.privateKey
     }
 
     var config: [String: String] {

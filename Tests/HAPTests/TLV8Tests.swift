@@ -6,7 +6,7 @@ import XCTest
 
 class TLV8Tests: XCTestCase {
     static var allTests: [(String, (TLV8Tests) -> () throws -> Void)] {
-        return [
+        [
             ("test", test),
             ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests)
         ]

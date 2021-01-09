@@ -11,13 +11,13 @@ public struct HTTPResponse: HTTPMessage {
 
     /// The HTTP version that corresponds to this response.
     public var version: HTTPVersion {
-        get { return head.version }
+        get { head.version }
         set { head.version = newValue }
     }
 
     /// The HTTP response status.
     public var status: HTTPResponseStatus {
-        get { return head.status }
+        get { head.status }
         set { head.status = newValue }
     }
 
@@ -25,7 +25,7 @@ public struct HTTPResponse: HTTPMessage {
     /// The `"Content-Length"` and `"Transfer-Encoding"` headers will be set automatically
     /// when the `body` property is mutated.
     public var headers: HTTPHeaders {
-        get { return head.headers }
+        get { head.headers }
         set { head.headers = newValue }
     }
 

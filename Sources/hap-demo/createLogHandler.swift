@@ -1,7 +1,6 @@
 import Foundation
 import Logging
 
-
 func createLogHandler(label: String) -> LogHandler {
     var handler = StreamLogHandler.standardOutput(label: label)
     #if DEBUG
