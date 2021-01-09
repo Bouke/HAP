@@ -24,7 +24,7 @@ class PairVerifyControllerTests: XCTestCase {
 
         let controller = PairVerifyController(device: device)
         // these are the client's keys for this verify session
-        let clientSecretKey = try! Data(bytes: Random.generate(byteCount: 32))
+        let clientSecretKey = try! Data(Random.generate(byteCount: 32))
         let clientPublicKey = crypto(crypto_scalarmult_curve25519_base,
                                      Data(count: Int(crypto_scalarmult_curve25519_BYTES)),
                                      clientSecretKey)!
@@ -35,7 +35,7 @@ class PairVerifyControllerTests: XCTestCase {
         do {
             // Client -> Server: public key
             let request: PairTagTLV8 = [
-                (.state, Data(bytes: [PairVerifyStep.startRequest.rawValue])),
+                (.state, Data([PairVerifyStep.startRequest.rawValue])),
                 (.publicKey, clientPublicKey)
             ]
             let resultOuter: PairTagTLV8

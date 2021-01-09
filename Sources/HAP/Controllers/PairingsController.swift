@@ -12,11 +12,11 @@ class PairingsController {
                 [
                     (.identifier, pairing.identifier),
                     (.publicKey, pairing.publicKey),
-                    (.permissions, Data(bytes: [pairing.role.rawValue]))
+                    (.permissions, Data([pairing.role.rawValue]))
                 ]
             }
-            .joined(separator: [(.state, Data(bytes: [PairStep.response.rawValue]))])
+            .joined(separator: [(.state, Data([PairStep.response.rawValue]))])
             //.flatMap { $0 }
-        return [(.state, Data(bytes: [PairStep.response.rawValue]))] + pairings
+        return [(.state, Data([PairStep.response.rawValue]))] + pairings
     }
 }

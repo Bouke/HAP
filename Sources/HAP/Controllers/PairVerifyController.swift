@@ -15,7 +15,7 @@ class PairVerifyController {
         let sharedSecret: Data
 
         init?(clientPublicKey otherPublicKey: Data) {
-            guard let secretKey = (try? Random.generate(byteCount: 32)).flatMap({ Data(bytes: $0) }),
+            guard let secretKey = (try? Random.generate(byteCount: 32)).flatMap({ Data($0) }),
                 let publicKey = crypto(crypto_scalarmult_curve25519_base,
                                        Data(count: Int(crypto_scalarmult_curve25519_BYTES)),
                                        secretKey),
@@ -79,7 +79,7 @@ class PairVerifyController {
         }
 
         let resultOuter: PairTagTLV8 = [
-            (.state, Data(bytes: [PairVerifyStep.startResponse.rawValue])),
+            (.state, Data([PairVerifyStep.startResponse.rawValue])),
             (.publicKey, session.publicKey),
             (.encryptedData, encryptedResultInner)
         ]
@@ -129,7 +129,7 @@ class PairVerifyController {
 
         logger.info("Pair verify completed")
         let result: PairTagTLV8 = [
-            (.state, Data(bytes: [PairVerifyStep.finishResponse.rawValue]))
+            (.state, Data([PairVerifyStep.finishResponse.rawValue]))
         ]
         return (result, pairing)
     }

@@ -264,13 +264,13 @@ public class Inspector {
         // Convert HAP permission flags into comma seperated swift permission enum values
         func permissions(_ permissions: Int) -> String {
             var list = [String]()
-            if permissions & 2 != 0 {
+            if (permissions & 2) == 2 {
                 list.append(".read")
             }
-            if permissions & 4 != 0 {
+            if (permissions & 4) == 4 {
                 list.append(".write")
             }
-            if permissions & 1 != 0 {
+            if (permissions & 1) == 1 {
                 list.append(".events")
             }
             return list.joined(separator: ", ")

@@ -10,7 +10,7 @@ extension Device {
 
     static internal func generateIdentifier() -> String {
         do {
-            return Data(bytes: try Random.generate(byteCount: 6))
+            return Data(try Random.generate(byteCount: 6))
                 .map { String($0, radix: 16, uppercase: true) }
                 .joined(separator: ":")
         } catch {

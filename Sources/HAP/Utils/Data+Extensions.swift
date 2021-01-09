@@ -7,13 +7,6 @@ func + (lhs: Data, rhs: Data) -> Data {
     return result
 }
 
-// Removed in Xcode 8 beta 3
-extension Data {
-    init<C: Collection>(_ collection: C) where C.Iterator.Element == UInt8 {
-        self = Data(bytes: Array(collection))
-    }
-}
-
 extension Data {
     init?(hex: String) {
         var result = [UInt8]()

@@ -25,8 +25,8 @@ func pairings(device: Device) -> Responder {
         guard pairing?.role == .admin else {
             logger.warning("Permission denied (non-admin) to update pairing data: \(data), method: \(method)")
             let result: PairTagTLV8 = [
-                (.state, Data(bytes: [PairStep.response.rawValue])),
-                (.error, Data(bytes: [PairError.authenticationFailed.rawValue]))
+                (.state, Data([PairStep.response.rawValue])),
+                (.error, Data([PairError.authenticationFailed.rawValue]))
             ]
             return HTTPResponse(tags: result)
         }
@@ -59,7 +59,7 @@ func pairings(device: Device) -> Responder {
         }
 
         let result: PairTagTLV8 = [
-            (.state, Data(bytes: [PairStep.response.rawValue]))
+            (.state, Data([PairStep.response.rawValue]))
         ]
         return HTTPResponse(tags: result)
     }
