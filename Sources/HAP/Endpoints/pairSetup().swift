@@ -24,10 +24,10 @@ func pairSetup(device: Device) -> Responder {
     let controller = PairSetupController(device: device)
     func createSession() -> Session {
         Session(server: SRP.Server(username: username,
-                                          salt: salt,
-                                          verificationKey: verificationKey,
-                                          group: group,
-                                          algorithm: algorithm))
+                                   salt: salt,
+                                   verificationKey: verificationKey,
+                                   group: group,
+                                   algorithm: algorithm))
     }
 
     // TODO: this memory is not freed

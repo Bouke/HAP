@@ -371,7 +371,7 @@ public class Device {
 
             // If the last remaining admin controller pairing is removed, all
             // pairings on the accessory must be removed.
-            if configuration.pairings.values.first(where: { $0.role == .admin }) == nil {
+            if !configuration.pairings.values.contains(where: { $0.role == .admin }) {
                 logger.warning("Last remaining admin controller pairing is removed, removing all pairings")
                 let allPairingIdentifiers = configuration.pairings.keys
                 for identifier in allPairingIdentifiers {

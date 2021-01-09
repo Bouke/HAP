@@ -134,7 +134,9 @@ open class Service: NSObject, JSONSerializable {
     }
 }
 
-func getOrCreateAppend<T>(type: CharacteristicType, characteristics: inout [Characteristic], generator: () -> GenericCharacteristic<T>) -> GenericCharacteristic<T> {
+func getOrCreateAppend<T>(type: CharacteristicType,
+                          characteristics: inout [Characteristic],
+                          generator: () -> GenericCharacteristic<T>) -> GenericCharacteristic<T> {
     if let existing = characteristics.first(where: { $0.type == type }) {
         guard let existingCasted = existing as? GenericCharacteristic<T> else {
             preconditionFailure("\(type) needs to have a value type of \(T.self)")

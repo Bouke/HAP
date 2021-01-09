@@ -77,6 +77,7 @@ public struct QRCode {
             let transform = CGAffineTransform(scaleX: 3, y: 3)
 
             if let output = filter.outputImage?.transformed(by: transform) {
+                // Having this comment here stops swiftlint from generating implicit_return violation
                 return output
             }
         }

@@ -1,4 +1,4 @@
-// swiftlint:disable force_cast
+// swiftlint:disable force_cast inclusive_language
 import Foundation
 
 extension String {
@@ -405,12 +405,12 @@ public class Inspector {
                     let required = serviceCharacteristics["Required"] ?? []
                     let optional = serviceCharacteristics["Optional"] ?? []
                     serviceInfo.append(ServiceInfo(name: name,
-                                                    title: title,
-                                                    paramName: serviceName(title, uuid: id),
-                                                    className: serviceName(title, uuid: id).uppercasedFirstLetter(),
-                                                    id: id,
-                                                    required: required,
-                                                    optional: optional
+                                                   title: title,
+                                                   paramName: serviceName(title, uuid: id),
+                                                   className: serviceName(title, uuid: id).uppercasedFirstLetter(),
+                                                   id: id,
+                                                   required: required,
+                                                   optional: optional
                     ))
 
                     whitelistedCharacteristics = whitelistedCharacteristics.union(required)
@@ -495,14 +495,14 @@ public class Inspector {
 
                     characteristicInfo.append(
                         CharacteristicInfo(hkname: name,
-                                            title: title,
-                                            id: id,
-                                            format: format,
-                                            maxValue: dict["MaxValue"] as? NSNumber,
-                                            minValue: dict["MinValue"] as? NSNumber,
-                                            properties: dict["Properties"] as? Int ?? Int(dict["Properties"].debugDescription as! String)!,
-                                            stepValue: dict["StepValue"] as? NSNumber,
-                                            units: dict["Units"] as? String))
+                                           title: title,
+                                           id: id,
+                                           format: format,
+                                           maxValue: dict["MaxValue"] as? NSNumber,
+                                           minValue: dict["MinValue"] as? NSNumber,
+                                           properties: dict["Properties"] as? Int ?? Int(dict["Properties"].debugDescription as! String)!,
+                                           stepValue: dict["StepValue"] as? NSNumber,
+                                           units: dict["Units"] as? String))
                     characteristicFormats.insert(format)
 
                 }
@@ -612,10 +612,10 @@ public class Inspector {
 
         func writeEnumerationCases(_ unsortedCases: NSDictionary, max: NSNumber?) {
             let cases = unsortedCases.sorted(by: {
-                if let v0 = $0.value as? NSNumber {
-                    return v0.intValue < ($1.value as! NSNumber).intValue
-                } else if let v0 = $0.value as? String {
-                    return v0 < ($1.value as! String)
+                if let number = $0.value as? NSNumber {
+                    return number.intValue < ($1.value as! NSNumber).intValue
+                } else if let string = $0.value as? String {
+                    return string < ($1.value as! String)
                 }
                 return false
             }).filter({
@@ -623,10 +623,10 @@ public class Inspector {
                     return true
                 }
                 let val: NSNumber
-                if let v0 = $0.value as? NSNumber {
-                    val = v0
-                } else if let v0 = $0.value as? String,
-                    let num = NumberFormatter().number(from: v0) {
+                if let number = $0.value as? NSNumber {
+                    val = number
+                } else if let string = $0.value as? String,
+                    let num = NumberFormatter().number(from: string) {
                     val = num
                 } else {
                     return true
@@ -747,15 +747,15 @@ public class Inspector {
             var requiredCharacteristicPropertyNames = [String]()
 
             write("        // Required Characteristics")
-            for ch in service.required {
-                if let info = characteristicInfo.first(where: { $0.hkname == ch }) {
+            for characteristic in service.required {
+                if let info = characteristicInfo.first(where: { $0.hkname == characteristic }) {
                     writeCharacteristicProperty(info: info, isOptional: false)
                     requiredCharacteristicPropertyNames.append(info.title.parameterName())
                 }
             }
             write("\n        // Optional Characteristics")
-            for ch in service.optional {
-                if let info = characteristicInfo.first(where: { $0.hkname == ch }) {
+            for characteristic in service.optional {
+                if let info = characteristicInfo.first(where: { $0.hkname == characteristic }) {
                     writeCharacteristicProperty(info: info, isOptional: true)
                 }
             }
@@ -766,8 +766,8 @@ public class Inspector {
                             var unwrapped = characteristics.map { $0.wrapped }
                 """)
 
-            for ch in service.required {
-                if let info = characteristicInfo.first(where: { $0.hkname == ch }) {
+            for characteristic in service.required {
+                if let info = characteristicInfo.first(where: { $0.hkname == characteristic }) {
                     let name = info.title.parameterName()
                     let characteristiceType = ".\(serviceName(info.title, uuid: info.id))"
                     write("""
@@ -779,8 +779,8 @@ public class Inspector {
                 }
             }
 
-            for ch in service.optional {
-                if let info = characteristicInfo.first(where: { $0.hkname == ch }) {
+            for characteristic in service.optional {
+                if let info = characteristicInfo.first(where: { $0.hkname == characteristic }) {
                     let name = info.title.parameterName()
                     let characteristiceType = ".\(serviceName(info.title, uuid: info.id))"
                     write("""
@@ -890,9 +890,9 @@ public class Inspector {
 }
 
 enum CharacteristicInfoPermission: String {
-    case read = "read"
-    case write = "write"
-    case events = "events"
+    case read
+    case write
+    case events
 }
 
 extension Array where Element == CharacteristicInfoPermission {

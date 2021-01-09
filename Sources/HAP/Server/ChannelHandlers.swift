@@ -43,10 +43,13 @@ class CryptographerHandler: ChannelDuplexHandler {
 
         repeat {
             let startIndex = cumulationBuffer!.readerIndex
-            guard let length = cumulationBuffer!.readInteger(endianness: Endianness.little, as: Int16.self) else { return }
+            guard let length = cumulationBuffer!.readInteger(endianness: Endianness.little, as: Int16.self) else {
+                return
+            }
             cumulationBuffer!.moveReaderIndex(to: startIndex)
-            guard 2 + length + 16 <= cumulationBuffer!.readableBytes else { return }
-
+            guard 2 + length + 16 <= cumulationBuffer!.readableBytes else {
+                return
+            }
             readOneFrame(context: context, length: Int(length))
         } while cumulationBuffer != nil
     }

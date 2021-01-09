@@ -1,4 +1,4 @@
-// swiftlint:disable force_try line_length
+// swiftlint:disable line_length
 @testable import HAP
 import NIO
 import XCTest

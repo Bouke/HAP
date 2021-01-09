@@ -5,7 +5,6 @@ import Logging
 
 fileprivate let logger = Logger(label: "hap.endpoints.characteristics")
 
-// swiftlint:disable:next cyclomatic_complexity
 func characteristics(device: Device) -> Responder {
     { context, request in
         let channel = context.channel
