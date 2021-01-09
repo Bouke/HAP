@@ -101,7 +101,7 @@ class MyDeviceDelegate: DeviceDelegate {
 
 var delegate = MyDeviceDelegate()
 device.delegate = delegate
-let server = try Server(device: device, listenPort: 8000)
+let server = try Server(device: device)
 
 // Stop server on interrupt.
 var keepRunning = true
