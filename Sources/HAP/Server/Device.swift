@@ -245,6 +245,7 @@ public class Device {
 
         addToAccessoryList(newAccessories)
 
+        delegate?.didAdd(accessories: newAccessories)
         delegate?.didChangeAccessoryList()
 
         // Write configuration data to persist updated aid's and notify listeners
@@ -308,6 +309,7 @@ public class Device {
                 configuration.aidForAccessorySerialNumber.removeValue(forKey: serialNumber)
             }
         }
+        delegate?.didRemove(accessories: unwantedAccessories)
         delegate?.didChangeAccessoryList()
 
         // write configuration data to persist updated aid's

@@ -55,6 +55,14 @@ public protocol DeviceDelegate: class {
     ///
     func didChangeAccessoryList()
 
+    /// Tells the delegate that one or more Accessories were added.
+    ///
+    func didAdd(accessories: [Accessory])
+
+    /// Tells the delegate that one or more Accessories were removed.
+    ///
+    func didRemove(accessories: [Accessory])
+
     /// Tells the delegate that the value of a characteristic has changed.
     ///
     /// - Parameters:
@@ -89,6 +97,10 @@ public extension DeviceDelegate {
     func didChangePairingState(from: PairingState, to: PairingState) { }
 
     func didChangeAccessoryList() { }
+
+    func didAdd(accessories: [Accessory]) { }
+    
+    func didRemove(accessories: [Accessory]) { }
 
     func characteristic<T>(
         _ characteristic: GenericCharacteristic<T>,
