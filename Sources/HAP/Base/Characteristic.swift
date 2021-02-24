@@ -109,8 +109,8 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
     func getValue(fromChannel channel: Channel?) -> JSONValueType? {
         let currentValue = _value
         DispatchQueue.main.async { [weak self] in
-            if let this = self, let service = this.service {
-                service.accessory?.delegate?.characteristic(this, ofService: service, didGetValue: currentValue)
+            if let self = self, let service = self.service {
+                service.accessory?.delegate?.characteristic(self, ofService: service, didGetValue: currentValue)
             }
         }
         return jsonValue()

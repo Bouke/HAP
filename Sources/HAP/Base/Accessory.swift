@@ -128,7 +128,7 @@ open class Accessory: JSONSerializable {
 /// For example, you might want to update the value of certain characteristics
 /// if the HAP controller is showing interest or makes a change.
 ///
-public protocol AccessoryDelegate: class {
+public protocol AccessoryDelegate: AnyObject {
     /// Characteristic's value was changed by controller. Used for notifying
     func characteristic<T>(
         _ characteristic: GenericCharacteristic<T>,
@@ -139,4 +139,19 @@ public protocol AccessoryDelegate: class {
         _ characteristic: GenericCharacteristic<T>,
         ofService: Service,
         didGetValue: T?)
+
+    /// Tells the delegate that identification of the device was requested.
+    ///
+    /// When the user configures a device, there might be multiple similar
+    /// devices. In order to identify the individual device, HAP
+    /// accommodates for an identification event. When possible, you should
+    /// make the physical device emit sound and/or light for the user to be
+    /// able to identify the device.
+    func didRequestIdentification()
+
+}
+
+extension AccessoryDelegate {
+    // Default implementation ignores the request
+    func didRequestIdentification() { }
 }
