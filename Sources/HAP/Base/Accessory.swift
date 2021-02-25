@@ -151,7 +151,7 @@ public protocol AccessoryDelegate: AnyObject {
 
 }
 
-extension AccessoryDelegate {
+public extension AccessoryDelegate {
     // Default implementation ignores the request
     func didRequestIdentification() { }
 }
