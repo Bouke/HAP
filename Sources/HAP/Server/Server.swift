@@ -23,6 +23,7 @@ public class Server: NSObject, NetServiceDelegate {
 
     let group: EventLoopGroup
     let bootstrap: ServerBootstrap
+    let ownGroup: Bool
 
     let channel: Channel
 
@@ -46,6 +47,7 @@ public class Server: NSObject, NetServiceDelegate {
 
         let applicationHandler = ApplicationHandler(responder: root(device: device))
 
+        self.ownGroup = worker == nil
         self.group = worker ?? MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
 
         bootstrap = ServerBootstrap(group: group)
@@ -107,10 +109,12 @@ public class Server: NSObject, NetServiceDelegate {
     public func stop() throws {
         service.stop()
         channel.close(promise: nil)
-        do {
-            try group.syncShutdownGracefully()
-        } catch {
-            throw ServerError.couldNotStop(error)
+        if ownGroup {
+            do {
+                try group.syncShutdownGracefully()
+            } catch {
+                throw ServerError.couldNotStop(error)
+            }
         }
     }
 
