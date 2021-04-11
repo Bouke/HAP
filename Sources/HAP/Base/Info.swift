@@ -22,6 +22,7 @@ extension Service {
             if characteristic === identify {
                 if let accessory = accessory {
                     accessory.device?.delegate?.didRequestIdentificationOf(accessory)
+                    accessory.delegate?.didRequestIdentification()
                 }
             }
             super.characteristic(characteristic, didChangeValue: newValue)

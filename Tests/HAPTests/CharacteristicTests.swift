@@ -13,7 +13,7 @@ class CharacteristicTests: XCTestCase {
 
     func testReadOptionalValueType() {
         let characteristic = GenericCharacteristic<Bool?>(type: .identify, value: false)
-        guard let value = characteristic.getValue() as? Bool? else {
+        guard let value = characteristic.getValue(fromChannel: nil) as? Bool? else {
             XCTFail("Could not get value")
             return
         }
@@ -36,7 +36,7 @@ class CharacteristicTests: XCTestCase {
         } catch {
             XCTFail("Could not set value: \(error)")
         }
-        guard let value = characteristic.getValue() as? Bool? else {
+        guard let value = characteristic.getValue(fromChannel: nil) as? Bool? else {
             XCTFail("Could not get value")
             return
         }
