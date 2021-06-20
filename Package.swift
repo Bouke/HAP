@@ -1,26 +1,47 @@
-// swift-tools-version:5.1
+// swift-tools-version:5.3
 
 import PackageDescription
 
 let package = Package(
     name: "HAP",
+    platforms: [
+        .macOS(.v11),
+    ],
     products: [
         .library(name: "HAP", targets: ["HAP"]),
         .executable(name: "hap-demo", targets: ["hap-demo"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/Bouke/SRP.git", .branch("swift-crypto")),
+        .package(url: "https://github.com/Bouke/SRP.git", .branch("master")),
         .package(url: "https://github.com/crossroadlabs/Regex.git", from: "1.1.0"),
         .package(url: "https://github.com/apple/swift-nio.git", from: "2.13.0"),
         .package(url: "https://github.com/apple/swift-log.git", Version("0.0.0") ..< Version("2.0.0")),
-        .package(url: "https://github.com/Bouke/swift-crypto.git", .exact("1.1.0-rc.2-patched")),
+        .package(url: "https://github.com/apple/swift-crypto.git", from: "1.1.0"),
     ],
     targets: [
         .target(name: "CQRCode"),
         .target(name: "COperatingSystem"),
-        .target(name: "HTTP", dependencies: ["NIO", "NIOHTTP1", "NIOFoundationCompat", "COperatingSystem"]),
-        .target(name: "HAP", dependencies: ["SRP", "Logging", "Regex", "CQRCode", "HTTP", "Crypto"]),
-        .target(name: "hap-demo", dependencies: ["HAP", "Logging"]),
+        .target(name: "HTTP",
+                dependencies: [
+                    .product(name: "NIO", package: "swift-nio"),
+                    .product(name: "NIOHTTP1", package: "swift-nio"),
+                    .product(name: "NIOFoundationCompat", package: "swift-nio"),
+                    "COperatingSystem",
+                ]),
+        .target(name: "HAP",
+                dependencies: [
+                    "SRP",
+                    .product(name: "Logging", package: "swift-log"),
+                    "Regex",
+                    "CQRCode",
+                    "HTTP",
+                    .product(name: "Crypto", package: "swift-crypto"),
+                ]),
+        .target(name: "hap-demo",
+                dependencies: [
+                    "HAP",
+                    .product(name: "Logging", package: "swift-log")
+                ]),
         .testTarget(name: "HAPTests", dependencies: ["HAP"]),
     ]
 )
