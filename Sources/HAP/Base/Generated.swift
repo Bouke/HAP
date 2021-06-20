@@ -2,9 +2,9 @@
 // framework definitions. Don't make changes to this file directly.
 // Update this file using the `hap-update` tool.
 //
-// Generated on:              8 January 2021
-// HomeKit framework version: 858
-// macOS:                     Version 11.1 (Build 20C69)
+// Generated on:              20 June 2021
+// HomeKit framework version: 868
+// macOS:                     Version 11.3.1 (Build 20E241)
 
 import Foundation
 
@@ -202,6 +202,7 @@ public extension CharacteristicType {
     static let accessoryFlags = CharacteristicType(0x00A6)
     static let active = CharacteristicType(0x00B0)
     static let activeIdentifier = CharacteristicType(0x00E7)
+    static let activityInterval = CharacteristicType(0x023B)
     static let administratorOnlyAccess = CharacteristicType(0x0001)
     static let applicationMatchingIdentifier = CharacteristicType(0x00A4)
     static let audioFeedback = CharacteristicType(0x0005)
@@ -361,6 +362,7 @@ extension CharacteristicType: CustomStringConvertible {
         case .accessoryFlags: return "Accessory Flags"
         case .active: return "Active"
         case .activeIdentifier: return "Active Identifier"
+        case .activityInterval: return "Activity Interval"
         case .administratorOnlyAccess: return "Administrator Only Access"
         case .applicationMatchingIdentifier: return "Application Matching Identifier"
         case .audioFeedback: return "Audio Feedback"
@@ -832,6 +834,7 @@ extension Service {
         public let ping: GenericCharacteristic<Data>
 
         // Optional Characteristics
+        public let activityInterval: GenericCharacteristic<UInt32>?
         public let heartBeat: GenericCharacteristic<UInt32>?
         public let sleepInterval: GenericCharacteristic<UInt32>?
 
@@ -841,6 +844,7 @@ extension Service {
                 type: .ping,
                 characteristics: &unwrapped,
                 generator: { PredefinedCharacteristic.ping() })
+            activityInterval = get(type: .activityInterval, characteristics: unwrapped)
             heartBeat = get(type: .heartBeat, characteristics: unwrapped)
             sleepInterval = get(type: .sleepInterval, characteristics: unwrapped)
             super.init(type: .accessoryRuntimeInformation, characteristics: unwrapped)
@@ -2291,6 +2295,34 @@ public extension AnyCharacteristic {
     ) -> AnyCharacteristic {
         return AnyCharacteristic(
             PredefinedCharacteristic.activeIdentifier(
+            value,
+            permissions: permissions,
+            description: description,
+            format: format,
+            unit: unit,
+            maxLength: maxLength,
+            maxValue: maxValue,
+            minValue: minValue,
+            minStep: minStep,
+            validValues: validValues,
+            validValuesRange: validValuesRange) as Characteristic)
+    }
+
+    static func activityInterval(
+        _ value: UInt32 = 0,
+        permissions: [CharacteristicPermission] = [.read, .events],
+        description: String? = "Activity Interval",
+        format: CharacteristicFormat? = .uint32,
+        unit: CharacteristicUnit? = nil,
+        maxLength: Int? = nil,
+        maxValue: Double? = nil,
+        minValue: Double? = 0,
+        minStep: Double? = 1,
+        validValues: [Double] = [],
+        validValuesRange: Range<Double>? = nil
+    ) -> AnyCharacteristic {
+        return AnyCharacteristic(
+            PredefinedCharacteristic.activityInterval(
             value,
             permissions: permissions,
             description: description,
@@ -6606,6 +6638,34 @@ public class PredefinedCharacteristic {
     ) -> GenericCharacteristic<UInt32> {
         return GenericCharacteristic<UInt32>(
             type: .activeIdentifier,
+            value: value,
+            permissions: permissions,
+            description: description,
+            format: format,
+            unit: unit,
+            maxLength: maxLength,
+            maxValue: maxValue,
+            minValue: minValue,
+            minStep: minStep,
+            validValues: validValues,
+            validValuesRange: validValuesRange)
+    }
+
+    static func activityInterval(
+        _ value: UInt32 = 0,
+        permissions: [CharacteristicPermission] = [.read, .events],
+        description: String? = "Activity Interval",
+        format: CharacteristicFormat? = .uint32,
+        unit: CharacteristicUnit? = nil,
+        maxLength: Int? = nil,
+        maxValue: Double? = nil,
+        minValue: Double? = 0,
+        minStep: Double? = 1,
+        validValues: [Double] = [],
+        validValuesRange: Range<Double>? = nil
+    ) -> GenericCharacteristic<UInt32> {
+        return GenericCharacteristic<UInt32>(
+            type: .activityInterval,
             value: value,
             permissions: permissions,
             description: description,
