@@ -7,8 +7,3 @@ extension Accessory {
         }
     }
 }
-
-extension Service {
-    public class Fan: FanBase {
-    }
-}

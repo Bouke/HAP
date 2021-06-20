@@ -742,7 +742,7 @@ public class Inspector {
         extension Service {
         """)
         for service in serviceInfo.sorted(by: { $0.className < $1.className }) {
-            write("    open class \(service.className)Base: Service {")
+            write("    open class \(service.className): Service {")
 
             var requiredCharacteristicPropertyNames = [String]()
 

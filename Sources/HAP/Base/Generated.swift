@@ -829,7 +829,7 @@ public class Enums {
 }
 
 extension Service {
-    open class AccessoryRuntimeInformationBase: Service {
+    open class AccessoryRuntimeInformation: Service {
         // Required Characteristics
         public let ping: GenericCharacteristic<Data>
 
@@ -851,7 +851,7 @@ extension Service {
         }
     }
 
-    open class AirPurifierBase: Service {
+    open class AirPurifier: Service {
         // Required Characteristics
         public let active: GenericCharacteristic<Enums.Active>
         public let currentAirPurifierState: GenericCharacteristic<Enums.CurrentAirPurifierState>
@@ -885,7 +885,7 @@ extension Service {
         }
     }
 
-    open class AirQualitySensorBase: Service {
+    open class AirQualitySensor: Service {
         // Required Characteristics
         public let currentAirQuality: GenericCharacteristic<Enums.CurrentAirQuality>
 
@@ -923,7 +923,7 @@ extension Service {
         }
     }
 
-    open class BatteryBase: Service {
+    open class Battery: Service {
         // Required Characteristics
         public let statusLowBattery: GenericCharacteristic<Enums.StatusLowBattery>
 
@@ -945,7 +945,7 @@ extension Service {
         }
     }
 
-    open class CarbonDioxideSensorBase: Service {
+    open class CarbonDioxideSensor: Service {
         // Required Characteristics
         public let carbonDioxideDetected: GenericCharacteristic<Enums.CarbonDioxideDetected>
 
@@ -975,7 +975,7 @@ extension Service {
         }
     }
 
-    open class CarbonMonoxideSensorBase: Service {
+    open class CarbonMonoxideSensor: Service {
         // Required Characteristics
         public let carbonMonoxideDetected: GenericCharacteristic<UInt8>
 
@@ -1005,7 +1005,7 @@ extension Service {
         }
     }
 
-    open class ContactSensorBase: Service {
+    open class ContactSensor: Service {
         // Required Characteristics
         public let contactSensorState: GenericCharacteristic<Enums.ContactSensorState>
 
@@ -1031,7 +1031,7 @@ extension Service {
         }
     }
 
-    open class DiagnosticsBase: Service {
+    open class Diagnostics: Service {
         // Required Characteristics
         public let supportedDiagnosticsSnapshot: GenericCharacteristic<Data>
 
@@ -1047,7 +1047,7 @@ extension Service {
         }
     }
 
-    open class DoorBase: Service {
+    open class Door: Service {
         // Required Characteristics
         public let currentPosition: GenericCharacteristic<UInt8>
         public let positionState: GenericCharacteristic<Enums.PositionState>
@@ -1079,7 +1079,7 @@ extension Service {
         }
     }
 
-    open class DoorbellBase: Service {
+    open class Doorbell: Service {
         // Required Characteristics
         public let programmableSwitchEvent: GenericCharacteristic<UInt8>
 
@@ -1105,7 +1105,7 @@ extension Service {
         }
     }
 
-    open class FanBase: Service {
+    open class Fan: Service {
         // Required Characteristics
         public let powerState: GenericCharacteristic<Bool>
 
@@ -1127,7 +1127,7 @@ extension Service {
         }
     }
 
-    open class FanV2Base: Service {
+    open class FanV2: Service {
         // Required Characteristics
         public let active: GenericCharacteristic<Enums.Active>
 
@@ -1157,7 +1157,7 @@ extension Service {
         }
     }
 
-    open class FaucetBase: Service {
+    open class Faucet: Service {
         // Required Characteristics
         public let active: GenericCharacteristic<Enums.Active>
 
@@ -1177,7 +1177,7 @@ extension Service {
         }
     }
 
-    open class FilterMaintenanceBase: Service {
+    open class FilterMaintenance: Service {
         // Required Characteristics
         public let filterChangeIndication: GenericCharacteristic<Enums.FilterChangeIndication>
 
@@ -1199,7 +1199,7 @@ extension Service {
         }
     }
 
-    open class GarageDoorOpenerBase: Service {
+    open class GarageDoorOpener: Service {
         // Required Characteristics
         public let currentDoorState: GenericCharacteristic<Enums.CurrentDoorState>
         public let targetDoorState: GenericCharacteristic<Enums.TargetDoorState>
@@ -1231,7 +1231,7 @@ extension Service {
         }
     }
 
-    open class HeaterCoolerBase: Service {
+    open class HeaterCooler: Service {
         // Required Characteristics
         public let active: GenericCharacteristic<Enums.Active>
         public let currentHeaterCoolerState: GenericCharacteristic<Enums.CurrentHeaterCoolerState>
@@ -1276,7 +1276,7 @@ extension Service {
         }
     }
 
-    open class HumidifierDehumidifierBase: Service {
+    open class HumidifierDehumidifier: Service {
         // Required Characteristics
         public let active: GenericCharacteristic<Enums.Active>
         public let currentHumidifierDehumidifierState: GenericCharacteristic<Enums.CurrentHumidifierDehumidifierState>
@@ -1321,7 +1321,7 @@ extension Service {
         }
     }
 
-    open class HumiditySensorBase: Service {
+    open class HumiditySensor: Service {
         // Required Characteristics
         public let currentRelativeHumidity: GenericCharacteristic<Float>
 
@@ -1347,7 +1347,7 @@ extension Service {
         }
     }
 
-    open class InfoBase: Service {
+    open class Info: Service {
         // Required Characteristics
         public let identify: GenericCharacteristic<Bool?>
         public let manufacturer: GenericCharacteristic<String>
@@ -1397,7 +1397,7 @@ extension Service {
         }
     }
 
-    open class InputSourceBase: Service {
+    open class InputSource: Service {
         // Required Characteristics
         public let configuredName: GenericCharacteristic<String>
         public let inputSourceType: GenericCharacteristic<Enums.InputSourceType>
@@ -1439,7 +1439,7 @@ extension Service {
         }
     }
 
-    open class IrrigationSystemBase: Service {
+    open class IrrigationSystem: Service {
         // Required Characteristics
         public let active: GenericCharacteristic<Enums.Active>
         public let programMode: GenericCharacteristic<UInt8>
@@ -1471,7 +1471,7 @@ extension Service {
         }
     }
 
-    open class LabelBase: Service {
+    open class Label: Service {
         // Required Characteristics
         public let labelNamespace: GenericCharacteristic<UInt8>
 
@@ -1487,7 +1487,7 @@ extension Service {
         }
     }
 
-    open class LeakSensorBase: Service {
+    open class LeakSensor: Service {
         // Required Characteristics
         public let leakDetected: GenericCharacteristic<Enums.LeakDetected>
 
@@ -1513,7 +1513,7 @@ extension Service {
         }
     }
 
-    open class LightSensorBase: Service {
+    open class LightSensor: Service {
         // Required Characteristics
         public let currentLightLevel: GenericCharacteristic<Float>
 
@@ -1539,7 +1539,7 @@ extension Service {
         }
     }
 
-    open class LightbulbBase: Service {
+    open class Lightbulb: Service {
         // Required Characteristics
         public let powerState: GenericCharacteristic<Bool>
 
@@ -1571,7 +1571,7 @@ extension Service {
         }
     }
 
-    open class LockManagementBase: Service {
+    open class LockManagement: Service {
         // Required Characteristics
         public let lockControlPoint: GenericCharacteristic<Data?>
         public let version: GenericCharacteristic<String>
@@ -1606,7 +1606,7 @@ extension Service {
         }
     }
 
-    open class LockMechanismBase: Service {
+    open class LockMechanism: Service {
         // Required Characteristics
         public let lockCurrentState: GenericCharacteristic<Enums.LockCurrentState>
         public let lockTargetState: GenericCharacteristic<Enums.LockTargetState>
@@ -1629,7 +1629,7 @@ extension Service {
         }
     }
 
-    open class MicrophoneBase: Service {
+    open class Microphone: Service {
         // Required Characteristics
         public let mute: GenericCharacteristic<Bool>
 
@@ -1647,7 +1647,7 @@ extension Service {
         }
     }
 
-    open class MotionSensorBase: Service {
+    open class MotionSensor: Service {
         // Required Characteristics
         public let motionDetected: GenericCharacteristic<Bool>
 
@@ -1673,7 +1673,7 @@ extension Service {
         }
     }
 
-    open class OccupancySensorBase: Service {
+    open class OccupancySensor: Service {
         // Required Characteristics
         public let occupancyDetected: GenericCharacteristic<Enums.OccupancyDetected>
 
@@ -1699,7 +1699,7 @@ extension Service {
         }
     }
 
-    open class OutletBase: Service {
+    open class Outlet: Service {
         // Required Characteristics
         public let powerState: GenericCharacteristic<Bool>
 
@@ -1719,7 +1719,7 @@ extension Service {
         }
     }
 
-    open class SecuritySystemBase: Service {
+    open class SecuritySystem: Service {
         // Required Characteristics
         public let securitySystemCurrentState: GenericCharacteristic<Enums.SecuritySystemCurrentState>
         public let securitySystemTargetState: GenericCharacteristic<Enums.SecuritySystemTargetState>
@@ -1748,7 +1748,7 @@ extension Service {
         }
     }
 
-    open class SlatsBase: Service {
+    open class Slats: Service {
         // Required Characteristics
         public let currentSlatState: GenericCharacteristic<Enums.CurrentSlatState>
         public let slatType: GenericCharacteristic<UInt8>
@@ -1777,7 +1777,7 @@ extension Service {
         }
     }
 
-    open class SmokeSensorBase: Service {
+    open class SmokeSensor: Service {
         // Required Characteristics
         public let smokeDetected: GenericCharacteristic<Enums.SmokeDetected>
 
@@ -1803,7 +1803,7 @@ extension Service {
         }
     }
 
-    open class SpeakerBase: Service {
+    open class Speaker: Service {
         // Required Characteristics
         public let mute: GenericCharacteristic<Bool>
 
@@ -1827,7 +1827,7 @@ extension Service {
         }
     }
 
-    open class StatefulProgrammableSwitchBase: Service {
+    open class StatefulProgrammableSwitch: Service {
         // Required Characteristics
         public let programmableSwitchEvent: GenericCharacteristic<UInt8>
         public let programmableSwitchOutputState: GenericCharacteristic<UInt8>
@@ -1850,7 +1850,7 @@ extension Service {
         }
     }
 
-    open class StatelessProgrammableSwitchBase: Service {
+    open class StatelessProgrammableSwitch: Service {
         // Required Characteristics
         public let programmableSwitchEvent: GenericCharacteristic<UInt8>
 
@@ -1870,7 +1870,7 @@ extension Service {
         }
     }
 
-    open class SwitchBase: Service {
+    open class Switch: Service {
         // Required Characteristics
         public let powerState: GenericCharacteristic<Bool>
 
@@ -1888,7 +1888,7 @@ extension Service {
         }
     }
 
-    open class TelevisionBase: Service {
+    open class Television: Service {
         // Required Characteristics
         public let active: GenericCharacteristic<Enums.Active>
         public let activeIdentifier: GenericCharacteristic<UInt32>
@@ -1940,7 +1940,7 @@ extension Service {
         }
     }
 
-    open class TemperatureSensorBase: Service {
+    open class TemperatureSensor: Service {
         // Required Characteristics
         public let currentTemperature: GenericCharacteristic<Float>
 
@@ -1966,7 +1966,7 @@ extension Service {
         }
     }
 
-    open class ThermostatBase: Service {
+    open class Thermostat: Service {
         // Required Characteristics
         public let currentHeatingCoolingState: GenericCharacteristic<Enums.CurrentHeatingCoolingState>
         public let targetHeatingCoolingState: GenericCharacteristic<Enums.TargetHeatingCoolingState>
@@ -2012,7 +2012,7 @@ extension Service {
         }
     }
 
-    open class ThreadTransportBase: Service {
+    open class ThreadTransport: Service {
         // Required Characteristics
         public let currentTransport: GenericCharacteristic<Bool>
         public let threadControlPoint: GenericCharacteristic<Data?>
@@ -2067,7 +2067,7 @@ extension Service {
         }
     }
 
-    open class TransferTransportManagementBase: Service {
+    open class TransferTransportManagement: Service {
         // Required Characteristics
         public let supportedTransferTransportConfiguration: GenericCharacteristic<Data>
         public let setupTransferTransport: GenericCharacteristic<Data?>
@@ -2088,7 +2088,7 @@ extension Service {
         }
     }
 
-    open class ValveBase: Service {
+    open class Valve: Service {
         // Required Characteristics
         public let active: GenericCharacteristic<Enums.Active>
         public let inUse: GenericCharacteristic<UInt8>
@@ -2126,7 +2126,7 @@ extension Service {
         }
     }
 
-    open class WiFiTransportBase: Service {
+    open class WiFiTransport: Service {
         // Required Characteristics
         public let currentTransport: GenericCharacteristic<Bool>
         public let wiFiCapabilities: GenericCharacteristic<UInt32>
@@ -2149,7 +2149,7 @@ extension Service {
         }
     }
 
-    open class WindowBase: Service {
+    open class Window: Service {
         // Required Characteristics
         public let currentPosition: GenericCharacteristic<UInt8>
         public let positionState: GenericCharacteristic<Enums.PositionState>
@@ -2181,7 +2181,7 @@ extension Service {
         }
     }
 
-    open class WindowCoveringBase: Service {
+    open class WindowCovering: Service {
         // Required Characteristics
         public let currentPosition: GenericCharacteristic<UInt8>
         public let positionState: GenericCharacteristic<Enums.PositionState>
