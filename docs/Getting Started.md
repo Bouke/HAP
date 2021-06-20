@@ -31,7 +31,7 @@ There are currently no official binaries from swift.org targetting ARM / Raspbia
 
 ```
 curl -s https://packagecloud.io/install/repositories/swift-arm/release/script.deb.sh | sudo bash
-sudo apt install swift5
+sudo apt install swiftlang
 ```
 
 ## First run
