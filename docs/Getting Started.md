@@ -39,3 +39,5 @@ Now that you have all the dependencies installed, you should be able to build an
 ```
 swift run -c release hap-demo
 ```
+
+[1]: https://github.com/futurejones/swift-arm64
