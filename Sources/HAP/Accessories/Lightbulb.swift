@@ -29,28 +29,27 @@ extension Accessory {
     }
 }
 
-extension Service {
-    open class Lightbulb: LightbulbBase {
+extension Service.Lightbulb {
 
-        public init(type: Accessory.Lightbulb.ColorType, isDimmable: Bool) {
-            var characteristics: [AnyCharacteristic] = []
+    public convenience init(type: Accessory.Lightbulb.ColorType, isDimmable: Bool) {
+        var characteristics: [AnyCharacteristic] = []
 
-            if isDimmable {
-                 characteristics.append(.brightness())
-            }
-
-            switch type {
-            case .color:
-                characteristics.append(.hue())
-                characteristics.append(.saturation())
-            case .colorTemperature(let min, let max):
-                precondition(min >= 50 && max <= 400,
-                             "Maximum range for color temperature is 50...400, \(min)...\(max) is out of bounds")
-                characteristics.append(.colorTemperature(maxValue: max, minValue: min))
-            default:
-                break
-            }
-            super.init(characteristics: characteristics)
+        if isDimmable {
+             characteristics.append(.brightness())
         }
+
+        switch type {
+        case .color:
+            characteristics.append(.hue())
+            characteristics.append(.saturation())
+        case .colorTemperature(let min, let max):
+            precondition(min >= 50 && max <= 400,
+                         "Maximum range for color temperature is 50...400, \(min)...\(max) is out of bounds")
+            characteristics.append(.colorTemperature(maxValue: max, minValue: min))
+        default:
+            break
+        }
+
+        self.init(characteristics: characteristics)
     }
 }

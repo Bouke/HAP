@@ -1,30 +1,34 @@
+import NIO
+
 public typealias Revision = String
 
-extension Service {
-    public class Info: InfoBase {
+extension Service.Info {
+    public convenience init(name: String,
+                            serialNumber: String,
+                            manufacturer: String = "unknown",
+                            model: String = "unknown",
+                            firmwareRevision: Revision = "1") {
+        self.init(characteristics: [
+            AnyCharacteristic(IdentifyCharacteristic()),
+            .name(name),
+            .serialNumber(serialNumber),
+            .manufacturer(manufacturer),
+            .model(model),
+            .firmwareRevision(firmwareRevision)
+        ])
+    }
+}
 
-        public init(name: String,
-                    serialNumber: String,
-                    manufacturer: String = "unknown",
-                    model: String = "unknown",
-                    firmwareRevision: Revision = "1") {
-            super.init(characteristics: [
-                .name(name),
-                .serialNumber(serialNumber),
-                .manufacturer(manufacturer),
-                .model(model),
-                .firmwareRevision(firmwareRevision)
-            ])
-        }
+public class IdentifyCharacteristic: GenericCharacteristic<Bool?> {
+    init() {
+        super.init(type: .identify, permissions: [.write], description: "Identify", format: .bool)
+    }
 
-        open override func characteristic<T>(_ characteristic: GenericCharacteristic<T>,
-                                             didChangeValue newValue: T?) {
-            if characteristic === identify {
-                if let accessory = accessory {
-                    accessory.device?.delegate?.didRequestIdentificationOf(accessory)
-                }
-            }
-            super.characteristic(characteristic, didChangeValue: newValue)
+    open override func setValue(_ newValue: Any?, fromChannel channel: Channel?) throws {
+        try super.setValue(newValue, fromChannel: channel)
+
+        if let accessory = service?.accessory {
+            accessory.device?.delegate?.didRequestIdentificationOf(accessory)
         }
     }
 }

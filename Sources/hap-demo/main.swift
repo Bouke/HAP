@@ -29,8 +29,8 @@ let bedroomNightStand = Accessory.Lightbulb(info: Service.Info(name: "Bedroom", 
 let securitySystem = Accessory(info: .init(name: "Multi-Zone", serialNumber: "A1803"),
                                type: .securitySystem,
                                services: [
-                                Service.SecuritySystemBase(characteristics: [.name("Zone A"), .statusFault(), .statusTampered()]),
-                                Service.SecuritySystemBase(characteristics: [.name("Zone B"), .statusFault(), .statusTampered()])
+                                Service.SecuritySystem(characteristics: [.name("Zone A"), .statusFault(), .statusTampered()]),
+                                Service.SecuritySystem(characteristics: [.name("Zone B"), .statusFault(), .statusTampered()])
                                ])
 
 let device = Device(

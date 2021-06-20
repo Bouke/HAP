@@ -1,7 +1,7 @@
 extension Accessory {
     open class Television: Accessory {
         public let television = Service.Television()
-        public let speaker: Service.SpeakerBase
+        public let speaker: Service.Speaker
         public var sources = [Service.InputSource]()
 
         public init(info: Service.Info, inputs: [(String, Enums.InputSourceType)], additionalServices: [Service] = []) {
@@ -28,32 +28,28 @@ extension Accessory {
     }
 }
 
-extension Service {
-    open class Television: TelevisionBase {
-        public init() {
-            super.init(characteristics: [.powerModeSelection(), .remoteKey()])
-            self.primary = true
-            sleepDiscoveryMode.value = .alwaysdiscoverable
-        }
+extension Service.Television {
+    public convenience init() {
+        self.init(characteristics: [.powerModeSelection(), .remoteKey()])
+        self.primary = true
+        sleepDiscoveryMode.value = .alwaysdiscoverable
+    }
+}
+
+extension Service.InputSource {
+    public convenience init(identifier: UInt32, name: String, input: Enums.InputSourceType) {
+        self.init(characteristics: [.identifier()])
+
+        self.name.value = name.replacingOccurrences(of: " ", with: "")
+        configuredName.value = name
+        inputSourceType.value = input
+        self.identifier?.value = identifier
+        isConfigured.value = .configured
     }
 }
 
 extension Service {
-    open class InputSource: InputSourceBase {
-        public init(identifier: UInt32, name: String, input: Enums.InputSourceType) {
-            super.init(characteristics: [.identifier()])
-
-            self.name.value = name.replacingOccurrences(of: " ", with: "")
-            configuredName.value = name
-            inputSourceType.value = input
-            self.identifier?.value = identifier
-            isConfigured.value = .configured
-        }
-    }
-}
-
-extension Service {
-    open class TelevisionSpeaker: SpeakerBase {
+    open class TelevisionSpeaker: Speaker {
         public init(name: String) {
             super.init(characteristics: [.active(), .volumeControlType(), .volumeSelector(), .volume(), .name(name)])
         }

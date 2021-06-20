@@ -7,8 +7,3 @@ extension Accessory {
         }
     }
 }
-
-extension Service {
-    open class MotionSensor: MotionSensorBase {
-    }
-}

@@ -7,9 +7,3 @@ extension Accessory {
         }
     }
 }
-
-extension Service {
-    open class TemperatureSensor: TemperatureSensorBase {
-
-    }
-}

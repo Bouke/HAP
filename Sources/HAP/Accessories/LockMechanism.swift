@@ -7,8 +7,3 @@ extension Accessory {
         }
     }
 }
-
-extension Service {
-    open class LockMechanism: LockMechanismBase {
-    }
-}
