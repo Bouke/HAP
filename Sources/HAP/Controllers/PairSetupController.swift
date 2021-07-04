@@ -1,13 +1,13 @@
-import Foundation
-import HKDF
+import Crypto
 import Logging
+import Foundation
 import SRP
 
 fileprivate let logger = Logger(label: "hap.controllers.pair-setup")
 
 class PairSetupController {
     struct Session {
-        let server: SRP.Server
+        let server: SRP.Server<SHA512>
     }
     enum Error: Swift.Error {
         case invalidParameters
@@ -15,6 +15,7 @@ class PairSetupController {
         case couldNotDecryptMessage
         case couldNotDecodeMessage
         case couldNotSign
+        case couldNotVerify
         case couldNotEncrypt
         case alreadyPaired
         case alreadyPairing
@@ -102,17 +103,19 @@ class PairSetupController {
             throw Error.invalidParameters
         }
 
-        let encryptionKey = deriveKey(algorithm: .sha512,
-                                      seed: session.server.sessionKey!,
-                                      info: "Pair-Setup-Encrypt-Info".data(using: .utf8),
-                                      salt: "Pair-Setup-Encrypt-Salt".data(using: .utf8),
-                                      count: 32)
+        let sessionKey = SymmetricKey(data: session.server.sessionKey!)
 
-        guard let plaintext = try? ChaCha20Poly1305.decrypt(cipher: encryptedData,
-                                                            nonce: "PS-Msg05".data(using: .utf8)!,
-                                                            key: encryptionKey) else {
-            throw Error.couldNotDecryptMessage
-        }
+        let encryptionKey = HKDF<SHA512>.deriveKey(inputKeyMaterial: sessionKey,
+                                                   salt: "Pair-Setup-Encrypt-Salt".data(using: .utf8)!,
+                                                   info: "Pair-Setup-Encrypt-Info".data(using: .utf8)!,
+                                                   outputByteCount: 32)
+
+        let msg05 = try ChaChaPoly.Nonce(data: Data(count: 4) + "PS-Msg05".data(using: .utf8)!)
+        let box = try ChaChaPoly.SealedBox(nonce: msg05,
+                                           ciphertext: encryptedData.dropLast(16),
+                                           tag: encryptedData.suffix(16))
+
+        let plaintext = try ChaChaPoly.open(box, using: encryptionKey)
 
         guard let data: PairTagTLV8 = try? decode(plaintext) else {
             throw Error.couldNotDecodeMessage
@@ -129,45 +132,41 @@ class PairSetupController {
         logger.debug("--> public key \(publicKey.hex)")
         logger.debug("--> signature \(signatureIn.hex)")
 
-        let hashIn = deriveKey(algorithm: .sha512,
-                               seed: session.server.sessionKey!,
-                               info: "Pair-Setup-Controller-Sign-Info".data(using: .utf8),
-                               salt: "Pair-Setup-Controller-Sign-Salt".data(using: .utf8),
-                               count: 32) +
-                     username +
-                     publicKey
+        let hashInKey = HKDF<SHA512>.deriveKey(inputKeyMaterial: sessionKey,
+                                               salt: "Pair-Setup-Controller-Sign-Salt".data(using: .utf8)!,
+                                               info: "Pair-Setup-Controller-Sign-Info".data(using: .utf8)!,
+                                               outputByteCount: 32).withUnsafeBytes({ Data($0) })
+        let hashIn = hashInKey + username + publicKey
 
-        try Ed25519.verify(publicKey: publicKey, message: hashIn, signature: signatureIn)
+        let key = try Curve25519.Signing.PublicKey(rawRepresentation: publicKey)
+        guard key.isValidSignature(signatureIn, for: hashIn) else {
+            throw Error.couldNotVerify
+        }
 
-        let hashOut = deriveKey(algorithm: .sha512,
-                                seed: session.server.sessionKey!,
-                                info: "Pair-Setup-Accessory-Sign-Info".data(using: .utf8),
-                                salt: "Pair-Setup-Accessory-Sign-Salt".data(using: .utf8),
-                                count: 32) +
-            device.identifier.data(using: .utf8)! +
-            device.publicKey
+        let hashOutKey = HKDF<SHA512>.deriveKey(inputKeyMaterial: sessionKey,
+                                                salt: "Pair-Setup-Accessory-Sign-Salt".data(using: .utf8)!,
+                                                info: "Pair-Setup-Accessory-Sign-Info".data(using: .utf8)!,
+                                                outputByteCount: 32).withUnsafeBytes({ Data($0) })
+        let hashOut = hashOutKey + device.identifier.data(using: .utf8)! + device.publicKey.rawRepresentation
 
-        guard let signatureOut = try? Ed25519.sign(privateKey: device.privateKey, message: hashOut) else {
+        guard let signatureOut = try? device.privateKey.signature(for: hashOut) else {
             throw Error.couldNotSign
         }
 
         let resultInner: PairTagTLV8 = [
             (.identifier, device.identifier.data(using: .utf8)!),
-            (.publicKey, device.publicKey),
+            (.publicKey, device.publicKey.rawRepresentation),
             (.signature, signatureOut)
         ]
 
         logger.debug("<-- identifier \(self.device.identifier)")
-        logger.debug("<-- public key \(self.device.publicKey.hex)")
+        logger.debug("<-- public key \(self.device.publicKey.rawRepresentation.hex)")
         logger.debug("<-- signature \(signatureOut.hex)")
         logger.info("Pair setup completed")
 
-        guard let encryptedResultInner = try? ChaCha20Poly1305.encrypt(message: encode(resultInner),
-                                                                       nonce: "PS-Msg06".data(using: .utf8)!,
-                                                                       key: encryptionKey)
-            else {
-                throw Error.couldNotEncrypt
-        }
+        let msg06 = try ChaChaPoly.Nonce(data: Data(count: 4) + "PS-Msg06".data(using: .utf8)!)
+        let sealed = try ChaChaPoly.seal(encode(resultInner), using: encryptionKey, nonce: msg06)
+        let encryptedResultInner = sealed.ciphertext + sealed.tag
 
         // At this point, the pairing has completed. The first controller is granted admin role.
         device.add(pairing: Pairing(identifier: username, publicKey: publicKey, role: .admin))

@@ -8,12 +8,12 @@ jobs:
     runs-on: ubuntu-18.04
     strategy:
       matrix:
-        swift: ['5.1', '5.2', '5.3']
+        swift: ['5.4.2']
     steps:
       - uses: actions/checkout@v2
       - name: Setup Swift ${{ matrix.swift }}
         run: |
-          sudo apt install libavahi-compat-libdnssd-dev libsodium-dev libssl-dev
+          sudo apt install libavahi-compat-libdnssd-dev
           wget --no-verbose https://swift.org/builds/swift-${{ matrix.swift }}-release/ubuntu1804/swift-${{ matrix.swift }}-RELEASE/swift-${{ matrix.swift }}-RELEASE-ubuntu18.04.tar.gz
           tar xzf swift-${{ matrix.swift }}-RELEASE-ubuntu18.04.tar.gz
           echo `pwd`/swift-${{ matrix.swift }}-RELEASE-ubuntu18.04/usr/bin >> $GITHUB_PATH
@@ -21,24 +21,15 @@ jobs:
         run: swift -version | grep ${{ matrix.swift }}
       - name: Run Tests
         run: swift test -c release -Xswiftc -enable-testing
-  macOS:
-    runs-on: macos-latest
-    continue-on-error: ${{ matrix.swift == '5.3' }}
-    strategy:
-      matrix:
-        swift: ['5.1', '5.2', '5.3']
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup Swift 5.1
-        run: sudo xcode-select -s /Applications/Xcode_11.3.1.app/Contents/Developer
-        if: matrix.swift == '5.1'
-      - name: Setup Swift 5.2
-        run: sudo xcode-select -s /Applications/Xcode_11.6.app/Contents/Developer
-        if: matrix.swift == '5.2'
-      - name: Setup Swift 5.3
-        run: sudo xcode-select -s /Applications/Xcode_12_beta.app/Contents/Developer
-        if: matrix.swift == '5.3'
-      - name: Setup libsodium
-        run: brew install libsodium
-      - name: Run Tests
-        run: swift test -c release -Xswiftc -enable-testing
+  # macOS 11:
+  #   runs-on: macos-11
+  #   strategy:
+  #     matrix:
+  #       swift: ['5.4']
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Setup Swift 5.4
+  #       run: sudo xcode-select -s /Applications/Xcode_12.5.app
+  #       if: matrix.swift == '5.4'
+  #     - name: Run Tests
+  #       run: swift test -c release -Xswiftc -enable-testing

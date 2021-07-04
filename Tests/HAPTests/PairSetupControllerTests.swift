@@ -1,8 +1,8 @@
 // swiftlint:disable force_try
 @testable import HAP
-import HKDF
 import SRP
 import XCTest
+import Crypto
 
 class PairSetupControllerTests: XCTestCase {
     static var allTests: [(String, (PairSetupControllerTests) -> () throws -> Void)] {
@@ -15,22 +15,21 @@ class PairSetupControllerTests: XCTestCase {
     func test() {
         let clientIdentifier = "hubba hubba".data(using: .utf8)!
         let password = "123-44-321"
-        let (salt, verificationKey) = createSaltedVerificationKey(username: "Pair-Setup",
-                                                                  password: password,
+        let (salt, verificationKey) = createSaltedVerificationKey(using: SHA512.self,
                                                                   group: .N3072,
-                                                                  algorithm: .sha512)
-        let session = PairSetupController.Session(server: SRP.Server(username: "Pair-Setup",
-                                                                     salt: salt,
-                                                                     verificationKey: verificationKey,
-                                                                     group: .N3072,
-                                                                     algorithm: .sha512))
+                                                                  username: "Pair-Setup",
+                                                                  password: password)
+        let session = PairSetupController.Session(server: SRP.Server<SHA512>(username: "Pair-Setup",
+                                                                             salt: salt,
+                                                                             verificationKey: verificationKey,
+                                                                             group: .N3072))
         let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00080"),
                             setupCode: .override(password),
                             storage: MemoryStorage(),
                             accessories: [])
         let controller = PairSetupController(device: device)
-        let client = SRP.Client(username: "Pair-Setup", password: password, group: .N3072, algorithm: .sha512)
-        let keys = Ed25519.generateSignKeypair()
+        let client = SRP.Client<SHA512>(username: "Pair-Setup", password: password, group: .N3072)
+        let clientPrivateKey = Curve25519.Signing.PrivateKey()
 
         let clientKeyProof: Data
         do {
@@ -58,48 +57,52 @@ class PairSetupControllerTests: XCTestCase {
             try! client.verifySession(keyProof: serverKeyProof)
         }
 
+        let sessionKey = SymmetricKey(data: session.server.sessionKey!)
+
         do {
             // Client -> Server: encrypted[username, publicKey, signature]
-            let hashIn = deriveKey(algorithm: .sha512,
-                                   seed: session.server.sessionKey!,
-                                   info: "Pair-Setup-Controller-Sign-Info".data(using: .utf8),
-                                   salt: "Pair-Setup-Controller-Sign-Salt".data(using: .utf8),
-                                   count: 32) +
-                clientIdentifier +
-                keys.publicKey
+            let hashInKey = HKDF<SHA512>.deriveKey(inputKeyMaterial: sessionKey,
+                                                   salt: "Pair-Setup-Controller-Sign-Salt".data(using: .utf8)!,
+                                                   info: "Pair-Setup-Controller-Sign-Info".data(using: .utf8)!,
+                                                   outputByteCount: 32)
+            let hashIn = hashInKey.withUnsafeBytes({ Data($0) }) + clientIdentifier + clientPrivateKey.publicKey.rawRepresentation
             let request: PairTagTLV8 = [
-                (.publicKey, keys.publicKey),
+                (.publicKey, clientPrivateKey.publicKey.rawRepresentation),
                 (.identifier, clientIdentifier),
-                (.signature, try! Ed25519.sign(privateKey: keys.privateKey, message: hashIn))
+                (.signature, try! clientPrivateKey.signature(for: hashIn))
             ]
-            let encryptionKey = deriveKey(algorithm: .sha512,
-                                          seed: session.server.sessionKey!,
-                                          info: "Pair-Setup-Encrypt-Info".data(using: .utf8),
-                                          salt: "Pair-Setup-Encrypt-Salt".data(using: .utf8),
-                                          count: 32)
+
+            let encryptionKey = HKDF<SHA512>.deriveKey(inputKeyMaterial: sessionKey,
+                                                       salt: "Pair-Setup-Encrypt-Salt".data(using: .utf8)!,
+                                                       info: "Pair-Setup-Encrypt-Info".data(using: .utf8)!,
+                                                       outputByteCount: 32)
+            let msg05 = try! ChaChaPoly.Nonce(data: Data(count: 4) + "PS-Msg05".data(using: .utf8)!)
+            let requestSealed = try! ChaChaPoly.seal(encode(request), using: encryptionKey, nonce: msg05)
             let requestEncrypted: PairTagTLV8 = [
-                (.encryptedData, try! ChaCha20Poly1305.encrypt(message: encode(request),
-                                                               nonce: "PS-Msg05".data(using: .utf8)!,
-                                                               key: encryptionKey))
+                (.encryptedData, requestSealed.ciphertext + requestSealed.tag)
             ]
             let responseEncrypted = try! controller.keyExchangeRequest(requestEncrypted, session)
 
             // Server -> Client: encrypted[username, publicKey, signature]
-            let plaintext = try! ChaCha20Poly1305.decrypt(cipher: responseEncrypted[.encryptedData]!,
-                                                          nonce: "PS-Msg06".data(using: .utf8)!,
-                                                          key: encryptionKey)
+            let msg06 = try! ChaChaPoly.Nonce(data: Data(count: 4) + "PS-Msg06".data(using: .utf8)!)
+            let responseSealed = try! ChaChaPoly.SealedBox(nonce: msg06,
+                                                           ciphertext: responseEncrypted[.encryptedData]!.dropLast(16),
+                                                           tag: responseEncrypted[.encryptedData]!.suffix(16))
+            let plaintext = try! ChaChaPoly.open(responseSealed, using: encryptionKey)
             let response: PairTagTLV8 = try! decode(plaintext)
-            let hashOut = deriveKey(algorithm: .sha512,
-                                    seed: session.server.sessionKey!,
-                                    info: "Pair-Setup-Accessory-Sign-Info".data(using: .utf8),
-                                    salt: "Pair-Setup-Accessory-Sign-Salt".data(using: .utf8),
-                                    count: 32) +
-                response[.identifier]! +
-                response[.publicKey]!
-            try! Ed25519.verify(publicKey: response[.publicKey]!, message: hashOut, signature: response[.signature]!)
+            let hashOutKey = HKDF<SHA512>.deriveKey(inputKeyMaterial: sessionKey,
+                                                    salt: "Pair-Setup-Accessory-Sign-Salt".data(using: .utf8)!,
+                                                    info: "Pair-Setup-Accessory-Sign-Info".data(using: .utf8)!,
+                                                    outputByteCount: 32)
+            let hashOut = hashOutKey.withUnsafeBytes({ Data($0) }) + response[.identifier]! + response[.publicKey]!
+
+            let serverPublicKey = try! Curve25519.Signing.PublicKey(rawRepresentation: response[.publicKey]!)
+            if !serverPublicKey.isValidSignature(response[.signature]!, for: hashOut) {
+                XCTFail("Invalid server signature")
+            }
         }
 
-        XCTAssertEqual(device.get(pairingWithIdentifier: clientIdentifier)?.publicKey, keys.publicKey)
+        XCTAssertEqual(device.get(pairingWithIdentifier: clientIdentifier)?.publicKey, clientPrivateKey.publicKey.rawRepresentation)
     }
 
     // from: https://oleb.net/blog/2017/03/keeping-xctest-in-sync/#appendix-code-generation-with-sourcery
