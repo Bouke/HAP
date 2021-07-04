@@ -291,7 +291,6 @@ public class Inspector {
             let blacklist = homekitDict["Blacklist"] as? [String: [String]],
             let blacklistApps = homekitDict["BlacklistFromApplications"] as? [String: [String]],
             let blacklistCharacteristics = blacklist["Characteristics"],
-            let blacklistAppCharacteristics = blacklistApps["Characteristics"],
             let blacklistServices = blacklist["Services"],
             let blacklistAppServices = blacklistApps["Services"] else {
                 print("Could not read plist")
@@ -301,7 +300,7 @@ public class Inspector {
         var blacklistedServices = blacklistServices
         blacklistedServices.append(contentsOf: blacklistAppServices)
 
-        var blacklistedCharacteristics = blacklistCharacteristics
+        let blacklistedCharacteristics = blacklistCharacteristics
         // Don't remove characteristics from app blacklist
         //blacklistedCharacteristics.append(contentsOf: blacklistAppCharacteristics)
 
@@ -353,7 +352,7 @@ public class Inspector {
 
         var categoryInfo = [CategoryInfo]()
 
-        for (name, dict) in categories {
+        for (_, dict) in categories {
             if let title = dict["DefaultDescription"] as? String,
                 let id = dict["Identifier"] as? Int {
                 categoryInfo.append(CategoryInfo(name: title, id: id))
@@ -438,7 +437,7 @@ public class Inspector {
         """)
         for service in serviceInfo.sorted(by: { $0.className < $1.className }) {
             if let id = Int(service.id, radix: 16) {
-                let idhex = String(id, radix: 16, uppercase: true)
+                _ = String(id, radix: 16, uppercase: true)
                 write("        case .\(serviceName(service.title, uuid: service.id)): return \"\(service.title)\"")
             }
         }
@@ -500,7 +499,7 @@ public class Inspector {
                                            format: format,
                                            maxValue: dict["MaxValue"] as? NSNumber,
                                            minValue: dict["MinValue"] as? NSNumber,
-                                           properties: dict["Properties"] as? Int ?? Int(dict["Properties"].debugDescription as! String)!,
+                                           properties: dict["Properties"] as? Int ?? Int(dict["Properties"].debugDescription)!,
                                            stepValue: dict["StepValue"] as? NSNumber,
                                            units: dict["Units"] as? String))
                     characteristicFormats.insert(format)
@@ -526,7 +525,7 @@ public class Inspector {
         """)
         for characteristic in characteristicInfo.sorted(by: { $0.title < $1.title }) {
             if let id = Int(characteristic.id, radix: 16) {
-                let idhex = String(id, radix: 16, uppercase: true)
+                _ = String(id, radix: 16, uppercase: true)
                 write("        case .\(serviceName(characteristic.title, uuid: characteristic.id)): return \"\(characteristic.title)\"")
             }
         }
@@ -559,7 +558,7 @@ public class Inspector {
         var unitInfo = [String]()
 
         for (name, dict) in units {
-            if let title = dict["DefaultDescription"] as? String {
+            if (dict["DefaultDescription"] as? String) != nil {
                 unitInfo.append(unitName(name))
             }
         }
@@ -643,7 +642,7 @@ public class Inspector {
 
         var enums = [(enumName: String, type: String, newValues: NSDictionary, info: CharacteristicInfo)]()
 
-        for (name, dict) in characteristicConstants {
+        for (_, dict) in characteristicConstants {
             let rName = dict["Read"] as? String
             let wName = dict["Write"] as? String
             let rwName = dict["ReadWrite"] as? String
@@ -692,12 +691,14 @@ public class Inspector {
 
         // Add any default enums which are not defined in the HAP config
         for defaultType in Inspector.defaultTypes {
-            if let enumInfo = enums.first(where: { $0.info.hkname == defaultType.characteristic }) {
+            if enums.first(where: { $0.info.hkname == defaultType.characteristic }) != nil {
                 // Already defined
             } else if let info = characteristicInfo.first(where: { $0.hkname == defaultType.characteristic }) {
                 print("Using predefined enum for '\(defaultType.enumName)'")
-                var valuedict = NSMutableDictionary()
-                defaultType.values.map({ valuedict[$0.0] = $0.1 })
+                let valuedict = NSMutableDictionary()
+                for value in defaultType.values {
+                    valuedict[value.0] = value.1
+                }
                 enums.append((enumName: defaultType.enumName, type: defaultType.baseType, newValues: valuedict, info: info))
             }
         }
@@ -711,8 +712,10 @@ public class Inspector {
                 // The HAP config definition couldn't be written, likely because both key and values are digits
                 // Fallback to a default definition if it exists
                 print("Use predefined enum cases for '\(enumName)'")
-                var valuedict = NSMutableDictionary()
-                defaultType.values.map({ valuedict[$0.0] = $0.1 })
+                let valuedict = NSMutableDictionary()
+                for value in defaultType.values {
+                    valuedict[value.0] = value.1
+                }
                 writeEnumeration(enumName: defaultType.enumName, type: defaultType.baseType, values: valuedict, max: info.maxValue)
                 enumeratedCharacteristics.insert(info.hkname)
                 defaultEnumCase[info.hkname] = defaultType.values[0].0.parameterName()

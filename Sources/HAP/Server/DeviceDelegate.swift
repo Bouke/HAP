@@ -2,7 +2,7 @@
 /// related events. Implement this protocol in an app-specific object and use
 /// the methods to update your app. For example, you might want to show the
 /// device's pairing state, or the value of certain characteristics.
-public protocol DeviceDelegate: class {
+public protocol DeviceDelegate: AnyObject {
     /// Tells the delegate that a controller subscribed for updates.
     ///
     /// - Parameters:

@@ -34,7 +34,7 @@ class PairVerifyControllerTests: XCTestCase {
         do {
             // Client -> Server: public key
             let request: PairTagTLV8 = [
-                (.state, Data(bytes: [PairVerifyStep.startRequest.rawValue])),
+                (.state, Data([PairVerifyStep.startRequest.rawValue])),
                 (.publicKey, clientPrivateKey.publicKey.rawRepresentation)
             ]
             let resultOuter: PairTagTLV8

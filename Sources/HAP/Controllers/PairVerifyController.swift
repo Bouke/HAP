@@ -63,7 +63,7 @@ class PairVerifyController {
         let encryptedResultInner = sealed.ciphertext + sealed.tag
 
         let resultOuter: PairTagTLV8 = [
-            (.state, Data(bytes: [PairVerifyStep.startResponse.rawValue])),
+            (.state, Data([PairVerifyStep.startResponse.rawValue])),
             (.publicKey, session.publicKey.rawRepresentation),
             (.encryptedData, encryptedResultInner)
         ]
