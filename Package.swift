@@ -19,15 +19,16 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-crypto.git", from: "1.1.0"),
     ],
     targets: [
-        .target(name: "CQRCode"),
-        .target(name: "COperatingSystem"),
+        .target(name: "CQRCode", exclude: ["LICENSE.txt"]),
+        .target(name: "COperatingSystem", exclude: ["LICENSE"]),
         .target(name: "HTTP",
                 dependencies: [
                     .product(name: "NIO", package: "swift-nio"),
                     .product(name: "NIOHTTP1", package: "swift-nio"),
                     .product(name: "NIOFoundationCompat", package: "swift-nio"),
                     "COperatingSystem",
-                ]),
+                ],
+                exclude: ["LICENSE"]),
         .target(name: "HAP",
                 dependencies: [
                     "SRP",
