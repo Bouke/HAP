@@ -1,7 +1,7 @@
 import COperatingSystem
 import Foundation
 
-public protocol Storage: class {
+public protocol Storage: AnyObject {
     func read() throws -> Data
     func write(_: Data) throws
 }

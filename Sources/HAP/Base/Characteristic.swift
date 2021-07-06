@@ -13,7 +13,7 @@ public struct AnyCharacteristic {
     }
 }
 
-protocol Characteristic: class, JSONSerializable {
+protocol Characteristic: AnyObject, JSONSerializable {
     var service: Service? { get set }
     var iid: InstanceID { get set }
     var type: CharacteristicType { get }
