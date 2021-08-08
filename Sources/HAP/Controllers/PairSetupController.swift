@@ -1,6 +1,6 @@
 import Crypto
-import Logging
 import Foundation
+import Logging
 import SRP
 
 fileprivate let logger = Logger(label: "hap.controllers.pair-setup")

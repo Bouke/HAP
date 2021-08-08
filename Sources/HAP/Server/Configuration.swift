@@ -1,6 +1,6 @@
+import Crypto
 import Foundation
 import Logging
-import Crypto
 
 fileprivate let logger = Logger(label: "hap.device")
 
@@ -66,7 +66,7 @@ extension Device {
 
         internal var pairings: [PairingIdentifier: Pairing] = [:]
 
-        // MARK:- Encodable
+        // MARK: - Encodable
 
         enum CodingKeys: String, CodingKey {
             case aidForAccessorySerialNumber

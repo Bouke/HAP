@@ -1,7 +1,7 @@
 // swiftlint:disable force_try
+import Crypto
 @testable import HAP
 import XCTest
-import Crypto
 
 class PairVerifyControllerTests: XCTestCase {
     static var allTests: [(String, (PairVerifyControllerTests) -> () throws -> Void)] {

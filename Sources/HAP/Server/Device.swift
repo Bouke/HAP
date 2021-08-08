@@ -504,11 +504,11 @@ public class Device {
     }
 
     var publicKey: Curve25519.Signing.PublicKey {
-        return configuration.publicKey
+        configuration.publicKey
     }
 
     var privateKey: Curve25519.Signing.PrivateKey {
-        return configuration.privateKey
+        configuration.privateKey
     }
 
     var config: [String: String] {
