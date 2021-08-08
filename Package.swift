@@ -37,7 +37,8 @@ let package = Package(
                     "CQRCode",
                     "HTTP",
                     .product(name: "Crypto", package: "swift-crypto"),
-                ]),
+                ],
+                exclude: ["Base/Predefined/README"]),
         .target(name: "hap-demo",
                 dependencies: [
                     "HAP",

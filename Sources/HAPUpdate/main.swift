@@ -20,7 +20,7 @@ if CommandLine.argc > 1 {
 do {
     print("Generating from \(sourceURL)")
 
-    let base = "Sources/HAPTypes"
+    let base = "Sources/HAP/Base"
     if !FileManager.default.directoryExists(atPath: base) {
         print("Expected existing directory at `\(base)`")
         exit(1)
