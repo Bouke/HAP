@@ -1,0 +1,61 @@
+import Foundation
+
+public extension AnyCharacteristic {
+    static func targetTiltAngle(
+        _ value: Int = -90,
+        permissions: [CharacteristicPermission] = [.read, .write, .events],
+        description: String? = "Target Tilt Angle",
+        format: CharacteristicFormat? = .int,
+        unit: CharacteristicUnit? = .arcdegrees,
+        maxLength: Int? = nil,
+        maxValue: Double? = 90,
+        minValue: Double? = -90,
+        minStep: Double? = 1,
+        validValues: [Double] = [],
+        validValuesRange: Range<Double>? = nil
+    ) -> AnyCharacteristic {
+        AnyCharacteristic(
+            PredefinedCharacteristic.targetTiltAngle(
+            value,
+            permissions: permissions,
+            description: description,
+            format: format,
+            unit: unit,
+            maxLength: maxLength,
+            maxValue: maxValue,
+            minValue: minValue,
+            minStep: minStep,
+            validValues: validValues,
+            validValuesRange: validValuesRange) as Characteristic)
+    }
+}
+
+public extension PredefinedCharacteristic {
+    static func targetTiltAngle(
+        _ value: Int = -90,
+        permissions: [CharacteristicPermission] = [.read, .write, .events],
+        description: String? = "Target Tilt Angle",
+        format: CharacteristicFormat? = .int,
+        unit: CharacteristicUnit? = .arcdegrees,
+        maxLength: Int? = nil,
+        maxValue: Double? = 90,
+        minValue: Double? = -90,
+        minStep: Double? = 1,
+        validValues: [Double] = [],
+        validValuesRange: Range<Double>? = nil
+    ) -> GenericCharacteristic<Int> {
+        GenericCharacteristic<Int>(
+            type: .targetTiltAngle,
+            value: value,
+            permissions: permissions,
+            description: description,
+            format: format,
+            unit: unit,
+            maxLength: maxLength,
+            maxValue: maxValue,
+            minValue: minValue,
+            minStep: minStep,
+            validValues: validValues,
+            validValuesRange: validValuesRange)
+    }
+}

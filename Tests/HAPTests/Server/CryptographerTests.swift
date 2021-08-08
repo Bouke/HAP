@@ -1,8 +1,8 @@
 // swiftlint:disable line_length
+import Crypto
 @testable import HAP
 import NIO
 import XCTest
-import Crypto
 
 private final class ReadRecorder: ChannelInboundHandler {
     typealias InboundIn = ByteBuffer

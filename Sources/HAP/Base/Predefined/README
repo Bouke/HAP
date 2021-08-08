@@ -1,0 +1,8 @@
+The files in this directory have been generated automatically
+from the macOS HomeKit framework definitions. Don't make changes
+to these files directly. Update these files using the `hap-update`
+tool.
+
+Generated on:              8 August 2021
+HomeKit framework version: 868
+macOS:                     Version 11.3.1 (Build 20E241)
