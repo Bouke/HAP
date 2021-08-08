@@ -9,7 +9,7 @@ let package = Package(
     ],
     products: [
         .library(name: "HAP", targets: ["HAP"]),
-        .executable(name: "hap-demo", targets: ["hap-demo"]),
+        .executable(name: "hap-demo", targets: ["HAPDemo"]),
     ],
     dependencies: [
         .package(url: "https://github.com/Bouke/SRP.git", from: "3.2.0"),
@@ -39,7 +39,7 @@ let package = Package(
                     .product(name: "Crypto", package: "swift-crypto"),
                 ],
                 exclude: ["Base/Predefined/README"]),
-        .target(name: "hap-demo",
+        .target(name: "HAPDemo",
                 dependencies: [
                     "HAP",
                     .product(name: "Logging", package: "swift-log")
@@ -49,8 +49,8 @@ let package = Package(
 )
 
 #if os(macOS)
-    package.products.append(.executable(name: "hap-update", targets: ["HAPUpdate"]))
-    package.targets.append(.target(name: "HAPUpdate"))
+    package.products.append(.executable(name: "hap-update", targets: ["HAPInspector"]))
+    package.targets.append(.target(name: "HAPInspector"))
 #endif
 
 #if os(Linux)
