@@ -217,8 +217,6 @@ public class Inspector {
         }
     }
 
-    static let outFile = "Generated.swift"
-
     // swiftlint:disable:next cyclomatic_complexity
     class func inspect(source plistPath: URL, target outputPath: String) throws {
         // Convert HAP unit names to swift instance variable name
@@ -306,8 +304,8 @@ public class Inspector {
 
         print("Writing to \(outputPath)")
 
-        let url = URL(fileURLWithPath: outputPath)
-        FileManager.default.createFile(atPath: outputPath, contents: nil, attributes: nil)
+        let url = URL(fileURLWithPath: "\(outputPath)/Base.swift")
+        FileManager.default.createFile(atPath: url.path, contents: nil, attributes: nil)
 
         let fileHandle = try FileHandle(forWritingTo: url)
         var output = FileHandlerOutputStream(fileHandle)

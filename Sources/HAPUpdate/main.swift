@@ -19,9 +19,27 @@ if CommandLine.argc > 1 {
 }
 do {
     print("Generating from \(sourceURL)")
-    let target = FileManager.default.fileExists(atPath: "Sources/HAP/Base") ?
-        "Sources/HAP/Base/Generated.swift" : "./Generated.swift"
+
+    let base = "Sources/HAPTypes"
+    if !FileManager.default.directoryExists(atPath: base) {
+        print("Expected existing directory at `\(base)`")
+        exit(1)
+    }
+
+    let target = "\(base)/Predefined"
+    if FileManager.default.directoryExists(atPath: target) {
+        try FileManager.default.removeItem(atPath: target)
+    }
+    try FileManager.default.createDirectory(atPath: target, withIntermediateDirectories: false, attributes: nil)
     try Inspector.inspect(source: sourceURL, target: target)
 } catch {
     print("Couldn't update: \(error)")
+}
+
+extension FileManager {
+    func directoryExists(atPath path: String) -> Bool {
+        var isDirectory: ObjCBool = false
+        let exists = fileExists(atPath: path, isDirectory: &isDirectory)
+        return exists && isDirectory.boolValue
+    }
 }
