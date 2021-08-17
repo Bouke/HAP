@@ -2,19 +2,6 @@ import Foundation
 
 extension Service {
     open class LockManagement: Service {
-        // Required Characteristics
-        public let lockControlPoint: GenericCharacteristic<Data?>
-        public let version: GenericCharacteristic<String>
-
-        // Optional Characteristics
-        public let administratorOnlyAccess: GenericCharacteristic<Bool>?
-        public let audioFeedback: GenericCharacteristic<Bool>?
-        public let currentDoorState: GenericCharacteristic<Enums.CurrentDoorState>?
-        public let lockManagementAutoSecurityTimeout: GenericCharacteristic<UInt32>?
-        public let lockLastKnownAction: GenericCharacteristic<UInt8>?
-        public let logs: GenericCharacteristic<Data>?
-        public let motionDetected: GenericCharacteristic<Bool>?
-
         public init(characteristics: [AnyCharacteristic] = []) {
             var unwrapped = characteristics.map { $0.wrapped }
             lockControlPoint = getOrCreateAppend(
@@ -34,5 +21,18 @@ extension Service {
             motionDetected = get(type: .motionDetected, characteristics: unwrapped)
             super.init(type: .lockManagement, characteristics: unwrapped)
         }
+
+        // MARK: - Required Characteristics
+        public let lockControlPoint: GenericCharacteristic<Data?>
+        public let version: GenericCharacteristic<String>
+
+        // MARK: - Optional Characteristics
+        public let administratorOnlyAccess: GenericCharacteristic<Bool>?
+        public let audioFeedback: GenericCharacteristic<Bool>?
+        public let currentDoorState: GenericCharacteristic<Enums.CurrentDoorState>?
+        public let lockManagementAutoSecurityTimeout: GenericCharacteristic<UInt32>?
+        public let lockLastKnownAction: GenericCharacteristic<UInt8>?
+        public let logs: GenericCharacteristic<Data>?
+        public let motionDetected: GenericCharacteristic<Bool>?
     }
 }

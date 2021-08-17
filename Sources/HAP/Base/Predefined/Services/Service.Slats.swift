@@ -2,16 +2,6 @@ import Foundation
 
 extension Service {
     open class Slats: Service {
-        // Required Characteristics
-        public let currentSlatState: GenericCharacteristic<Enums.CurrentSlatState>
-        public let slatType: GenericCharacteristic<UInt8>
-
-        // Optional Characteristics
-        public let name: GenericCharacteristic<String>?
-        public let swingMode: GenericCharacteristic<UInt8>?
-        public let currentTiltAngle: GenericCharacteristic<Int>?
-        public let targetTiltAngle: GenericCharacteristic<Int>?
-
         public init(characteristics: [AnyCharacteristic] = []) {
             var unwrapped = characteristics.map { $0.wrapped }
             currentSlatState = getOrCreateAppend(
@@ -28,5 +18,15 @@ extension Service {
             targetTiltAngle = get(type: .targetTiltAngle, characteristics: unwrapped)
             super.init(type: .slats, characteristics: unwrapped)
         }
+
+        // MARK: - Required Characteristics
+        public let currentSlatState: GenericCharacteristic<Enums.CurrentSlatState>
+        public let slatType: GenericCharacteristic<UInt8>
+
+        // MARK: - Optional Characteristics
+        public let name: GenericCharacteristic<String>?
+        public let swingMode: GenericCharacteristic<UInt8>?
+        public let currentTiltAngle: GenericCharacteristic<Int>?
+        public let targetTiltAngle: GenericCharacteristic<Int>?
     }
 }

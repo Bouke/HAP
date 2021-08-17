@@ -2,18 +2,6 @@ import Foundation
 
 extension Service {
     open class FanV2: Service {
-        // Required Characteristics
-        public let active: GenericCharacteristic<Enums.Active>
-
-        // Optional Characteristics
-        public let currentFanState: GenericCharacteristic<Enums.CurrentFanState>?
-        public let targetFanState: GenericCharacteristic<Enums.TargetFanState>?
-        public let lockPhysicalControls: GenericCharacteristic<UInt8>?
-        public let name: GenericCharacteristic<String>?
-        public let rotationDirection: GenericCharacteristic<Enums.RotationDirection>?
-        public let rotationSpeed: GenericCharacteristic<Float>?
-        public let swingMode: GenericCharacteristic<UInt8>?
-
         public init(characteristics: [AnyCharacteristic] = []) {
             var unwrapped = characteristics.map { $0.wrapped }
             active = getOrCreateAppend(
@@ -29,5 +17,17 @@ extension Service {
             swingMode = get(type: .swingMode, characteristics: unwrapped)
             super.init(type: .fanV2, characteristics: unwrapped)
         }
+
+        // MARK: - Required Characteristics
+        public let active: GenericCharacteristic<Enums.Active>
+
+        // MARK: - Optional Characteristics
+        public let currentFanState: GenericCharacteristic<Enums.CurrentFanState>?
+        public let targetFanState: GenericCharacteristic<Enums.TargetFanState>?
+        public let lockPhysicalControls: GenericCharacteristic<UInt8>?
+        public let name: GenericCharacteristic<String>?
+        public let rotationDirection: GenericCharacteristic<Enums.RotationDirection>?
+        public let rotationSpeed: GenericCharacteristic<Float>?
+        public let swingMode: GenericCharacteristic<UInt8>?
     }
 }

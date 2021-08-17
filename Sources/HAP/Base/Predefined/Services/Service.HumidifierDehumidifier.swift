@@ -2,21 +2,6 @@ import Foundation
 
 extension Service {
     open class HumidifierDehumidifier: Service {
-        // Required Characteristics
-        public let active: GenericCharacteristic<Enums.Active>
-        public let currentHumidifierDehumidifierState: GenericCharacteristic<Enums.CurrentHumidifierDehumidifierState>
-        public let targetHumidifierDehumidifierState: GenericCharacteristic<Enums.TargetHumidifierDehumidifierState>
-        public let currentRelativeHumidity: GenericCharacteristic<Float>
-
-        // Optional Characteristics
-        public let lockPhysicalControls: GenericCharacteristic<UInt8>?
-        public let name: GenericCharacteristic<String>?
-        public let relativeHumidityDehumidifierThreshold: GenericCharacteristic<Float>?
-        public let relativeHumidityHumidifierThreshold: GenericCharacteristic<Float>?
-        public let rotationSpeed: GenericCharacteristic<Float>?
-        public let swingMode: GenericCharacteristic<UInt8>?
-        public let currentWaterLevel: GenericCharacteristic<Float>?
-
         public init(characteristics: [AnyCharacteristic] = []) {
             var unwrapped = characteristics.map { $0.wrapped }
             active = getOrCreateAppend(
@@ -44,5 +29,20 @@ extension Service {
             currentWaterLevel = get(type: .currentWaterLevel, characteristics: unwrapped)
             super.init(type: .humidifierDehumidifier, characteristics: unwrapped)
         }
+
+        // MARK: - Required Characteristics
+        public let active: GenericCharacteristic<Enums.Active>
+        public let currentHumidifierDehumidifierState: GenericCharacteristic<Enums.CurrentHumidifierDehumidifierState>
+        public let targetHumidifierDehumidifierState: GenericCharacteristic<Enums.TargetHumidifierDehumidifierState>
+        public let currentRelativeHumidity: GenericCharacteristic<Float>
+
+        // MARK: - Optional Characteristics
+        public let lockPhysicalControls: GenericCharacteristic<UInt8>?
+        public let name: GenericCharacteristic<String>?
+        public let relativeHumidityDehumidifierThreshold: GenericCharacteristic<Float>?
+        public let relativeHumidityHumidifierThreshold: GenericCharacteristic<Float>?
+        public let rotationSpeed: GenericCharacteristic<Float>?
+        public let swingMode: GenericCharacteristic<UInt8>?
+        public let currentWaterLevel: GenericCharacteristic<Float>?
     }
 }

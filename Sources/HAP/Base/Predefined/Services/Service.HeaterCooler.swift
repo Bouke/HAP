@@ -2,21 +2,6 @@ import Foundation
 
 extension Service {
     open class HeaterCooler: Service {
-        // Required Characteristics
-        public let active: GenericCharacteristic<Enums.Active>
-        public let currentHeaterCoolerState: GenericCharacteristic<Enums.CurrentHeaterCoolerState>
-        public let targetHeaterCoolerState: GenericCharacteristic<Enums.TargetHeaterCoolerState>
-        public let currentTemperature: GenericCharacteristic<Float>
-
-        // Optional Characteristics
-        public let lockPhysicalControls: GenericCharacteristic<UInt8>?
-        public let name: GenericCharacteristic<String>?
-        public let rotationSpeed: GenericCharacteristic<Float>?
-        public let swingMode: GenericCharacteristic<UInt8>?
-        public let coolingThresholdTemperature: GenericCharacteristic<Float>?
-        public let heatingThresholdTemperature: GenericCharacteristic<Float>?
-        public let temperatureDisplayUnits: GenericCharacteristic<Enums.TemperatureDisplayUnits>?
-
         public init(characteristics: [AnyCharacteristic] = []) {
             var unwrapped = characteristics.map { $0.wrapped }
             active = getOrCreateAppend(
@@ -44,5 +29,20 @@ extension Service {
             temperatureDisplayUnits = get(type: .temperatureDisplayUnits, characteristics: unwrapped)
             super.init(type: .heaterCooler, characteristics: unwrapped)
         }
+
+        // MARK: - Required Characteristics
+        public let active: GenericCharacteristic<Enums.Active>
+        public let currentHeaterCoolerState: GenericCharacteristic<Enums.CurrentHeaterCoolerState>
+        public let targetHeaterCoolerState: GenericCharacteristic<Enums.TargetHeaterCoolerState>
+        public let currentTemperature: GenericCharacteristic<Float>
+
+        // MARK: - Optional Characteristics
+        public let lockPhysicalControls: GenericCharacteristic<UInt8>?
+        public let name: GenericCharacteristic<String>?
+        public let rotationSpeed: GenericCharacteristic<Float>?
+        public let swingMode: GenericCharacteristic<UInt8>?
+        public let coolingThresholdTemperature: GenericCharacteristic<Float>?
+        public let heatingThresholdTemperature: GenericCharacteristic<Float>?
+        public let temperatureDisplayUnits: GenericCharacteristic<Enums.TemperatureDisplayUnits>?
     }
 }

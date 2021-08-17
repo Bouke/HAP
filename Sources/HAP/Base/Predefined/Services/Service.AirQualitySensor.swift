@@ -2,22 +2,6 @@ import Foundation
 
 extension Service {
     open class AirQualitySensor: Service {
-        // Required Characteristics
-        public let currentAirQuality: GenericCharacteristic<Enums.CurrentAirQuality>
-
-        // Optional Characteristics
-        public let nitrogenDioxideDensity: GenericCharacteristic<Float>?
-        public let ozoneDensity: GenericCharacteristic<Float>?
-        public let pm10Density: GenericCharacteristic<Float>?
-        public let pm2_5Density: GenericCharacteristic<Float>?
-        public let sulphurDioxideDensity: GenericCharacteristic<Float>?
-        public let volatileOrganicCompoundDensity: GenericCharacteristic<Float>?
-        public let name: GenericCharacteristic<String>?
-        public let statusActive: GenericCharacteristic<Bool>?
-        public let statusFault: GenericCharacteristic<UInt8>?
-        public let statusLowBattery: GenericCharacteristic<Enums.StatusLowBattery>?
-        public let statusTampered: GenericCharacteristic<UInt8>?
-
         public init(characteristics: [AnyCharacteristic] = []) {
             var unwrapped = characteristics.map { $0.wrapped }
             currentAirQuality = getOrCreateAppend(
@@ -37,5 +21,21 @@ extension Service {
             statusTampered = get(type: .statusTampered, characteristics: unwrapped)
             super.init(type: .airQualitySensor, characteristics: unwrapped)
         }
+
+        // MARK: - Required Characteristics
+        public let currentAirQuality: GenericCharacteristic<Enums.CurrentAirQuality>
+
+        // MARK: - Optional Characteristics
+        public let nitrogenDioxideDensity: GenericCharacteristic<Float>?
+        public let ozoneDensity: GenericCharacteristic<Float>?
+        public let pm10Density: GenericCharacteristic<Float>?
+        public let pm2_5Density: GenericCharacteristic<Float>?
+        public let sulphurDioxideDensity: GenericCharacteristic<Float>?
+        public let volatileOrganicCompoundDensity: GenericCharacteristic<Float>?
+        public let name: GenericCharacteristic<String>?
+        public let statusActive: GenericCharacteristic<Bool>?
+        public let statusFault: GenericCharacteristic<UInt8>?
+        public let statusLowBattery: GenericCharacteristic<Enums.StatusLowBattery>?
+        public let statusTampered: GenericCharacteristic<UInt8>?
     }
 }

@@ -2,16 +2,6 @@ import Foundation
 
 extension Service {
     open class GarageDoorOpener: Service {
-        // Required Characteristics
-        public let currentDoorState: GenericCharacteristic<Enums.CurrentDoorState>
-        public let targetDoorState: GenericCharacteristic<Enums.TargetDoorState>
-        public let obstructionDetected: GenericCharacteristic<Bool>
-
-        // Optional Characteristics
-        public let lockCurrentState: GenericCharacteristic<Enums.LockCurrentState>?
-        public let lockTargetState: GenericCharacteristic<Enums.LockTargetState>?
-        public let name: GenericCharacteristic<String>?
-
         public init(characteristics: [AnyCharacteristic] = []) {
             var unwrapped = characteristics.map { $0.wrapped }
             currentDoorState = getOrCreateAppend(
@@ -31,5 +21,15 @@ extension Service {
             name = get(type: .name, characteristics: unwrapped)
             super.init(type: .garageDoorOpener, characteristics: unwrapped)
         }
+
+        // MARK: - Required Characteristics
+        public let currentDoorState: GenericCharacteristic<Enums.CurrentDoorState>
+        public let targetDoorState: GenericCharacteristic<Enums.TargetDoorState>
+        public let obstructionDetected: GenericCharacteristic<Bool>
+
+        // MARK: - Optional Characteristics
+        public let lockCurrentState: GenericCharacteristic<Enums.LockCurrentState>?
+        public let lockTargetState: GenericCharacteristic<Enums.LockTargetState>?
+        public let name: GenericCharacteristic<String>?
     }
 }

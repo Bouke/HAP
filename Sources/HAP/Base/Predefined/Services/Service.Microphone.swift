@@ -2,12 +2,6 @@ import Foundation
 
 extension Service {
     open class Microphone: Service {
-        // Required Characteristics
-        public let mute: GenericCharacteristic<Bool>
-
-        // Optional Characteristics
-        public let volume: GenericCharacteristic<UInt8>?
-
         public init(characteristics: [AnyCharacteristic] = []) {
             var unwrapped = characteristics.map { $0.wrapped }
             mute = getOrCreateAppend(
@@ -17,5 +11,11 @@ extension Service {
             volume = get(type: .volume, characteristics: unwrapped)
             super.init(type: .microphone, characteristics: unwrapped)
         }
+
+        // MARK: - Required Characteristics
+        public let mute: GenericCharacteristic<Bool>
+
+        // MARK: - Optional Characteristics
+        public let volume: GenericCharacteristic<UInt8>?
     }
 }

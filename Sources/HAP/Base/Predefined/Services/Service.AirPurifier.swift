@@ -2,17 +2,6 @@ import Foundation
 
 extension Service {
     open class AirPurifier: Service {
-        // Required Characteristics
-        public let active: GenericCharacteristic<Enums.Active>
-        public let currentAirPurifierState: GenericCharacteristic<Enums.CurrentAirPurifierState>
-        public let targetAirPurifierState: GenericCharacteristic<Enums.TargetAirPurifierState>
-
-        // Optional Characteristics
-        public let lockPhysicalControls: GenericCharacteristic<UInt8>?
-        public let name: GenericCharacteristic<String>?
-        public let rotationSpeed: GenericCharacteristic<Float>?
-        public let swingMode: GenericCharacteristic<UInt8>?
-
         public init(characteristics: [AnyCharacteristic] = []) {
             var unwrapped = characteristics.map { $0.wrapped }
             active = getOrCreateAppend(
@@ -33,5 +22,16 @@ extension Service {
             swingMode = get(type: .swingMode, characteristics: unwrapped)
             super.init(type: .airPurifier, characteristics: unwrapped)
         }
+
+        // MARK: - Required Characteristics
+        public let active: GenericCharacteristic<Enums.Active>
+        public let currentAirPurifierState: GenericCharacteristic<Enums.CurrentAirPurifierState>
+        public let targetAirPurifierState: GenericCharacteristic<Enums.TargetAirPurifierState>
+
+        // MARK: - Optional Characteristics
+        public let lockPhysicalControls: GenericCharacteristic<UInt8>?
+        public let name: GenericCharacteristic<String>?
+        public let rotationSpeed: GenericCharacteristic<Float>?
+        public let swingMode: GenericCharacteristic<UInt8>?
     }
 }

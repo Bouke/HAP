@@ -2,19 +2,6 @@ import Foundation
 
 extension Service {
     open class Lightbulb: Service {
-        // Required Characteristics
-        public let powerState: GenericCharacteristic<Bool>
-
-        // Optional Characteristics
-        public let brightness: GenericCharacteristic<Int>?
-        public let characteristicValueActiveTransitionCount: GenericCharacteristic<UInt8>?
-        public let characteristicValueTransitionControl: GenericCharacteristic<Data>?
-        public let colorTemperature: GenericCharacteristic<Int>?
-        public let hue: GenericCharacteristic<Float>?
-        public let name: GenericCharacteristic<String>?
-        public let saturation: GenericCharacteristic<Float>?
-        public let supportedCharacteristicValueTransitionConfiguration: GenericCharacteristic<Data>?
-
         public init(characteristics: [AnyCharacteristic] = []) {
             var unwrapped = characteristics.map { $0.wrapped }
             powerState = getOrCreateAppend(
@@ -31,5 +18,18 @@ extension Service {
             supportedCharacteristicValueTransitionConfiguration = get(type: .supportedCharacteristicValueTransitionConfiguration, characteristics: unwrapped)
             super.init(type: .lightbulb, characteristics: unwrapped)
         }
+
+        // MARK: - Required Characteristics
+        public let powerState: GenericCharacteristic<Bool>
+
+        // MARK: - Optional Characteristics
+        public let brightness: GenericCharacteristic<Int>?
+        public let characteristicValueActiveTransitionCount: GenericCharacteristic<UInt8>?
+        public let characteristicValueTransitionControl: GenericCharacteristic<Data>?
+        public let colorTemperature: GenericCharacteristic<Int>?
+        public let hue: GenericCharacteristic<Float>?
+        public let name: GenericCharacteristic<String>?
+        public let saturation: GenericCharacteristic<Float>?
+        public let supportedCharacteristicValueTransitionConfiguration: GenericCharacteristic<Data>?
     }
 }

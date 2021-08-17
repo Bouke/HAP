@@ -762,24 +762,7 @@ public class Inspector {
                 """)
                 write("    open class \(service.className): Service {")
 
-                var requiredCharacteristicPropertyNames = [String]()
-
-                write("        // Required Characteristics")
-                for characteristic in service.required {
-                    if let info = characteristicInfo.first(where: { $0.hkname == characteristic }) {
-                        writeCharacteristicProperty(info: info, isOptional: false)
-                        requiredCharacteristicPropertyNames.append(info.title.parameterName())
-                    }
-                }
-                write("\n        // Optional Characteristics")
-                for characteristic in service.optional {
-                    if let info = characteristicInfo.first(where: { $0.hkname == characteristic }) {
-                        writeCharacteristicProperty(info: info, isOptional: true)
-                    }
-                }
-
                 write("""
-
                             public init(characteristics: [AnyCharacteristic] = []) {
                                 var unwrapped = characteristics.map { $0.wrapped }
                     """)
@@ -810,9 +793,25 @@ public class Inspector {
                 write("""
                                 super.init(type: .\(serviceName(service.title, uuid: service.id)), characteristics: unwrapped)
                             }
-                        }
+
                     """)
-                write("}")
+                write("        // MARK: - Required Characteristics")
+                for characteristic in service.required {
+                    if let info = characteristicInfo.first(where: { $0.hkname == characteristic }) {
+                        writeCharacteristicProperty(info: info, isOptional: false)
+                    }
+                }
+                write("\n        // MARK: - Optional Characteristics")
+                for characteristic in service.optional {
+                    if let info = characteristicInfo.first(where: { $0.hkname == characteristic }) {
+                        writeCharacteristicProperty(info: info, isOptional: true)
+                    }
+                }
+
+                write("""
+                        }
+                    }
+                    """)
             }
         }
 

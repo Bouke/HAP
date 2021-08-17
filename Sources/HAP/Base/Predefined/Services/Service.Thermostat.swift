@@ -2,20 +2,6 @@ import Foundation
 
 extension Service {
     open class Thermostat: Service {
-        // Required Characteristics
-        public let currentHeatingCoolingState: GenericCharacteristic<Enums.CurrentHeatingCoolingState>
-        public let targetHeatingCoolingState: GenericCharacteristic<Enums.TargetHeatingCoolingState>
-        public let currentTemperature: GenericCharacteristic<Float>
-        public let targetTemperature: GenericCharacteristic<Float>
-        public let temperatureDisplayUnits: GenericCharacteristic<Enums.TemperatureDisplayUnits>
-
-        // Optional Characteristics
-        public let name: GenericCharacteristic<String>?
-        public let currentRelativeHumidity: GenericCharacteristic<Float>?
-        public let targetRelativeHumidity: GenericCharacteristic<Float>?
-        public let coolingThresholdTemperature: GenericCharacteristic<Float>?
-        public let heatingThresholdTemperature: GenericCharacteristic<Float>?
-
         public init(characteristics: [AnyCharacteristic] = []) {
             var unwrapped = characteristics.map { $0.wrapped }
             currentHeatingCoolingState = getOrCreateAppend(
@@ -45,5 +31,19 @@ extension Service {
             heatingThresholdTemperature = get(type: .heatingThresholdTemperature, characteristics: unwrapped)
             super.init(type: .thermostat, characteristics: unwrapped)
         }
+
+        // MARK: - Required Characteristics
+        public let currentHeatingCoolingState: GenericCharacteristic<Enums.CurrentHeatingCoolingState>
+        public let targetHeatingCoolingState: GenericCharacteristic<Enums.TargetHeatingCoolingState>
+        public let currentTemperature: GenericCharacteristic<Float>
+        public let targetTemperature: GenericCharacteristic<Float>
+        public let temperatureDisplayUnits: GenericCharacteristic<Enums.TemperatureDisplayUnits>
+
+        // MARK: - Optional Characteristics
+        public let name: GenericCharacteristic<String>?
+        public let currentRelativeHumidity: GenericCharacteristic<Float>?
+        public let targetRelativeHumidity: GenericCharacteristic<Float>?
+        public let coolingThresholdTemperature: GenericCharacteristic<Float>?
+        public let heatingThresholdTemperature: GenericCharacteristic<Float>?
     }
 }

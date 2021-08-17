@@ -2,18 +2,6 @@ import Foundation
 
 extension Service {
     open class CarbonMonoxideSensor: Service {
-        // Required Characteristics
-        public let carbonMonoxideDetected: GenericCharacteristic<UInt8>
-
-        // Optional Characteristics
-        public let carbonMonoxideLevel: GenericCharacteristic<Float>?
-        public let carbonMonoxidePeakLevel: GenericCharacteristic<Float>?
-        public let name: GenericCharacteristic<String>?
-        public let statusActive: GenericCharacteristic<Bool>?
-        public let statusFault: GenericCharacteristic<UInt8>?
-        public let statusLowBattery: GenericCharacteristic<Enums.StatusLowBattery>?
-        public let statusTampered: GenericCharacteristic<UInt8>?
-
         public init(characteristics: [AnyCharacteristic] = []) {
             var unwrapped = characteristics.map { $0.wrapped }
             carbonMonoxideDetected = getOrCreateAppend(
@@ -29,5 +17,17 @@ extension Service {
             statusTampered = get(type: .statusTampered, characteristics: unwrapped)
             super.init(type: .carbonMonoxideSensor, characteristics: unwrapped)
         }
+
+        // MARK: - Required Characteristics
+        public let carbonMonoxideDetected: GenericCharacteristic<UInt8>
+
+        // MARK: - Optional Characteristics
+        public let carbonMonoxideLevel: GenericCharacteristic<Float>?
+        public let carbonMonoxidePeakLevel: GenericCharacteristic<Float>?
+        public let name: GenericCharacteristic<String>?
+        public let statusActive: GenericCharacteristic<Bool>?
+        public let statusFault: GenericCharacteristic<UInt8>?
+        public let statusLowBattery: GenericCharacteristic<Enums.StatusLowBattery>?
+        public let statusTampered: GenericCharacteristic<UInt8>?
     }
 }

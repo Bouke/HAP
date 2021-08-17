@@ -2,16 +2,6 @@ import Foundation
 
 extension Service {
     open class OccupancySensor: Service {
-        // Required Characteristics
-        public let occupancyDetected: GenericCharacteristic<Enums.OccupancyDetected>
-
-        // Optional Characteristics
-        public let name: GenericCharacteristic<String>?
-        public let statusActive: GenericCharacteristic<Bool>?
-        public let statusFault: GenericCharacteristic<UInt8>?
-        public let statusLowBattery: GenericCharacteristic<Enums.StatusLowBattery>?
-        public let statusTampered: GenericCharacteristic<UInt8>?
-
         public init(characteristics: [AnyCharacteristic] = []) {
             var unwrapped = characteristics.map { $0.wrapped }
             occupancyDetected = getOrCreateAppend(
@@ -25,5 +15,15 @@ extension Service {
             statusTampered = get(type: .statusTampered, characteristics: unwrapped)
             super.init(type: .occupancySensor, characteristics: unwrapped)
         }
+
+        // MARK: - Required Characteristics
+        public let occupancyDetected: GenericCharacteristic<Enums.OccupancyDetected>
+
+        // MARK: - Optional Characteristics
+        public let name: GenericCharacteristic<String>?
+        public let statusActive: GenericCharacteristic<Bool>?
+        public let statusFault: GenericCharacteristic<UInt8>?
+        public let statusLowBattery: GenericCharacteristic<Enums.StatusLowBattery>?
+        public let statusTampered: GenericCharacteristic<UInt8>?
     }
 }

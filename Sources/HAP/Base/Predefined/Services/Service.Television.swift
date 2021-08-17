@@ -2,23 +2,6 @@ import Foundation
 
 extension Service {
     open class Television: Service {
-        // Required Characteristics
-        public let active: GenericCharacteristic<Enums.Active>
-        public let activeIdentifier: GenericCharacteristic<UInt32>
-        public let configuredName: GenericCharacteristic<String>
-        public let remoteKey: GenericCharacteristic<Enums.RemoteKey?>
-        public let sleepDiscoveryMode: GenericCharacteristic<Enums.SleepDiscoveryMode>
-
-        // Optional Characteristics
-        public let brightness: GenericCharacteristic<Int>?
-        public let closedCaptions: GenericCharacteristic<Enums.ClosedCaptions>?
-        public let displayOrder: GenericCharacteristic<Data>?
-        public let currentMediaState: GenericCharacteristic<UInt8>?
-        public let targetMediaState: GenericCharacteristic<Enums.TargetMediaState>?
-        public let name: GenericCharacteristic<String>?
-        public let pictureMode: GenericCharacteristic<Enums.PictureMode>?
-        public let powerModeSelection: GenericCharacteristic<Enums.PowerModeSelection?>?
-
         public init(characteristics: [AnyCharacteristic] = []) {
             var unwrapped = characteristics.map { $0.wrapped }
             active = getOrCreateAppend(
@@ -51,5 +34,22 @@ extension Service {
             powerModeSelection = get(type: .powerModeSelection, characteristics: unwrapped)
             super.init(type: .television, characteristics: unwrapped)
         }
+
+        // MARK: - Required Characteristics
+        public let active: GenericCharacteristic<Enums.Active>
+        public let activeIdentifier: GenericCharacteristic<UInt32>
+        public let configuredName: GenericCharacteristic<String>
+        public let remoteKey: GenericCharacteristic<Enums.RemoteKey?>
+        public let sleepDiscoveryMode: GenericCharacteristic<Enums.SleepDiscoveryMode>
+
+        // MARK: - Optional Characteristics
+        public let brightness: GenericCharacteristic<Int>?
+        public let closedCaptions: GenericCharacteristic<Enums.ClosedCaptions>?
+        public let displayOrder: GenericCharacteristic<Data>?
+        public let currentMediaState: GenericCharacteristic<UInt8>?
+        public let targetMediaState: GenericCharacteristic<Enums.TargetMediaState>?
+        public let name: GenericCharacteristic<String>?
+        public let pictureMode: GenericCharacteristic<Enums.PictureMode>?
+        public let powerModeSelection: GenericCharacteristic<Enums.PowerModeSelection?>?
     }
 }

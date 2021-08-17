@@ -2,16 +2,6 @@ import Foundation
 
 extension Service {
     open class IrrigationSystem: Service {
-        // Required Characteristics
-        public let active: GenericCharacteristic<Enums.Active>
-        public let programMode: GenericCharacteristic<UInt8>
-        public let inUse: GenericCharacteristic<UInt8>
-
-        // Optional Characteristics
-        public let remainingDuration: GenericCharacteristic<UInt32>?
-        public let name: GenericCharacteristic<String>?
-        public let statusFault: GenericCharacteristic<UInt8>?
-
         public init(characteristics: [AnyCharacteristic] = []) {
             var unwrapped = characteristics.map { $0.wrapped }
             active = getOrCreateAppend(
@@ -31,5 +21,15 @@ extension Service {
             statusFault = get(type: .statusFault, characteristics: unwrapped)
             super.init(type: .irrigationSystem, characteristics: unwrapped)
         }
+
+        // MARK: - Required Characteristics
+        public let active: GenericCharacteristic<Enums.Active>
+        public let programMode: GenericCharacteristic<UInt8>
+        public let inUse: GenericCharacteristic<UInt8>
+
+        // MARK: - Optional Characteristics
+        public let remainingDuration: GenericCharacteristic<UInt32>?
+        public let name: GenericCharacteristic<String>?
+        public let statusFault: GenericCharacteristic<UInt8>?
     }
 }

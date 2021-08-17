@@ -2,13 +2,6 @@ import Foundation
 
 extension Service {
     open class StatelessProgrammableSwitch: Service {
-        // Required Characteristics
-        public let programmableSwitchEvent: GenericCharacteristic<UInt8>
-
-        // Optional Characteristics
-        public let name: GenericCharacteristic<String>?
-        public let labelIndex: GenericCharacteristic<UInt8>?
-
         public init(characteristics: [AnyCharacteristic] = []) {
             var unwrapped = characteristics.map { $0.wrapped }
             programmableSwitchEvent = getOrCreateAppend(
@@ -19,5 +12,12 @@ extension Service {
             labelIndex = get(type: .labelIndex, characteristics: unwrapped)
             super.init(type: .statelessProgrammableSwitch, characteristics: unwrapped)
         }
+
+        // MARK: - Required Characteristics
+        public let programmableSwitchEvent: GenericCharacteristic<UInt8>
+
+        // MARK: - Optional Characteristics
+        public let name: GenericCharacteristic<String>?
+        public let labelIndex: GenericCharacteristic<UInt8>?
     }
 }

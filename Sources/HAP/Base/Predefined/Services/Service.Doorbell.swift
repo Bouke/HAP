@@ -2,16 +2,6 @@ import Foundation
 
 extension Service {
     open class Doorbell: Service {
-        // Required Characteristics
-        public let programmableSwitchEvent: GenericCharacteristic<UInt8>
-
-        // Optional Characteristics
-        public let brightness: GenericCharacteristic<Int>?
-        public let mute: GenericCharacteristic<Bool>?
-        public let name: GenericCharacteristic<String>?
-        public let operatingStateResponse: GenericCharacteristic<Data>?
-        public let volume: GenericCharacteristic<UInt8>?
-
         public init(characteristics: [AnyCharacteristic] = []) {
             var unwrapped = characteristics.map { $0.wrapped }
             programmableSwitchEvent = getOrCreateAppend(
@@ -25,5 +15,15 @@ extension Service {
             volume = get(type: .volume, characteristics: unwrapped)
             super.init(type: .doorbell, characteristics: unwrapped)
         }
+
+        // MARK: - Required Characteristics
+        public let programmableSwitchEvent: GenericCharacteristic<UInt8>
+
+        // MARK: - Optional Characteristics
+        public let brightness: GenericCharacteristic<Int>?
+        public let mute: GenericCharacteristic<Bool>?
+        public let name: GenericCharacteristic<String>?
+        public let operatingStateResponse: GenericCharacteristic<Data>?
+        public let volume: GenericCharacteristic<UInt8>?
     }
 }

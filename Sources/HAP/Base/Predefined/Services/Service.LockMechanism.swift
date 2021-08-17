@@ -2,13 +2,6 @@ import Foundation
 
 extension Service {
     open class LockMechanism: Service {
-        // Required Characteristics
-        public let lockCurrentState: GenericCharacteristic<Enums.LockCurrentState>
-        public let lockTargetState: GenericCharacteristic<Enums.LockTargetState>
-
-        // Optional Characteristics
-        public let name: GenericCharacteristic<String>?
-
         public init(characteristics: [AnyCharacteristic] = []) {
             var unwrapped = characteristics.map { $0.wrapped }
             lockCurrentState = getOrCreateAppend(
@@ -22,5 +15,12 @@ extension Service {
             name = get(type: .name, characteristics: unwrapped)
             super.init(type: .lockMechanism, characteristics: unwrapped)
         }
+
+        // MARK: - Required Characteristics
+        public let lockCurrentState: GenericCharacteristic<Enums.LockCurrentState>
+        public let lockTargetState: GenericCharacteristic<Enums.LockTargetState>
+
+        // MARK: - Optional Characteristics
+        public let name: GenericCharacteristic<String>?
     }
 }

@@ -2,16 +2,6 @@ import Foundation
 
 extension Service {
     open class SmokeSensor: Service {
-        // Required Characteristics
-        public let smokeDetected: GenericCharacteristic<Enums.SmokeDetected>
-
-        // Optional Characteristics
-        public let name: GenericCharacteristic<String>?
-        public let statusActive: GenericCharacteristic<Bool>?
-        public let statusFault: GenericCharacteristic<UInt8>?
-        public let statusLowBattery: GenericCharacteristic<Enums.StatusLowBattery>?
-        public let statusTampered: GenericCharacteristic<UInt8>?
-
         public init(characteristics: [AnyCharacteristic] = []) {
             var unwrapped = characteristics.map { $0.wrapped }
             smokeDetected = getOrCreateAppend(
@@ -25,5 +15,15 @@ extension Service {
             statusTampered = get(type: .statusTampered, characteristics: unwrapped)
             super.init(type: .smokeSensor, characteristics: unwrapped)
         }
+
+        // MARK: - Required Characteristics
+        public let smokeDetected: GenericCharacteristic<Enums.SmokeDetected>
+
+        // MARK: - Optional Characteristics
+        public let name: GenericCharacteristic<String>?
+        public let statusActive: GenericCharacteristic<Bool>?
+        public let statusFault: GenericCharacteristic<UInt8>?
+        public let statusLowBattery: GenericCharacteristic<Enums.StatusLowBattery>?
+        public let statusTampered: GenericCharacteristic<UInt8>?
     }
 }

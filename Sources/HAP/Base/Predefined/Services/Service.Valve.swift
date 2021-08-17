@@ -2,19 +2,6 @@ import Foundation
 
 extension Service {
     open class Valve: Service {
-        // Required Characteristics
-        public let active: GenericCharacteristic<Enums.Active>
-        public let inUse: GenericCharacteristic<UInt8>
-        public let valveType: GenericCharacteristic<UInt8>
-
-        // Optional Characteristics
-        public let isConfigured: GenericCharacteristic<Enums.IsConfigured>?
-        public let name: GenericCharacteristic<String>?
-        public let remainingDuration: GenericCharacteristic<UInt32>?
-        public let labelIndex: GenericCharacteristic<UInt8>?
-        public let setDuration: GenericCharacteristic<UInt32>?
-        public let statusFault: GenericCharacteristic<UInt8>?
-
         public init(characteristics: [AnyCharacteristic] = []) {
             var unwrapped = characteristics.map { $0.wrapped }
             active = getOrCreateAppend(
@@ -37,5 +24,18 @@ extension Service {
             statusFault = get(type: .statusFault, characteristics: unwrapped)
             super.init(type: .valve, characteristics: unwrapped)
         }
+
+        // MARK: - Required Characteristics
+        public let active: GenericCharacteristic<Enums.Active>
+        public let inUse: GenericCharacteristic<UInt8>
+        public let valveType: GenericCharacteristic<UInt8>
+
+        // MARK: - Optional Characteristics
+        public let isConfigured: GenericCharacteristic<Enums.IsConfigured>?
+        public let name: GenericCharacteristic<String>?
+        public let remainingDuration: GenericCharacteristic<UInt32>?
+        public let labelIndex: GenericCharacteristic<UInt8>?
+        public let setDuration: GenericCharacteristic<UInt32>?
+        public let statusFault: GenericCharacteristic<UInt8>?
     }
 }

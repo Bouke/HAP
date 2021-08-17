@@ -2,15 +2,6 @@ import Foundation
 
 extension Service {
     open class Speaker: Service {
-        // Required Characteristics
-        public let mute: GenericCharacteristic<Bool>
-
-        // Optional Characteristics
-        public let active: GenericCharacteristic<Enums.Active>?
-        public let volume: GenericCharacteristic<UInt8>?
-        public let volumeControlType: GenericCharacteristic<Enums.VolumeControlType>?
-        public let volumeSelector: GenericCharacteristic<Enums.VolumeSelector?>?
-
         public init(characteristics: [AnyCharacteristic] = []) {
             var unwrapped = characteristics.map { $0.wrapped }
             mute = getOrCreateAppend(
@@ -23,5 +14,14 @@ extension Service {
             volumeSelector = get(type: .volumeSelector, characteristics: unwrapped)
             super.init(type: .speaker, characteristics: unwrapped)
         }
+
+        // MARK: - Required Characteristics
+        public let mute: GenericCharacteristic<Bool>
+
+        // MARK: - Optional Characteristics
+        public let active: GenericCharacteristic<Enums.Active>?
+        public let volume: GenericCharacteristic<UInt8>?
+        public let volumeControlType: GenericCharacteristic<Enums.VolumeControlType>?
+        public let volumeSelector: GenericCharacteristic<Enums.VolumeSelector?>?
     }
 }
