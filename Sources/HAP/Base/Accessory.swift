@@ -25,12 +25,14 @@ struct AIDGenerator: Sequence, IteratorProtocol, Codable {
     }
 }
 
-open class Accessory: JSONSerializable {
+open class Accessory: Hashable, JSONSerializable {
     public weak var device: Device?
     internal var aid: InstanceID = 0
     public let type: AccessoryType
     public let info: Service.Info
     internal let services: [Service]
+
+    public weak var delegate: AccessoryDelegate?
 
     // An accessory implementation can set this flag to false if a device
     // becomes unreachable for a period. If the accessory has a
@@ -107,6 +109,8 @@ open class Accessory: JSONSerializable {
                                 ofService service: Service,
                                 didChangeValue newValue: T?) {
         device?.characteristic(characteristic, ofService: service, ofAccessory: self, didChangeValue: newValue)
+        delegate?.characteristic(characteristic, ofService: service, ofAccessory: self, didChangeValue: newValue)
+
     }
 
     public func serialized() -> [String: JSONValueType] {
@@ -114,5 +118,13 @@ open class Accessory: JSONSerializable {
             "aid": aid,
             "services": services.map { $0.serialized() }
         ]
+    }
+
+    public static func == (lhs: Accessory, rhs: Accessory) -> Bool {
+        lhs === rhs
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(ObjectIdentifier(self))
     }
 }
