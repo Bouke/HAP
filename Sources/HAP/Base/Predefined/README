@@ -3,6 +3,6 @@ from the macOS HomeKit framework definitions. Don't make changes
 to these files directly. Update these files using the `hap-update`
 tool.
 
-Generated on:              17 August 2021
-HomeKit framework version: 868
-macOS:                     Version 11.3.1 (Build 20E241)
+Generated on:              28 May 2022
+HomeKit framework version: 880
+macOS:                     Version 12.2.1 (Build 21D62)

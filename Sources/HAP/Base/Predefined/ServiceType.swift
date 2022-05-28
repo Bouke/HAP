@@ -1,7 +1,9 @@
 public extension ServiceType {
+    static let accessoryMetrics = ServiceType(0x0270)
     static let accessoryRuntimeInformation = ServiceType(0x0239)
     static let airPurifier = ServiceType(0x00BB)
     static let airQualitySensor = ServiceType(0x008D)
+    static let assetUpdate = ServiceType(0x0267)
     static let battery = ServiceType(0x0096)
     static let carbonDioxideSensor = ServiceType(0x0097)
     static let carbonMonoxideSensor = ServiceType(0x007F)
@@ -51,9 +53,11 @@ public extension ServiceType {
 extension ServiceType: CustomStringConvertible {
     public var description: String {
         switch self {
+        case .accessoryMetrics: return "Accessory Metrics"
         case .accessoryRuntimeInformation: return "Accessory Runtime Information"
         case .airPurifier: return "Air Purifier"
         case .airQualitySensor: return "Air Quality Sensor"
+        case .assetUpdate: return "Asset Update"
         case .battery: return "Battery"
         case .carbonDioxideSensor: return "Carbon dioxide Sensor"
         case .carbonMonoxideSensor: return "Carbon monoxide Sensor"

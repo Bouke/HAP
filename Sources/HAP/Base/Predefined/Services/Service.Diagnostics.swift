@@ -8,6 +8,8 @@ extension Service {
                 type: .supportedDiagnosticsSnapshot,
                 characteristics: &unwrapped,
                 generator: { PredefinedCharacteristic.supportedDiagnosticsSnapshot() })
+            selectedDiagnosticsModes = get(type: .selectedDiagnosticsModes, characteristics: unwrapped)
+            supportedDiagnosticsModes = get(type: .supportedDiagnosticsModes, characteristics: unwrapped)
             super.init(type: .diagnostics, characteristics: unwrapped)
         }
 
@@ -15,5 +17,7 @@ extension Service {
         public let supportedDiagnosticsSnapshot: GenericCharacteristic<Data>
 
         // MARK: - Optional Characteristics
+        public let selectedDiagnosticsModes: GenericCharacteristic<UInt32>?
+        public let supportedDiagnosticsModes: GenericCharacteristic<UInt32>?
     }
 }

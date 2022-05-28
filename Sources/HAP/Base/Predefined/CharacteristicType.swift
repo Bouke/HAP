@@ -6,6 +6,7 @@ public extension CharacteristicType {
     static let activityInterval = CharacteristicType(0x023B)
     static let administratorOnlyAccess = CharacteristicType(0x0001)
     static let applicationMatchingIdentifier = CharacteristicType(0x00A4)
+    static let assetUpdateReadiness = CharacteristicType(0x0269)
     static let audioFeedback = CharacteristicType(0x0005)
     static let batteryLevel = CharacteristicType(0x0068)
     static let brightness = CharacteristicType(0x0008)
@@ -51,6 +52,7 @@ public extension CharacteristicType {
     static let filterLifeLevel = CharacteristicType(0x00AB)
     static let filterResetChangeIndication = CharacteristicType(0x00AD)
     static let firmwareRevision = CharacteristicType(0x0052)
+    static let hardwareFinish = CharacteristicType(0x026C)
     static let hardwareRevision = CharacteristicType(0x0053)
     static let heartBeat = CharacteristicType(0x024A)
     static let heatingThresholdTemperature = CharacteristicType(0x0012)
@@ -109,6 +111,7 @@ public extension CharacteristicType {
     static let securitySystemAlarmType = CharacteristicType(0x008E)
     static let securitySystemCurrentState = CharacteristicType(0x0066)
     static let securitySystemTargetState = CharacteristicType(0x0067)
+    static let selectedDiagnosticsModes = CharacteristicType(0x024D)
     static let serialNumber = CharacteristicType(0x0030)
     static let setDuration = CharacteristicType(0x00D3)
     static let setupTransferTransport = CharacteristicType(0x0201)
@@ -123,7 +126,9 @@ public extension CharacteristicType {
     static let statusLowBattery = CharacteristicType(0x0079)
     static let statusTampered = CharacteristicType(0x007A)
     static let sulphurDioxideDensity = CharacteristicType(0x00C5)
+    static let supportedAssetTypes = CharacteristicType(0x0268)
     static let supportedCharacteristicValueTransitionConfiguration = CharacteristicType(0x0144)
+    static let supportedDiagnosticsModes = CharacteristicType(0x024C)
     static let supportedDiagnosticsSnapshot = CharacteristicType(0x0238)
     static let supportedTransferTransportConfiguration = CharacteristicType(0x0202)
     static let swingMode = CharacteristicType(0x00B6)
@@ -166,6 +171,7 @@ extension CharacteristicType: CustomStringConvertible {
         case .activityInterval: return "Activity Interval"
         case .administratorOnlyAccess: return "Administrator Only Access"
         case .applicationMatchingIdentifier: return "Application Matching Identifier"
+        case .assetUpdateReadiness: return "Asset Update Readiness"
         case .audioFeedback: return "Audio Feedback"
         case .batteryLevel: return "Battery Level"
         case .brightness: return "Brightness"
@@ -211,6 +217,7 @@ extension CharacteristicType: CustomStringConvertible {
         case .filterLifeLevel: return "Filter Life Level"
         case .filterResetChangeIndication: return "Filter Reset Change Indication"
         case .firmwareRevision: return "Firmware Revision"
+        case .hardwareFinish: return "Hardware Finish"
         case .hardwareRevision: return "Hardware Revision"
         case .heartBeat: return "Heart Beat"
         case .heatingThresholdTemperature: return "Heating Threshold Temperature"
@@ -269,6 +276,7 @@ extension CharacteristicType: CustomStringConvertible {
         case .securitySystemAlarmType: return "Security System Alarm Type"
         case .securitySystemCurrentState: return "Security System Current State"
         case .securitySystemTargetState: return "Security System Target State"
+        case .selectedDiagnosticsModes: return "Selected Diagnostics Modes"
         case .serialNumber: return "Serial Number"
         case .setDuration: return "Set Duration"
         case .setupTransferTransport: return "Setup Transfer Transport"
@@ -283,7 +291,9 @@ extension CharacteristicType: CustomStringConvertible {
         case .statusLowBattery: return "Status Low Battery"
         case .statusTampered: return "Status Tampered"
         case .sulphurDioxideDensity: return "Sulphur dioxide Density"
+        case .supportedAssetTypes: return "Supported Asset Types"
         case .supportedCharacteristicValueTransitionConfiguration: return "Supported Characteristic Value Transition Configuration"
+        case .supportedDiagnosticsModes: return "Supported Diagnostics Modes"
         case .supportedDiagnosticsSnapshot: return "Supported Diagnostics Snapshot"
         case .supportedTransferTransportConfiguration: return "Supported Transfer Transport Configuration"
         case .swingMode: return "Swing Mode"

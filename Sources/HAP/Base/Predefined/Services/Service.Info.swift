@@ -28,9 +28,10 @@ extension Service {
             applicationMatchingIdentifier = get(type: .applicationMatchingIdentifier, characteristics: unwrapped)
             configuredName = get(type: .configuredName, characteristics: unwrapped)
             firmwareRevision = get(type: .firmwareRevision, characteristics: unwrapped)
+            hardwareFinish = get(type: .hardwareFinish, characteristics: unwrapped)
             hardwareRevision = get(type: .hardwareRevision, characteristics: unwrapped)
-            softwareRevision = get(type: .softwareRevision, characteristics: unwrapped)
             productData = get(type: .productData, characteristics: unwrapped)
+            softwareRevision = get(type: .softwareRevision, characteristics: unwrapped)
             super.init(type: .info, characteristics: unwrapped)
         }
 
@@ -46,8 +47,9 @@ extension Service {
         public let applicationMatchingIdentifier: GenericCharacteristic<Data>?
         public let configuredName: GenericCharacteristic<String>?
         public let firmwareRevision: GenericCharacteristic<String>?
+        public let hardwareFinish: GenericCharacteristic<Data>?
         public let hardwareRevision: GenericCharacteristic<String>?
-        public let softwareRevision: GenericCharacteristic<String>?
         public let productData: GenericCharacteristic<Data>?
+        public let softwareRevision: GenericCharacteristic<String>?
     }
 }
