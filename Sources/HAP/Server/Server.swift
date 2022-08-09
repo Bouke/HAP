@@ -46,7 +46,7 @@ public class Server: NSObject, NetServiceDelegate {
         device.controllerHandler = ControllerHandler()
         device.controllerHandler!.removeSubscriptions = device.removeSubscriberForAllCharacteristics
 
-        let applicationHandler = ApplicationHandler(responder: root(device: device))
+        let application = ApplicationHandler(responder: root(device: device))
 
         self.ownGroup = worker == nil
         self.group = worker ?? MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
@@ -58,21 +58,9 @@ public class Server: NSObject, NetServiceDelegate {
 
             // Set the handlers that are applied to the accepted child `Channel`s.
             .childChannelInitializer { channel in
-                channel.pipeline.addHandler(CryptographerHandler()).flatMap {
-                    channel.pipeline.addHandler(EventHandler()).flatMap {
-                        channel.pipeline.configureHTTPServerPipeline(withErrorHandling: true).flatMap {
-                            // It's important we use the same handler for all accepted channels.
-                            // The ControllerHandler is thread-safe!
-                            channel.pipeline.addHandler(device.controllerHandler!).flatMap {
-                                channel.pipeline.addHandler(RequestHandler()).flatMap {
-                                    channel.pipeline.addHandler(UpgradeEventHandler()).flatMap {
-                                        channel.pipeline.addHandler(applicationHandler)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                // It's important we use the same handler for all accepted channels.
+                // The ControllerHandler is thread-safe!
+                channel.pipeline.addHapClientHandlers(application: application, controller: device.controllerHandler!)
             }
 
             // Enable TCP_NODELAY and SO_REUSEADDR for the accepted Channels
@@ -140,5 +128,23 @@ public class Server: NSObject, NetServiceDelegate {
 
     public func netService(_ sender: NetService, didNotPublish errorDict: [String: NSNumber]) {
         logger.error("Did not publish Bonjour service: \(errorDict)")
+    }
+}
+
+extension ChannelPipeline {
+    func addHapClientHandlers(application: ChannelHandler, controller: ChannelHandler) -> EventLoopFuture<Void> {
+        addHandler(CryptographerHandler()).flatMap {
+            self.addHandler(EventHandler()).flatMap {
+                self.configureHTTPServerPipeline(withErrorHandling: true).flatMap {
+                    self.addHandler(controller).flatMap {
+                        self.addHandler(RequestHandler()).flatMap {
+                            self.addHandler(UpgradeEventHandler()).flatMap {
+                                self.addHandler(application)
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
