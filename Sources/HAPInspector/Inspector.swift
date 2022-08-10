@@ -23,9 +23,9 @@ extension String {
         self
             .replacingOccurrences(of: "_", with: " ")
             .replacingOccurrences(of: "-", with: " ")
+            .replacingOccurrences(of: ".", with: " ")
             .capitalized
             .replacingOccurrences(of: " ", with: "")
-            .replacingOccurrences(of: ".", with: "_")
             .lowercasedFirstLetter()
     }
 }

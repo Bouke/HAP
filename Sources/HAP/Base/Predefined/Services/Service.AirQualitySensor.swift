@@ -11,7 +11,7 @@ extension Service {
             nitrogenDioxideDensity = get(type: .nitrogenDioxideDensity, characteristics: unwrapped)
             ozoneDensity = get(type: .ozoneDensity, characteristics: unwrapped)
             pm10Density = get(type: .pm10Density, characteristics: unwrapped)
-            pm2_5Density = get(type: .pm2_5Density, characteristics: unwrapped)
+            pm25Density = get(type: .pm25Density, characteristics: unwrapped)
             sulphurDioxideDensity = get(type: .sulphurDioxideDensity, characteristics: unwrapped)
             volatileOrganicCompoundDensity = get(type: .volatileOrganicCompoundDensity, characteristics: unwrapped)
             name = get(type: .name, characteristics: unwrapped)
@@ -29,7 +29,7 @@ extension Service {
         public let nitrogenDioxideDensity: GenericCharacteristic<Float>?
         public let ozoneDensity: GenericCharacteristic<Float>?
         public let pm10Density: GenericCharacteristic<Float>?
-        public let pm2_5Density: GenericCharacteristic<Float>?
+        public let pm25Density: GenericCharacteristic<Float>?
         public let sulphurDioxideDensity: GenericCharacteristic<Float>?
         public let volatileOrganicCompoundDensity: GenericCharacteristic<Float>?
         public let name: GenericCharacteristic<String>?
