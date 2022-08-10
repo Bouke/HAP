@@ -13,7 +13,11 @@ fileprivate let logger = Logger(label: "bridge")
 LoggingSystem.bootstrap(createLogHandler)
 
 #if DEBUG
-    logger.warning("⚠️  It looks like you're running a debug build, which doesn't perform well. Specify `-c release` for good performance.")
+    logger.warning(
+        """
+        ⚠️  It looks like you're running a debug build, which doesn't perform well. \
+        Specify `-c release` for good performance.
+        """)
 #endif
 
 let storage = FileStorage(filename: "configuration.json")
@@ -22,17 +26,20 @@ if CommandLine.arguments.contains("--recreate") {
     try storage.write(Data())
 }
 
+// Define two light bulb accessories.
 let livingRoomLightbulb = Accessory.Lightbulb(info: Service.Info(name: "Living Room", serialNumber: "00002"))
 let bedroomNightStand = Accessory.Lightbulb(info: Service.Info(name: "Bedroom", serialNumber: "00003"))
 
-// Security system with multiple zones and statuses fault and tampered.
-let securitySystem = Accessory(info: .init(name: "Multi-Zone", serialNumber: "A1803"),
-                               type: .securitySystem,
-                               services: [
-                                Service.SecuritySystem(characteristics: [.name("Zone A"), .statusFault(), .statusTampered()]),
-                                Service.SecuritySystem(characteristics: [.name("Zone B"), .statusFault(), .statusTampered()])
-                               ])
+// And a security system with multiple zones and statuses fault and tampered.
+let securitySystem = Accessory(
+    info: Service.Info(name: "Multi-Zone", serialNumber: "A1803"),
+    type: .securitySystem,
+    services: [
+        Service.SecuritySystem(characteristics: [.name("Zone A"), .statusFault(), .statusTampered()]),
+        Service.SecuritySystem(characteristics: [.name("Zone B"), .statusFault(), .statusTampered()])
+    ])
 
+// Attach those to the bridge device.
 let device = Device(
     bridgeInfo: Service.Info(name: "Bridge", serialNumber: "00001"),
     setupCode: "123-44-321",
@@ -41,66 +48,13 @@ let device = Device(
         livingRoomLightbulb,
         bedroomNightStand,
         securitySystem
-//        Accessory.Door(info: Service.Info(name: "Front Door", serialNumber: "00005")),
-//        Accessory.Switch(info: Service.Info(name: "Garden Lights", serialNumber: "00006")),
-//        Accessory.Thermostat(info: Service.Info(name: "Living Room Thermostat", serialNumber: "00007")),
-//        Accessory.Thermometer(info: Service.Info(name: "Office Thermometer", serialNumber: "00008")),
-//        Accessory.Outlet(info: Service.Info(name: "Coffee Machine", serialNumber: "00009")),
-//        Accessory.Window(info: Service.Info(name: "Toilet Window", serialNumber: "00010")),
-//        Accessory.WindowCovering(info: Service.Info(name: "Shades", serialNumber: "00011")),
-//        Accessory.Fan(info: Service.Info(name: "Living Room Ceiling Fan", serialNumber: "00012")),
-//        Accessory.GarageDoorOpener(info: Service.Info(name: "Garage", serialNumber: "00013")),
-//        Accessory.LockMechanism(info: Service.Info(name: "Front Door Lock", serialNumber: "00014")),
-//        Accessory.SecuritySystem(info: Service.Info(name: "Alarm", serialNumber: "00015"))
     ])
 
-class MyDeviceDelegate: DeviceDelegate {
-    func didRequestIdentificationOf(_ accessory: Accessory) {
-        logger.info("Requested identification of accessory \(String(describing: accessory.info.name.value ?? ""))")
-    }
-
-    func characteristic<T>(_ characteristic: GenericCharacteristic<T>,
-                           ofService service: Service,
-                           ofAccessory accessory: Accessory,
-                           didChangeValue newValue: T?) {
-        logger.debug("Characteristic \(characteristic) in service \(service.type) of accessory \(accessory.info.name.value ?? "") did change: \(String(describing: newValue))")
-    }
-
-    func characteristicListenerDidSubscribe(_ accessory: Accessory,
-                                            service: Service,
-                                            characteristic: AnyCharacteristic) {
-        logger.debug("Characteristic \(characteristic) in service \(service.type) of accessory \(accessory.info.name.value ?? "") got a subscriber")
-    }
-
-    func characteristicListenerDidUnsubscribe(_ accessory: Accessory,
-                                              service: Service,
-                                              characteristic: AnyCharacteristic) {
-        logger.debug("Characteristic \(characteristic) in service \(service.type) of accessory \(accessory.info.name.value ?? "") lost a subscriber")
-    }
-
-    func didChangePairingState(from: PairingState, to: PairingState) {
-        if to == .notPaired {
-            printPairingInstructions()
-        }
-    }
-
-    func printPairingInstructions() {
-        if device.isPaired {
-            print()
-            print("The device is paired, either unpair using your iPhone or remove the configuration file `configuration.json`.")
-            print()
-        } else {
-            print()
-            print("Scan the following QR code using your iPhone to pair this device:")
-            print()
-            print(device.setupQRCode.asText)
-            print()
-        }
-    }
-}
-
-var delegate = MyDeviceDelegate()
+// Attach a delegate that logs all activity.
+var delegate = LoggingDeviceDelegate(logger: logger)
 device.delegate = delegate
+
+// Attach device to a server handling networking.
 let server = try Server(device: device)
 
 // Stop server on interrupt.
@@ -116,7 +70,7 @@ signal(SIGTERM) { _ in stop() }
 
 logger.info("Initializing the server...")
 
-// Switch the lights every 5 seconds.
+// Toggle the lights every 5 seconds.
 let timer = DispatchSource.makeTimerSource()
 timer.schedule(deadline: .now() + .seconds(1), repeating: .seconds(5))
 timer.setEventHandler(handler: {

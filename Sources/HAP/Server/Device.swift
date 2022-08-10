@@ -451,7 +451,8 @@ public class Device {
 
     func fireCharacteristicChangeEvent(_ characteristic: Characteristic, source: Channel) {
         let subscribers = subscribersSyncQueue.sync {
-            characteristicSubscribers[ObjectIdentifier(characteristic)]?.filter({ $0 != ObjectIdentifier(source) }) ?? Set()
+            characteristicSubscribers[ObjectIdentifier(characteristic)]?
+                .filter({ $0 != ObjectIdentifier(source) }) ?? Set()
         }
         for subscriber in subscribers {
             controllerHandler?.notifyChannel(identifier: subscriber, ofCharacteristicChange: characteristic)

@@ -14,7 +14,7 @@ func pairVerify(device: Device) -> Responder {
     let controller = PairVerifyController(device: device)
 
     func getSession(for context: RequestContext) -> Session? {
-        return context.session["PairVerify"] as? Session
+        context.session["PairVerify"] as? Session
     }
 
     func setSession(for context: RequestContext, to session: Session?) {

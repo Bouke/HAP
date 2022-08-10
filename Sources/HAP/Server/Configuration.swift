@@ -68,6 +68,7 @@ extension Device {
 
         // MARK: - Encodable
 
+        // swiftlint:disable:next nesting
         enum CodingKeys: String, CodingKey {
             case aidForAccessorySerialNumber
             case aidGenerator
@@ -82,7 +83,8 @@ extension Device {
 
         init(from decoder: Decoder) throws {
             let values = try decoder.container(keyedBy: CodingKeys.self)
-            aidForAccessorySerialNumber = try values.decode([String: InstanceID].self, forKey: .aidForAccessorySerialNumber)
+            aidForAccessorySerialNumber = try values.decode([String: InstanceID].self,
+                                                            forKey: .aidForAccessorySerialNumber)
             aidGenerator = try values.decode(AIDGenerator.self, forKey: .aidGenerator)
             identifier = try values.decode(String.self, forKey: .identifier)
             number = try values.decode(UInt32.self, forKey: .number)

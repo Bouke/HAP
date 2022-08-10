@@ -29,7 +29,7 @@ func pairSetup(device: Device) -> Responder {
     }
 
     func getSession(for context: RequestContext) -> Session? {
-        return context.session["PairSetup"] as? Session
+        context.session["PairSetup"] as? Session
     }
 
     func setSession(for context: RequestContext, to session: Session?) {

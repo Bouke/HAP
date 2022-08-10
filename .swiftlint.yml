@@ -1,8 +1,9 @@
 excluded:
-  - Sources/HAP/Base/Generated.swift
+  - Sources/HAP/Base/
 disabled_rules:
   - function_body_length
   - private_over_fileprivate
+  - todo
 opt_in_rules:
   - array_init
   - attributes

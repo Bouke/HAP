@@ -20,7 +20,6 @@ func pairings(device: Device) -> Responder {
                 return .badRequest
         }
 
-        // TODO: authorization
         let pairing = device.controllerHandler?.getPairingForChannel(context.channel)
         guard pairing?.role == .admin else {
             logger.warning("Permission denied (non-admin) to update pairing data: \(data), method: \(method)")
