@@ -89,7 +89,7 @@ public extension CharacteristicType {
     static let outletInUse = CharacteristicType(0x0026)
     static let ozoneDensity = CharacteristicType(0x00C3)
     static let pm10Density = CharacteristicType(0x00C7)
-    static let pm2_5Density = CharacteristicType(0x00C6)
+    static let pm25Density = CharacteristicType(0x00C6)
     static let pictureMode = CharacteristicType(0x00E2)
     static let ping = CharacteristicType(0x023C)
     static let positionState = CharacteristicType(0x0072)
@@ -254,7 +254,7 @@ extension CharacteristicType: CustomStringConvertible {
         case .outletInUse: return "Outlet In Use"
         case .ozoneDensity: return "Ozone Density"
         case .pm10Density: return "PM10 Density"
-        case .pm2_5Density: return "PM2.5 Density"
+        case .pm25Density: return "PM2.5 Density"
         case .pictureMode: return "Picture Mode"
         case .ping: return "Ping"
         case .positionState: return "Position State"

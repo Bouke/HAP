@@ -1,7 +1,7 @@
 import Foundation
 
 public extension AnyCharacteristic {
-    static func pm2_5Density(
+    static func pm25Density(
         _ value: Float = 0,
         permissions: [CharacteristicPermission] = [.read, .events],
         description: String? = "PM2.5 Density",
@@ -15,7 +15,7 @@ public extension AnyCharacteristic {
         validValuesRange: Range<Double>? = nil
     ) -> AnyCharacteristic {
         AnyCharacteristic(
-            PredefinedCharacteristic.pm2_5Density(
+            PredefinedCharacteristic.pm25Density(
             value,
             permissions: permissions,
             description: description,
@@ -31,7 +31,7 @@ public extension AnyCharacteristic {
 }
 
 public extension PredefinedCharacteristic {
-    static func pm2_5Density(
+    static func pm25Density(
         _ value: Float = 0,
         permissions: [CharacteristicPermission] = [.read, .events],
         description: String? = "PM2.5 Density",
@@ -45,7 +45,7 @@ public extension PredefinedCharacteristic {
         validValuesRange: Range<Double>? = nil
     ) -> GenericCharacteristic<Float> {
         GenericCharacteristic<Float>(
-            type: .pm2_5Density,
+            type: .pm25Density,
             value: value,
             permissions: permissions,
             description: description,
