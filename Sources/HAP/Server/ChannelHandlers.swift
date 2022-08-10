@@ -18,23 +18,14 @@ class CryptographerHandler: ChannelDuplexHandler {
     typealias OutboundIn = ByteBuffer
     typealias OutboundOut = ByteBuffer
 
-    var cryptographer: Cryptographer?
+    var cryptographer: Cryptographer
     var cumulationBuffer: ByteBuffer?
 
-    func triggerUserOutboundEvent(context: ChannelHandlerContext, event: Any, promise: EventLoopPromise<Void>?) {
-        if case let CryptographyEvent.sharedKey(sharedKey) = event {
-            cryptographer = Cryptographer(sharedSecret: SymmetricKey(data: sharedKey))
-            promise?.succeed(())
-        } else {
-            context.triggerUserOutboundEvent(event, promise: promise)
-        }
+    init(_ cryptographer: Cryptographer) {
+        self.cryptographer = cryptographer
     }
 
     func channelRead(context: ChannelHandlerContext, data: NIOAny) {
-        guard cryptographer != nil else {
-            return context.fireChannelRead(data)
-        }
-
         var buffer = unwrapInboundIn(data)
         if cumulationBuffer == nil {
             cumulationBuffer = buffer
@@ -62,9 +53,9 @@ class CryptographerHandler: ChannelDuplexHandler {
 
         var message: Data
         do {
-            message = try cryptographer!.decrypt(lengthBytes: lengthBytes.readableBytesView,
-                                                 ciphertext: cyphertext.readableBytesView,
-                                                 tag: tag.readableBytesView)
+            message = try cryptographer.decrypt(lengthBytes: lengthBytes.readableBytesView,
+                                                ciphertext: cyphertext.readableBytesView,
+                                                tag: tag.readableBytesView)
         } catch {
             // swiftlint:disable:next line_length
             logger.warning("Could not decrypt message from \(context.remoteAddress?.description ?? "???"): \(error), closing connection.")
@@ -81,10 +72,6 @@ class CryptographerHandler: ChannelDuplexHandler {
     }
 
     func write(context: ChannelHandlerContext, data: NIOAny, promise: EventLoopPromise<Void>?) {
-        guard cryptographer != nil else {
-            return context.write(data, promise: promise)
-        }
-
         var buffer = unwrapOutboundIn(data)
         while buffer.readableBytes > 0 {
             writeOneFrame(context: context, buffer: &buffer, promise: promise)
@@ -98,7 +85,7 @@ class CryptographerHandler: ChannelDuplexHandler {
 
         var cipher: Data
         do {
-            cipher = try cryptographer!.encrypt(plaintext: frame)
+            cipher = try cryptographer.encrypt(plaintext: frame)
         } catch {
             // swiftlint:disable:next line_length
             logger.warning("Could not decrypt message from \(context.remoteAddress?.description ?? "???"): \(error), closing connection.")
@@ -279,23 +266,30 @@ class ControllerHandler: ChannelDuplexHandler {
     }
 }
 
-// Abuse response headers to trigger outbound event AFTER the response itself was
-// written to the channel. Ideally we'd expose the `Future` to the `Responder`,
-// so itself can trigger this event instead.
-class UpgradeEventHandler: ChannelOutboundHandler {
+class CryptographerInstallerHandler: ChannelOutboundHandler, RemovableChannelHandler {
     typealias OutboundIn = HTTPResponse
     typealias OutboundOut = HTTPResponse
 
+    var newCryptographer: Cryptographer?
+
     func write(context: ChannelHandlerContext, data: NIOAny, promise: EventLoopPromise<Void>?) {
-        var response = unwrapOutboundIn(data)
-        if let sharedKeyB64 = response.headers["x-shared-key"].first {
-            let sharedKey = Data(base64Encoded: sharedKeyB64)!
-            response.headers.remove(name: "x-shared-key")
-            context.write(wrapOutboundOut(response)).whenSuccess {
-                context.triggerUserOutboundEvent(CryptographyEvent.sharedKey(sharedKey), promise: nil)
-            }
+        guard let cryptographer = newCryptographer else {
+            return context.write(data, promise: promise)
+        }
+
+        context.write(data).whenSuccess {
+            promise?.succeed(())
+            context.pipeline.addHandler(CryptographerHandler(cryptographer), position: .first)
+            context.pipeline.removeHandler(self)
+        }
+    }
+
+    func triggerUserOutboundEvent(context: ChannelHandlerContext, event: Any, promise: EventLoopPromise<Void>?) {
+        if case let CryptographyEvent.sharedKey(sharedKey) = event {
+            newCryptographer = Cryptographer(sharedSecret: SymmetricKey(data: sharedKey))
+            promise?.succeed(())
         } else {
-            context.write(wrapOutboundOut(response), promise: nil)
+            context.triggerUserOutboundEvent(event, promise: promise)
         }
     }
 }

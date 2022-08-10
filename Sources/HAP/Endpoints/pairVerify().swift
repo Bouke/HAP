@@ -53,12 +53,9 @@ func pairVerify(device: Device) -> Responder {
                 context.triggerUserOutboundEvent(PairingEvent.verified(pairing), promise: nil)
 
                 let sharedKey = session.sharedSecret.withUnsafeBytes({ Data($0) })
-                return HTTPResponse(
-                    headers: HTTPHeaders([
-                        ("x-shared-key", sharedKey.base64EncodedString()),
-                        ("Content-Type", "application/pairing+tlv8")
-                    ]),
-                    body: encode(result))
+                context.triggerUserOutboundEvent(CryptographyEvent.sharedKey(sharedKey), promise: nil)
+
+                return HTTPResponse(tags: result)
 
             default:
                 throw Error.unsupportedOperation
