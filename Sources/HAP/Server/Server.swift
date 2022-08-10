@@ -136,10 +136,12 @@ extension ChannelPipeline {
         addHandler(CryptographerHandler()).flatMap {
             self.addHandler(EventHandler()).flatMap {
                 self.configureHTTPServerPipeline(withErrorHandling: true).flatMap {
-                    self.addHandler(controller).flatMap {
-                        self.addHandler(RequestHandler()).flatMap {
-                            self.addHandler(UpgradeEventHandler()).flatMap {
-                                self.addHandler(application)
+                    self.addHandler(SessionHandler()).flatMap {
+                        self.addHandler(controller).flatMap {
+                            self.addHandler(RequestHandler()).flatMap {
+                                self.addHandler(UpgradeEventHandler()).flatMap {
+                                    self.addHandler(application)
+                                }
                             }
                         }
                     }

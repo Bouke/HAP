@@ -7,30 +7,20 @@ fileprivate typealias Session = PairVerifyController.Session
 fileprivate let SESSION_KEY = "hap.pair-verify.session"
 fileprivate enum Error: Swift.Error {
     case noSession
+    case unsupportedOperation
 }
 
 func pairVerify(device: Device) -> Responder {
     let controller = PairVerifyController(device: device)
 
-    // TODO: this memory is not freed
-    var threadUnsafeSessions: [ObjectIdentifier: Session] = [:]
-    let rwQueue = DispatchQueue(label: "HAP-PairVerify-\(device.identifier)-lock", attributes: .concurrent)
-
     func getSession(for context: RequestContext) -> Session? {
-        let channel = context.channel
-        var session: Session?
-        rwQueue.sync { // Concurrent read
-            session = threadUnsafeSessions[ObjectIdentifier(channel)]
-        }
-        return session
+        return context.session["PairVerify"] as? Session
     }
 
     func setSession(for context: RequestContext, to session: Session?) {
-        let channel = context.channel
-        rwQueue.async(flags: .barrier) {
-            threadUnsafeSessions[ObjectIdentifier(channel)] = session
-        }
+        context.session["PairVerify"] = session as AnyObject?
     }
+
     return { context, request in
         guard
             let body = request.body.data,
@@ -51,11 +41,12 @@ func pairVerify(device: Device) -> Responder {
                 return HTTPResponse(tags: response)
 
             case .finishRequest:
-                defer {
-                    setSession(for: context, to: nil)
-                }
                 guard let session = getSession(for: context) else {
                     throw Error.noSession
+                }
+
+                defer {
+                    setSession(for: context, to: nil)
                 }
 
                 let (result, pairing) = try controller.finishRequest(data, session)
@@ -70,10 +61,11 @@ func pairVerify(device: Device) -> Responder {
                     body: encode(result))
 
             default:
-                return .badRequest
+                throw Error.unsupportedOperation
             }
         } catch {
             logger.warning("Could not verify pairing: \(error)")
+            setSession(for: context, to: nil)
             return .badRequest
         }
     }
