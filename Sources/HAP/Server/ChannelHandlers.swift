@@ -314,13 +314,36 @@ class ApplicationHandler: ChannelInboundHandler {
 
     func channelRead(context: ChannelHandlerContext, data: NIOAny) {
         let request = unwrapInboundIn(data)
-        context.write(wrapOutboundOut(responder(context, request)), promise: nil)
+        let response = responder(context, request)
+        context.write(wrapOutboundOut(response), promise: nil)
     }
 }
 
 protocol RequestContext {
     var channel: Channel { get }
     func triggerUserOutboundEvent(_ event: Any, promise: EventLoopPromise<Void>?)
+    var session: SessionHandler { get }
 }
 
-extension ChannelHandlerContext: RequestContext { }
+extension ChannelHandlerContext: RequestContext {
+    var session: SessionHandler {
+        get {
+            // swiftlint:disable:next force_try
+            try! pipeline.syncOperations.handler(type: SessionHandler.self)
+        }
+    }
+}
+
+class SessionHandler : ChannelDuplexHandler {
+    typealias InboundIn = HTTPServerRequestPart
+    typealias OutboundIn = HTTPServerResponsePart
+
+    var storage = Dictionary<String, AnyObject>()
+
+    init() { }
+
+    subscript(index: String) -> AnyObject? {
+        get { return storage[index] }
+        set { storage[index] = newValue }
+    }
+}

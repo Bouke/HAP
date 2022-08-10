@@ -28,24 +28,12 @@ func pairSetup(device: Device) -> Responder {
                                            group: group))
     }
 
-    // TODO: this memory is not freed
-    var threadUnsafeSessions: [ObjectIdentifier: Session] = [:]
-    let rwQueue = DispatchQueue(label: "HAP-\(username)-\(device.identifier)-lock", attributes: .concurrent)
-
     func getSession(for context: RequestContext) -> Session? {
-        let channel = context.channel
-        var session: Session?
-        rwQueue.sync { // Concurrent read
-            session = threadUnsafeSessions[ObjectIdentifier(channel)]
-        }
-        return session
+        return context.session["PairSetup"] as? Session
     }
 
     func setSession(for context: RequestContext, to session: Session?) {
-        let channel = context.channel
-        rwQueue.async(flags: .barrier) {
-            threadUnsafeSessions[ObjectIdentifier(channel)] = session
-        }
+        context.session["PairSetup"] = session as AnyObject?
     }
 
     return { context, request in
