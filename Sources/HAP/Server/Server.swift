@@ -133,15 +133,13 @@ public class Server: NSObject, NetServiceDelegate {
 
 extension ChannelPipeline {
     func addHapClientHandlers(application: ChannelHandler, controller: ChannelHandler) -> EventLoopFuture<Void> {
-        addHandler(CryptographerHandler()).flatMap {
-            self.addHandler(EventHandler()).flatMap {
-                self.configureHTTPServerPipeline(withErrorHandling: true).flatMap {
-                    self.addHandler(SessionHandler()).flatMap {
-                        self.addHandler(controller).flatMap {
-                            self.addHandler(RequestHandler()).flatMap {
-                                self.addHandler(UpgradeEventHandler()).flatMap {
-                                    self.addHandler(application)
-                                }
+        addHandler(EventHandler()).flatMap {
+            self.configureHTTPServerPipeline(withErrorHandling: true).flatMap {
+                self.addHandler(SessionHandler()).flatMap {
+                    self.addHandler(controller).flatMap {
+                        self.addHandler(RequestHandler()).flatMap {
+                            self.addHandler(CryptographerInstallerHandler()).flatMap {
+                                self.addHandler(application)
                             }
                         }
                     }

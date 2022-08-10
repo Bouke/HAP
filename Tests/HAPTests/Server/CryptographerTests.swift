@@ -48,8 +48,7 @@ class CryptographerTests: XCTestCase {
         channel = EmbeddedChannel()
         readRecorder = ReadRecorder()
         writeRecorder = WriteRecorder()
-        handler = CryptographerHandler()
-        handler.cryptographer = Cryptographer(sharedSecret: SymmetricKey(data: sharedKey))
+        handler = CryptographerHandler(Cryptographer(sharedSecret: SymmetricKey(data: sharedKey)))
 
         XCTAssertNoThrow(try channel.pipeline.addHandler(writeRecorder).wait())
         XCTAssertNoThrow(try channel.pipeline.addHandler(handler).wait())
