@@ -26,6 +26,7 @@ public extension CharacteristicType {
     static let configuredName = CharacteristicType(0x00E3)
     static let contactSensorState = CharacteristicType(0x006A)
     static let coolingThresholdTemperature = CharacteristicType(0x000D)
+    static let cryptoHash = CharacteristicType(0x0250)
     static let currentAirPurifierState = CharacteristicType(0x00A9)
     static let currentAirQuality = CharacteristicType(0x0095)
     static let currentDoorState = CharacteristicType(0x000E)
@@ -52,6 +53,8 @@ public extension CharacteristicType {
     static let filterLifeLevel = CharacteristicType(0x00AB)
     static let filterResetChangeIndication = CharacteristicType(0x00AD)
     static let firmwareRevision = CharacteristicType(0x0052)
+    static let firmwareUpdateReadiness = CharacteristicType(0x0234)
+    static let firmwareUpdateStatus = CharacteristicType(0x0235)
     static let hardwareFinish = CharacteristicType(0x026C)
     static let hardwareRevision = CharacteristicType(0x0053)
     static let heartBeat = CharacteristicType(0x024A)
@@ -78,6 +81,7 @@ public extension CharacteristicType {
     static let macTransmissionCounters = CharacteristicType(0x0248)
     static let manufacturer = CharacteristicType(0x0020)
     static let maximumTransmitPower = CharacteristicType(0x0243)
+    static let metricsBufferFullState = CharacteristicType(0x0272)
     static let model = CharacteristicType(0x0021)
     static let motionDetected = CharacteristicType(0x0022)
     static let mute = CharacteristicType(0x011A)
@@ -121,6 +125,7 @@ public extension CharacteristicType {
     static let sleepInterval = CharacteristicType(0x023A)
     static let smokeDetected = CharacteristicType(0x0076)
     static let softwareRevision = CharacteristicType(0x0054)
+    static let stagedFirmwareVersion = CharacteristicType(0x0249)
     static let statusActive = CharacteristicType(0x0075)
     static let statusFault = CharacteristicType(0x0077)
     static let statusLowBattery = CharacteristicType(0x0079)
@@ -130,8 +135,11 @@ public extension CharacteristicType {
     static let supportedCharacteristicValueTransitionConfiguration = CharacteristicType(0x0144)
     static let supportedDiagnosticsModes = CharacteristicType(0x024C)
     static let supportedDiagnosticsSnapshot = CharacteristicType(0x0238)
+    static let supportedFirmwareUpdateConfiguration = CharacteristicType(0x0233)
+    static let supportedMetrics = CharacteristicType(0x0271)
     static let supportedTransferTransportConfiguration = CharacteristicType(0x0202)
     static let swingMode = CharacteristicType(0x00B6)
+    static let tapType = CharacteristicType(0x022F)
     static let targetAirPurifierState = CharacteristicType(0x00A8)
     static let targetDoorState = CharacteristicType(0x0032)
     static let targetFanState = CharacteristicType(0x00BF)
@@ -151,6 +159,7 @@ public extension CharacteristicType {
     static let threadNodeCapabilities = CharacteristicType(0x0702)
     static let threadOpenthreadVersion = CharacteristicType(0x0706)
     static let threadStatus = CharacteristicType(0x0703)
+    static let token = CharacteristicType(0x0231)
     static let transmitPower = CharacteristicType(0x0242)
     static let valveType = CharacteristicType(0x00D5)
     static let version = CharacteristicType(0x0037)
@@ -191,6 +200,7 @@ extension CharacteristicType: CustomStringConvertible {
         case .configuredName: return "Configured Name"
         case .contactSensorState: return "Contact Sensor State"
         case .coolingThresholdTemperature: return "Cooling Threshold Temperature"
+        case .cryptoHash: return "Crypto Hash"
         case .currentAirPurifierState: return "Current Air Purifier State"
         case .currentAirQuality: return "Current Air Quality"
         case .currentDoorState: return "Current Door State"
@@ -217,6 +227,8 @@ extension CharacteristicType: CustomStringConvertible {
         case .filterLifeLevel: return "Filter Life Level"
         case .filterResetChangeIndication: return "Filter Reset Change Indication"
         case .firmwareRevision: return "Firmware Revision"
+        case .firmwareUpdateReadiness: return "Firmware Update Readiness"
+        case .firmwareUpdateStatus: return "Firmware Update Status"
         case .hardwareFinish: return "Hardware Finish"
         case .hardwareRevision: return "Hardware Revision"
         case .heartBeat: return "Heart Beat"
@@ -243,6 +255,7 @@ extension CharacteristicType: CustomStringConvertible {
         case .macTransmissionCounters: return "MAC Transmission Counters"
         case .manufacturer: return "Manufacturer"
         case .maximumTransmitPower: return "Maximum Transmit Power"
+        case .metricsBufferFullState: return "Metrics Buffer Full State"
         case .model: return "Model"
         case .motionDetected: return "Motion Detected"
         case .mute: return "Mute"
@@ -286,6 +299,7 @@ extension CharacteristicType: CustomStringConvertible {
         case .sleepInterval: return "Sleep Interval"
         case .smokeDetected: return "Smoke Detected"
         case .softwareRevision: return "Software Revision"
+        case .stagedFirmwareVersion: return "Staged Firmware Version"
         case .statusActive: return "Status Active"
         case .statusFault: return "Status Fault"
         case .statusLowBattery: return "Status Low Battery"
@@ -295,8 +309,11 @@ extension CharacteristicType: CustomStringConvertible {
         case .supportedCharacteristicValueTransitionConfiguration: return "Supported Characteristic Value Transition Configuration"
         case .supportedDiagnosticsModes: return "Supported Diagnostics Modes"
         case .supportedDiagnosticsSnapshot: return "Supported Diagnostics Snapshot"
+        case .supportedFirmwareUpdateConfiguration: return "Supported Firmware Update Configuration"
+        case .supportedMetrics: return "Supported Metrics"
         case .supportedTransferTransportConfiguration: return "Supported Transfer Transport Configuration"
         case .swingMode: return "Swing Mode"
+        case .tapType: return "Tap Type"
         case .targetAirPurifierState: return "Target Air Purifier State"
         case .targetDoorState: return "Target Door State"
         case .targetFanState: return "Target Fan State"
@@ -316,6 +333,7 @@ extension CharacteristicType: CustomStringConvertible {
         case .threadNodeCapabilities: return "Thread Node Capabilities"
         case .threadOpenthreadVersion: return "Thread OpenThread Version"
         case .threadStatus: return "Thread Status"
+        case .token: return "Token"
         case .transmitPower: return "Transmit Power"
         case .valveType: return "Valve Type"
         case .version: return "Version"
