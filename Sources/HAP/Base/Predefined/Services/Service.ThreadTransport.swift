@@ -8,10 +8,6 @@ extension Service {
                 type: .currentTransport,
                 characteristics: &unwrapped,
                 generator: { PredefinedCharacteristic.currentTransport() })
-            threadControlPoint = getOrCreateAppend(
-                type: .threadControlPoint,
-                characteristics: &unwrapped,
-                generator: { PredefinedCharacteristic.threadControlPoint() })
             threadNodeCapabilities = getOrCreateAppend(
                 type: .threadNodeCapabilities,
                 characteristics: &unwrapped,
@@ -37,7 +33,6 @@ extension Service {
 
         // MARK: - Required Characteristics
         public let currentTransport: GenericCharacteristic<Bool>
-        public let threadControlPoint: GenericCharacteristic<Data?>
         public let threadNodeCapabilities: GenericCharacteristic<UInt16>
         public let threadStatus: GenericCharacteristic<UInt16>
 

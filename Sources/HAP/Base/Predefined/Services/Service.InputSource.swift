@@ -24,7 +24,6 @@ extension Service {
                 type: .currentVisibilityState,
                 characteristics: &unwrapped,
                 generator: { PredefinedCharacteristic.currentVisibilityState() })
-            identifier = get(type: .identifier, characteristics: unwrapped)
             inputDeviceType = get(type: .inputDeviceType, characteristics: unwrapped)
             targetVisibilityState = get(type: .targetVisibilityState, characteristics: unwrapped)
             super.init(type: .inputSource, characteristics: unwrapped)
@@ -38,7 +37,6 @@ extension Service {
         public let currentVisibilityState: GenericCharacteristic<Enums.CurrentVisibilityState>
 
         // MARK: - Optional Characteristics
-        public let identifier: GenericCharacteristic<UInt32>?
         public let inputDeviceType: GenericCharacteristic<Enums.InputDeviceType>?
         public let targetVisibilityState: GenericCharacteristic<Enums.TargetVisibilityState>?
     }

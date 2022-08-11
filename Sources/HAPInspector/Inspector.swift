@@ -290,7 +290,8 @@ public class Inspector {
             let blacklistApps = homekitDict["BlacklistFromApplications"] as? [String: [String]],
             let blacklistCharacteristics = blacklist["Characteristics"],
             let blacklistServices = blacklist["Services"],
-            let blacklistAppServices = blacklistApps["Services"] else {
+            let blacklistAppServices = blacklistApps["Services"],
+            let blacklistAppCharacteristics = blacklistApps["Characteristics"] else {
                 print("Could not read plist")
                 return
             }
@@ -298,9 +299,9 @@ public class Inspector {
         var blacklistedServices = blacklistServices
         blacklistedServices.append(contentsOf: blacklistAppServices)
 
-        let blacklistedCharacteristics = blacklistCharacteristics
+        var blacklistedCharacteristics = blacklistCharacteristics
         // Don't remove characteristics from app blacklist
-        //blacklistedCharacteristics.append(contentsOf: blacklistAppCharacteristics)
+        blacklistedCharacteristics.append(contentsOf: blacklistAppCharacteristics)
 
         print("Writing to \(outputPath)")
 

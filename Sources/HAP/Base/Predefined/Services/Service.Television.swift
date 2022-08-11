@@ -26,7 +26,6 @@ extension Service {
                 generator: { PredefinedCharacteristic.sleepDiscoveryMode() })
             brightness = get(type: .brightness, characteristics: unwrapped)
             closedCaptions = get(type: .closedCaptions, characteristics: unwrapped)
-            displayOrder = get(type: .displayOrder, characteristics: unwrapped)
             currentMediaState = get(type: .currentMediaState, characteristics: unwrapped)
             targetMediaState = get(type: .targetMediaState, characteristics: unwrapped)
             name = get(type: .name, characteristics: unwrapped)
@@ -45,7 +44,6 @@ extension Service {
         // MARK: - Optional Characteristics
         public let brightness: GenericCharacteristic<Int>?
         public let closedCaptions: GenericCharacteristic<Enums.ClosedCaptions>?
-        public let displayOrder: GenericCharacteristic<Data>?
         public let currentMediaState: GenericCharacteristic<UInt8>?
         public let targetMediaState: GenericCharacteristic<Enums.TargetMediaState>?
         public let name: GenericCharacteristic<String>?

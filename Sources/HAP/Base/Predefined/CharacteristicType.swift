@@ -1,11 +1,9 @@
 // swiftlint:disable no_grouping_extension
 public extension CharacteristicType {
-    static let accessoryFlags = CharacteristicType(0x00A6)
     static let active = CharacteristicType(0x00B0)
     static let activeIdentifier = CharacteristicType(0x00E7)
     static let activityInterval = CharacteristicType(0x023B)
     static let administratorOnlyAccess = CharacteristicType(0x0001)
-    static let applicationMatchingIdentifier = CharacteristicType(0x00A4)
     static let assetUpdateReadiness = CharacteristicType(0x0269)
     static let audioFeedback = CharacteristicType(0x0005)
     static let batteryLevel = CharacteristicType(0x0068)
@@ -18,8 +16,6 @@ public extension CharacteristicType {
     static let carbonMonoxideDetected = CharacteristicType(0x0069)
     static let carbonMonoxideLevel = CharacteristicType(0x0090)
     static let carbonMonoxidePeakLevel = CharacteristicType(0x0091)
-    static let characteristicValueActiveTransitionCount = CharacteristicType(0x024B)
-    static let characteristicValueTransitionControl = CharacteristicType(0x0143)
     static let chargingState = CharacteristicType(0x008F)
     static let closedCaptions = CharacteristicType(0x00DD)
     static let colorTemperature = CharacteristicType(0x00CE)
@@ -46,7 +42,6 @@ public extension CharacteristicType {
     static let currentVerticalTiltAngle = CharacteristicType(0x006E)
     static let currentVisibilityState = CharacteristicType(0x0135)
     static let currentWaterLevel = CharacteristicType(0x00B5)
-    static let displayOrder = CharacteristicType(0x0136)
     static let eventRetransmissionMaximum = CharacteristicType(0x023D)
     static let eventTransmissionCounters = CharacteristicType(0x023E)
     static let filterChangeIndication = CharacteristicType(0x00AC)
@@ -55,13 +50,11 @@ public extension CharacteristicType {
     static let firmwareRevision = CharacteristicType(0x0052)
     static let firmwareUpdateReadiness = CharacteristicType(0x0234)
     static let firmwareUpdateStatus = CharacteristicType(0x0235)
-    static let hardwareFinish = CharacteristicType(0x026C)
     static let hardwareRevision = CharacteristicType(0x0053)
     static let heartBeat = CharacteristicType(0x024A)
     static let heatingThresholdTemperature = CharacteristicType(0x0012)
     static let holdPosition = CharacteristicType(0x006F)
     static let hue = CharacteristicType(0x0013)
-    static let identifier = CharacteristicType(0x00E6)
     static let identify = CharacteristicType(0x0014)
     static let inUse = CharacteristicType(0x00D2)
     static let inputDeviceType = CharacteristicType(0x00DC)
@@ -89,7 +82,6 @@ public extension CharacteristicType {
     static let nitrogenDioxideDensity = CharacteristicType(0x00C4)
     static let obstructionDetected = CharacteristicType(0x0024)
     static let occupancyDetected = CharacteristicType(0x0071)
-    static let operatingStateResponse = CharacteristicType(0x0232)
     static let outletInUse = CharacteristicType(0x0026)
     static let ozoneDensity = CharacteristicType(0x00C3)
     static let pm10Density = CharacteristicType(0x00C7)
@@ -99,7 +91,6 @@ public extension CharacteristicType {
     static let positionState = CharacteristicType(0x0072)
     static let powerModeSelection = CharacteristicType(0x00DF)
     static let powerState = CharacteristicType(0x0025)
-    static let productData = CharacteristicType(0x0220)
     static let programMode = CharacteristicType(0x00D1)
     static let programmableSwitchEvent = CharacteristicType(0x0073)
     static let programmableSwitchOutputState = CharacteristicType(0x0074)
@@ -132,7 +123,6 @@ public extension CharacteristicType {
     static let statusTampered = CharacteristicType(0x007A)
     static let sulphurDioxideDensity = CharacteristicType(0x00C5)
     static let supportedAssetTypes = CharacteristicType(0x0268)
-    static let supportedCharacteristicValueTransitionConfiguration = CharacteristicType(0x0144)
     static let supportedDiagnosticsModes = CharacteristicType(0x024C)
     static let supportedDiagnosticsSnapshot = CharacteristicType(0x0238)
     static let supportedFirmwareUpdateConfiguration = CharacteristicType(0x0233)
@@ -155,7 +145,6 @@ public extension CharacteristicType {
     static let targetVerticalTiltAngle = CharacteristicType(0x007D)
     static let targetVisibilityState = CharacteristicType(0x0134)
     static let temperatureDisplayUnits = CharacteristicType(0x0036)
-    static let threadControlPoint = CharacteristicType(0x0704)
     static let threadNodeCapabilities = CharacteristicType(0x0702)
     static let threadOpenthreadVersion = CharacteristicType(0x0706)
     static let threadStatus = CharacteristicType(0x0703)
@@ -174,12 +163,10 @@ public extension CharacteristicType {
 extension CharacteristicType: CustomStringConvertible {
     public var description: String {
         switch self {
-        case .accessoryFlags: return "Accessory Flags"
         case .active: return "Active"
         case .activeIdentifier: return "Active Identifier"
         case .activityInterval: return "Activity Interval"
         case .administratorOnlyAccess: return "Administrator Only Access"
-        case .applicationMatchingIdentifier: return "Application Matching Identifier"
         case .assetUpdateReadiness: return "Asset Update Readiness"
         case .audioFeedback: return "Audio Feedback"
         case .batteryLevel: return "Battery Level"
@@ -192,8 +179,6 @@ extension CharacteristicType: CustomStringConvertible {
         case .carbonMonoxideDetected: return "Carbon monoxide Detected"
         case .carbonMonoxideLevel: return "Carbon monoxide Level"
         case .carbonMonoxidePeakLevel: return "Carbon monoxide Peak Level"
-        case .characteristicValueActiveTransitionCount: return "Characteristic Value Active Transition Count"
-        case .characteristicValueTransitionControl: return "Characteristic Value Transition Control"
         case .chargingState: return "Charging State"
         case .closedCaptions: return "Closed Captions"
         case .colorTemperature: return "Color Temperature"
@@ -220,7 +205,6 @@ extension CharacteristicType: CustomStringConvertible {
         case .currentVerticalTiltAngle: return "Current Vertical Tilt Angle"
         case .currentVisibilityState: return "Current Visibility State"
         case .currentWaterLevel: return "Current Water Level"
-        case .displayOrder: return "Display Order"
         case .eventRetransmissionMaximum: return "Event Retransmission Maximum"
         case .eventTransmissionCounters: return "Event Transmission Counters"
         case .filterChangeIndication: return "Filter Change indication"
@@ -229,13 +213,11 @@ extension CharacteristicType: CustomStringConvertible {
         case .firmwareRevision: return "Firmware Revision"
         case .firmwareUpdateReadiness: return "Firmware Update Readiness"
         case .firmwareUpdateStatus: return "Firmware Update Status"
-        case .hardwareFinish: return "Hardware Finish"
         case .hardwareRevision: return "Hardware Revision"
         case .heartBeat: return "Heart Beat"
         case .heatingThresholdTemperature: return "Heating Threshold Temperature"
         case .holdPosition: return "Hold Position"
         case .hue: return "Hue"
-        case .identifier: return "Identifier"
         case .identify: return "Identify"
         case .inUse: return "In Use"
         case .inputDeviceType: return "Input Device Type"
@@ -263,7 +245,6 @@ extension CharacteristicType: CustomStringConvertible {
         case .nitrogenDioxideDensity: return "Nitrogen dioxide Density"
         case .obstructionDetected: return "Obstruction Detected"
         case .occupancyDetected: return "Occupancy Detected"
-        case .operatingStateResponse: return "Operating State Response"
         case .outletInUse: return "Outlet In Use"
         case .ozoneDensity: return "Ozone Density"
         case .pm10Density: return "PM10 Density"
@@ -273,7 +254,6 @@ extension CharacteristicType: CustomStringConvertible {
         case .positionState: return "Position State"
         case .powerModeSelection: return "Power Mode Selection"
         case .powerState: return "Power State"
-        case .productData: return "Product Data"
         case .programMode: return "Program Mode"
         case .programmableSwitchEvent: return "Programmable Switch Event"
         case .programmableSwitchOutputState: return "Programmable Switch Output State"
@@ -306,7 +286,6 @@ extension CharacteristicType: CustomStringConvertible {
         case .statusTampered: return "Status Tampered"
         case .sulphurDioxideDensity: return "Sulphur dioxide Density"
         case .supportedAssetTypes: return "Supported Asset Types"
-        case .supportedCharacteristicValueTransitionConfiguration: return "Supported Characteristic Value Transition Configuration"
         case .supportedDiagnosticsModes: return "Supported Diagnostics Modes"
         case .supportedDiagnosticsSnapshot: return "Supported Diagnostics Snapshot"
         case .supportedFirmwareUpdateConfiguration: return "Supported Firmware Update Configuration"
@@ -329,7 +308,6 @@ extension CharacteristicType: CustomStringConvertible {
         case .targetVerticalTiltAngle: return "Target Vertical Tilt Angle"
         case .targetVisibilityState: return "Target Visibility State"
         case .temperatureDisplayUnits: return "Temperature Display Units"
-        case .threadControlPoint: return "Thread Control Point"
         case .threadNodeCapabilities: return "Thread Node Capabilities"
         case .threadOpenthreadVersion: return "Thread OpenThread Version"
         case .threadStatus: return "Thread Status"

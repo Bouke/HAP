@@ -11,7 +11,6 @@ extension Service {
             brightness = get(type: .brightness, characteristics: unwrapped)
             mute = get(type: .mute, characteristics: unwrapped)
             name = get(type: .name, characteristics: unwrapped)
-            operatingStateResponse = get(type: .operatingStateResponse, characteristics: unwrapped)
             volume = get(type: .volume, characteristics: unwrapped)
             super.init(type: .doorbell, characteristics: unwrapped)
         }
@@ -23,7 +22,6 @@ extension Service {
         public let brightness: GenericCharacteristic<Int>?
         public let mute: GenericCharacteristic<Bool>?
         public let name: GenericCharacteristic<String>?
-        public let operatingStateResponse: GenericCharacteristic<Data>?
         public let volume: GenericCharacteristic<UInt8>?
     }
 }
