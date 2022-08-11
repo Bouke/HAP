@@ -259,23 +259,7 @@ public class Inspector {
             return name.parameterName()
         }
 
-        // Convert HAP permission flags into comma seperated swift permission enum values
-        func permissions(_ permissions: Int) -> String {
-            var list = [String]()
-            if (permissions & 2) == 2 {
-                list.append(".read")
-            }
-            if (permissions & 4) == 4 {
-                list.append(".write")
-            }
-            if (permissions & 1) == 1 {
-                list.append(".events")
-            }
-            return list.joined(separator: ", ")
-        }
-
         // Decode plist
-
         guard let plist = NSDictionary(contentsOf: plistPath),
             let plistDict = plist["PlistDictionary"] as? NSDictionary,
             let assistantDict = plistDict["Assistant"] as? NSDictionary,
@@ -469,25 +453,9 @@ public class Inspector {
             let format: String
             let maxValue: NSNumber?
             let minValue: NSNumber?
-            let properties: Int
+            let permissions: CharacteristicInfoPermission
             let stepValue: NSNumber?
             let units: String?
-            var permissions: [CharacteristicInfoPermission] {
-                var list = [CharacteristicInfoPermission]()
-                if properties & 2 == 2 {
-                    list.append(.read)
-                }
-                if properties & 4 == 4 {
-                    list.append(.write)
-                }
-                if properties & 1 == 1 {
-                    list.append(.events)
-                }
-                return list
-            }
-            var isReadable: Bool {
-                permissions.contains(.read)
-            }
         }
 
         var characteristicInfo = [CharacteristicInfo]()
@@ -507,7 +475,7 @@ public class Inspector {
                                            format: format,
                                            maxValue: dict["MaxValue"] as? NSNumber,
                                            minValue: dict["MinValue"] as? NSNumber,
-                                           properties: dict["Properties"] as? Int ?? Int(dict["Properties"].debugDescription)!,
+                                           permissions: CharacteristicInfoPermission(rawValue:  dict["Properties"] as! Int),
                                            stepValue: dict["StepValue"] as? NSNumber,
                                            units: dict["Units"] as? String))
                     characteristicFormats.insert(format)
@@ -745,7 +713,7 @@ public class Inspector {
             let enumType = enumeratedCharacteristics.contains(characteristic.hkname) ?
                 "Enums.\(name.uppercasedFirstLetter())" :
                 typeName(characteristic.format)
-            return enumType + (characteristic.isReadable ? "" : "?")
+            return enumType + (characteristic.permissions.contains(.read) ? "" : "?")
         }
 
         for service in serviceInfo.sorted(by: { $0.className < $1.className }) {
@@ -816,7 +784,7 @@ public class Inspector {
         }
 
         func defaultValue(_ characteristic: CharacteristicInfo) -> String {
-            if characteristic.isReadable {
+            if characteristic.permissions.contains(.read) {
                 if enumeratedCharacteristics.contains(characteristic.hkname) {
                     guard let defaultCase = defaultEnumCase[characteristic.hkname] else {
                         preconditionFailure("No default enum case for enum \(characteristic.hkname)")
@@ -846,7 +814,7 @@ public class Inspector {
             try writeToFile(atPath: "Characteristics/Characteristic.\(name.uppercasedFirstLetter()).swift") { write in
                 func writeFactoryArgumentsWithDefaults() {
                     write("        _ value: \(valueType(characteristic)) = \(defaultValue(characteristic)),")
-                    write("        permissions: [CharacteristicPermission] = \(characteristic.permissions.arrayLiteral),")
+                    write("        permissions: [CharacteristicPermission] = \(characteristic.permissions),")
                     write("        description: String? = \"\(characteristic.title)\",")
                     write("        format: CharacteristicFormat? = .\(characteristic.format),")
                     write("        unit: CharacteristicUnit? = \(characteristic.units != nil ? ".\(unitName(characteristic.units!))" : "nil"),")
@@ -903,14 +871,18 @@ public class Inspector {
     }
 }
 
-enum CharacteristicInfoPermission: String {
-    case read
-    case write
-    case events
-}
+struct CharacteristicInfoPermission: OptionSet, CustomStringConvertible {
+    let rawValue: Int
 
-extension Array where Element == CharacteristicInfoPermission {
-    var arrayLiteral: String {
-        "[" + self.map { ".\($0)" }.joined(separator: ", ") + "]"
+    static let read = CharacteristicInfoPermission(rawValue: 2)
+    static let write = CharacteristicInfoPermission(rawValue: 4)
+    static let events = CharacteristicInfoPermission(rawValue: 1)
+
+    var description: String {
+        var permissions: [String] = []
+        if contains(.read) { permissions += [".read"] }
+        if contains(.write) { permissions += [".write"] }
+        if contains(.events) { permissions += [".events"] }
+        return "[" + permissions.joined(separator: ", ") + "]"
     }
 }
