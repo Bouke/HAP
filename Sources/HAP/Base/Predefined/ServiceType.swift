@@ -15,6 +15,7 @@ public extension ServiceType {
     static let fanV2 = ServiceType(0x00B7)
     static let faucet = ServiceType(0x00D7)
     static let filterMaintenance = ServiceType(0x00BA)
+    static let firmwareUpdate = ServiceType(0x0236)
     static let garageDoorOpener = ServiceType(0x0041)
     static let heaterCooler = ServiceType(0x00BC)
     static let humidifierDehumidifier = ServiceType(0x00BD)
@@ -39,6 +40,7 @@ public extension ServiceType {
     static let statefulProgrammableSwitch = ServiceType(0x0088)
     static let statelessProgrammableSwitch = ServiceType(0x0089)
     static let `switch` = ServiceType(0x0049)
+    static let tapManagement = ServiceType(0x022E)
     static let television = ServiceType(0x00D8)
     static let temperatureSensor = ServiceType(0x008A)
     static let thermostat = ServiceType(0x004A)
@@ -69,6 +71,7 @@ extension ServiceType: CustomStringConvertible {
         case .fanV2: return "Fan"
         case .faucet: return "Faucet"
         case .filterMaintenance: return "Filter Maintenance"
+        case .firmwareUpdate: return "Firmware Update"
         case .garageDoorOpener: return "Garage Door Opener"
         case .heaterCooler: return "Heater-Cooler"
         case .humidifierDehumidifier: return "Humidifier-Dehumidifier"
@@ -93,6 +96,7 @@ extension ServiceType: CustomStringConvertible {
         case .statefulProgrammableSwitch: return "Stateful Programmable Switch"
         case .statelessProgrammableSwitch: return "Stateless Programmable Switch"
         case .`switch`: return "Switch"
+        case .tapManagement: return "Tap Management"
         case .television: return "Television"
         case .temperatureSensor: return "Temperature Sensor"
         case .thermostat: return "Thermostat"
