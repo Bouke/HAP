@@ -1,6 +1,6 @@
 import Foundation
-import HTTP
 import Logging
+import VaporHTTP
 
 fileprivate let logger = Logger(label: "hap.endpoints.pair-verify")
 fileprivate typealias Session = PairVerifyController.Session

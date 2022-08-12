@@ -1,7 +1,7 @@
 import Foundation
 @testable import HAP
-import HTTP
 import NIO
+import VaporHTTP
 
 class MockContext: RequestContext {
     init() { }
