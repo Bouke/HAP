@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.4
 
 import PackageDescription
 
@@ -39,18 +39,18 @@ let package = Package(
                     .product(name: "Crypto", package: "swift-crypto"),
                 ],
                 exclude: ["Base/Predefined/README"]),
-        .target(name: "HAPDemo",
-                dependencies: [
-                    "HAP",
-                    .product(name: "Logging", package: "swift-log")
-                ]),
+        .executableTarget(name: "HAPDemo",
+                          dependencies: [
+                            "HAP",
+                            .product(name: "Logging", package: "swift-log")
+                          ]),
         .testTarget(name: "HAPTests", dependencies: ["HAP"]),
     ]
 )
 
 #if os(macOS)
     package.products.append(.executable(name: "hap-update", targets: ["HAPInspector"]))
-    package.targets.append(.target(name: "HAPInspector"))
+    package.targets.append(.executableTarget(name: "HAPInspector"))
 #endif
 
 #if os(Linux)
