@@ -41,7 +41,7 @@ extension Characteristic {
 
         if permissions.contains(.read) {
             // TODO: fixit
-            serialized["value"] = getValue() ?? 0 //NSNull()
+            serialized["value"] = getValue() ?? 0 // NSNull()
         }
 
         if let description = description { serialized["description"] = description }

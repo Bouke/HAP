@@ -197,7 +197,11 @@ class ControllerHandler: ChannelDuplexHandler {
             self.channels[ObjectIdentifier(channel)] = channel
             channelsCount = self.channels.count
         }
-        logger.info("Controller \(channel.remoteAddress?.description ?? "N/A") connected, \(channelsCount) controllers total")
+        logger.info(
+            """
+            Controller \(channel.remoteAddress?.description ?? "N/A") connected, \
+            \(channelsCount) controllers total
+            """)
         context.fireChannelActive()
     }
 
@@ -210,7 +214,11 @@ class ControllerHandler: ChannelDuplexHandler {
             channelsCount = self.channels.count
         }
         self.removeSubscriptions?(channel)
-        logger.info("Controller \(channel.remoteAddress?.description ?? "N/A") disconnected, \(channelsCount) controllers total")
+        logger.info(
+            """
+            Controller \(channel.remoteAddress?.description ?? "N/A") disconnected, \
+            \(channelsCount) controllers total
+            """)
         context.fireChannelInactive()
     }
 
@@ -321,23 +329,21 @@ protocol RequestContext {
 
 extension ChannelHandlerContext: RequestContext {
     var session: SessionHandler {
-        get {
-            // swiftlint:disable:next force_try
-            try! pipeline.syncOperations.handler(type: SessionHandler.self)
-        }
+        // swiftlint:disable:next force_try
+        try! pipeline.syncOperations.handler(type: SessionHandler.self)
     }
 }
 
-class SessionHandler : ChannelDuplexHandler {
+class SessionHandler: ChannelDuplexHandler {
     typealias InboundIn = HTTPServerRequestPart
     typealias OutboundIn = HTTPServerResponsePart
 
-    var storage = Dictionary<String, AnyObject>()
+    var storage = [String: AnyObject]()
 
     init() { }
 
     subscript(index: String) -> AnyObject? {
-        get { return storage[index] }
+        get { storage[index] }
         set { storage[index] = newValue }
     }
 }

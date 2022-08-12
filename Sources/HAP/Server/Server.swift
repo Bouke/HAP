@@ -67,7 +67,10 @@ public class Server: NSObject, NetServiceDelegate {
             .childChannelOption(ChannelOptions.socket(IPPROTO_TCP, TCP_NODELAY), value: 1)
             .childChannelOption(ChannelOptions.socket(SocketOptionLevel(SOL_SOCKET), SO_REUSEADDR), value: 1)
             .childChannelOption(ChannelOptions.maxMessagesPerRead, value: 16)
-            .childChannelOption(ChannelOptions.recvAllocator, value: AdaptiveRecvByteBufferAllocator(minimum: 1200, initial: 2056, maximum: 16392))
+            .childChannelOption(ChannelOptions.recvAllocator,
+                                value: AdaptiveRecvByteBufferAllocator(minimum: 1200,
+                                                                       initial: 2056,
+                                                                       maximum: 16392))
 
         logger.debug("binding listening port...")
         do {

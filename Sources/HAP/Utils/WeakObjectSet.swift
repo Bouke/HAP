@@ -1,4 +1,4 @@
-//adapted from: http://stackoverflow.com/a/36184182
+// adapted from: http://stackoverflow.com/a/36184182
 
 class WeakObject<T: AnyObject>: Equatable, Hashable {
     weak var object: T?

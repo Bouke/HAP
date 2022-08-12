@@ -65,7 +65,7 @@ class PairSetupControllerTests: XCTestCase {
                                                    salt: "Pair-Setup-Controller-Sign-Salt".data(using: .utf8)!,
                                                    info: "Pair-Setup-Controller-Sign-Info".data(using: .utf8)!,
                                                    outputByteCount: 32)
-            let hashIn = hashInKey.withUnsafeBytes({ Data($0) }) + clientIdentifier + clientPrivateKey.publicKey.rawRepresentation
+            let hashIn = hashInKey.rawRepresentation + clientIdentifier + clientPrivateKey.publicKey.rawRepresentation
             let request: PairTagTLV8 = [
                 (.publicKey, clientPrivateKey.publicKey.rawRepresentation),
                 (.identifier, clientIdentifier),
@@ -102,7 +102,8 @@ class PairSetupControllerTests: XCTestCase {
             }
         }
 
-        XCTAssertEqual(device.get(pairingWithIdentifier: clientIdentifier)?.publicKey, clientPrivateKey.publicKey.rawRepresentation)
+        XCTAssertEqual(device.get(pairingWithIdentifier: clientIdentifier)?.publicKey,
+                       clientPrivateKey.publicKey.rawRepresentation)
     }
 
     // from: https://oleb.net/blog/2017/03/keeping-xctest-in-sync/#appendix-code-generation-with-sourcery

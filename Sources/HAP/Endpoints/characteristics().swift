@@ -66,7 +66,11 @@ func characteristics(device: Device, channel: Channel, request: HTTPRequest) -> 
                 case let _value as String: value = .string(_value)
                 default:
                     value = nil
-                    logger.error("Characteristic \(characteristic.description ?? "") has unsupported type: \(type(of: characteristic))")
+                    logger.error(
+                        """
+                        Characteristic \(characteristic.description ?? "") \
+                        has unsupported type: \(type(of: characteristic))
+                        """)
                 }
 
                 var response = Protocol.Characteristic(aid: path.aid, iid: path.iid, value: value)

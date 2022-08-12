@@ -31,7 +31,7 @@ do {
         try FileManager.default.removeItem(atPath: target)
     }
     try FileManager.default.createDirectory(atPath: target, withIntermediateDirectories: false, attributes: nil)
-    try Inspector.inspect(source: sourceURL, target: target)
+    try inspect(source: sourceURL, target: target)
 } catch {
     print("Couldn't update: \(error)")
 }
