@@ -302,7 +302,7 @@ class CryptographerInstallerHandler: ChannelOutboundHandler, RemovableChannelHan
     }
 }
 
-typealias Responder = (RequestContext, HTTPRequest) -> HTTPResponse
+typealias Responder = (RequestContext, HTTPRequest) -> EventLoopFuture<HTTPResponse>
 
 class ApplicationHandler: ChannelInboundHandler {
     typealias InboundIn = HTTPRequest
@@ -317,7 +317,9 @@ class ApplicationHandler: ChannelInboundHandler {
     func channelRead(context: ChannelHandlerContext, data: NIOAny) {
         let request = unwrapInboundIn(data)
         let response = responder(context, request)
-        context.write(wrapOutboundOut(response), promise: nil)
+        response.whenSuccess { response in
+            context.write(self.wrapOutboundOut(response), promise: nil)
+        }
     }
 }
 

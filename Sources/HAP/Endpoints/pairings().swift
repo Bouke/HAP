@@ -7,7 +7,7 @@ fileprivate let logger = Logger(label: "hap.endpoints.pairings")
 func pairings(device: Device) -> Responder {
     let controller = PairingsController(device: device)
 
-    return { context, request in
+    return future({ context, request in
         guard request.method == .POST else {
             return HTTPResponse(status: .methodNotAllowed)
         }
@@ -61,5 +61,5 @@ func pairings(device: Device) -> Responder {
             (.state, Data([PairStep.response.rawValue]))
         ]
         return HTTPResponse(tags: result)
-    }
+    })
 }

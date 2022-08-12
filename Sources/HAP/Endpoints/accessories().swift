@@ -5,7 +5,7 @@ import VaporHTTP
 fileprivate let logger = Logger(label: "hap.endpoints.accessories")
 
 func accessories(device: Device) -> Responder {
-    { _, request in
+    future({ _, request in
         guard request.method == .GET else {
             return .badRequest
         }
@@ -23,5 +23,5 @@ func accessories(device: Device) -> Responder {
             logger.error("Could not serialize object: \(error)")
             return .internalServerError
         }
-    }
+    })
 }

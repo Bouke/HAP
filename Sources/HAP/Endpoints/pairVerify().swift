@@ -21,7 +21,7 @@ func pairVerify(device: Device) -> Responder {
         context.session["PairVerify"] = session as AnyObject?
     }
 
-    return { context, request in
+    return future({ context, request in
         guard
             let body = request.body.data,
             let data: PairTagTLV8 = try? decode(body)
@@ -65,5 +65,5 @@ func pairVerify(device: Device) -> Responder {
             setSession(for: context, to: nil)
             return .badRequest
         }
-    }
+    })
 }
