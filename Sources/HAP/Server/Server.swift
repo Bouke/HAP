@@ -135,19 +135,26 @@ public class Server: NSObject, NetServiceDelegate {
 }
 
 extension ChannelPipeline {
-    func addHapClientHandlers(application: ChannelHandler, controller: ChannelHandler) -> EventLoopFuture<Void> {
-        addHandler(EventHandler()).flatMap {
-            self.configureHTTPServerPipeline(withErrorHandling: true).flatMap {
-                self.addHandler(SessionHandler()).flatMap {
-                    self.addHandler(controller).flatMap {
-                        self.addHandler(RequestHandler()).flatMap {
-                            self.addHandler(CryptographerInstallerHandler()).flatMap {
-                                self.addHandler(application)
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    func addHapClientHandlers(application: ApplicationHandler,
+                              controller: ControllerHandler) -> EventLoopFuture<Void> {
+        var handlers: [ChannelHandler] = []
+
+        // Setup event handling as final handler as HAP events happen outside the HTTP context.
+        handlers.append(EventHandler())
+
+        // Setup NIO HTTP handling.
+        handlers.append(HTTPResponseEncoder())
+        handlers.append(ByteToMessageHandler(HTTPRequestDecoder()))
+        handlers.append(HTTPServerPipelineHandler())
+        handlers.append(HTTPServerProtocolErrorHandler())
+
+        // Setup HAP HTTP handling
+        handlers.append(SessionHandler())
+        handlers.append(controller)
+        handlers.append(RequestHandler())
+        handlers.append(CryptographerInstallerHandler())
+        handlers.append(application)
+
+        return self.addHandlers(handlers)
     }
 }
