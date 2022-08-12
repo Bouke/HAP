@@ -1,5 +1,5 @@
 import Foundation
-import HTTP
+import VaporHTTP
 
 import Logging
 fileprivate let logger = Logger(label: "hap.endpoints")

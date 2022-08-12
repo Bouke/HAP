@@ -1,5 +1,5 @@
 import Foundation
-import HTTP
+import VaporHTTP
 
 typealias PairTagTLV8Tuple = (PairTag, Data)
 typealias PairTagTLV8 = [PairTagTLV8Tuple]

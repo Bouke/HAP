@@ -1,7 +1,7 @@
 // swiftlint:disable force_try line_length
 import Foundation
 @testable import HAP
-import HTTP
+import VaporHTTP
 import XCTest
 
 class PairingsEndpointTests: XCTestCase {

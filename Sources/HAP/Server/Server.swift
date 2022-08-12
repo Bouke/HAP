@@ -1,8 +1,8 @@
 import Foundation
-import HTTP
 import Logging
 import NIO
 import NIOHTTP1
+import VaporHTTP
 
 #if os(Linux)
     import Dispatch

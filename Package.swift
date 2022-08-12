@@ -21,7 +21,7 @@ let package = Package(
     targets: [
         .target(name: "CQRCode", exclude: ["LICENSE.txt"]),
         .target(name: "COperatingSystem", exclude: ["LICENSE"]),
-        .target(name: "HTTP",
+        .target(name: "VaporHTTP",
                 dependencies: [
                     .product(name: "NIO", package: "swift-nio"),
                     .product(name: "NIOHTTP1", package: "swift-nio"),
@@ -35,7 +35,7 @@ let package = Package(
                     .product(name: "Logging", package: "swift-log"),
                     "Regex",
                     "CQRCode",
-                    "HTTP",
+                    "VaporHTTP",
                     .product(name: "Crypto", package: "swift-crypto"),
                 ],
                 exclude: ["Base/Predefined/README"]),

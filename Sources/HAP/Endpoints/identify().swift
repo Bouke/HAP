@@ -1,5 +1,5 @@
 import Foundation
-import HTTP
+import VaporHTTP
 
 func identify(device: Device) -> Responder {
     { _, _ in

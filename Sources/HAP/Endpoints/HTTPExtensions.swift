@@ -1,5 +1,5 @@
 import Foundation
-import HTTP
+import VaporHTTP
 
 extension HTTPResponse {
     static var noContent: HTTPResponse {

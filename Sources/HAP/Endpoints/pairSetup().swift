@@ -1,8 +1,8 @@
 import Crypto
 import Foundation
-import HTTP
 import Logging
 import SRP
+import VaporHTTP
 
 fileprivate let logger = Logger(label: "hap.pairSetup")
 fileprivate typealias Session = PairSetupController.Session

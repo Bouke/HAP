@@ -1,10 +1,10 @@
 import Crypto
 import Dispatch
 import Foundation
-import HTTP
 import Logging
 import NIO
 import NIOHTTP1
+import VaporHTTP
 
 fileprivate let logger = Logger(label: "hap.nio")
 
