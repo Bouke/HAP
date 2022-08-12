@@ -14,14 +14,14 @@ class PairingsEndpointTests: XCTestCase {
     }
 
     var device: Device!
-    var connection: MockContext!
+    var context: MockContext!
     var pairing: Pairing!
     var application: Responder!
 
     override func setUp() {
         device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00072B"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [])
         device.controllerHandler = ControllerHandler()
-        connection = MockContext()
+        context = MockContext()
         application = pairings(device: device)
     }
 
@@ -49,12 +49,12 @@ class PairingsEndpointTests: XCTestCase {
 
     func setupPairingWithRole(_ role: Pairing.Role) {
         pairing = Pairing(identifier: Data(), publicKey: Data(), role: role)
-        device.controllerHandler!.registerPairing(pairing, forChannel: connection.channel)
+        device.controllerHandler!.registerPairing(pairing, forChannel: context.channel)
         device.add(pairing: pairing)
     }
 
     func call(_ data: PairTagTLV8) -> (HTTPResponse, PairTagTLV8?) {
-        let response = application(connection, HTTPRequest(method: .POST, uri: "/pairings", body: encode(data)))
+        let response = context.call(application, HTTPRequest(method: .POST, uri: "/pairings", body: encode(data)))
         return (response, try! decode(response.body.data!))
     }
 

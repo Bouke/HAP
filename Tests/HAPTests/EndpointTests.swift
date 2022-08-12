@@ -36,7 +36,7 @@ class EndpointTests: XCTestCase {
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00055"), type: .color, isDimmable: true)
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = accessories(device: device)
-        let response = application(MockContext(), HTTPRequest(uri: "/accessories"))
+        let response = MockContext().call(application, HTTPRequest(uri: "/accessories"))
         let jsonObject = try! JSONSerialization.jsonObject(with: response.body.data ?? Data(), options: []) as! [String: [[String: Any]]]
         guard let accessory = jsonObject["accessories"]?.first else {
             return XCTFail("No accessory")
@@ -95,7 +95,7 @@ class EndpointTests: XCTestCase {
         let application = characteristics(device: device)
         let testQueue = DispatchQueue(label: "TestQueue")
         testQueue.async {
-            let response = application(MockContext(), HTTPRequest(uri: "/characteristics?id=\(energy.aid).\(energy.info.name.iid),\(energy.aid).\(energy.service.watt.iid)&meta=1&perms=1&type=1&ev=1"))
+            let response = MockContext().call(application, HTTPRequest(uri: "/characteristics?id=\(energy.aid).\(energy.info.name.iid),\(energy.aid).\(energy.service.watt.iid)&meta=1&perms=1&type=1&ev=1"))
             guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body.data ?? Data(), options: [])) as? [String: [[String: Any]]] else {
                 return XCTFail("Could not decode")
             }
@@ -129,7 +129,7 @@ class EndpointTests: XCTestCase {
         let application = characteristics(device: device)
         let testQueue = DispatchQueue(label: "TestQueue")
         testQueue.async {
-            let response = application(MockContext(), HTTPRequest(uri: "/characteristics?id=\(lamp.aid).\(lamp.info.manufacturer.iid),\(lamp.aid).\(lamp.info.name.iid)"))
+            let response = MockContext().call(application, HTTPRequest(uri: "/characteristics?id=\(lamp.aid).\(lamp.info.manufacturer.iid),\(lamp.aid).\(lamp.info.name.iid)"))
             guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body.data ?? Data(), options: [])) as? [String: [[String: Any]]] else {
                 return XCTFail("Could not decode")
             }
@@ -149,7 +149,7 @@ class EndpointTests: XCTestCase {
         }
 
         testQueue.async {
-            let response = application(MockContext(), HTTPRequest(uri: "/characteristics?id=\(lamp.aid).\(lamp.info.name.iid),\(lamp.aid).\(lamp.lightbulb.brightness!.iid)&meta=1&perms=1&type=1&ev=1"))
+            let response = MockContext().call(application, HTTPRequest(uri: "/characteristics?id=\(lamp.aid).\(lamp.info.name.iid),\(lamp.aid).\(lamp.lightbulb.brightness!.iid)&meta=1&perms=1&type=1&ev=1"))
             guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body.data ?? Data(), options: [])) as? [String: [[String: Any]]] else {
                 return XCTFail("Could not decode")
             }
@@ -203,7 +203,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+            let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
             XCTAssertEqual(response.status, .noContent)
             XCTAssertEqual(lamp.lightbulb.powerState.value, true)
         }
@@ -220,7 +220,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+            let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
             XCTAssertEqual(response.status, .noContent)
             XCTAssertEqual(lamp.lightbulb.brightness!.value, 50)
         }
@@ -237,7 +237,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+            let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
             XCTAssertEqual(response.status, .noContent)
             XCTAssertEqual(lamp.lightbulb.brightness!.value, 100)
         }
@@ -275,7 +275,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+            let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
             XCTAssertEqual(response.status, .noContent)
             XCTAssertEqual(thermostat.thermostat.targetTemperature.value, 19.5)
             XCTAssertEqual(thermostat.thermostat.targetHeatingCoolingState.value, .auto)
@@ -293,7 +293,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+            let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
             XCTAssertEqual(response.status, .noContent)
             XCTAssertEqual(thermostat.thermostat.targetTemperature.value, 20)
         }
@@ -310,7 +310,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+            let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
             XCTAssertEqual(response.status, .noContent)
             XCTAssertEqual(thermostat.thermostat.targetHeatingCoolingState.value, .off)
         }
@@ -330,7 +330,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+            let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
             XCTAssertEqual(response.status, .noContent)
             XCTAssertEqual(thermostat.thermostat.targetHeatingCoolingState.value, .off)
         }
@@ -357,7 +357,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+            let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
             XCTAssertEqual(response.status, .badRequest)
         }
 
@@ -373,7 +373,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+            let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
             XCTAssertEqual(response.status, .badRequest)
             let json = try! JSONSerialization.jsonObject(with: response.body.data ?? Data())  as! [String: [[String: Any]]]
             XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int, HAPStatusCodes.invalidValue.rawValue)
@@ -397,7 +397,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+            let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
             XCTAssertEqual(response.status, .multiStatus)
             XCTAssertEqual(lamp.lightbulb.brightness!.value, 50)
 
@@ -425,7 +425,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+            let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
             XCTAssertEqual(response.status, .multiStatus)
 
             let json = try! JSONSerialization.jsonObject(with: response.body.data ?? Data())  as! [String: [[String: Any]]]
@@ -451,7 +451,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+            let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
             XCTAssertEqual(response.status, .multiStatus)
             XCTAssertEqual(lamp.lightbulb.brightness!.value, 50)
 
@@ -477,7 +477,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+            let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
             XCTAssertEqual(response.status, .multiStatus)
             XCTAssertEqual(lamp.lightbulb.brightness!.value, 50)
 
@@ -499,7 +499,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+            let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
             XCTAssertEqual(response.status, .badRequest)
         }
 
@@ -514,7 +514,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+            let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
             XCTAssertEqual(response.status, .badRequest)
         }
 
@@ -529,7 +529,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+            let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
             XCTAssertEqual(response.status, .badRequest)
         }
 
@@ -546,7 +546,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+            let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
             XCTAssertEqual(response.status, .unprocessableEntity)
         }
 
@@ -563,7 +563,7 @@ class EndpointTests: XCTestCase {
                 ]
             ]
             let body = try! JSONSerialization.data(withJSONObject: jsonObject, options: [])
-            let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+            let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
             XCTAssertEqual(response.status, .unprocessableEntity)
         }
         let expectation = self.expectation(description: "Test Complete")
@@ -586,7 +586,7 @@ class EndpointTests: XCTestCase {
         // First a good one
         testQueue.async {
             let req = "\(lamp.aid).\(lamp.lightbulb.brightness!.iid),\(lightsensor.aid).\(lightsensor.lightSensor.currentLightLevel.iid),\(thermostat.aid).\(thermostat.thermostat.currentTemperature.iid)"
-            let response = application(MockContext(), HTTPRequest(uri: "/characteristics?id=\(req)"))
+            let response = MockContext().call(application, HTTPRequest(uri: "/characteristics?id=\(req)"))
 
             XCTAssertEqual(response.status, .ok)
 
@@ -630,7 +630,7 @@ class EndpointTests: XCTestCase {
         testQueue.async {
             let iid = lightsensor.info.identify.iid
             let aid = lightsensor.aid
-            let response = application(MockContext(), HTTPRequest(uri: "/characteristics?id=\(aid).\(iid)"))
+            let response = MockContext().call(application, HTTPRequest(uri: "/characteristics?id=\(aid).\(iid)"))
             XCTAssertEqual(response.status, .multiStatus)
             let json = try! JSONSerialization.jsonObject(with: response.body.data ?? Data())  as! [String: [[String: Any]]]
             XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int, HAPStatusCodes.writeOnly.rawValue)
@@ -644,7 +644,7 @@ class EndpointTests: XCTestCase {
             let aid = lightsensor.aid
             let iid2 = thermostat.thermostat.currentTemperature.iid
             let aid2 = thermostat.aid
-            let response = application(MockContext(), HTTPRequest(uri: "/characteristics?id=\(aid2).\(iid2),\(aid).\(iid)"))
+            let response = MockContext().call(application, HTTPRequest(uri: "/characteristics?id=\(aid2).\(iid2),\(aid).\(iid)"))
             XCTAssertEqual(response.status, .multiStatus)
             guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body.data ?? Data(), options: [])) as? [String: [[String: Any]]] else {
                 return XCTFail("Could not decode")
@@ -672,7 +672,7 @@ class EndpointTests: XCTestCase {
             let aid = lightsensor.aid
             let iid2 = thermostat.thermostat.currentTemperature.iid
             let aid2 = thermostat.aid
-            let response = application(MockContext(), HTTPRequest(uri: "/characteristics?id=\(aid).\(iid),\(aid2).\(iid2)"))
+            let response = MockContext().call(application, HTTPRequest(uri: "/characteristics?id=\(aid).\(iid),\(aid2).\(iid2)"))
             XCTAssertEqual(response.status, .multiStatus)
             guard let jsonObject = (try? JSONSerialization.jsonObject(with: response.body.data ?? Data(), options: [])) as? [String: [[String: Any]]] else {
                 return XCTFail("Could not decode")
@@ -703,19 +703,19 @@ class EndpointTests: XCTestCase {
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
         let application = root(device: device)
         do {
-            let response = application(MockContext(), HTTPRequest(uri: "/identify"))
+            let response = MockContext().call(application, HTTPRequest(uri: "/identify"))
             XCTAssertEqual(response.status, .unauthorized)
         }
         do {
-            let response = application(MockContext(), HTTPRequest(uri: "/accessories"))
+            let response = MockContext().call(application, HTTPRequest(uri: "/accessories"))
             XCTAssertEqual(response.status, .unauthorized)
         }
         do {
-            let response = application(MockContext(), HTTPRequest(uri: "/characteristics"))
+            let response = MockContext().call(application, HTTPRequest(uri: "/characteristics"))
             XCTAssertEqual(response.status, .unauthorized)
         }
         do {
-            let response = application(MockContext(), HTTPRequest(uri: "/pairings"))
+            let response = MockContext().call(application, HTTPRequest(uri: "/pairings"))
             XCTAssertEqual(response.status, .unauthorized)
         }
     }
@@ -781,7 +781,7 @@ class EndpointTests: XCTestCase {
 //                let body = try! JSONSerialization.data(withJSONObject: [
 //                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.powerState.iid, "value": 1]]
 //                ], options: [])
-//                let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+//                let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
 //                XCTAssertEqual(response.status, .noContent)
 //            }
 //
@@ -819,7 +819,7 @@ class EndpointTests: XCTestCase {
 //                let body = try! JSONSerialization.data(withJSONObject: [
 //                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.powerState.iid, "value": 1]]
 //                ], options: [])
-//                let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+//                let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
 //                XCTAssertEqual(response.status, .noContent)
 //
 //                wait(for: [expectation], timeout: 0.01)
@@ -836,7 +836,7 @@ class EndpointTests: XCTestCase {
 //                let body = try! JSONSerialization.data(withJSONObject: [
 //                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.powerState.iid, "value": 0]]
 //                ], options: [])
-//                let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+//                let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
 //                XCTAssertEqual(response.status, .noContent)
 //
 //                wait(for: [expectation], timeout: 1.01)
@@ -882,7 +882,7 @@ class EndpointTests: XCTestCase {
 //                let body = try! JSONSerialization.data(withJSONObject: [
 //                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.powerState.iid, "value": 1]]
 //                ], options: [])
-//                let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+//                let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
 //                XCTAssertEqual(response.status, .noContent)
 //
 //                wait(for: [expectation], timeout: 0.01)
@@ -903,7 +903,7 @@ class EndpointTests: XCTestCase {
 //                    let body = try! JSONSerialization.data(withJSONObject: [
 //                        "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.powerState.iid, "value": 0]]
 //                    ], options: [])
-//                    let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+//                    let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
 //                    XCTAssertEqual(response.status, .noContent)
 //                }
 //                // third update: change target temperature
@@ -911,7 +911,7 @@ class EndpointTests: XCTestCase {
 //                    let body = try! JSONSerialization.data(withJSONObject: [
 //                        "characteristics": [["aid": thermostat.aid, "iid": thermostat.thermostat.targetTemperature.iid, "value": 17.5]]
 //                    ], options: [])
-//                    let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+//                    let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
 //                    XCTAssertEqual(response.status, .noContent)
 //                }
 //
@@ -971,7 +971,7 @@ class EndpointTests: XCTestCase {
 //                let body = try! JSONSerialization.data(withJSONObject: [
 //                    "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.powerState.iid, "value": 1]]
 //                ], options: [])
-//                let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+//                let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
 //                XCTAssertEqual(response.status, .noContent)
 //
 //                wait(for: [expectation], timeout: 0.01)
@@ -992,7 +992,7 @@ class EndpointTests: XCTestCase {
 //                    let body = try! JSONSerialization.data(withJSONObject: [
 //                        "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.powerState.iid, "value": 0]]
 //                    ], options: [])
-//                    let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+//                    let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
 //                    XCTAssertEqual(response.status, .noContent)
 //                }
 //                // second update: turn lamp on again
@@ -1000,7 +1000,7 @@ class EndpointTests: XCTestCase {
 //                    let body = try! JSONSerialization.data(withJSONObject: [
 //                        "characteristics": [["aid": lamp.aid, "iid": lamp.lightbulb.powerState.iid, "value": 1]]
 //                    ], options: [])
-//                    let response = application(MockContext(), HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
+//                    let response = MockContext().call(application, HTTPRequest(method: .PUT, uri: "/characteristics", body: body))
 //                    XCTAssertEqual(response.status, .noContent)
 //                }
 //

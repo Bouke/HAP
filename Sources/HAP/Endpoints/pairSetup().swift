@@ -36,7 +36,7 @@ func pairSetup(device: Device) -> Responder {
         context.session["PairSetup"] = session as AnyObject?
     }
 
-    return { context, request in
+    return future({ context, request in
         guard
             let body = request.body.data,
             let data: PairTagTLV8 = try? decode(body),
@@ -115,5 +115,5 @@ func pairSetup(device: Device) -> Responder {
         } else {
             return .badRequest
         }
-    }
+    })
 }
