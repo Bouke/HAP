@@ -1,5 +1,6 @@
 excluded:
   - Sources/HAP/Base/
+  - Sources/VaporHTTP/
 disabled_rules:
   - function_body_length
   - private_over_fileprivate
