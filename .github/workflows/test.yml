@@ -13,6 +13,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Setup Swift ${{ matrix.swift }}
         run: |
+          sudo apt update
           sudo apt install libavahi-compat-libdnssd-dev
           wget --no-verbose https://swift.org/builds/swift-${{ matrix.swift }}-release/ubuntu1804/swift-${{ matrix.swift }}-RELEASE/swift-${{ matrix.swift }}-RELEASE-ubuntu18.04.tar.gz
           tar xzf swift-${{ matrix.swift }}-RELEASE-ubuntu18.04.tar.gz
