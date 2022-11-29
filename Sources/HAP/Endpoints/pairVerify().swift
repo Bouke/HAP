@@ -63,7 +63,45 @@ func pairVerify(device: Device) -> Responder {
         } catch {
             logger.warning("Could not verify pairing: \(error)")
             setSession(for: context, to: nil)
-            return .badRequest
+
+            // HAP Specification 4.8.4:
+            // Must return authentication error to Verify Finish Response (M4) when
+            // 1. fail verifiction of authentication tag on encrypted keys
+            // 2. decryption fails
+            // 3. pairing ID is not recognised
+            // 4. fail verification of iOS device signature
+
+            let response: PairTagTLV8?
+
+            switch error {
+            case
+                PairVerifyController.Error.couldNotDecrypt,
+                PairVerifyController.Error.couldNotDecode,
+                PairVerifyController.Error.noPublicKeyForUser,
+                PairVerifyController.Error.invalidSignature:
+
+                response = [
+                    (.state, Data([PairVerifyStep.finishResponse.rawValue])),
+                    (.error, Data([PairError.authenticationFailed.rawValue]))
+                ]
+            default:
+                // For other errors, respond with an HTTP error 400 (bad request)
+                // PairVerifyController.Error
+                // .invalidParameters
+                // .noSession
+                // .couldNotSetupSession
+                // .couldNotEncrypt
+                // Ed25519.Error
+                // .invalidSignature
+                // .couldNotSign
+                response = nil
+            }
+
+            if let response = response {
+                return HTTPResponse(tags: response)
+            } else {
+                return .badRequest
+            }
         }
     })
 }
