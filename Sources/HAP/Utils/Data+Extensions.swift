@@ -26,7 +26,7 @@ extension Data {
 }
 
 extension RandomAccessCollection where Iterator.Element == UInt8 {
-    var hex: String {
+    public var hex: String {
         self.reduce("") { $0 + String(format: "%02x", $1) }
     }
 }

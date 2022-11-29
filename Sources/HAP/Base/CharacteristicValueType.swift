@@ -171,11 +171,14 @@ extension Double: CharacteristicValueType {
 
 extension Data: CharacteristicValueType, JSONValueTypeConvertible {
     public init?(value: Any) {
-        fatalError("How does deserialization of Data work?")
+		switch value {
+		case let value as String: self = Data(base64Encoded: value)!
+		default: fatalError("don't now how to decode \(value)")
+		}
     }
     static public let format = CharacteristicFormat.data
     public var jsonValueType: JSONValueType {
-        fatalError("How does serialization of Data work?")
+		self.base64EncodedString()
     }
 }
 

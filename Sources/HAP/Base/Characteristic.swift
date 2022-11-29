@@ -69,7 +69,7 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
 
     weak var service: Service?
 
-    internal var iid: InstanceID = 0
+    public var iid: InstanceID = 0
     public let type: CharacteristicType
 
     internal var _value: T?
