@@ -132,6 +132,10 @@ open class Service: NSObject, JSONSerializable {
         }
         return json
     }
+
+	open override var debugDescription: String {
+		"#\(iid) \(type.description) of accessory \(accessory?.debugDescription ?? "no accessory")"
+	}
 }
 
 func getOrCreateAppend<T>(type: CharacteristicType,

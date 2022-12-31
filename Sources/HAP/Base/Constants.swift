@@ -80,6 +80,7 @@ public enum CharacteristicPermission: String, Codable {
     // This characteristic is hidden from the user
     case hidden = "hd"
 
+    // This characteristic supports write response
     case writeResponse = "wr"
 
     // Short-hand for "all" permissions.

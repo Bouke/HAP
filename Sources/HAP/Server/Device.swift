@@ -257,17 +257,17 @@ public class Device {
     /// Generate uniqueness hash for device configuration, used to determine
     /// if the configuration number should be updated.
     func generateStableHash() -> Int {
-        var hash = 0
+		var hash: UInt64 = 0
         for accessory in accessories {
-            hash ^= 17 &* accessory.aid
+            hash ^= 17 &* UInt64(accessory.aid)
             for service in accessory.services {
-                hash ^= 19 &* service.iid
+                hash ^= 19 &* UInt64(service.iid)
                 for characteristic in service.characteristics {
-                    hash ^= 23 &* characteristic.iid
+                    hash ^= 23 &* UInt64(characteristic.iid)
                 }
             }
         }
-        return hash
+		return Int(truncatingIfNeeded: hash)
     }
 
     /// Notify the server that the config record has changed

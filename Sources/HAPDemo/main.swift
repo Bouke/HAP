@@ -30,6 +30,51 @@ if CommandLine.arguments.contains("--recreate") {
 let livingRoomLightbulb = Accessory.Lightbulb(info: Service.Info(name: "Living Room", serialNumber: "00002"))
 let bedroomNightStand = Accessory.Lightbulb(info: Service.Info(name: "Bedroom", serialNumber: "00003"))
 
+let brightness = PredefinedCharacteristic.brightness()
+let colorTemperature = PredefinedCharacteristic.colorTemperature(maxValue: 400, minValue: 50)
+let supportedTransitions = PredefinedCharacteristic.supportedCharacteristicValueTransitionConfiguration()
+
+let adaptive = Accessory(info: .init(name: "Adaptive", serialNumber: "0001"), type: .lightbulb, services: [
+	Service.Lightbulb(characteristics: [
+		AnyCharacteristic(brightness),
+		AnyCharacteristic(colorTemperature),
+		.characteristicValueTransitionControl(),
+		.characteristicValueActiveTransitionCount(),
+		AnyCharacteristic(supportedTransitions)
+	])
+])
+
+enum SupportedCharacteristicValueTransitionConfigurationsTypes : UInt8 {
+	case SupportedTransitionConfiguration = 0x01
+}
+
+enum SupportedValueTransitionConfigurationTypes : UInt8 {
+	case CharacteristicIid = 0x01
+	case TransitionType = 0x02
+}
+
+enum TransitionType : UInt8 {
+	case Brightness = 0x01
+	case ColorTemperature = 0x02
+}
+
+supportedTransitions.value = encode([
+	(SupportedCharacteristicValueTransitionConfigurationsTypes.SupportedTransitionConfiguration, [
+		encode([
+			(SupportedValueTransitionConfigurationTypes.CharacteristicIid, brightness.iid.littleEndianBytes),
+			(SupportedValueTransitionConfigurationTypes.TransitionType, Data([TransitionType.Brightness.rawValue])),
+		]),
+		encode([
+			(SupportedValueTransitionConfigurationTypes.CharacteristicIid, colorTemperature.iid.littleEndianBytes),
+			(SupportedValueTransitionConfigurationTypes.TransitionType, Data([TransitionType.ColorTemperature.rawValue])),
+		]),
+	])
+]);
+
+//print("Did encode as: \(supportedTransitions.value!.base64EncodedString())")
+//print("Did encode as: \(supportedTransitions.value!.hex)")
+//exit(0)
+
 // And a security system with multiple zones and statuses fault and tampered.
 let securitySystem = Accessory(
     info: Service.Info(name: "Multi-Zone", serialNumber: "A1803"),
@@ -45,10 +90,13 @@ let device = Device(
     setupCode: "123-44-321",
     storage: storage,
     accessories: [
-        livingRoomLightbulb,
-        bedroomNightStand,
-        securitySystem
+		adaptive
+//        livingRoomLightbulb,
+//        bedroomNightStand,
+//        securitySystem
     ])
+
+
 
 // Attach a delegate that logs all activity.
 var delegate = LoggingDeviceDelegate(logger: logger)

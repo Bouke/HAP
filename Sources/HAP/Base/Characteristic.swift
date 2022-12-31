@@ -62,14 +62,14 @@ extension Characteristic {
     }
 }
 
-public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, JSONSerializable, Hashable, Equatable {
+public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, JSONSerializable, Hashable, Equatable, CustomDebugStringConvertible {
     enum Error: Swift.Error {
         case valueTypeException
     }
 
     weak var service: Service?
 
-    internal var iid: InstanceID = 0
+    public var iid: InstanceID = 0
     public let type: CharacteristicType
 
     internal var _value: T?
@@ -178,5 +178,9 @@ public class GenericCharacteristic<T: CharacteristicValueType>: Characteristic, 
 
     internal var device: Device? {
         service?.accessory?.device
+    }
+
+    public var debugDescription: String {
+        "characteristic #\(iid) \(description ?? type.description) of service \(service?.debugDescription ?? "no service")"
     }
 }

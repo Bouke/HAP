@@ -15,7 +15,7 @@ class EndpointTests: XCTestCase {
         guard let accessory = jsonObject["accessories"]?.first else {
             return XCTFail("No accessory")
         }
-        XCTAssertEqual(accessory["aid"] as? Int, lamp.aid)
+        XCTAssertEqual(accessory["aid"] as? InstanceID, lamp.aid)
         guard let services = accessory["services"] as? [[String: Any]] else {
             return XCTFail("No services")
         }
@@ -77,7 +77,7 @@ class EndpointTests: XCTestCase {
                 return XCTFail("No characteristics")
             }
 
-            guard let nameCharacteristic = characteristics.first(where: { $0["iid"] as? Int == energy.info.name.iid }) else {
+            guard let nameCharacteristic = characteristics.first(where: { $0["iid"] as? InstanceID == energy.info.name.iid }) else {
                 return XCTFail("No name characteristic")
             }
             XCTAssertEqual(nameCharacteristic["value"] as? String, "Energy")
@@ -85,7 +85,7 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(nameCharacteristic["type"] as? String, "23")
             XCTAssertEqual(nameCharacteristic["ev"] as? Bool, false)
 
-            guard let wattCharacteristic = characteristics.first(where: { $0["iid"] as? Int == energy.service.watt.iid }) else {
+            guard let wattCharacteristic = characteristics.first(where: { $0["iid"] as? InstanceID == energy.service.watt.iid }) else {
                 return XCTFail("No identify characteristic")
             }
             XCTAssertEqual(wattCharacteristic["value"] as? Int, 42)
@@ -111,12 +111,12 @@ class EndpointTests: XCTestCase {
                 return XCTFail("No characteristics")
             }
 
-            guard let manufacturerCharacteristic = characteristics.first(where: { $0["iid"] as? Int == lamp.info.manufacturer.iid }) else {
+            guard let manufacturerCharacteristic = characteristics.first(where: { $0["iid"] as? InstanceID == lamp.info.manufacturer.iid }) else {
                 return XCTFail("No manufacturer characteristic")
             }
             XCTAssertEqual(manufacturerCharacteristic["value"] as? String, "Bouke")
 
-            guard let nameCharacteristic = characteristics.first(where: { $0["iid"] as? Int == lamp.info.name.iid }) else {
+            guard let nameCharacteristic = characteristics.first(where: { $0["iid"] as? InstanceID == lamp.info.name.iid }) else {
                 return XCTFail("No name characteristic")
             }
             XCTAssertEqual(nameCharacteristic["value"] as? String, "Night stand left")
@@ -131,7 +131,7 @@ class EndpointTests: XCTestCase {
                 return XCTFail("No characteristics")
             }
 
-            guard let nameCharacteristic = characteristics.first(where: { $0["iid"] as? Int == lamp.info.name.iid }) else {
+            guard let nameCharacteristic = characteristics.first(where: { $0["iid"] as? InstanceID == lamp.info.name.iid }) else {
                 return XCTFail("No name characteristic")
             }
             XCTAssertEqual(nameCharacteristic["value"] as? String, "Night stand left")
@@ -139,7 +139,7 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(nameCharacteristic["type"] as? String, "23")
             XCTAssertEqual(nameCharacteristic["ev"] as? Bool, false)
 
-            guard let brightnessCharacteristic = characteristics.first(where: { $0["iid"] as? Int == lamp.lightbulb.brightness!.iid }) else {
+            guard let brightnessCharacteristic = characteristics.first(where: { $0["iid"] as? InstanceID == lamp.lightbulb.brightness!.iid }) else {
                 return XCTFail("No identify characteristic")
             }
             XCTAssertEqual(brightnessCharacteristic["value"] as? Int, 100)
@@ -571,15 +571,15 @@ class EndpointTests: XCTestCase {
                 return XCTFail("No characteristics")
             }
 
-            guard let light = characteristics.first(where: { $0["aid"] as? Int == lightsensor.aid }) else {
+            guard let light = characteristics.first(where: { $0["aid"] as? InstanceID == lightsensor.aid }) else {
                 return XCTFail("Could not get light aid")
             }
 
-            guard let therm = characteristics.first(where: { $0["aid"] as? Int == thermostat.aid }) else {
+            guard let therm = characteristics.first(where: { $0["aid"] as? InstanceID == thermostat.aid }) else {
                 return XCTFail("Could not get therm aid")
             }
 
-            guard let lampa = characteristics.first(where: { $0["aid"] as? Int == lamp.aid }) else {
+            guard let lampa = characteristics.first(where: { $0["aid"] as? InstanceID == lamp.aid }) else {
                 return XCTFail("Could not get lampa aid")
             }
 
@@ -608,8 +608,8 @@ class EndpointTests: XCTestCase {
             XCTAssertEqual(response.status, .multiStatus)
             let json = try! JSONSerialization.jsonObject(with: response.body.data ?? Data())  as! [String: [[String: Any]]]
             XCTAssertEqual(json["characteristics"]![0]["status"]! as! Int, HAPStatusCodes.writeOnly.rawValue)
-            XCTAssertEqual(json["characteristics"]![0]["aid"]! as! Int, aid)
-            XCTAssertEqual(json["characteristics"]![0]["iid"]! as! Int, iid)
+            XCTAssertEqual(json["characteristics"]![0]["aid"]! as! InstanceID, aid)
+            XCTAssertEqual(json["characteristics"]![0]["iid"]! as! InstanceID, iid)
         }
 
         // trying to read write only access and one with read access

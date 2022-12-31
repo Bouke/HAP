@@ -7,6 +7,8 @@ func createLogHandler(label: String) -> LogHandler {
         switch label {
         case "hap.encryption":
             handler.logLevel = .info
+        case "hap.endpoints.characteristics":
+            handler.logLevel = .trace
         case "hap",
              _ where label.starts(with: "hap."):
             handler.logLevel = .debug

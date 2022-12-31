@@ -1,10 +1,14 @@
 import Foundation
 
-// TODO: SwiftFoundation in Swift 4.0 cannot encode/decode UInt64,
-// which is the data-type we wanted to use here. We can change it back
-// to UInt64 once the following commit has made it into a release:
-// https://github.com/apple/swift-corelibs-foundation/commit/64b67c91479390776c43a96bd31e4e85f106d5e1
-typealias InstanceID = Int
+// HAP Specification 2.6.1: Instance IDs
+//
+// instance IDs are numbers with a range of [1, 18446744073709551615] for IP
+// accessories (see ”7.4.4.2 Instance IDs” (page 122) for BLE accessories).
+// These numbers are used to uniquely identify HAP accessory objects within an
+// HAP accessory server, or uniquely identify services, and characteristics
+// within an HAP accessory object. The instance ID for each object must be
+// unique for the lifetime of the server/client pairing.
+public typealias InstanceID = UInt64
 
 // HAP Specification 2.6.1.1: Accessory Instance IDs
 //
@@ -25,7 +29,7 @@ struct AIDGenerator: Sequence, IteratorProtocol, Codable {
     }
 }
 
-open class Accessory: Hashable, JSONSerializable {
+open class Accessory: Hashable, JSONSerializable, CustomDebugStringConvertible {
     public weak var device: Device?
     internal var aid: InstanceID = 0
     public let type: AccessoryType
@@ -127,4 +131,8 @@ open class Accessory: Hashable, JSONSerializable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(ObjectIdentifier(self))
     }
+
+	public var debugDescription: String {
+		"#\(aid) \(type) \(info.name.value ?? "Unnamed accessory")"
+	}
 }

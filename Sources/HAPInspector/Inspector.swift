@@ -199,6 +199,10 @@ let defaultTypes: [DefaultType] = [
 
 ]
 
+let additionalPermissions = [
+    "characteristic-value-transition-control": CharacteristicInfoPermission.writeResponse
+]
+
 struct FileHandlerOutputStream: TextOutputStream {
     private let fileHandle: FileHandle
     let encoding: String.Encoding
@@ -404,7 +408,7 @@ func inspect(source plistPath: URL, target outputPath: String) throws {
                                        format: format,
                                        maxValue: dict["MaxValue"] as? NSNumber,
                                        minValue: dict["MinValue"] as? NSNumber,
-                                       permissions: CharacteristicInfoPermission(rawValue: dict["Properties"] as! Int),
+                                       permissions: CharacteristicInfoPermission(rawValue: dict["Properties"] as! UInt32).union(additionalPermissions[name] ?? []),
                                        stepValue: dict["StepValue"] as? NSNumber,
                                        units: dict["Units"] as? String))
                 characteristicFormats.insert(format)
@@ -874,17 +878,21 @@ struct ServiceInfo {
 }
 
 struct CharacteristicInfoPermission: OptionSet, CustomStringConvertible {
-    let rawValue: Int
+    let rawValue: UInt32
 
     static let read = CharacteristicInfoPermission(rawValue: 2)
     static let write = CharacteristicInfoPermission(rawValue: 4)
     static let events = CharacteristicInfoPermission(rawValue: 1)
+
+    // Custom values to support additional permissions.
+    static let writeResponse = CharacteristicInfoPermission(rawValue: 1 << 31)
 
     var description: String {
         var permissions: [String] = []
         if contains(.read) { permissions += [".read"] }
         if contains(.write) { permissions += [".write"] }
         if contains(.events) { permissions += [".events"] }
+        if contains(.writeResponse) { permissions += [".writeResponse"] }
         return "[" + permissions.joined(separator: ", ") + "]"
     }
 }

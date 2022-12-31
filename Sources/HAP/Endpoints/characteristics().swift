@@ -42,6 +42,9 @@ func characteristics(device: Device, channel: Channel, request: HTTPRequest) -> 
                                                              status: .resourceDoesNotExist))
                     continue
             }
+
+            logger.trace("reading value of \(characteristic)")
+
             guard characteristic.permissions.contains(.read) else {
                 logger.info("\(characteristic) has no read permission")
                 responses.append(Protocol.Characteristic(aid: path.aid, iid: path.iid, status: .writeOnly))
@@ -91,6 +94,8 @@ func characteristics(device: Device, channel: Channel, request: HTTPRequest) -> 
                 response.ev = characteristic.permissions.contains(.events)
             }
             responses.append(response)
+
+            logger.trace("read value: \(value)")
         }
 
         /* HAP Specification 5.7.3.2

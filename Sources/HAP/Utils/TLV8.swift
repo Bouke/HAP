@@ -46,7 +46,7 @@ enum TLV8Error: Swift.Error {
     case decodeError
 }
 
-func decode<Key>(_ data: Data) throws -> [(Key, Data)] where Key: RawRepresentable, Key.RawValue == UInt8 {
+public func decode<Key>(_ data: Data) throws -> [(Key, Data)] where Key: RawRepresentable, Key.RawValue == UInt8 {
     var result = [(Key, Data)]()
     var index = data.startIndex
     var currentType: Key?
@@ -84,7 +84,7 @@ func decode<Key>(_ data: Data) throws -> [(Key, Data)] where Key: RawRepresentab
     return result
 }
 
-func encode<Key>(_ array: [(Key, Data)]) -> Data where Key: RawRepresentable, Key.RawValue == UInt8 {
+public func encode<Key>(_ array: [(Key, Data)]) -> Data where Key: RawRepresentable, Key.RawValue == UInt8 {
     var result = Data()
     func append(type: UInt8, value: Data.SubSequence) {
         result.append(Data([type, UInt8(value.count)] + value))
@@ -103,6 +103,30 @@ func encode<Key>(_ array: [(Key, Data)]) -> Data where Key: RawRepresentable, Ke
         } while index < value.endIndex
     }
     return result
+}
+
+// I think we can avoid duplication of encode methods by having the value be a `TLV8ValueProtocol` thingy, which both Data and [Data] adhere to.
+public func encode<Key>(_ array: [(Key, [Data])]) -> Data where Key: RawRepresentable, Key.RawValue == UInt8 {
+	var result = Data()
+	for (type, value) in array {
+		var first = true
+		for (item) in value {
+			if !first {
+				result.append(Data([TLV8.delimiter.rawValue, 0]))
+			}
+			first = false
+			result.append(encode([(type, item)]))
+		}
+		if first {
+			// Zero-length array
+			result.append(Data([type.rawValue, 0]))
+		}
+	}
+	return result
+}
+
+enum TLV8: UInt8 {
+	case delimiter = 0
 }
 
 // Pair Setup State
