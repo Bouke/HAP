@@ -29,7 +29,7 @@ struct AIDGenerator: Sequence, IteratorProtocol, Codable {
     }
 }
 
-open class Accessory: Hashable, JSONSerializable {
+open class Accessory: Hashable, JSONSerializable, CustomDebugStringConvertible {
     public weak var device: Device?
     internal var aid: InstanceID = 0
     public let type: AccessoryType
@@ -131,4 +131,8 @@ open class Accessory: Hashable, JSONSerializable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(ObjectIdentifier(self))
     }
+
+	public var debugDescription: String {
+		"#\(aid) \(type) \(info.name.value ?? "Unnamed accessory")"
+	}
 }
