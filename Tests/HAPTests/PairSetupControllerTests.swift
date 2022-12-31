@@ -5,13 +5,6 @@ import SRP
 import XCTest
 
 class PairSetupControllerTests: XCTestCase {
-    static var allTests: [(String, (PairSetupControllerTests) -> () throws -> Void)] {
-        [
-            ("test", test),
-            ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests)
-        ]
-    }
-
     func test() {
         let clientIdentifier = "hubba hubba".data(using: .utf8)!
         let password = "123-44-321"
@@ -104,18 +97,5 @@ class PairSetupControllerTests: XCTestCase {
 
         XCTAssertEqual(device.get(pairingWithIdentifier: clientIdentifier)?.publicKey,
                        clientPrivateKey.publicKey.rawRepresentation)
-    }
-
-    // from: https://oleb.net/blog/2017/03/keeping-xctest-in-sync/#appendix-code-generation-with-sourcery
-    func testLinuxTestSuiteIncludesAllTests() {
-        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-            let thisClass = type(of: self)
-            let linuxCount = thisClass.allTests.count
-            let darwinCount = Int(thisClass
-                .defaultTestSuite.testCaseCount)
-            XCTAssertEqual(linuxCount,
-                           darwinCount,
-                           "\(darwinCount - linuxCount) tests are missing from allTests")
-        #endif
     }
 }

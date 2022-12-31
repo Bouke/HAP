@@ -6,32 +6,6 @@ import VaporHTTP
 import XCTest
 
 class EndpointTests: XCTestCase {
-    static var allTests: [(String, (EndpointTests) -> () throws -> Void)] {
-        #if os(macOS)
-            let asynchronousTests: [(String, (EndpointTests) -> () throws -> Void)] = [
-                ("testNoEventsToSelf", testNoEventsToSelf),
-                ("testSingleEventPerUpdate", testSingleEventPerUpdate),
-                ("testDelayMultipleEvents", testDelayMultipleEvents),
-                ("testDelayMultipleEventsCoalescence", testDelayMultipleEventsCoalescence),
-                ("testDelayMultipleEventsCoalescenceFiltering", testDelayMultipleEventsCoalescenceFiltering)
-            ]
-        #else
-            let asynchronousTests: [(String, (EndpointTests) -> () throws -> Void)] = []
-        #endif
-
-        return [
-            ("testAccessories", testAccessories),
-            ("testCustomCharacteristicType", testCustomCharacteristicType),
-            ("testGetCharacteristics", testGetCharacteristics),
-            ("testPutBoolAndIntCharacteristics", testPutBoolAndIntCharacteristics),
-            ("testPutDoubleAndEnumCharacteristics", testPutDoubleAndEnumCharacteristics),
-            ("testPutBadCharacteristics", testPutBadCharacteristics),
-            ("testGetBadCharacteristics", testGetBadCharacteristics),
-            ("testAuthentication", testAuthentication),
-            ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests)
-        ] + asynchronousTests
-    }
-
     func testAccessories() {
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00055"), type: .color, isDimmable: true)
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
@@ -1026,17 +1000,4 @@ class EndpointTests: XCTestCase {
 //        }
     }
     #endif
-
-    // from: https://oleb.net/blog/2017/03/keeping-xctest-in-sync/#appendix-code-generation-with-sourcery
-    func testLinuxTestSuiteIncludesAllTests() {
-        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-            let thisClass = type(of: self)
-            let linuxCount = thisClass.allTests.count
-            let darwinCount = Int(thisClass
-                .defaultTestSuite.testCaseCount)
-            XCTAssertEqual(linuxCount,
-                           darwinCount,
-                           "\(darwinCount - linuxCount) tests are missing from allTests")
-        #endif
-    }
 }

@@ -27,17 +27,6 @@ private final class WriteRecorder: ChannelOutboundHandler {
 }
 
 class CryptographerTests: XCTestCase {
-    static var allTests: [(String, (CryptographerTests) -> () throws -> Void)] {
-        [
-            ("testReadSimpleFrame", testReadSimpleFrame),
-            ("testReadMultipleFramesSingleRead", testReadMultipleFramesSingleRead),
-            ("testReadPartialFramesMultipleReads", testReadPartialFramesMultipleReads),
-            ("testWriteSingleFrame", testWriteSingleFrame),
-            ("testWriteMultipleFrames", testWriteMultipleFrames),
-            ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests)
-        ]
-    }
-
     var channel: EmbeddedChannel!
     var handler: CryptographerHandler!
     var sharedKey = Data(repeating: 0, count: 32)
@@ -122,18 +111,5 @@ class CryptographerTests: XCTestCase {
         frame1.writeBytes(Data(hex: "0002e11819fe31522b9aed04d4c8c1f335744068e3354315c27462eefda696a506a42f9a8379516b42f9c22c340215d481fa81208e186d38d6c4ff8f12e1d5e820aba190bc8f6c51b733ea62c8137513bf9bb8aa7ec13f5863074c4543e38c738ac23da70122327df4cc020ceafcdc0060d78b029f04392199f94d84e9d178d1ccebc4b18748b7fc4419de1743c1f3a4ea23d738cdb5011420682bf6b3f84c502c7a79e1ba99e871b20a8d807552c9a5e6562675257061a6da529ecf023af5a3f25b8a41a1d227b36e11e1e2b85af4307175975c1bca4575dee06f4170b91ec4a5542c7cf8c94988739fa6bff05f4eccbc53079cd19c797a83de182650ed40ae89e9d8413a88cf99c13ac7b5c221416a4a5e6cfa1be303456c75147cd1378787bcf4418289d17f1cb8f09d0ecdb89321dd9a4e616c0358e8ac29d653893061cb3d4866d2ddc1e8ea28fb32d809146841efef072c9ef5a56cd07e68b33dbcc971982ae71be0511f157f0bbc54e5ad4542cde5d12db0aaa53b1c380ea92292e86b632a7db1e8861f605304bb3dccc0dfd51c93f9bcdb7812b42c1ba20c5228ef5a5ed6c970e8a90304ba5e1436043bf54f38a3ebdf5aba58df147eef1af9c34123996fad1877bd9a6ffd95f183a31c1eafd65a00f806bd146dbf4d5cd00cee7c412ad627375bf7bdf5077a71f19bc9222b692448497f107b14b042e4d7da736a100fe5be173e28904ff1b88498cbf7e816c41b")!)
         XCTAssertEqual(writeRecorder.writes,
                        [frame0, frame1])
-    }
-
-    // from: https://oleb.net/blog/2017/03/keeping-xctest-in-sync/#appendix-code-generation-with-sourcery
-    func testLinuxTestSuiteIncludesAllTests() {
-        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-        let thisClass = type(of: self)
-        let linuxCount = thisClass.allTests.count
-        let darwinCount = Int(thisClass
-            .defaultTestSuite.testCaseCount)
-        XCTAssertEqual(linuxCount,
-                       darwinCount,
-                       "\(darwinCount - linuxCount) tests are missing from allTests")
-        #endif
     }
 }
