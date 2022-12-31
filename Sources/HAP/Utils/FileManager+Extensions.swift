@@ -1,11 +1,3 @@
-//
-//  FileManager+Extensions.swift
-//  HAP
-//
-//  Created by Bouke Haarsma on 19-07-16.
-//
-//
-
 import Foundation
 
 extension FileManager {
