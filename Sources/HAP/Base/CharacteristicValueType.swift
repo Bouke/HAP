@@ -1,8 +1,6 @@
 import Foundation
 import Logging
 
-fileprivate let logger = Logger(label: "hap.adaptive.data")
-
 public protocol CharacteristicValueType: Equatable, JSONValueTypeConvertible {
     init?(value: Any)
     static var format: CharacteristicFormat { get }
@@ -174,7 +172,6 @@ extension Double: CharacteristicValueType {
 
 extension Data: CharacteristicValueType, JSONValueTypeConvertible {
     public init?(value: Any) {
-		logger.error("writing from data field")
 		switch value {
 		case let value as String: self = Data(base64Encoded: value)!
 		default: fatalError("don't now how to decode \(value)")
@@ -182,7 +179,6 @@ extension Data: CharacteristicValueType, JSONValueTypeConvertible {
     }
     static public let format = CharacteristicFormat.data
     public var jsonValueType: JSONValueType {
-		logger.error("reading from data field")
 		return self.base64EncodedString()
     }
 }
