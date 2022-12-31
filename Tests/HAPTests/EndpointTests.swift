@@ -6,32 +6,6 @@ import VaporHTTP
 import XCTest
 
 class EndpointTests: XCTestCase {
-    static var allTests: [(String, (EndpointTests) -> () throws -> Void)] {
-        #if os(macOS)
-            let asynchronousTests: [(String, (EndpointTests) -> () throws -> Void)] = [
-                ("testNoEventsToSelf", testNoEventsToSelf),
-                ("testSingleEventPerUpdate", testSingleEventPerUpdate),
-                ("testDelayMultipleEvents", testDelayMultipleEvents),
-                ("testDelayMultipleEventsCoalescence", testDelayMultipleEventsCoalescence),
-                ("testDelayMultipleEventsCoalescenceFiltering", testDelayMultipleEventsCoalescenceFiltering)
-            ]
-        #else
-            let asynchronousTests: [(String, (EndpointTests) -> () throws -> Void)] = []
-        #endif
-
-        return [
-            ("testAccessories", testAccessories),
-            ("testCustomCharacteristicType", testCustomCharacteristicType),
-            ("testGetCharacteristics", testGetCharacteristics),
-            ("testPutBoolAndIntCharacteristics", testPutBoolAndIntCharacteristics),
-            ("testPutDoubleAndEnumCharacteristics", testPutDoubleAndEnumCharacteristics),
-            ("testPutBadCharacteristics", testPutBadCharacteristics),
-            ("testGetBadCharacteristics", testGetBadCharacteristics),
-            ("testAuthentication", testAuthentication),
-            ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests)
-        ] + asynchronousTests
-    }
-
     func testAccessories() {
         let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00055"), type: .color, isDimmable: true)
         let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
@@ -720,8 +694,8 @@ class EndpointTests: XCTestCase {
         }
     }
 
-    #if os(macOS)
-    func testNoEventsToSelf() {
+    func testNoEventsToSelf() throws {
+		throw XCTSkip("Test needs to be rewritten for Swift-NIO")
 //        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat", serialNumber: "00065"))
 //        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00066"))
 //        let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00066B"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
@@ -758,7 +732,8 @@ class EndpointTests: XCTestCase {
 //        }
     }
 
-    func testSingleEventPerUpdate() {
+    func testSingleEventPerUpdate() throws {
+		throw XCTSkip("Test needs to be rewritten for Swift-NIO")
 //        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat", serialNumber: "00067"))
 //        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00068"))
 //        let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00069"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
@@ -790,7 +765,8 @@ class EndpointTests: XCTestCase {
 //        }
     }
 
-    func testDelayMultipleEvents() {
+    func testDelayMultipleEvents() throws {
+		throw XCTSkip("Test needs to be rewritten for Swift-NIO")
 //        let lamp = Accessory.Lightbulb(info: .init(name: "Diner table", serialNumber: "00070"))
 //        let device = Device(setupCode: "123-44-321", storage: MemoryStorage(), accessory: lamp)
 //        let application = characteristics(device: device)
@@ -849,7 +825,8 @@ class EndpointTests: XCTestCase {
 //        }
     }
 
-    func testDelayMultipleEventsCoalescence() {
+    func testDelayMultipleEventsCoalescence() throws {
+		throw XCTSkip("Test needs to be rewritten for Swift-NIO")
 //        let thermostat = Accessory.Thermostat(info: .init(name: "Thermostat", serialNumber: "00071"))
 //        let lamp = Accessory.Lightbulb(info: .init(name: "Night stand left", serialNumber: "00072"))
 //        let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00072B"), setupCode: "123-44-321", storage: MemoryStorage(), accessories: [thermostat, lamp])
@@ -936,7 +913,8 @@ class EndpointTests: XCTestCase {
 //        }
     }
 
-    func testDelayMultipleEventsCoalescenceFiltering() {
+    func testDelayMultipleEventsCoalescenceFiltering() throws {
+		throw XCTSkip("Test needs to be rewritten for Swift-NIO")
 //        // Either we keep track of the state of a characteristic on individual
 //        // and only notify the actual changes. Or we only send the last relevant
 //        // state of a characteristic. This test assumes the latter, so if we
@@ -1024,19 +1002,5 @@ class EndpointTests: XCTestCase {
 //            XCTAssertEqual(eventCharacteristics.count, 1, "when a characteristic receives multiple updates within the coalescing window, we should only send the last relevant update, not all intermediate updates")
 //            XCTAssertEqual(eventCharacteristics[0]["value"] as? On, true, "the lamp should be on")
 //        }
-    }
-    #endif
-
-    // from: https://oleb.net/blog/2017/03/keeping-xctest-in-sync/#appendix-code-generation-with-sourcery
-    func testLinuxTestSuiteIncludesAllTests() {
-        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-            let thisClass = type(of: self)
-            let linuxCount = thisClass.allTests.count
-            let darwinCount = Int(thisClass
-                .defaultTestSuite.testCaseCount)
-            XCTAssertEqual(linuxCount,
-                           darwinCount,
-                           "\(darwinCount - linuxCount) tests are missing from allTests")
-        #endif
     }
 }

@@ -4,13 +4,6 @@ import Crypto
 import XCTest
 
 class PairVerifyControllerTests: XCTestCase {
-    static var allTests: [(String, (PairVerifyControllerTests) -> () throws -> Void)] {
-        [
-            ("test", test),
-            ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests)
-        ]
-    }
-
     func test() {
         let device = Device(bridgeInfo: .init(name: "Test", serialNumber: "00090"),
                             setupCode: "123-44-321",
@@ -102,18 +95,5 @@ class PairVerifyControllerTests: XCTestCase {
                 return XCTFail("finishRequest failed: \(error)")
             }
         }
-    }
-
-    // from: https://oleb.net/blog/2017/03/keeping-xctest-in-sync/#appendix-code-generation-with-sourcery
-    func testLinuxTestSuiteIncludesAllTests() {
-        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-            let thisClass = type(of: self)
-            let linuxCount = thisClass.allTests.count
-            let darwinCount = Int(thisClass
-                .defaultTestSuite.testCaseCount)
-            XCTAssertEqual(linuxCount,
-                           darwinCount,
-                           "\(darwinCount - linuxCount) tests are missing from allTests")
-        #endif
     }
 }

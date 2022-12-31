@@ -5,14 +5,6 @@ import VaporHTTP
 import XCTest
 
 class PairingsEndpointTests: XCTestCase {
-    static var allTests: [(String, (PairingsEndpointTests) -> () throws -> Void)] {
-        [
-            ("testListPairingsNonAdmin", testListPairingsNonAdmin),
-            ("testListPairingsAdmin", testListPairingsAdmin),
-            ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests)
-        ]
-    }
-
     var device: Device!
     var context: MockContext!
     var pairing: Pairing!
@@ -56,18 +48,5 @@ class PairingsEndpointTests: XCTestCase {
     func call(_ data: PairTagTLV8) -> (HTTPResponse, PairTagTLV8?) {
         let response = context.call(application, HTTPRequest(method: .POST, uri: "/pairings", body: encode(data)))
         return (response, try! decode(response.body.data!))
-    }
-
-    // from: https://oleb.net/blog/2017/03/keeping-xctest-in-sync/#appendix-code-generation-with-sourcery
-    func testLinuxTestSuiteIncludesAllTests() {
-        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-            let thisClass = type(of: self)
-            let linuxCount = thisClass.allTests.count
-            let darwinCount = Int(thisClass
-                .defaultTestSuite.testCaseCount)
-            XCTAssertEqual(linuxCount,
-                           darwinCount,
-                           "\(darwinCount - linuxCount) tests are missing from allTests")
-        #endif
     }
 }

@@ -3,13 +3,6 @@ import Foundation
 import XCTest
 
 class DeviceTests: XCTestCase {
-    static var allTests: [(String, (DeviceTests) -> () throws -> Void)] {
-        [
-            ("testInstanceIdentifiers", testInstanceIdentifiers),
-            ("testLinuxTestSuiteIncludesAllTests", testLinuxTestSuiteIncludesAllTests)
-        ]
-    }
-
     func testInstanceIdentifiers() {
         // no bridge -- 1 accessory
         do {
@@ -61,18 +54,5 @@ class DeviceTests: XCTestCase {
             XCTAssertEqual(characteristics.map({ $0.iid }),
                            [2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12])
         }
-    }
-
-    // from: https://oleb.net/blog/2017/03/keeping-xctest-in-sync/#appendix-code-generation-with-sourcery
-    func testLinuxTestSuiteIncludesAllTests() {
-        #if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-            let thisClass = type(of: self)
-            let linuxCount = thisClass.allTests.count
-            let darwinCount = Int(thisClass
-                .defaultTestSuite.testCaseCount)
-            XCTAssertEqual(linuxCount,
-                           darwinCount,
-                           "\(darwinCount - linuxCount) tests are missing from allTests")
-        #endif
     }
 }
