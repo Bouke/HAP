@@ -259,11 +259,11 @@ public class Device {
     func generateStableHash() -> Int {
 		var hash: UInt64 = 0
         for accessory in accessories {
-            hash ^= 17 &* accessory.aid
+            hash ^= 17 &* UInt64(accessory.aid)
             for service in accessory.services {
-                hash ^= 19 &* service.iid
+                hash ^= 19 &* UInt64(service.iid)
                 for characteristic in service.characteristics {
-                    hash ^= 23 &* characteristic.iid
+                    hash ^= 23 &* UInt64(characteristic.iid)
                 }
             }
         }
