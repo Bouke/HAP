@@ -44,7 +44,7 @@ class Cryptographer {
                                                                     tag: T) throws -> Data {
         defer { decryptCount += 1 }
 
-        let nonce = try ChaChaPoly.Nonce(data: Data(count: 4) + decryptCount.bigEndian.bytes)
+        let nonce = try ChaChaPoly.Nonce(data: Data(count: 4) + decryptCount.littleEndianBytes)
         let box = try ChaChaPoly.SealedBox(nonce: nonce, ciphertext: ciphertext, tag: tag)
 
         return try ChaChaPoly.open(box, using: decryptKey, authenticating: lengthBytes)
@@ -53,8 +53,8 @@ class Cryptographer {
     func encrypt(plaintext: ByteBuffer) throws -> Data {
         defer { encryptCount += 1 }
 
-        let nonce = try ChaChaPoly.Nonce(data: Data(count: 4) + encryptCount.bigEndian.bytes)
-        let authenticationData = UInt16(plaintext.readableBytes).bigEndian.bytes
+        let nonce = try ChaChaPoly.Nonce(data: Data(count: 4) + encryptCount.littleEndianBytes)
+        let authenticationData = UInt16(plaintext.readableBytes).littleEndianBytes
 
         let box = try ChaChaPoly.seal(plaintext.readableBytesView,
                                       using: encryptKey,
