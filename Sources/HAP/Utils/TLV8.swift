@@ -112,13 +112,14 @@ public func encode<Key>(_ array: [(Key, [Data])]) -> Data where Key: RawRepresen
 		var first = true
 		for (item) in value {
 			if !first {
-				result.append(encode([(TLV8.delimiter, Data([0]))]))
+				result.append(Data([TLV8.delimiter.rawValue, 0]))
 			}
 			first = false
 			result.append(encode([(type, item)]))
 		}
 		if first {
-			result.append(encode([(type, Data([0]))]))
+			// Zero-length array
+			result.append(Data([type.rawValue, 0]))
 		}
 	}
 	return result
