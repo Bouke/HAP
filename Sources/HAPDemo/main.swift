@@ -61,11 +61,11 @@ enum TransitionType : UInt8 {
 supportedTransitions.value = encode([
 	(SupportedCharacteristicValueTransitionConfigurationsTypes.SupportedTransitionConfiguration, [
 		encode([
-			(SupportedValueTransitionConfigurationTypes.CharacteristicIid, brightness.iid.bytes),
+			(SupportedValueTransitionConfigurationTypes.CharacteristicIid, brightness.iid.littleEndianBytes),
 			(SupportedValueTransitionConfigurationTypes.TransitionType, Data([TransitionType.Brightness.rawValue])),
 		]),
 		encode([
-			(SupportedValueTransitionConfigurationTypes.CharacteristicIid, colorTemperature.iid.bytes),
+			(SupportedValueTransitionConfigurationTypes.CharacteristicIid, colorTemperature.iid.littleEndianBytes),
 			(SupportedValueTransitionConfigurationTypes.TransitionType, Data([TransitionType.ColorTemperature.rawValue])),
 		]),
 	])
