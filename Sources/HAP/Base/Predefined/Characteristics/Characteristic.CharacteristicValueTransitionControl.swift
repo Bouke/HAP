@@ -3,7 +3,7 @@ import Foundation
 public extension AnyCharacteristic {
     static func characteristicValueTransitionControl(
         _ value: Data = Data(),
-        permissions: [CharacteristicPermission] = [.read, .write],
+        permissions: [CharacteristicPermission] = [.read, .write, .writeResponse],
         description: String? = "Characteristic Value Transition Control",
         format: CharacteristicFormat? = .tlv8,
         unit: CharacteristicUnit? = nil,
@@ -33,7 +33,7 @@ public extension AnyCharacteristic {
 public extension PredefinedCharacteristic {
     static func characteristicValueTransitionControl(
         _ value: Data = Data(),
-        permissions: [CharacteristicPermission] = [.read, .write],
+        permissions: [CharacteristicPermission] = [.read, .write, .writeResponse],
         description: String? = "Characteristic Value Transition Control",
         format: CharacteristicFormat? = .tlv8,
         unit: CharacteristicUnit? = nil,
