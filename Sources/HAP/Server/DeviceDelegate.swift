@@ -51,6 +51,18 @@ public protocol DeviceDelegate: AnyObject {
     ///
     func didChangePairingState(from: PairingState, to: PairingState)
 
+    /// Tells the delegate that one or more Accessories were added or removed.
+    ///
+    func didChangeAccessoryList()
+
+    /// Tells the delegate that one or more Accessories were added.
+    ///
+    func didAdd(accessories: [Accessory])
+
+    /// Tells the delegate that one or more Accessories were removed.
+    ///
+    func didRemove(accessories: [Accessory])
+
     /// Tells the delegate that the value of a characteristic has changed.
     ///
     /// - Parameters:
@@ -59,6 +71,7 @@ public protocol DeviceDelegate: AnyObject {
     ///   - service: the service to which the characteristic belongs
     ///   - characteristic: the characteristic that was changed
     ///   - newValue: the new value of the characteristic
+    ///
     func characteristic<T>(
         _ characteristic: GenericCharacteristic<T>,
         ofService: Service,
@@ -82,6 +95,12 @@ public extension DeviceDelegate {
     func didRequestIdentificationOf(_ accessory: Accessory) { }
 
     func didChangePairingState(from: PairingState, to: PairingState) { }
+
+    func didChangeAccessoryList() { }
+
+    func didAdd(accessories: [Accessory]) { }
+    
+    func didRemove(accessories: [Accessory]) { }
 
     func characteristic<T>(
         _ characteristic: GenericCharacteristic<T>,
