@@ -70,6 +70,15 @@ open class Service: NSObject, JSONSerializable {
     var primary: Bool?
     var hidden: Bool?
 
+    public var label:String?{
+        let nameCharacteristic:GenericCharacteristic<String>? = get(type: .name, characteristics: characteristics)
+        if let serviceName = nameCharacteristic?.value{
+            return serviceName
+        }else{
+            return String(describing: Swift.type(of: self))
+        }
+    }
+    
     public init(type: ServiceType, characteristics: [AnyCharacteristic]) {
         self.type = type
         self.characteristics = characteristics.map { $0.wrapped }
